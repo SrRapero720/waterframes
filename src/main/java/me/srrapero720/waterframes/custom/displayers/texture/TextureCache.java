@@ -6,7 +6,7 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.displayers.DisplayerApi;
 import me.srrapero720.waterframes.custom.displayers.ImageDisplayer;
 import me.srrapero720.waterframes.custom.displayers.VideoDisplayer;
-import me.srrapero720.vlcj.gifs.GifDecoder;
+import me.srrapero720.waterframes.gifs.GifDecoder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
