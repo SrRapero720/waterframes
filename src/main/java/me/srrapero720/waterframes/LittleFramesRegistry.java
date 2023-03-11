@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes;
 
+import me.srrapero720.waterframes.watercore_supplier.DefaultTabSupplier;
 import net.minecraft.Util;
 import net.minecraft.util.datafix.fixes.References;
 import net.minecraft.world.item.BlockItem;
@@ -26,7 +27,7 @@ public class LittleFramesRegistry {
 
     // ITEMS
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, WaterFrames.ID);
-    public static final CreativeModeTab TAB = new DefaultTab("waterframes", "waterframe");
+    public static final CreativeModeTab TAB = new DefaultTabSupplier("waterframes", "waterframe");
     
     // BLOCKS
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, WaterFrames.ID);
