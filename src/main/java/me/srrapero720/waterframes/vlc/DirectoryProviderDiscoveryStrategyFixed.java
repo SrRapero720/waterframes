@@ -55,13 +55,13 @@ abstract public class DirectoryProviderDiscoveryStrategyFixed extends BaseNative
     
     /** Service loader for the directory provider implementations. */
     private static final List<DiscoveryDirectoryProvider> directoryProviders = Arrays
-            .asList(//new UserDirConfigFileDiscoveryDirectoryProvider(),
-                    //new ConfigDirConfigFileDiscoveryDirectoryProvider(),
-                    //new JnaLibraryPathDirectoryProvider(),
+            .asList(new UserDirConfigFileDiscoveryDirectoryProvider(),
+                    new ConfigDirConfigFileDiscoveryDirectoryProvider(),
+                    new JnaLibraryPathDirectoryProvider(),
                     new LinuxWellKnownDirectoryProvider(),
                     new MacOsWellKnownDirectoryProvider(),
-                    //new SystemPathDirectoryProvider(),
-                    //new UserDirDirectoryProvider(),
+                    new SystemPathDirectoryProvider(),
+                    new UserDirDirectoryProvider(),
                     new WindowsInstallDirectoryProvider());
 
     
