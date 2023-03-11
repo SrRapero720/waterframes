@@ -43,7 +43,7 @@ public class LittleFramesClient {
         MinecraftForge.EVENT_BUS.register(TextureCache.class);
 
         CreativeCoreClient.registerClientConfig(WaterFrames.ID);
-        CreativeCoreClient.registerItemModel(new ResourceLocation(WaterFrames.ID, "creative_pic_frame"),
+        CreativeCoreClient.registerItemModel(new ResourceLocation(WaterFrames.ID, "waterframe"),
                 new CreativeItemBoxModel(new ModelResourceLocation("minecraft", "stone", "inventory")) {
 
                     @Override
@@ -53,7 +53,7 @@ public class LittleFramesClient {
                 });
 
 
-        CreativeCoreClient.registerBlockModel(new ResourceLocation(WaterFrames.ID, "creative_pic_frame"), new CreativeBlockModel() {
+        CreativeCoreClient.registerBlockModel(new ResourceLocation(WaterFrames.ID, "waterframe"), new CreativeBlockModel() {
             public final ModelProperty<Boolean> visibility = new ModelProperty<>();
             public final ModelDataMap visible = new ModelDataMap.Builder().withInitial(visibility, true).build();
             public final ModelDataMap invisible = new ModelDataMap.Builder().withInitial(visibility, false).build();
