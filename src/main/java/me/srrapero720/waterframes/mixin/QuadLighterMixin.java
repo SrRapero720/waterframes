@@ -15,13 +15,14 @@ public abstract class QuadLighterMixin extends QuadGatheringTransformer {
     @Unique public int customTint = -1;
     @Shadow private int tint;
 
-    @Redirect(method = "updateColor([F[FFFFFI)V", at = @At(value = "HEAD"), remap = false)
-    public void mixColor(float[] normal, float[] color, float x, float y, float z, float tint, int multiplier) {
+    @Inject(method = "updateColor([F[FFFFFI)V", at = @At(value = "HEAD"), remap = false, cancellable = true)
+    public void mixColor(float[] normal, float[] color, float x, float y, float z, float tint, int multiplier, CallbackInfo info) {
         if (customTint != -1) {
             this.tint = (int) tint;
             color[0] = ((customTint >> 16) & 0xFF) / 255F;
             color[1] = ((customTint >> 8) & 0xFF) / 255F;
             color[2] = (customTint & 0xFF) / 255F;
+            info.cancel();
         }
     }
 }
