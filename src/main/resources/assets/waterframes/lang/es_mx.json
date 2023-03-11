@@ -1,5 +1,6 @@
 {
     "block.waterframes.waterframe": "Cuadro de Imagenes",
+    "itemGroup.waterframes": "WATERFrAMES",
     "label.waterframes.not_whitelisted": "URL no permitida, no se puede cargar",
     "label.waterframes.whitelist_warning": "Aviso: Lista blanca de URLs no activada",
     "gui.waterframes.flipx": "invertir (eje X)",
