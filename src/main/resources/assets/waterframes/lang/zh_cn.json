@@ -1,5 +1,5 @@
 {
-    "block.waterframes.creative_pic_frame": "Water Picture Frame",
+    "block.waterframes.waterframe": "Water Picture Frame",
     "label.waterframes.not_whitelisted": "URL不在白名单, 无法保存!",
     "label.waterframes.whitelist_warning": "警告: URL白名单未启用",
     "gui.waterframes.flipx": "翻转 (x轴)",
