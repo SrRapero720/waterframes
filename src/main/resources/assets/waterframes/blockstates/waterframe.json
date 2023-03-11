@@ -1,7 +1,7 @@
 {
     "variants": {
         "": {
-            "model": "waterframes:block/creative_pic_frame"
+            "model": "waterframes:block/waterframe"
         }
     }
 }
