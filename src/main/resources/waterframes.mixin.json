@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "me.srrapero720.waterframes.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "refmap": "waterframes.mixin.refmap.json",
+  "mixins": [
+    "QuadLighterMixin"
+  ],
+  "client": [
+  ],
+  "minVersion": "0.8"
+}

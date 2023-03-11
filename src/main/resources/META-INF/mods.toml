@@ -1,0 +1,38 @@
+modLoader="javafml"
+loaderVersion="[40,)"
+issueTrackerURL="https://github.com/SrRapero720/LittleFrames-1.18.2/issues"
+logoFile=""
+license="All rights reserved"
+
+[[mods]]
+	modId="waterframes"
+	version="${file.jarVersion}"
+	displayName="WATERFrAMES"
+	displayURL="https://www.curseforge.com/minecraft/mc-mods/littleframes-1-18-2"
+	authors="SrRapero720 | CoolDCB"
+	description='''
+	#ShowItIngame
+'''
+
+
+[[dependencies.waterframes]]
+	modId = "forge"
+	mandatory = true
+	versionRange = "[40,)"
+	ordering = "NONE"
+	side = "BOTH"
+
+[[dependencies.waterframes]]
+	modId="creativecore"
+	mandatory=true
+	ordering="NONE"
+	side="BOTH"
+	versionRange="[2.6,)"
+
+# FURUTE REPLACEMENT FOR CreativeCore
+[[dependencies.waterframes]]
+    modId="watercore"
+    mandatory=false
+    ordering="BEFORE"
+    side="BOTH"
+    versionRange="[1.2,)"
