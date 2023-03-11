@@ -1,21 +1,30 @@
-# LittleFrames - 1.18.2 [STILL IN DEV]
-Backport of LittleFrames to 1.18.2 and some functions from CreativeCore-1.19.2
+# WATERFrAMES
+Based on CreativeMD LittleFrames.
+In first place. I planned to do a backport and use the LittleFrames on it.
+But we made a LOT OF USELESS CHANGES. Original code are full of junk. Also is incompatible 
+with FancyVideo-Api
 
-LittleTiles is not included here, all items, tabs and config is removed.
-if you want a bits mod, use Chisel&Bits.
+For now. WATERFrAMES wants to be a better option over LittleFrames
 
-### VLCJ AND OTHER DEPENDENCY MODS
-No need more dependencies, everything is wrapped here (vlcj and vlcj-natives)
-I just want to make functional this backport. No port every new change from the original
-mod (Still requires CreativeCore-1.18.2)
+## DEPENDENCIES
+- [WATERCoRE](https://www.curseforge.com/minecraft/mc-mods/watercore)
+- [CreativeCore](https://www.curseforge.com/minecraft/mc-mods/creativecore/files/4394989)
+- VLC4 - [windows](https://artifacts.videolan.org/vlc/nightly-win64/20230309-0427/) | [iOS](https://artifacts.videolan.org/vlc/nightly-macos-x86_64/20230311-0415/) | [Debian](https://artifacts.videolan.org/vlc/debian/)  
 
-### WATERCoRE
-Because I am not a huge fan of CreativeCore (it is overcomplicated)
-this mod is going to depend on [WATERCoRE](https://github.com/SrRapero720/WATERCoRE), but isn't ready.
+## FEATURES
+- Show images and gifs in with your friends
+- Play videos in game
+- Use local media (modpack)
+- Place anywhere
+- WIP: Play youtube videos
+
+## WARNING
+We are working on remove CreativeCore as dependency and work arround WATERCoRE
 
 ## AUTHORS
 - [SrRapero720](https://github.com/SrRapero720)
 - [CoolDCB](https://github.com/CoolDCB)
+- (Original) [CreativeMD]()
 
 ## LICENCE
 All rights reserved
