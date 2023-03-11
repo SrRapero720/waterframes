@@ -7,6 +7,8 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import me.srrapero720.vlcj.binding.support.runtime.RuntimeUtil;
 import me.srrapero720.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider;
 
+@Deprecated(forRemoval = false)
+// I remove this because FancyVideo-API unwrapp their vlc on game dir, and my cpde try to use it (and have broken things)
 public class LocalFileDiscoveryDirectoryProvider implements DiscoveryDirectoryProvider {
     
     @Override

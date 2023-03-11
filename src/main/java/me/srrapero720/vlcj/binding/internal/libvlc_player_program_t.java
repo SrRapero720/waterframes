@@ -1,0 +1,49 @@
+/*
+ * This file is part of VLCJ.
+ *
+ * VLCJ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * VLCJ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with VLCJ.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright 2009-2021 Caprica Software Limited.
+ */
+
+package me.srrapero720.vlcj.binding.internal;
+
+import com.sun.jna.Pointer;
+import com.sun.jna.Structure;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+/**
+ *
+ */
+public class libvlc_player_program_t extends Structure {
+
+    private static final List<String> FIELD_ORDER = Collections.unmodifiableList(Arrays.asList("i_group_id", "psz_name", "b_selected", "b_scrambled"));
+
+    // Id used for libvlc_media_player_select_program()
+    public int i_group_id;
+    // Program name, always valid
+    public Pointer psz_name;
+    // True if the program is selected
+    public int b_selected;
+    // True if the program is scrambled
+    public int b_scrambled;
+
+    @Override
+    protected List<String> getFieldOrder() {
+        return FIELD_ORDER;
+    }
+}

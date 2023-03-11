@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 public class VLCDiscovery {
-    
+
     private static volatile boolean loaded = false;
     private static volatile boolean startedLoading = false;
     private static volatile boolean successful = false;
@@ -22,11 +22,11 @@ public class VLCDiscovery {
     public static volatile MediaPlayerFactory factory;
     private static Field searchPaths;
     private static Field libraries;
-    
+
     public static boolean isLoaded() {
         return loaded;
     }
-    
+
     public static boolean isLoadedOrRequest() {
         if (loaded)
             return true;
@@ -36,11 +36,11 @@ public class VLCDiscovery {
         }
         return false;
     }
-    
+
     public static boolean isAvailable() {
         return successful;
     }
-    
+
     public static synchronized boolean load() {
         if (loaded)
             return successful;
@@ -64,7 +64,9 @@ public class VLCDiscovery {
                         paths.remove(RuntimeUtil.getLibVlcLibraryName());
                         WaterFrames.LOGGER.info("Failed to load VLC in '{}'", path);
                         return true;
-                    } catch (IllegalArgumentException | IllegalAccessException e) {}
+                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
                     return false;
                 }
 
@@ -97,5 +99,5 @@ public class VLCDiscovery {
         }
         return successful;
     }
-    
+
 }

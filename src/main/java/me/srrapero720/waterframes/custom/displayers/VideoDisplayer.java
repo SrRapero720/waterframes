@@ -17,11 +17,9 @@ import team.creative.creativecore.client.CreativeCoreClient;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
 import me.srrapero720.waterframes.vlc.VLCDiscovery;
-import me.srrapero720.vlcj.player.base.MediaPlayer;
 import me.srrapero720.vlcj.player.component.CallbackMediaPlayerComponent;
 import me.srrapero720.vlcj.player.embedded.videosurface.callback.BufferFormat;
 import me.srrapero720.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
-import me.srrapero720.vlcj.player.embedded.videosurface.callback.RenderCallback;
 
 public class VideoDisplayer extends DisplayerApi {
     
@@ -88,18 +86,14 @@ public class VideoDisplayer extends DisplayerApi {
         this.pos = pos;
         texture = GlStateManager._genTexture();
         
-        player = new CallbackMediaPlayerComponent(VLCDiscovery.factory, null, null, false, new RenderCallback() {
-            
-            @Override
-            public void display(MediaPlayer mediaPlayer, ByteBuffer[] nativeBuffers, BufferFormat bufferFormat) {
-                lock.lock();
-                try {
-                    buffer.put(nativeBuffers[0].asIntBuffer());
-                    buffer.rewind();
-                    needsUpdate = true;
-                } finally {
-                    lock.unlock();
-                }
+        player = new CallbackMediaPlayerComponent(VLCDiscovery.factory, null, null, false, (mediaPlayer, nativeBuffers, bufferFormat) -> {
+            lock.lock();
+            try {
+                buffer.put(nativeBuffers[0].asIntBuffer());
+                buffer.rewind();
+                needsUpdate = true;
+            } finally {
+                lock.unlock();
             }
         }, new BufferFormatCallback() {
             
