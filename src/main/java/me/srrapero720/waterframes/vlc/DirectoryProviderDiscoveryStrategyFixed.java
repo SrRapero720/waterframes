@@ -22,7 +22,6 @@ package me.srrapero720.waterframes.vlc;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.ServiceLoader;
 
@@ -56,7 +55,7 @@ abstract public class DirectoryProviderDiscoveryStrategyFixed extends BaseNative
     
     /** Service loader for the directory provider implementations. */
     private static final List<DiscoveryDirectoryProvider> directoryProviders = Arrays
-            .asList(new LocalFileDiscoveryDirectoryProvider(), new UserDirConfigFileDiscoveryDirectoryProvider(), new ConfigDirConfigFileDiscoveryDirectoryProvider(), new JnaLibraryPathDirectoryProvider(), new LinuxWellKnownDirectoryProvider(), new MacOsWellKnownDirectoryProvider(), new SystemPathDirectoryProvider(), new UserDirDirectoryProvider(), new WindowsInstallDirectoryProvider());
+            .asList(new UserDirConfigFileDiscoveryDirectoryProvider(), new ConfigDirConfigFileDiscoveryDirectoryProvider(), new JnaLibraryPathDirectoryProvider(), new LinuxWellKnownDirectoryProvider(), new MacOsWellKnownDirectoryProvider(), new SystemPathDirectoryProvider(), new UserDirDirectoryProvider(), new WindowsInstallDirectoryProvider());
     
     /** Create a new native discovery strategy.
      *
@@ -88,12 +87,7 @@ abstract public class DirectoryProviderDiscoveryStrategyFixed extends BaseNative
     }
     
     private List<DiscoveryDirectoryProvider> sort(List<DiscoveryDirectoryProvider> providers) {
-        Collections.sort(providers, new Comparator<DiscoveryDirectoryProvider>() {
-            @Override
-            public int compare(DiscoveryDirectoryProvider p1, DiscoveryDirectoryProvider p2) {
-                return p2.priority() - p1.priority();
-            }
-        });
+        Collections.sort(providers, (p1, p2) -> p2.priority() - p1.priority());
         return providers;
     }
     

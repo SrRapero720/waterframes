@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.srrapero720.watercore.SrRegistry;
 import net.srrapero720.watercore.custom.tabs.DefaultTab;
 import me.srrapero720.waterframes.custom.blocks.BlockEntityWaterFrame;
 import me.srrapero720.waterframes.custom.blocks.WaterPictureFrame;
@@ -20,15 +21,16 @@ import java.util.function.Supplier;
 @Deprecated(since = "1.18.2")
 //Future replacement: WATERegister
 public class LittleFramesRegistry {
-    
+    static {
+    }
+
     // ITEMS
-    
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, WaterFrames.ID);
-    public static final CreativeModeTab TAB = new DefaultTab("waterframes", "");
+    public static final CreativeModeTab TAB = new DefaultTab("waterframes", "waterframe");
     
     // BLOCKS
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, WaterFrames.ID);
-    public static final RegistryObject<Block> CREATIVE_PICTURE_FRAME = register("creative_pic_frame", () -> new WaterPictureFrame());
+    public static final RegistryObject<Block> CREATIVE_PICTURE_FRAME = register("waterframe", () -> new WaterPictureFrame());
     
     private static <T extends Block> RegistryObject<T> register(String name, Supplier<? extends T> sup) {
         RegistryObject<T> ret = BLOCKS.register(name, sup);
@@ -40,7 +42,7 @@ public class LittleFramesRegistry {
     
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, WaterFrames.ID);
     
-    public static final RegistryObject<BlockEntityType<BlockEntityWaterFrame>> BE_CREATIVE_FRAME = registerBlockEntity("creative_pic_frame", () -> BlockEntityType.Builder
+    public static final RegistryObject<BlockEntityType<BlockEntityWaterFrame>> BE_CREATIVE_FRAME = registerBlockEntity("waterframe", () -> BlockEntityType.Builder
             .of(BlockEntityWaterFrame::new, CREATIVE_PICTURE_FRAME.get()));
     
     public static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerBlockEntity(String name, Supplier<BlockEntityType.Builder<T>> sup) {

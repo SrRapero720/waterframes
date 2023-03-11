@@ -286,7 +286,7 @@ public class GuiWaterFrame extends GuiLayer {
                 else if (frame.cache != null)
                     frame.cache.reload();
             }
-        }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reloadtooltip").build()));
+        }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));
         
     }
 
