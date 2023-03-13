@@ -1,5 +1,7 @@
 package me.srrapero720.waterframes;
 
+import me.srrapero720.waterframes.custom.blocks.BlockEntityWaterFrame;
+import me.srrapero720.waterframes.custom.blocks.WaterPictureFrame;
 import me.srrapero720.waterframes.watercore_supplier.DefaultTabSupplier;
 import net.minecraft.Util;
 import net.minecraft.util.datafix.fixes.References;
@@ -12,19 +14,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.srrapero720.watercore.SrRegistry;
-import net.srrapero720.watercore.custom.tabs.DefaultTab;
-import me.srrapero720.waterframes.custom.blocks.BlockEntityWaterFrame;
-import me.srrapero720.waterframes.custom.blocks.WaterPictureFrame;
 
 import java.util.function.Supplier;
 
 @Deprecated(since = "1.18.2")
 //Future replacement: WATERegister
 public class LittleFramesRegistry {
-    static {
-    }
-
     // ITEMS
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, WaterFrames.ID);
     public static final CreativeModeTab TAB = new DefaultTabSupplier("waterframes", "waterframe");

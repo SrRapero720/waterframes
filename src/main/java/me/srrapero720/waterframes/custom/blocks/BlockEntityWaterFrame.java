@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.custom.blocks;
 
+import me.srrapero720.watercore.internal.WaterRegistry;
 import me.srrapero720.waterframes.LittleFramesRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import net.minecraft.client.Minecraft;

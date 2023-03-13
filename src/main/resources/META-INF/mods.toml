@@ -18,7 +18,7 @@ license="All rights reserved"
 [[dependencies.waterframes]]
 	modId = "forge"
 	mandatory = true
-	versionRange = "[40,)"
+	versionRange = "[40.2,)"
 	ordering = "NONE"
 	side = "BOTH"
 
@@ -32,7 +32,7 @@ license="All rights reserved"
 # FURUTE REPLACEMENT FOR CreativeCore
 [[dependencies.waterframes]]
     modId="watercore"
-    mandatory=false
+    mandatory=true
     ordering="BEFORE"
     side="BOTH"
     versionRange="[1.2,)"

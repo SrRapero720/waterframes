@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes;
 
+import me.srrapero720.waterframes.custom.packets.WaterFramePacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -11,8 +12,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import team.creative.creativecore.common.config.holder.CreativeConfigRegistry;
 import team.creative.creativecore.common.network.CreativeNetwork;
-import team.creative.littleframes.LittleFramesConfig;
-import me.srrapero720.waterframes.custom.packets.WaterFramePacket;
 
 @Mod(WaterFrames.ID)
 public class WaterFrames {
@@ -34,10 +33,6 @@ public class WaterFrames {
 
     public static void init(final FMLCommonSetupEvent event) {
         CreativeConfigRegistry.ROOT.registerValue(ID, CONFIG = new LittleFramesConfig());
-
         NETWORK.registerType(WaterFramePacket.class, WaterFramePacket::new);
-    }
-    @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class RegistryEvents {
     }
 }

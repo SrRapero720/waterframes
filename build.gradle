@@ -74,8 +74,7 @@ dependencies {
     implementation fg.deobf("curse.maven:ferritecore-429235:4074294")
     implementation fg.deobf("curse.maven:fastload-630620:4271605")
     implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3544496")
-    implementation fg.deobf("curse.maven:watercore-782432:4400318")
-
+    implementation fg.deobf("curse.maven:watercore-782432:4434754")
     
     // Apply Mixin AP
     implementation fg.deobf("curse.maven:creativecore-257814:4394989")

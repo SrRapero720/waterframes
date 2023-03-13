@@ -1,30 +1,29 @@
 package me.srrapero720.waterframes.custom.displayers;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.MemoryTracker;
+import com.mojang.blaze3d.systems.RenderSystem;
+import me.srrapero720.vlcj.player.component.CallbackMediaPlayerComponent;
+import me.srrapero720.vlcj.player.embedded.videosurface.callback.BufferFormat;
+import me.srrapero720.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
+import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
+import me.srrapero720.waterframes.vlc.VLCDiscovery;
+import net.minecraft.client.Minecraft;
+import org.lwjgl.opengl.GL11;
+import team.creative.creativecore.client.CreativeCoreClient;
+import team.creative.creativecore.common.util.math.vec.Vec3d;
+
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.MemoryTracker;
-import com.mojang.blaze3d.systems.RenderSystem;
-
-import net.minecraft.client.Minecraft;
-import team.creative.creativecore.client.CreativeCoreClient;
-import team.creative.creativecore.common.util.math.vec.Vec3d;
-import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
-import me.srrapero720.waterframes.vlc.VLCDiscovery;
-import me.srrapero720.vlcj.player.component.CallbackMediaPlayerComponent;
-import me.srrapero720.vlcj.player.embedded.videosurface.callback.BufferFormat;
-import me.srrapero720.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
-
 public class VideoDisplayer extends DisplayerApi {
     
     private static final String VLC_DOWNLOAD_32 = "https://i.imgur.com/VF3LuvM.png";
     private static final String VLC_DOWNLOAD_64 = "https://i.imgur.com/2aN8ZQC.png";
+    private static final String VLC_FVA_UNSUPPORT = "https://i.imgur.com/o0IN1zV.png";
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
     
     private static final List<VideoDisplayer> OPEN_DISPLAYS = new ArrayList<>();
