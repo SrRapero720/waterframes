@@ -85,6 +85,10 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
+mixin {
+    add sourceSets.main, "watercore.mixin-refmap.json"
+}
+
 
 jar {
     manifest {
