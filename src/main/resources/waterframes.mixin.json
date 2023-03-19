@@ -4,9 +4,10 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "waterframes.mixin.refmap.json",
   "mixins": [
-    "QuadLighterMixin"
+
   ],
   "client": [
+    "QuadLighterMixin"
   ],
   "minVersion": "0.8"
 }
