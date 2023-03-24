@@ -29,10 +29,17 @@ license="All rights reserved"
 	side="BOTH"
 	versionRange="[2.6,)"
 
+[[dependencies.waterframes]]
+	modId="fancyvideo_api"
+	mandatory=true
+	ordering="NONE"
+	side="CLIENT"
+	versionRange="[1.1,)"
+
 # FURUTE REPLACEMENT FOR CreativeCore
 [[dependencies.waterframes]]
     modId="watercore"
     mandatory=true
-    ordering="BEFORE"
+    ordering="NONE"
     side="BOTH"
     versionRange="[1.3,)"
