@@ -19,8 +19,8 @@
 
 package me.srrapero720.waterframes.vlc;
 
-import me.srrapero720.vlcj.binding.lib.LibC;
-import me.srrapero720.vlcj.binding.support.runtime.RuntimeUtil;
+import uk.co.caprica.vlcj.binding.LibC;
+import uk.co.caprica.vlcj.binding.RuntimeUtil;
 
 /** Default implementation of a native discovery strategy that searches directories on the Windows operating system. */
 public class WindowsNativeDiscoveryStrategyFixed extends DirectoryProviderDiscoveryStrategyFixed {

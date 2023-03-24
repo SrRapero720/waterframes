@@ -25,18 +25,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import me.srrapero720.vlcj.factory.discovery.NativeDiscovery;
-import me.srrapero720.vlcj.factory.discovery.provider.ConfigDirConfigFileDiscoveryDirectoryProvider;
-import me.srrapero720.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider;
-import me.srrapero720.vlcj.factory.discovery.provider.DiscoveryProviderPriority;
-import me.srrapero720.vlcj.factory.discovery.provider.JnaLibraryPathDirectoryProvider;
-import me.srrapero720.vlcj.factory.discovery.provider.LinuxWellKnownDirectoryProvider;
-import me.srrapero720.vlcj.factory.discovery.provider.MacOsWellKnownDirectoryProvider;
-import me.srrapero720.vlcj.factory.discovery.provider.SystemPathDirectoryProvider;
-import me.srrapero720.vlcj.factory.discovery.provider.UserDirConfigFileDiscoveryDirectoryProvider;
-import me.srrapero720.vlcj.factory.discovery.provider.UserDirDirectoryProvider;
-import me.srrapero720.vlcj.factory.discovery.provider.WindowsInstallDirectoryProvider;
-import me.srrapero720.vlcj.factory.discovery.strategy.BaseNativeDiscoveryStrategy;
+import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
+import uk.co.caprica.vlcj.factory.discovery.provider.ConfigDirConfigFileDiscoveryDirectoryProvider;
+import uk.co.caprica.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider;
+import uk.co.caprica.vlcj.factory.discovery.provider.DiscoveryProviderPriority;
+import uk.co.caprica.vlcj.factory.discovery.provider.JnaLibraryPathDirectoryProvider;
+import uk.co.caprica.vlcj.factory.discovery.provider.LinuxWellKnownDirectoryProvider;
+import uk.co.caprica.vlcj.factory.discovery.provider.MacOsWellKnownDirectoryProvider;
+import uk.co.caprica.vlcj.factory.discovery.provider.SystemPathDirectoryProvider;
+import uk.co.caprica.vlcj.factory.discovery.provider.UserDirConfigFileDiscoveryDirectoryProvider;
+import uk.co.caprica.vlcj.factory.discovery.provider.UserDirDirectoryProvider;
+import uk.co.caprica.vlcj.factory.discovery.provider.WindowsInstallDirectoryProvider;
+import uk.co.caprica.vlcj.factory.discovery.strategy.BaseNativeDiscoveryStrategy;
 
 /** Implementation of a native discovery strategy that searches a list of well-known directories.
  * <p>

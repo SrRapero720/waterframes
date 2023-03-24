@@ -44,7 +44,7 @@ public class LittleFramesClient {
 
         CreativeCoreClient.registerClientConfig(WaterFrames.ID);
         CreativeCoreClient.registerItemModel(new ResourceLocation(WaterFrames.ID, "waterframe"),
-                new CreativeItemBoxModel(new ModelResourceLocation("minecraft", "stone", "inventory")) {
+                new CreativeItemBoxModel(new ModelResourceLocation("minecraft", "oak_planks", "inventory")) {
 
                     @Override
                     public List<? extends RenderBox> getBoxes(ItemStack itemStack, RenderType renderType) {

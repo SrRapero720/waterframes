@@ -1,0 +1,21 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "###",
+        "#P#",
+        "###"
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:oak_log"
+        },
+        "P": {
+            "item": "minecraft:painting"
+        }
+    },
+    "result": {
+        "item": "waterframes:waterframe",
+        "count": 1
+    },
+    "group": "stuff"
+}

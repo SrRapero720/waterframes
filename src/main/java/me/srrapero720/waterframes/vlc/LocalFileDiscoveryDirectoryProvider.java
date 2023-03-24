@@ -4,8 +4,8 @@ package me.srrapero720.waterframes.vlc;
 import java.nio.file.Path;
 
 import net.minecraftforge.fml.loading.FMLPaths;
-import me.srrapero720.vlcj.binding.support.runtime.RuntimeUtil;
-import me.srrapero720.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider;
+import uk.co.caprica.vlcj.binding.RuntimeUtil;
+import uk.co.caprica.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider;
 
 @Deprecated(forRemoval = false)
 // I remove this because FancyVideo-API unwrapp their vlc on game dir, and my cpde try to use it (and have broken things)

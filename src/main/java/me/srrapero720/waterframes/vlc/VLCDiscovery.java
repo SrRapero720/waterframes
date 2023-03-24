@@ -2,10 +2,10 @@ package me.srrapero720.waterframes.vlc;
 
 import com.sun.jna.NativeLibrary;
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.vlcj.binding.support.runtime.RuntimeUtil;
-import me.srrapero720.vlcj.factory.MediaPlayerFactory;
-import me.srrapero720.vlcj.factory.discovery.NativeDiscovery;
-import me.srrapero720.vlcj.factory.discovery.strategy.NativeDiscoveryStrategy;
+import uk.co.caprica.vlcj.binding.RuntimeUtil;
+import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery;
+import uk.co.caprica.vlcj.factory.discovery.strategy.NativeDiscoveryStrategy;
 import team.creative.creativecore.reflection.ReflectionHelper;
 
 import java.lang.ref.Reference;
@@ -50,24 +50,8 @@ public class VLCDiscovery {
             discovery = new NativeDiscovery(new LinuxNativeDiscoveryStrategyFixed(), new MacOsNativeDiscoveryStrategyFixed(), windows) {
 
                 @Override
-                public boolean attemptFix(String path, NativeDiscoveryStrategy discoveryStrategy) {
-                    if (searchPaths == null) {
-                        searchPaths = ReflectionHelper.findField(NativeLibrary.class, "searchPaths");
-                        libraries = ReflectionHelper.findField(NativeLibrary.class, "libraries");
-                    }
-                    try {
-                        Map<String, Reference<NativeLibrary>> libs = (Map<String, Reference<NativeLibrary>>) libraries.get(null);
-                        Map<String, List<String>> paths = (Map<String, List<String>>) searchPaths.get(null);
-                        libs.remove(RuntimeUtil.getLibVlcCoreLibraryName());
-                        paths.remove(RuntimeUtil.getLibVlcCoreLibraryName());
-                        libs.remove(RuntimeUtil.getLibVlcLibraryName());
-                        paths.remove(RuntimeUtil.getLibVlcLibraryName());
-                        WaterFrames.LOGGER.info("Failed to load VLC in '{}'", path);
-                        return true;
-                    } catch (IllegalArgumentException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                    return false;
+                protected void onFound(String path, NativeDiscoveryStrategy strategy) {
+                    super.onFound(path, strategy);
                 }
 
                 @Override
