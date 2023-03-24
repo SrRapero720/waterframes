@@ -75,7 +75,7 @@ dependencies {
     implementation fg.deobf("curse.maven:ferritecore-429235:4074294")
     implementation fg.deobf("curse.maven:fastload-630620:4271605")
     implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3544496")
-    implementation fg.deobf("curse.maven:watercore-782432:4435992")
+//    implementation fg.deobf("curse.maven:watercore-782432:4435992")
 
 
     implementation fg.deobf("curse.maven:rubidium-574856:4024781")

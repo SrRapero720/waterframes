@@ -1,7 +1,5 @@
 package me.srrapero720.waterframes;
 
-import me.srrapero720.watercore.internal.WaterConsole;
-import me.srrapero720.watercore.internal.WaterRegistry;
 import me.srrapero720.waterframes.custom.blocks.BlockEntityWaterFrame;
 import me.srrapero720.waterframes.custom.blocks.WaterPictureFrame;
 import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
@@ -15,7 +13,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;

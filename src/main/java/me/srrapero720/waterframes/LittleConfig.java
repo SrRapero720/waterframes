@@ -1,4 +1,4 @@
-package team.creative.littleframes.server;
+package me.srrapero720.waterframes;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;

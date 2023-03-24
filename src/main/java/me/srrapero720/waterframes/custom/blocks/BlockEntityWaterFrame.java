@@ -1,8 +1,10 @@
 package me.srrapero720.waterframes.custom.blocks;
 
-import me.srrapero720.watercore.internal.WaterRegistry;
 import me.srrapero720.waterframes.LittleFramesRegistry;
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.custom.displayers.DisplayerApi;
+import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
+import me.srrapero720.waterframes.custom.packets.WaterFramePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,9 +22,6 @@ import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
-import me.srrapero720.waterframes.custom.displayers.DisplayerApi;
-import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
-import me.srrapero720.waterframes.custom.packets.WaterFramePacket;
 
 public class BlockEntityWaterFrame extends team.creative.creativecore.common.be.BlockEntityCreative {
 
