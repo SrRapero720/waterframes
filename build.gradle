@@ -66,6 +66,7 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -79,6 +80,8 @@ dependencies {
 
     implementation fg.deobf("curse.maven:rubidium-574856:4024781")
     implementation fg.deobf("curse.maven:oculus-581495:4354939")
+
+    implementation 'com.github.sealedtx:java-youtube-downloader:3.1.0'
 
     // Apply Mixin AP
     implementation fg.deobf("curse.maven:creativecore-257814:4394989")
