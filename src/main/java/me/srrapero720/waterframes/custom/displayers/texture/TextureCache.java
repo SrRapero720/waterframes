@@ -14,6 +14,7 @@ import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.event.TickEvent.RenderTickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -24,32 +25,41 @@ import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class TextureCache {
+    private static final Map<String, TextureCache> cached = new HashMap<>();
     
-    private static HashMap<String, TextureCache> cached = new HashMap<>();
-    
-    @SubscribeEvent
-    public static void render(RenderTickEvent event) {
-        if (event.phase == Phase.END) {
-            for (Iterator<TextureCache> iterator = cached.values().iterator(); iterator.hasNext();) {
-                TextureCache type = iterator.next();
-                if (!type.isUsed()) {
-                    type.remove();
-                    iterator.remove();
-                }
+//    @SubscribeEvent
+//    public static void render(@NotNull RenderTickEvent event) {
+//        if (event.phase == Phase.END) {
+//            renderInternal();
+//        }
+//    }
+
+    public static void renderInternal() {
+        for (Iterator<TextureCache> iterator = cached.values().iterator(); iterator.hasNext();) {
+            var type = iterator.next();
+            if (!type.isUsed()) {
+                type.remove();
+                iterator.remove();
             }
         }
     }
     
-    @SubscribeEvent
-    public static void render(ClientTickEvent event) {
-        if (event.phase == Phase.END)
-            VideoDisplayer.tick();
+//    @SubscribeEvent
+//    public static void render(@NotNull ClientTickEvent event) {
+//        if (event.phase == Phase.START) tick();
+//    }
+
+    public static void tick() {
+        VideoDisplayer.tick();
     }
+
+
     
     public static void reloadAll() {
-        for (TextureCache cache : cached.values())
+        for (var cache : cached.values())
             cache.reload();
     }
     
@@ -221,9 +231,7 @@ public class TextureCache {
     
     public void remove() {
         ready = false;
-        if (textures != null)
-            for (int i = 0; i < textures.length; i++)
-                GlStateManager._deleteTexture(textures[i]);
+        if (textures != null) for (int texture: textures) GlStateManager._deleteTexture(texture);
     }
     
     public int getWidth() {
@@ -280,13 +288,14 @@ public class TextureCache {
         //Setup wrap mode
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
+
         
         //Setup texture scaling filtering
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
         
-        if (!hasAlpha)
-            RenderSystem.pixelStore(GL11.GL_UNPACK_ALIGNMENT, 1);
+        if (!hasAlpha) RenderSystem.pixelStore(GL11.GL_UNPACK_ALIGNMENT, 1);
+
 
         // fixes random crash, when values are too high it causes a jvm crash, caused weird behavior when game is paused
         GlStateManager._pixelStore(3314, 0);

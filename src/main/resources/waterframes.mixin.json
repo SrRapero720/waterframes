@@ -4,9 +4,9 @@
   "compatibilityLevel": "JAVA_17",
   "refmap": "waterframes.mixin.refmap.json",
   "mixins": [
-
   ],
   "client": [
+    "MinecraftMixin",
     "QuadLighterMixin"
   ],
   "minVersion": "0.8"
