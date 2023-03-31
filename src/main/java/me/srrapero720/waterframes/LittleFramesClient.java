@@ -34,23 +34,23 @@ import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
 public class LittleFramesClient {
-    public static void load(IEventBus bus) { bus.addListener(LittleFramesClient::setup); }
 
-    public static void setup(FMLClientSetupEvent event) {
+    @OnlyIn(Dist.CLIENT)
+    public static void setup(FMLClientSetupEvent ignored) {
         MinecraftForge.EVENT_BUS.register(TextureCache.class);
 
         CreativeCoreClient.registerClientConfig(WaterFrames.ID);
-        CreativeCoreClient.registerItemModel(new ResourceLocation(WaterFrames.ID, "waterframe"),
+        CreativeCoreClient.registerItemModel(new ResourceLocation(WaterFrames.ID, "frame"),
                 new CreativeItemBoxModel(new ModelResourceLocation("minecraft", "oak_planks", "inventory")) {
 
                     @Override
                     public List<? extends RenderBox> getBoxes(ItemStack itemStack, RenderType renderType) {
-                        return Collections.singletonList(new RenderBox(0, 0, 0, WaterPictureFrame.frameThickness, 1, 1, Blocks.OAK_PLANKS));
+                        return Collections.singletonList(new RenderBox(0.5f, 0f, 0f, 0.5f + WaterPictureFrame.frameThickness, 1f, 1f, Blocks.OAK_PLANKS));
                     }
                 });
 
 
-        CreativeCoreClient.registerBlockModel(new ResourceLocation(WaterFrames.ID, "waterframe"), new CreativeBlockModel() {
+        CreativeCoreClient.registerBlockModel(new ResourceLocation(WaterFrames.ID, "frame"), new CreativeBlockModel() {
             public final ModelProperty<Boolean> visibility = new ModelProperty<>();
             public final ModelDataMap visible = new ModelDataMap.Builder().withInitial(visibility, true).build();
             public final ModelDataMap invisible = new ModelDataMap.Builder().withInitial(visibility, false).build();
@@ -71,7 +71,7 @@ public class LittleFramesClient {
             }
         });
 
-        BlockEntityRenderers.register(LittleFramesRegistry.BE_CREATIVE_FRAME.get(), x -> new WaterFramesRenderer());
+        BlockEntityRenderers.register(LittleFramesRegistry.WATERFRAME_BLOCKENTITY.get(), x -> new WaterFramesRenderer());
     }
 
 }

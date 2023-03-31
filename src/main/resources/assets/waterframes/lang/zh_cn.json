@@ -1,5 +1,5 @@
 {
-    "block.waterframes.waterframe": "Water Picture Frame",
+    "block.waterframes.frame": "Picture Frame",
     "itemGroup.waterframes": "WATERFrAMES",
     "label.waterframes.not_whitelisted": "URL不在白名单, 无法保存!",
     "label.waterframes.whitelist_warning": "警告: URL白名单未启用",

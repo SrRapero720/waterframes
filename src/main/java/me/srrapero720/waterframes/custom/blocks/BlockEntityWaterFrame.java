@@ -64,7 +64,7 @@ public class BlockEntityWaterFrame extends team.creative.creativecore.common.be.
     public DisplayerApi display;
     
     public BlockEntityWaterFrame(BlockPos pos, BlockState state) {
-        super(LittleFramesRegistry.BE_CREATIVE_FRAME.get(), pos, state);
+        super(LittleFramesRegistry.WATERFRAME_BLOCKENTITY.get(), pos, state);
     }
     
     @OnlyIn(Dist.CLIENT)

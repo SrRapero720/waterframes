@@ -14,6 +14,6 @@ public class DefaultTabSupplier extends CreativeModeTab {
     }
 
     public @NotNull ItemStack makeIcon() {
-        return new ItemStack(LittleFramesRegistry.CREATIVE_PICTURE_FRAME.get());
+        return new ItemStack(LittleFramesRegistry.WATERFRAME_BLOCK.get());
     }
 }

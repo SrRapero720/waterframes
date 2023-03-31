@@ -1,7 +1,7 @@
 {
     "variants": {
         "": {
-            "model": "waterframes:block/waterframe"
+            "model": "waterframes:block/frame"
         }
     }
 }
