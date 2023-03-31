@@ -21,7 +21,7 @@ apply plugin: 'org.spongepowered.mixin'
 0- | Minor features (new language added)
 A/B/C/D | Patches or Hotfixes
 * */
-version = '1.0.1-A'
+version = '1.0.1-B'
 group= "me.srrapero720" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -78,8 +78,8 @@ dependencies {
 //    implementation fg.deobf("curse.maven:watercore-782432:4435992")
 
 
-    implementation fg.deobf("curse.maven:rubidium-574856:4024781")
-    implementation fg.deobf("curse.maven:oculus-581495:4354939")
+    implementation fg.deobf("curse.maven:rubidium-574856:4451888")
+//    implementation fg.deobf("curse.maven:oculus-581495:4451905")
     implementation fg.deobf("curse.maven:fancyvideo-api-591686:3803736")
 
     implementation 'com.github.sealedtx:java-youtube-downloader:3.1.0'
