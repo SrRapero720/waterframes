@@ -20,10 +20,8 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class VideoDisplayer extends DisplayerApi {
-    
-    private static final String VLC_DOWNLOAD_32 = "https://i.imgur.com/VF3LuvM.png";
+
     private static final String VLC_DOWNLOAD_64 = "https://i.imgur.com/2aN8ZQC.png";
-    private static final String VLC_FVA_UNSUPPORT = "https://i.imgur.com/o0IN1zV.png";
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
     
     private static final List<VideoDisplayer> OPEN_DISPLAYS = new ArrayList<>();
@@ -58,10 +56,9 @@ public class VideoDisplayer extends DisplayerApi {
             }
         } else
             return null;
-        String failURL = System.getProperty("sun.arch.data.model").equals("32") ? VLC_DOWNLOAD_32 : VLC_DOWNLOAD_64;
-        TextureCache cache = TextureCache.get(failURL);
+        TextureCache cache = TextureCache.get(VLC_DOWNLOAD_64);
         if (cache.ready())
-            return cache.createDisplay(pos, failURL, volume, minDistance, maxDistance, loop, true);
+            return cache.createDisplay(pos, VLC_DOWNLOAD_64, volume, minDistance, maxDistance, loop, true);
         return null;
     }
     
@@ -233,17 +230,15 @@ public class VideoDisplayer extends DisplayerApi {
     
     @Override
     public void pause(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
-        if (player == null)
-            return;
-        player.mediaPlayer().controls().setTime(tick * 50);
+        if (player == null) return;
+        player.mediaPlayer().controls().setTime(tick * 50L);
         player.mediaPlayer().controls().pause();
     }
     
     @Override
     public void resume(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
-        if (player == null)
-            return;
-        player.mediaPlayer().controls().setTime(tick * 50);
+        if (player == null) return;
+        player.mediaPlayer().controls().setTime(tick * 50L);
         player.mediaPlayer().controls().play();
     }
     
