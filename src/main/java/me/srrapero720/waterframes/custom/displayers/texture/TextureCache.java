@@ -31,7 +31,7 @@ public class TextureCache {
     
     @SubscribeEvent
     public static void render(RenderTickEvent event) {
-        if (event.phase == Phase.START) {
+        if (event.phase == Phase.END) {
             for (Iterator<TextureCache> iterator = cached.values().iterator(); iterator.hasNext();) {
                 TextureCache type = iterator.next();
                 if (!type.isUsed()) {
@@ -44,7 +44,7 @@ public class TextureCache {
     
     @SubscribeEvent
     public static void render(ClientTickEvent event) {
-        if (event.phase == Phase.START)
+        if (event.phase == Phase.END)
             VideoDisplayer.tick();
     }
     
