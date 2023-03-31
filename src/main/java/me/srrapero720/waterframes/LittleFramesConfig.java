@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-@Deprecated(forRemoval = false)
+@Deprecated(forRemoval = true)
 //TODO: Replace this class with server.LittleConfig
 public class LittleFramesConfig {
     

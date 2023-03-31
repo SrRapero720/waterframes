@@ -21,7 +21,7 @@ apply plugin: 'org.spongepowered.mixin'
 0- | Minor features (new language added)
 A/B/C/D | Patches or Hotfixes
 * */
-version = '1.0.1-B'
+version = '1.0.1-C'
 group= "me.srrapero720" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
