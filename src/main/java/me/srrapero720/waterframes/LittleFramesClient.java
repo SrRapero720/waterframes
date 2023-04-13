@@ -71,7 +71,7 @@ public class LittleFramesClient {
             }
         });
 
-        BlockEntityRenderers.register(LittleFramesRegistry.WATERFRAME_BLOCKENTITY.get(), x -> new WaterFramesRenderer());
+        BlockEntityRenderers.register(LittleFramesRegistry.WATERFRAME_BLOCKENTITY.get(), WaterFramesRenderer::new);
     }
 
 }

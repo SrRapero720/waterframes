@@ -9,12 +9,8 @@ import me.srrapero720.waterframes.custom.displayers.VideoDisplayer;
 import me.srrapero720.waterframes.gifs.GifDecoder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.event.TickEvent.ClientTickEvent;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.TickEvent.RenderTickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.jetbrains.annotations.NotNull;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -283,12 +279,11 @@ public class TextureCache {
         buffer.flip();
         
         int textureID = GlStateManager._genTexture(); //Generate texture ID
-        RenderSystem.bindTexture(textureID); //Bind texture ID
-        
+        RenderSystem.bindTexture(textureID); //Bind texture ID;
+
         //Setup wrap mode
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-
         
         //Setup texture scaling filtering
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
@@ -299,8 +294,11 @@ public class TextureCache {
 
         // fixes random crash, when values are too high it causes a jvm crash, caused weird behavior when game is paused
         GlStateManager._pixelStore(3314, 0);
-        GlStateManager._pixelStore(3316, 0);
-        GlStateManager._pixelStore(3315, 0);
+        GL11.glPixelStorei(3314, 0);
+        GL11.glPixelStorei(3316, 0);
+        GL11.glPixelStorei(3315, 0);
+        GL11.glTexParameteri(3553, 10240, 9728);
+        GL11.glTexParameteri(3553, 10241, 9729);
         
         //Send texel data to OpenGL
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, hasAlpha ? GL11.GL_RGBA8 : GL11.GL_RGB8, width, height, 0, hasAlpha ? GL11.GL_RGBA : GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, buffer);
