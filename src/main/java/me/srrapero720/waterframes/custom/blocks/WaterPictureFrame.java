@@ -24,6 +24,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.handler.BlockGuiCreator;
 import team.creative.creativecore.common.gui.handler.GuiCreator;
@@ -36,13 +37,11 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final float frameThickness = 0.031F;
     
-    public static AlignedBox box(Direction direction) {
+    public static @NotNull AlignedBox box(Direction direction) {
         Facing facing = Facing.get(direction);
         AlignedBox box = new AlignedBox();
-        if (facing.positive)
-            box.setMax(facing.axis, frameThickness);
-        else
-            box.setMin(facing.axis, 1 - frameThickness);
+        if (facing.positive) box.setMax(facing.axis, frameThickness);
+        else box.setMin(facing.axis, 1 - frameThickness);
         return box;
     }
     
@@ -52,27 +51,27 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
     }
     
     @Override
-    public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rotation) {
+    public BlockState rotate(@NotNull BlockState state, LevelAccessor world, BlockPos pos, @NotNull Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
     
     @Override
-    public BlockState rotate(BlockState state, Rotation rotation) {
+    public @NotNull BlockState rotate(@NotNull BlockState state, @NotNull Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
     
     @Override
-    public BlockState mirror(BlockState state, Mirror mirror) {
+    public @NotNull BlockState mirror(@NotNull BlockState state, @NotNull Mirror mirror) {
         return state.setValue(FACING, mirror.mirror(state.getValue(FACING)));
     }
     
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
     
     @Override
-    public BlockState getStateForPlacement(BlockPlaceContext context) {
+    public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
         return this.defaultBlockState().setValue(FACING, context.getClickedFace());
     }
     
@@ -82,20 +81,32 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
     }
     
     @Override
-    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(@NotNull BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return box(state.getValue(FACING)).voxelShape();
     }
     
     @Override
-    public VoxelShape getInteractionShape(BlockState state, BlockGetter level, BlockPos pos) {
+    public VoxelShape getInteractionShape(@NotNull BlockState state, BlockGetter level, BlockPos pos) {
         return box(state.getValue(FACING)).voxelShape();
     }
     
     @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    public InteractionResult use(BlockState state, @NotNull Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!level.isClientSide && WaterFrames.CONFIG.canInteract(player, level))
             GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void neighborChanged(@NotNull BlockState state, @NotNull Level level, BlockPos pos, Block block, BlockPos blockPos, boolean exists) {
+        boolean flag = level.hasNeighborSignal(pos);
+        if (flag != state.getValue(BlockStateProperties.POWERED)) {
+            BlockEntityWaterFrame frame = (BlockEntityWaterFrame) level.getBlockEntity(pos);
+            if (frame.playing) frame.pause();
+            else frame.play();
+        }
+
+        super.neighborChanged(state, level, pos, block, blockPos, exists);
     }
     
     @Override
