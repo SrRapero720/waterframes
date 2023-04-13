@@ -81,6 +81,7 @@ dependencies {
     implementation fg.deobf("curse.maven:rubidium-574856:4451888")
     implementation fg.deobf("curse.maven:oculus-581495:4451905")
     implementation fg.deobf("curse.maven:fancyvideo-api-591686:3803736")
+    implementation fg.deobf("curse.maven:video-player-645407:4348349")
 
     implementation 'com.github.sealedtx:java-youtube-downloader:3.1.0'
 
