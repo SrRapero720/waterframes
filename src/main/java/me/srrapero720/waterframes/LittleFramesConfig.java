@@ -40,8 +40,34 @@ public class LittleFramesConfig {
     public boolean useVLC = true;
     
     @CreativeConfig
-    public List<String> whitelist = Arrays
-            .asList("imgur.com", "gyazo.com", "prntscr.com", "tinypic.com", "puu.sh", "pinimg.com", "photobucket.com", "staticflickr.com", "flic.kr", "tenor.co", "gfycat.com", "giphy.com", "gph.is", "gifbin.com", "i.redd.it", "media.tumblr.com", "twimg.com", "discordapp.com", "images.discordapp.net", "githubusercontent.com", "googleusercontent.com", "googleapis.com", "wikimedia.org", "ytimg.com");
+    public List<String> whitelist = Arrays.asList(
+            "imgur.com",
+            "gyazo.com",
+            "prntscr.com",
+            "tinypic.com",
+            "puu.sh",
+            "pinimg.com",
+            "photobucket.com",
+            "staticflickr.com",
+            "flic.kr",
+            "tenor.co",
+            "gfycat.com",
+            "giphy.com",
+            "gph.is",
+            "gifbin.com",
+            "i.redd.it",
+            "media.tumblr.com",
+            "twimg.com",
+            "discordapp.com",
+            "images.discordapp.net",
+            "githubusercontent.com",
+            "googleusercontent.com",
+            "googleapis.com",
+            "wikimedia.org",
+            "ytimg.com",
+            "youtube.com",
+            "drive.google.com"
+    );
     
     public boolean canUse(Player player, String url) {
         return canUse(player, url, false);
