@@ -277,23 +277,22 @@ public class TextureCache {
             }
         }
         buffer.flip();
-        
+
         int textureID = GlStateManager._genTexture(); //Generate texture ID
-        RenderSystem.bindTexture(textureID); //Bind texture ID;
+        RenderSystem.bindTexture(textureID); //Bind texture ID
 
         //Setup wrap mode
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-        
+
         //Setup texture scaling filtering
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-        
+
         if (!hasAlpha) RenderSystem.pixelStore(GL11.GL_UNPACK_ALIGNMENT, 1);
 
 
         // fixes random crash, when values are too high it causes a jvm crash, caused weird behavior when game is paused
-        GlStateManager._pixelStore(3314, 0);
         GL11.glPixelStorei(3314, 0);
         GL11.glPixelStorei(3316, 0);
         GL11.glPixelStorei(3315, 0);
