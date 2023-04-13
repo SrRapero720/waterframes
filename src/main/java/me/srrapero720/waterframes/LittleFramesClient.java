@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -20,13 +21,13 @@ import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.client.CreativeCoreClient;
 import team.creative.creativecore.client.render.box.RenderBox;
 import team.creative.creativecore.client.render.model.CreativeBlockModel;
 import team.creative.creativecore.client.render.model.CreativeItemBoxModel;
+
+import static me.srrapero720.waterframes.WaterFrames.REGISTRY;
 
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +37,7 @@ import java.util.Random;
 public class LittleFramesClient {
 
     @OnlyIn(Dist.CLIENT)
-    public static void setup(FMLClientSetupEvent ignored) {
+    public static void setup() {
         MinecraftForge.EVENT_BUS.register(TextureCache.class);
 
         CreativeCoreClient.registerClientConfig(WaterFrames.ID);
@@ -71,7 +72,7 @@ public class LittleFramesClient {
             }
         });
 
-        BlockEntityRenderers.register(LittleFramesRegistry.WATERFRAME_BLOCKENTITY.get(), WaterFramesRenderer::new);
+        BlockEntityRenderers.register((BlockEntityType<BlockEntityWaterFrame>) REGISTRY.blockEntityOnly("frame"), WaterFramesRenderer::new);
     }
 
 }

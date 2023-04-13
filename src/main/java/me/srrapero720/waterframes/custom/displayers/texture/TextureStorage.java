@@ -19,8 +19,8 @@ import net.minecraft.client.Minecraft;
 
 public class TextureStorage {
     
-    private File cacheDirectory = new File(Minecraft.getInstance().gameDirectory, "littleframe_cache");
-    private File index = new File(cacheDirectory, "index");
+    private final File cacheDirectory = new File(Minecraft.getInstance().gameDirectory, "waterframes_cache");
+    private final File index = new File(cacheDirectory, "index");
     
     private Map<String, CacheEntry> entries = new HashMap<String, CacheEntry>();
     

@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.custom.displayers.texture;
 
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.gifs.GifDecoder;
+import me.srrapero720.gifs.GifDecoder;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
