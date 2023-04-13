@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.custom.blocks;
 
+import me.srrapero720.watercore.internal.WaterConsole;
 import me.srrapero720.waterframes.WaterFrames;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
@@ -33,7 +35,7 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 import me.srrapero720.waterframes.custom.cc_gui.GuiWaterFrame;
 
 public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreator {
-    
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final float frameThickness = 0.031F;
     
@@ -67,7 +69,7 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
     
     @Override
     protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> builder) {
-        builder.add(FACING);
+        builder.add(FACING, POWERED);
     }
     
     @Override
@@ -98,15 +100,25 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
     }
 
     @Override
-    public void neighborChanged(@NotNull BlockState state, @NotNull Level level, BlockPos pos, Block block, BlockPos blockPos, boolean exists) {
-        boolean flag = level.hasNeighborSignal(pos);
-        if (flag != state.getValue(BlockStateProperties.POWERED)) {
-            BlockEntityWaterFrame frame = (BlockEntityWaterFrame) level.getBlockEntity(pos);
-            if (frame.playing) frame.pause();
-            else frame.play();
+    public void neighborChanged(@NotNull BlockState state, @NotNull Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
+        boolean hasSignal = false;
+        var frame = (BlockEntityWaterFrame) level.getBlockEntity(pos);
+        for (var direction : Direction.values()) {
+            var neighborBlockPos = pos.relative(direction);
+            var neighborBlockState = level.getBlockState(neighborBlockPos);
+            if (neighborBlockState.isSignalSource()) {
+                hasSignal = true;
+                break;
+            }
         }
 
-        super.neighborChanged(state, level, pos, block, blockPos, exists);
+        if (hasSignal) {
+            if (frame.playing) frame.pause();
+        } else {
+            if (!frame.playing) frame.play();
+        }
+
+        super.neighborChanged(state, level, pos, block, neighborPos, isMoving);
     }
     
     @Override
