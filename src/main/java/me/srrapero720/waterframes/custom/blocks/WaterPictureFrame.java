@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.custom.blocks;
 
-import me.srrapero720.watercore.internal.WaterConsole;
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.custom.cc_gui.GuiWaterFrame;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -32,7 +32,6 @@ import team.creative.creativecore.common.gui.handler.BlockGuiCreator;
 import team.creative.creativecore.common.gui.handler.GuiCreator;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
-import me.srrapero720.waterframes.custom.cc_gui.GuiWaterFrame;
 
 public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreator {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;

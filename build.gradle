@@ -21,7 +21,7 @@ apply plugin: 'org.spongepowered.mixin'
 0- | Minor features (new language added)
 A/B/C/D | Patches or Hotfixes
 * */
-version = '1.0.1-C'
+version = '1.1.0-ALPHA1'
 group= "me.srrapero720" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -75,7 +75,7 @@ dependencies {
     implementation fg.deobf("curse.maven:ferritecore-429235:4074294")
     implementation fg.deobf("curse.maven:fastload-630620:4271605")
     implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3544496")
-    implementation files("libs/WATERCoRE-1.4.0-DEV.jar")
+    implementation files("libs/WATERCoRE-1.4.0-DEV20.jar")
 
 
     implementation fg.deobf("curse.maven:rubidium-574856:4451888")

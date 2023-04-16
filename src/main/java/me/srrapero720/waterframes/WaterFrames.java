@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes;
 
-import me.srrapero720.watercore.internal.WaterRegistry;
+import me.srrapero720.watercore.internal.WRegistry;
 import me.srrapero720.waterframes.custom.blocks.BlockEntityWaterFrame;
 import me.srrapero720.waterframes.custom.blocks.WaterPictureFrame;
 import me.srrapero720.waterframes.custom.packets.WaterFramePacket;
@@ -23,7 +23,7 @@ import team.creative.creativecore.common.network.CreativeNetwork;
 public class WaterFrames {
     public static final String ID = "waterframes";
     public static final Logger LOGGER = LogManager.getLogger(ID);
-    public static final WaterRegistry REGISTRY = new WaterRegistry(ID);
+    public static final WRegistry REGISTRY = new WRegistry(ID);
     public static final CreativeNetwork NETWORK = new CreativeNetwork("1.1", LOGGER, new ResourceLocation(ID, "main"));
 
     public static LittleFramesConfig CONFIG;
@@ -37,11 +37,11 @@ public class WaterFrames {
     }
 
     public void register() {
-        REGISTRY.register(WaterRegistry.Type.BLOCKS, new ResourceLocation(ID, "frame"), WaterPictureFrame::new);
-        REGISTRY.register(WaterRegistry.Type.ITEM, new ResourceLocation(ID, "frame"), () ->
-                new BlockItem(REGISTRY.blockOnly("frame"), new Item.Properties().tab(WaterRegistry.tab("main"))));
+        REGISTRY.register(WRegistry.Type.BLOCKS, new ResourceLocation(ID, "frame"), WaterPictureFrame::new);
+        REGISTRY.register(WRegistry.Type.ITEM, new ResourceLocation(ID, "frame"), () ->
+                new BlockItem(REGISTRY.blockOnly("frame"), new Item.Properties().tab(WRegistry.tab("main"))));
 
-        REGISTRY.register(WaterRegistry.Type.BLOCK_ENTITIES, new ResourceLocation(ID, "frame"), () ->
+        REGISTRY.register(WRegistry.Type.BLOCK_ENTITIES, new ResourceLocation(ID, "frame"), () ->
                 BlockEntityType.Builder.of(BlockEntityWaterFrame::new, REGISTRY.blockOnly("frame")));
         REGISTRY.register(bus());
     }
