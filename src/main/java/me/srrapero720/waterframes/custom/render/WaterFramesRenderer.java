@@ -60,7 +60,7 @@ public class WaterFramesRenderer implements BlockEntityRenderer<BlockEntityWater
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(frame.brightness, frame.brightness, frame.brightness, frame.alpha);
+        RenderSystem.setShaderColor(frame.brightness + 1, frame.brightness + 1, frame.brightness + 1, frame.alpha);
         int texture = display.texture();
         
         if (texture == -1) return;
@@ -81,7 +81,8 @@ public class WaterFramesRenderer implements BlockEntityRenderer<BlockEntityWater
         pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-frame.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
         
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
+//        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
         builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
