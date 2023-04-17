@@ -50,15 +50,6 @@ public class LittleFramesClient {
 
         CreativeCoreClient.registerClientConfig(WaterFrames.ID);
 
-        CreativeCoreClient.registerItemModel(new ResourceLocation(WaterFrames.ID, "frame"),
-                new CreativeItemBoxModel(new ModelResourceLocation("minecraft", "oak_planks", "inventory")) {
-                    @Override
-                    public List<? extends RenderBox> getBoxes(ItemStack itemStack, RenderType renderType) {
-                        return Collections.singletonList(new RenderBox(0.5f, 0f, 0f, 0.5f + WaterPictureFrame.frameThickness, 1f, 1f, Blocks.OAK_PLANKS));
-                    }
-        });
-
-
         CreativeCoreClient.registerBlockModel(new ResourceLocation(WaterFrames.ID, "frame"), new CreativeBlockModel() {
             public final ModelProperty<Boolean> visibility = new ModelProperty<>();
             public final ModelDataMap visible = new ModelDataMap.Builder().withInitial(visibility, true).build();

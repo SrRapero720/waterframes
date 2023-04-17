@@ -233,11 +233,8 @@ public class BlockEntityWaterFrame extends BlockEntity {
         if (blockEntity instanceof BlockEntityWaterFrame be) {
             if (level.isClientSide) {
                 DisplayerApi display = be.requestDisplay();
-                if (display != null)
-                    display.tick(be.url, be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);
-            }
-            if (be.playing)
-                be.tick++;
+                if (display != null) display.tick(be.url, be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}
+            if (be.playing) be.tick++;
         }
     }
 

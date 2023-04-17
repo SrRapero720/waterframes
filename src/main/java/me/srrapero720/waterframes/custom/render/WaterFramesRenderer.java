@@ -80,9 +80,8 @@ public class WaterFramesRenderer implements BlockEntityRenderer<BlockEntityWater
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-frame.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
-        
-        RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
-//        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
         builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);

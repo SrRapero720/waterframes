@@ -1,7 +1,11 @@
 {
     "variants": {
-        "": {
-            "model": "waterframes:block/frame"
-        }
+        "visible=false": { "model": "waterframes:block:/frame_hidden" },
+        "facing=north,visible=true": {"model": "waterframes:block/frame", "y": 180},
+        "facing=south,visible=true": { "model": "waterframes:block/frame"},
+        "facing=west,visible=true": {"model": "waterframes:block/frame", "y": -270},
+        "facing=east,visible=true": {"model": "waterframes:block/frame", "y": -90},
+        "facing=up,visible=true": {"model": "waterframes:block/frame","x": 90 },
+        "facing=down,visible=true": {"model": "waterframes:block/frame", "x": -90 }
     }
 }
