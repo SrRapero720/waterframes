@@ -2,7 +2,7 @@
 	"credit": "Made with Blockbench by J-RAP",
 	"textures": {
 		"0": "waterframes:block/frame",
-		"1": "waterframes:block/frame-front",
+		"1": "waterframes:block/frame_front",
 		"particle": "waterframes:block/frame"
 	},
 	"elements": [

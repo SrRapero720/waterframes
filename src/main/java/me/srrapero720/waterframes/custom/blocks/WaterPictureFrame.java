@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.custom.blocks;
 
+import me.srrapero720.watercore.internal.WConsole;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.cc_gui.GuiWaterFrame;
 import net.minecraft.core.BlockPos;
@@ -36,13 +37,14 @@ import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 import java.util.Random;
+import java.util.logging.Logger;
 
 public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreator {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty VISIBLE = BooleanProperty.create("visible");
     public static final float frameThickness = 0.0625F / 2F;
-    
+
     public static @NotNull AlignedBox box(Direction direction) {
         Facing facing = Facing.get(direction);
         AlignedBox box = new AlignedBox();
@@ -50,46 +52,46 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
         else box.setMin(facing.axis, 1 - frameThickness);
         return box;
     }
-    
+
     public WaterPictureFrame() {
         super(BlockBehaviour.Properties.of(Material.WOOD).explosionResistance(2.5F).destroyTime(2.0F).noOcclusion());
     }
-    
+
     @Override
     public BlockState rotate(@NotNull BlockState state, LevelAccessor world, BlockPos pos, @NotNull Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
-    
+
     @Override
     public @NotNull BlockState rotate(@NotNull BlockState state, @NotNull Rotation rotation) {
         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
     }
-    
+
     @Override
     public @NotNull BlockState mirror(@NotNull BlockState state, @NotNull Mirror mirror) {
         return state.setValue(FACING, mirror.mirror(state.getValue(FACING)));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> builder) {
         builder.add(FACING, POWERED, VISIBLE);
     }
-    
+
     @Override
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getClickedFace());
+        return this.defaultBlockState().setValue(FACING, context.getClickedFace())
+                .setValue(VISIBLE, true)
+                .setValue(POWERED, false);
     }
-    
+
     @Override
-    public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
-    }
-    
+    public RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
+
     @Override
     public VoxelShape getShape(@NotNull BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return box(state.getValue(FACING)).voxelShape();
     }
-    
+
     @Override
     public VoxelShape getInteractionShape(@NotNull BlockState state, BlockGetter level, BlockPos pos) {
         return box(state.getValue(FACING)).voxelShape();
@@ -97,8 +99,8 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
 
     @Override
     public InteractionResult use(BlockState state, @NotNull Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide && WaterFrames.CONFIG.canInteract(player, level))
-            GuiCreator.BLOCK_OPENER.open(player, pos);
+        WConsole.justPrint(state.getValue(VISIBLE).toString());
+        if (!level.isClientSide && WaterFrames.CONFIG.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
     }
 
@@ -130,21 +132,15 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
         super.tick(pState, pLevel, pPos, pRandom);
     }
 
-
-
-    @Override
-    public void onPlace(BlockState pState, Level pLevel, BlockPos pPos, BlockState pOldState, boolean pIsMoving) {
-        pState.setValue(VISIBLE, true);
-        super.onPlace(pState, pLevel, pPos, pOldState, pIsMoving);
-    }
-
     @Override
     public BlockState updateShape(BlockState pState, Direction pDirection, BlockState pNeighborState, LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pNeighborPos) {
-//        pState.setValue(VISIBLE, true);
         var be = pLevel.getBlockEntity(pCurrentPos);
-        if (be instanceof BlockEntityWaterFrame wf) pState.setValue(VISIBLE, wf.visibleFrame);
-        return super.updateShape(pState, pDirection, pNeighborState, pLevel, pCurrentPos, pNeighborPos);
+        var state = pState;
+        if (be instanceof BlockEntityWaterFrame wf) state = pState.setValue(VISIBLE, wf.visibleFrame);
+        return super.updateShape(state, pDirection, pNeighborState, pLevel, pCurrentPos, pNeighborPos);
     }
+
+
 
     /* ---------------------------
      *             TICKS

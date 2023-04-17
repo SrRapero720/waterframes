@@ -205,25 +205,11 @@ public class BlockEntityWaterFrame extends BlockEntity {
         bothSides = nbt.getBoolean("bothSides");
         flipX = nbt.getBoolean("flipX");
         flipY = nbt.getBoolean("flipY");
-        if (nbt.contains("alpha"))
-            alpha = nbt.getFloat("alpha");
-        else
-            alpha = 1;
-        if (nbt.contains("brightness"))
-            brightness = nbt.getFloat("brightness");
-        else
-            brightness = 1;
-
+        alpha = nbt.contains("alpha") ? nbt.getFloat("alpha") : 1;
+        brightness = nbt.contains("brightness") ? nbt.getFloat("brightness") : 1;
         volume = nbt.getFloat("volume");
-        if (nbt.contains("min"))
-            minDistance = nbt.getFloat("min");
-        else
-            minDistance = 5;
-        if (nbt.contains("max"))
-            maxDistance = nbt.getFloat("max");
-        else
-            maxDistance = 20;
-
+        minDistance = nbt.contains("min") ? nbt.getFloat("min") : 5;
+        maxDistance = nbt.contains("max") ? nbt.getFloat("max") : 20;
         playing = nbt.getBoolean("playing");
         tick = nbt.getInt("tick");
         loop = nbt.getBoolean("loop");
@@ -231,6 +217,12 @@ public class BlockEntityWaterFrame extends BlockEntity {
 
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         if (blockEntity instanceof BlockEntityWaterFrame be) {
+            if (state.getValue(WaterPictureFrame.VISIBLE) != be.visibleFrame) {
+                var brandNewState = state.setValue(WaterPictureFrame.VISIBLE, be.visibleFrame);
+                level.setBlock(pos, brandNewState, 0);
+            }
+
+
             if (level.isClientSide) {
                 DisplayerApi display = be.requestDisplay();
                 if (display != null) display.tick(be.url, be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}
