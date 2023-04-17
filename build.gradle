@@ -4,16 +4,20 @@ buildscript {
         mavenCentral()
         maven { url = 'https://repo.spongepowered.org/maven' }
         maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://maven.parchmentmc.org' }
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
+        classpath 'org.parchmentmc:librarian:1.+'
     }
 }
 
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
+
 
 /*
 1. | Major update (rewrites or fml version changes)
@@ -32,7 +36,7 @@ configurations {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.18.2'
+    mappings channel: 'parchment', version: '2022.08.07-1.18.2'
 
     runs {
         client {
