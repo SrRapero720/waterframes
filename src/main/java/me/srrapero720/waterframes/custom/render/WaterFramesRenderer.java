@@ -60,7 +60,7 @@ public class WaterFramesRenderer implements BlockEntityRenderer<BlockEntityWater
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(frame.brightness + 1, frame.brightness + 1, frame.brightness + 1, frame.alpha);
+        RenderSystem.setShaderColor(frame.brightness, frame.brightness, frame.brightness, frame.alpha);
         int texture = display.texture();
         
         if (texture == -1) return;
