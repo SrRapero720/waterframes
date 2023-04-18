@@ -14,9 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MinecraftMixin {
     @OnlyIn(Dist.CLIENT)
     @Inject(method = "runTick", at = @At("HEAD"))
-    public void injectRunTick(boolean p_91384_, CallbackInfo ci) { TextureCache.renderInternal(); }
-
-    @OnlyIn(Dist.CLIENT)
-    @Inject(method = "runTick", at = @At("HEAD"))
-    public void injectTick(boolean p_91384_, CallbackInfo ci) { TextureCache.tick(); }
+    public void injectRunTick(boolean pRenderLevel, CallbackInfo ci) {
+        TextureCache.renderInternal();
+        TextureCache.tick();
+    }
 }

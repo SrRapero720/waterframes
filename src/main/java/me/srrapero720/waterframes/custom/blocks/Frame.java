@@ -2,8 +2,7 @@ package me.srrapero720.waterframes.custom.blocks;
 
 import me.srrapero720.watercore.internal.WConsole;
 import me.srrapero720.waterframes.FramesConfig;
-import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.custom.cc_gui.GuiWaterFrame;
+import me.srrapero720.waterframes.custom.screen.FrameScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -15,7 +14,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -38,9 +36,8 @@ import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 import java.util.Random;
-import java.util.logging.Logger;
 
-public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreator {
+public class Frame extends BaseEntityBlock implements BlockGuiCreator {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty VISIBLE = BooleanProperty.create("visible");
@@ -54,7 +51,7 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
         return box;
     }
 
-    public WaterPictureFrame() {
+    public Frame() {
         super(BlockBehaviour.Properties.of(Material.WOOD).explosionResistance(2.5F).destroyTime(2.0F).noOcclusion());
     }
 
@@ -108,7 +105,7 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
     @Override
     public void neighborChanged(@NotNull BlockState state, @NotNull Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
         boolean hasSignal = false;
-        var frame = (BlockEntityWaterFrame) level.getBlockEntity(pos);
+        var frame = (TileFrame) level.getBlockEntity(pos);
         for (var direction : Direction.values()) {
             var neighborBlockPos = pos.relative(direction);
             var neighborBlockState = level.getBlockState(neighborBlockPos);
@@ -137,7 +134,7 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
     public BlockState updateShape(BlockState pState, Direction pDirection, BlockState pNeighborState, LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pNeighborPos) {
         var be = pLevel.getBlockEntity(pCurrentPos);
         var state = pState;
-        if (be instanceof BlockEntityWaterFrame wf) state = pState.setValue(VISIBLE, wf.visibleFrame);
+        if (be instanceof TileFrame wf) state = pState.setValue(VISIBLE, wf.visibleFrame);
         return super.updateShape(state, pDirection, pNeighborState, pLevel, pCurrentPos, pNeighborPos);
     }
 
@@ -149,7 +146,7 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
 
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return BlockEntityWaterFrame::tick;
+        return TileFrame::tick;
     }
 
     /* ---------------------------
@@ -157,12 +154,12 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
      * --------------------------- */
 
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new BlockEntityWaterFrame(pos, state); }
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new TileFrame(pos, state); }
     
     @Override
     public GuiLayer create(CompoundTag nbt, Level level, BlockPos pos, BlockState state, Player player) {
         BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof BlockEntityWaterFrame frame) return new GuiWaterFrame(frame);
+        if (be instanceof TileFrame frame) return new FrameScreen(frame);
         return null;
     }
 

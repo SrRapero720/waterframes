@@ -2,11 +2,11 @@ package me.srrapero720.waterframes;
 
 import me.srrapero720.watercore.internal.WConfig;
 import me.srrapero720.watercore.internal.WRegistry;
-import me.srrapero720.waterframes.custom.blocks.BlockEntityWaterFrame;
-import me.srrapero720.waterframes.custom.blocks.WaterPictureFrame;
+import me.srrapero720.waterframes.custom.blocks.TileFrame;
+import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
-import me.srrapero720.waterframes.custom.packets.WaterFramePacket;
-import me.srrapero720.waterframes.custom.render.WaterFramesRenderer;
+import me.srrapero720.waterframes.custom.packets.FramesPacket;
+import me.srrapero720.waterframes.custom.render.FramesRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -42,12 +42,12 @@ public class WaterFrames {
     }
 
     public void register() {
-        REGISTRY.register(WRegistry.Type.BLOCKS, new ResourceLocation(ID, "frame"), WaterPictureFrame::new);
+        REGISTRY.register(WRegistry.Type.BLOCKS, new ResourceLocation(ID, "frame"), Frame::new);
         REGISTRY.register(WRegistry.Type.ITEM, new ResourceLocation(ID, "frame"), () ->
                 new BlockItem(REGISTRY.blockOnly("frame"), new Item.Properties().tab(WRegistry.tab("main"))));
 
         REGISTRY.register(WRegistry.Type.BLOCK_ENTITIES, new ResourceLocation(ID, "frame"), () ->
-                BlockEntityType.Builder.of(BlockEntityWaterFrame::new, REGISTRY.blockOnly("frame")));
+                BlockEntityType.Builder.of(TileFrame::new, REGISTRY.blockOnly("frame")));
         REGISTRY.register(bus());
 
         ModLoadingContext.get().registerConfig(net.minecraftforge.fml.config.ModConfig.Type.SERVER, WConfig.SPEC, "waterframes-server.toml");
@@ -55,12 +55,12 @@ public class WaterFrames {
 
 
     public void common(final FMLCommonSetupEvent event) {
-        NETWORK.registerType(WaterFramePacket.class, WaterFramePacket::new);
+        NETWORK.registerType(FramesPacket.class, FramesPacket::new);
     }
 
     @OnlyIn(Dist.CLIENT)
     public void client(final FMLClientSetupEvent event) {
         MinecraftForge.EVENT_BUS.register(TextureCache.class);
-        BlockEntityRenderers.register((BlockEntityType<BlockEntityWaterFrame>) REGISTRY.blockEntityOnly("frame"), WaterFramesRenderer::new);
+        BlockEntityRenderers.register((BlockEntityType<TileFrame>) REGISTRY.blockEntityOnly("frame"), FramesRenderer::new);
     }
 }

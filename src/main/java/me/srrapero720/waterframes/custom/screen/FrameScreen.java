@@ -1,12 +1,14 @@
-package me.srrapero720.waterframes.custom.cc_gui;
+package me.srrapero720.waterframes.custom.screen;
 
 import me.srrapero720.waterframes.FramesConfig;
-import me.srrapero720.waterframes.custom.blocks.BlockEntityWaterFrame;
+import me.srrapero720.waterframes.custom.blocks.TileFrame;
 import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
 import me.srrapero720.waterframes.custom.displayers.texture.TextureSeeker;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import team.creative.creativecore.common.gui.Align;
@@ -18,14 +20,18 @@ import team.creative.creativecore.common.gui.controls.parent.GuiTable;
 import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.style.GuiIcon;
+import team.creative.creativecore.common.gui.style.GuiStyle;
+import team.creative.creativecore.common.gui.style.display.DisplayColor;
+import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 import team.creative.creativecore.common.gui.sync.GuiSyncLocal;
 import team.creative.creativecore.common.util.mc.ColorUtils;
 import team.creative.creativecore.common.util.text.TextBuilder;
 import team.creative.creativecore.common.util.text.TextListBuilder;
 
-public class GuiWaterFrame extends GuiLayer {
-    
-    public BlockEntityWaterFrame frame;
+import java.util.List;
+
+public class FrameScreen extends GuiLayer {
+    public TileFrame frame;
     
     public float scaleMultiplier;
     
@@ -84,11 +90,11 @@ public class GuiWaterFrame extends GuiLayer {
         frame.markDirty();
     });
     
-    public GuiWaterFrame(BlockEntityWaterFrame frame) {
+    public FrameScreen(TileFrame frame) {
         this(frame, 16);
     }
     
-    public GuiWaterFrame(BlockEntityWaterFrame frame, int scaleSize) {
+    public FrameScreen(TileFrame frame, int scaleSize) {
         super("waterframe", 250, 200);
         this.frame = frame;
         this.scaleMultiplier = 1F / (scaleSize);
@@ -151,7 +157,7 @@ public class GuiWaterFrame extends GuiLayer {
         align = Align.STRETCH;
         flow = GuiFlow.STACK_Y;
 
-        url = new GuiTextField(save, "url", frame.getRealURL());
+        url = new WidgetTextField(save, "url", frame.getRealURL());
         url.setMaxStringLength(512);
         add(url);
         GuiLabel error = new GuiLabel("error").setDefaultColor(ColorUtils.RED);
@@ -319,4 +325,50 @@ public class GuiWaterFrame extends GuiLayer {
         
     }
 
+    public static class WidgetTextField extends team.creative.creativecore.common.gui.controls.simple.GuiTextfield {
+        public static final StyleDisplay WARN_DISABLED_BORDER = new DisplayColor(0.196F, 0, 0, 1);
+        public static final StyleDisplay WARN_DISABLED_BACKGROUND = new DisplayColor(0.588F, 0.352F, 0.352F, 1);
+        public static final StyleDisplay WARN_WARNING_BORDER = new DisplayColor(0.196F, 0, 0, 1);
+        public static final StyleDisplay WARN_WARNING_BACKGROUND = new DisplayColor(0.588F, 0.588F, 0.352F, 1);
+        private GuiButton saveButton;
+
+        public WidgetTextField(GuiButton saveButton, String name, String text) {
+            super(name, text);
+            this.saveButton = saveButton;
+        }
+
+        @Override
+        public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
+            if (!canUse(true))
+                return FramesConfig.ENABLE_WHITELIST.get() ? WARN_DISABLED_BORDER : WARN_WARNING_BORDER;
+            return super.getBorder(style, display);
+        }
+
+        @Override
+        public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
+            if (!canUse(true))
+                return FramesConfig.ENABLE_WHITELIST.get() ? WARN_DISABLED_BACKGROUND : WARN_WARNING_BACKGROUND;
+            return super.getBackground(style, display);
+        }
+
+        @Override
+        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+            boolean pressed = super.keyPressed(keyCode, scanCode, modifiers);
+            saveButton.setEnabled(canUse(false));
+            return pressed;
+        }
+
+        @Override
+        public List<Component> getTooltip() {
+            if (!canUse(false))
+                return new TextBuilder().text(ChatFormatting.RED + "" + ChatFormatting.BOLD).translate("label.waterframes.not_whitelisted.name").build();
+            else if (!canUse(true))
+                return new TextBuilder().text(ChatFormatting.GOLD + "").translate("label.waterframes.whitelist_warning.name").build();
+            return null;
+        }
+
+        protected boolean canUse(boolean ignoreToggle) {
+            return FramesConfig.canUse(getPlayer(), getText(), ignoreToggle);
+        }
+    }
 }

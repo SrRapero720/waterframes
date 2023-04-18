@@ -3,7 +3,7 @@ package me.srrapero720.waterframes.custom.blocks;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.displayers.DisplayerApi;
 import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
-import me.srrapero720.waterframes.custom.packets.WaterFramePacket;
+import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,7 +19,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.loading.FMLPaths;
 import org.jetbrains.annotations.NotNull;
-import team.creative.creativecore.common.be.BlockEntityCreative;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
@@ -28,7 +27,7 @@ import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 import static me.srrapero720.waterframes.WaterFrames.REGISTRY;
 
-public class BlockEntityWaterFrame extends BlockEntity {
+public class TileFrame extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
     public static @NotNull String replaceVariables(@NotNull String url) {
@@ -69,7 +68,7 @@ public class BlockEntityWaterFrame extends BlockEntity {
     @OnlyIn(Dist.CLIENT)
     public DisplayerApi display;
 
-    public BlockEntityWaterFrame(BlockPos pos, BlockState state) {
+    public TileFrame(BlockPos pos, BlockState state) {
         super(REGISTRY.blockEntityOnly("frame"), pos, state);
     }
 
@@ -107,9 +106,9 @@ public class BlockEntityWaterFrame extends BlockEntity {
     }
 
     public AlignedBox getBox() {
-        Direction direction = getBlockState().getValue(WaterPictureFrame.FACING);
+        Direction direction = getBlockState().getValue(Frame.FACING);
         Facing facing = Facing.get(direction);
-        AlignedBox box = WaterPictureFrame.box(direction);
+        AlignedBox box = Frame.box(direction);
 
         Axis one = facing.one();
         Axis two = facing.two();
@@ -149,18 +148,18 @@ public class BlockEntityWaterFrame extends BlockEntity {
 
     public void play() {
         playing = true;
-        WaterFrames.NETWORK.sendToClient(new WaterFramePacket(worldPosition, playing, tick), level, worldPosition);
+        WaterFrames.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
     }
 
     public void pause() {
         playing = false;
-        WaterFrames.NETWORK.sendToClient(new WaterFramePacket(worldPosition, playing, tick), level, worldPosition);
+        WaterFrames.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
     }
 
     public void stop() {
         playing = false;
         tick = 0;
-        WaterFrames.NETWORK.sendToClient(new WaterFramePacket(worldPosition, playing, tick), level, worldPosition);
+        WaterFrames.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
     }
 
     protected void savePicture(CompoundTag nbt) {
@@ -216,9 +215,9 @@ public class BlockEntityWaterFrame extends BlockEntity {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
-        if (blockEntity instanceof BlockEntityWaterFrame be) {
-            if (state.getValue(WaterPictureFrame.VISIBLE) != be.visibleFrame) {
-                var brandNewState = state.setValue(WaterPictureFrame.VISIBLE, be.visibleFrame);
+        if (blockEntity instanceof TileFrame be) {
+            if (state.getValue(Frame.VISIBLE) != be.visibleFrame) {
+                var brandNewState = state.setValue(Frame.VISIBLE, be.visibleFrame);
                 level.setBlock(pos, brandNewState, 0);
             }
 

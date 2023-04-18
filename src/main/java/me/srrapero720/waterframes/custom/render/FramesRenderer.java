@@ -6,8 +6,8 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
-import me.srrapero720.waterframes.custom.blocks.BlockEntityWaterFrame;
-import me.srrapero720.waterframes.custom.blocks.WaterPictureFrame;
+import me.srrapero720.waterframes.custom.blocks.TileFrame;
+import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.custom.displayers.DisplayerApi;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
@@ -27,25 +27,25 @@ import team.creative.creativecore.common.util.math.box.BoxCorner;
 import team.creative.creativecore.common.util.math.box.BoxFace;
 
 @OnlyIn(Dist.CLIENT)
-public class WaterFramesRenderer implements BlockEntityRenderer<BlockEntityWaterFrame> {
+public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
     final BlockEntityRendererProvider.Context context;
 
-    public WaterFramesRenderer(BlockEntityRendererProvider.Context c) {
+    public FramesRenderer(BlockEntityRendererProvider.Context c) {
         this.context = c;
     }
 
     @Override
-    public boolean shouldRenderOffScreen(BlockEntityWaterFrame frame) {
+    public boolean shouldRenderOffScreen(TileFrame frame) {
         return frame.getSizeX() > 16 || frame.getSizeY() > 16;
     }
     
     @Override
-    public boolean shouldRender(BlockEntityWaterFrame frame, Vec3 vec) {
+    public boolean shouldRender(TileFrame frame, Vec3 vec) {
         return Vec3.atCenterOf(frame.getBlockPos()).closerThan(vec, frame.renderDistance);
     }
     
     @Override
-    public void render(BlockEntityWaterFrame frame, float partialTicks, PoseStack pose, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
+    public void render(TileFrame frame, float partialTicks, PoseStack pose, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
         if (frame.isURLEmpty() || frame.alpha == 0) {
             if (frame.display != null) frame.display.release();
             return;
@@ -70,7 +70,7 @@ public class WaterFramesRenderer implements BlockEntityRenderer<BlockEntityWater
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         
-        Facing facing = Facing.get(frame.getBlockState().getValue(WaterPictureFrame.FACING));
+        Facing facing = Facing.get(frame.getBlockState().getValue(Frame.FACING));
         AlignedBox box = frame.getBox();
         box.grow(facing.axis, 0.01F);
         BoxFace face = BoxFace.get(facing);
