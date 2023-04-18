@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.custom.displayers.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.displayers.DisplayerApi;
 import me.srrapero720.waterframes.custom.displayers.ImageDisplayer;
@@ -142,7 +143,7 @@ public class TextureCache {
     
     public DisplayerApi createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
         volume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
-        if (textures == null && !noVideo && WaterFrames.CONFIG.useVLC)
+        if (textures == null && !noVideo && !FramesConfig.DISABLE_VLC.get())
             return VideoDisplayer.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
         return new ImageDisplayer(this);
     }

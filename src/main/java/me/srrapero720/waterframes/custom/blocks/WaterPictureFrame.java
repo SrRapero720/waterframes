@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.custom.blocks;
 
 import me.srrapero720.watercore.internal.WConsole;
+import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.cc_gui.GuiWaterFrame;
 import net.minecraft.core.BlockPos;
@@ -100,7 +101,7 @@ public class WaterPictureFrame extends BaseEntityBlock implements BlockGuiCreato
     @Override
     public InteractionResult use(BlockState state, @NotNull Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         WConsole.justPrint(state.getValue(VISIBLE).toString());
-        if (!level.isClientSide && WaterFrames.CONFIG.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        if (!level.isClientSide && FramesConfig.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
     }
 

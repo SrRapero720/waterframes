@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.custom.cc_gui;
 
+import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -9,6 +10,7 @@ import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 import team.creative.creativecore.common.util.text.TextBuilder;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class GuiTextField extends GuiTextfield {
@@ -23,14 +25,14 @@ public class GuiTextField extends GuiTextfield {
     @Override
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
         if (!canUse(true))
-            return WaterFrames.CONFIG.whitelistEnabled ? GuiWarningStyles.DISABLED_BORDER : GuiWarningStyles.WARNING_BORDER;
+            return FramesConfig.ENABLE_WHITELIST.get() ? GuiWarningStyles.DISABLED_BORDER : GuiWarningStyles.WARNING_BORDER;
         return super.getBorder(style, display);
     }
     
     @Override
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
         if (!canUse(true))
-            return WaterFrames.CONFIG.whitelistEnabled ? GuiWarningStyles.DISABLED_BACKGROUND : GuiWarningStyles.WARNING_BACKGROUND;
+            return FramesConfig.ENABLE_WHITELIST.get() ? GuiWarningStyles.DISABLED_BACKGROUND : GuiWarningStyles.WARNING_BACKGROUND;
         return super.getBackground(style, display);
     }
     
@@ -51,6 +53,6 @@ public class GuiTextField extends GuiTextfield {
     }
     
     protected boolean canUse(boolean ignoreToggle) {
-        return WaterFrames.CONFIG.canUse(getPlayer(), getText(), ignoreToggle);
+        return FramesConfig.canUse(getPlayer(), getText(), ignoreToggle);
     }
 }
