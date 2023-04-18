@@ -18,13 +18,13 @@ Of course, CreativeMD can use code from this repo. so if he want he can port thi
 - [FancyVideo-API](https://beta.curseforge.com/minecraft/mc-mods/fancyvideo-api) - Video (VLC) support
 
 ## FEATURES
-- Display pictures (supports gifs) and Videos
+- Display pictures (supports gifs) and Videos (H.264 H.265)
 - Access to local media files (perfect to modpacks)
 - Easy customization
 - WIP: Play videos from Youtube, GoogleDrive and Stardeos.
 
 ## IMPORTANT
-Currently i am working on remove CreativeCore as dependency and depends entirely of WATERCoRE
+Currently i am working on remove CreativeCore as dependency and depends on WATERCoRE
 the main reason i not do that directly is because i need to create a lot of stuff for WATERCoRE. Like
 a Screen API (similar to Android API) and a networking API. for now CC is a good alternative but less 
 documented.
@@ -33,3 +33,7 @@ documented.
 - [SrRapero720](https://github.com/SrRapero720) | Owner
 - [CoolDCB](https://github.com/CoolDCB) | Helper
 - [CreativeMD](https://github.com/CreativeMD) | Base autor
+
+# LICENCE
+All rights reserved<br>
+If you want any permission to use this code ask me first in [Discord](https://discord.gg/cuYAzzZ)<br>
