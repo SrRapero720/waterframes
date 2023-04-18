@@ -1,14 +1,14 @@
-package me.srrapero720.waterframes.custom.displayers;
+package me.srrapero720.waterframes.custom.display;
 
 import team.creative.creativecore.client.CreativeCoreClient;
-import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
+import me.srrapero720.waterframes.custom.display.texture.TextureCache;
 
-public class ImageDisplayer extends DisplayerApi {
+public class PictureDisplay extends IDisplay {
     
     public final TextureCache texture;
     private int textureId;
     
-    public ImageDisplayer(TextureCache texture) {
+    public PictureDisplay(TextureCache texture) {
         this.texture = texture;
     }
     

@@ -8,7 +8,7 @@ import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import me.srrapero720.waterframes.custom.blocks.TileFrame;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.custom.displayers.DisplayerApi;
+import me.srrapero720.waterframes.custom.display.IDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -51,7 +51,7 @@ public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
             return;
         }
         
-        DisplayerApi display = frame.requestDisplay();
+        IDisplay display = frame.requestDisplay();
         if (display == null) return;
         
         display.prepare(frame.getURL(), frame.volume * Minecraft.getInstance().options

@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.custom.displayers;
+package me.srrapero720.waterframes.custom.display;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
@@ -7,7 +7,7 @@ import me.srrapero720.watercore.api.thread.ThreadUtil;
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
-import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
+import me.srrapero720.waterframes.custom.display.texture.TextureCache;
 import me.srrapero720.waterframes.vlc.VLCDiscovery;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
@@ -20,12 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class VideoDisplayer extends DisplayerApi {
+public class MediaDisplay extends IDisplay {
 
     private static final String VLC_DOWNLOAD_64 = "https://i.imgur.com/2aN8ZQC.png";
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
     
-    private static final List<VideoDisplayer> OPEN_DISPLAYS = new ArrayList<>();
+    private static final List<MediaDisplay> OPEN_DISPLAYS = new ArrayList<>();
     
     public static void tick() {
         synchronized (OPEN_DISPLAYS) {
@@ -41,16 +41,16 @@ public class VideoDisplayer extends DisplayerApi {
     
     public static void unload() {
         synchronized (OPEN_DISPLAYS) {
-            for (VideoDisplayer display : OPEN_DISPLAYS)
+            for (MediaDisplay display : OPEN_DISPLAYS)
                 display.free();
             OPEN_DISPLAYS.clear();
         }
     }
     
-    public static DisplayerApi createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
+    public static IDisplay createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         if (VLCDiscovery.isLoadedOrRequest()) {
             if (VLCDiscovery.isAvailable()) {
-                VideoDisplayer display = new VideoDisplayer(pos, url, volume, minDistance, maxDistance, loop);
+                MediaDisplay display = new MediaDisplay(pos, url, volume, minDistance, maxDistance, loop);
                 OPEN_DISPLAYS.add(display);
                 return display;
             }
@@ -76,7 +76,7 @@ public class VideoDisplayer extends DisplayerApi {
     private volatile boolean first = true;
     private long lastCorrectedTime = Long.MIN_VALUE;
     
-    public VideoDisplayer(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
+    public MediaDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         super();
         this.pos = pos;
         texture = GlStateManager._genTexture();
@@ -96,9 +96,9 @@ public class VideoDisplayer extends DisplayerApi {
             public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
                 lock.lock();
                 try {
-                    VideoDisplayer.this.width = sourceWidth;
-                    VideoDisplayer.this.height = sourceHeight;
-                    VideoDisplayer.this.first = true;
+                    MediaDisplay.this.width = sourceWidth;
+                    MediaDisplay.this.height = sourceHeight;
+                    MediaDisplay.this.first = true;
                     buffer = MemoryTracker.create(sourceWidth * sourceHeight * 4).asIntBuffer();
                     needsUpdate = true;
                 } finally {

@@ -1,12 +1,12 @@
-package me.srrapero720.waterframes.custom.displayers.texture;
+package me.srrapero720.waterframes.custom.display.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.srrapero720.gifs.GifDecoder;
 import me.srrapero720.waterframes.FramesConfig;
-import me.srrapero720.waterframes.custom.displayers.DisplayerApi;
-import me.srrapero720.waterframes.custom.displayers.ImageDisplayer;
-import me.srrapero720.waterframes.custom.displayers.VideoDisplayer;
+import me.srrapero720.waterframes.custom.display.IDisplay;
+import me.srrapero720.waterframes.custom.display.MediaDisplay;
+import me.srrapero720.waterframes.custom.display.PictureDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.event.world.WorldEvent;
@@ -35,7 +35,7 @@ public class TextureCache {
         }
     }
 
-    public static void tick() { VideoDisplayer.tick(); }
+    public static void tick() { MediaDisplay.tick(); }
 
     public static void reloadAll() {
         for (var cache : cached.values())
@@ -48,7 +48,7 @@ public class TextureCache {
             for (TextureCache cache : cached.values())
                 cache.remove();
             cached.clear();
-            VideoDisplayer.unload();
+            MediaDisplay.unload();
         }
     }
     
@@ -118,15 +118,15 @@ public class TextureCache {
         return last;
     }
     
-    public DisplayerApi createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
+    public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         return createDisplay(pos, url, volume, minDistance, maxDistance, loop, false);
     }
     
-    public DisplayerApi createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
+    public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
         volume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
         if (textures == null && !noVideo && !FramesConfig.DISABLE_VLC.get())
-            return VideoDisplayer.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
-        return new ImageDisplayer(this);
+            return MediaDisplay.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
+        return new PictureDisplay(this);
     }
     
     public String getError() {

@@ -1,6 +1,6 @@
-package me.srrapero720.waterframes.custom.displayers;
+package me.srrapero720.waterframes.custom.display;
 
-public abstract class DisplayerApi {
+public abstract class IDisplay {
     
     public abstract int getWidth();
     

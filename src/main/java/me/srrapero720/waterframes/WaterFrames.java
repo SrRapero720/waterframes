@@ -4,7 +4,7 @@ import me.srrapero720.watercore.internal.WConfig;
 import me.srrapero720.watercore.internal.WRegistry;
 import me.srrapero720.waterframes.custom.blocks.TileFrame;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
+import me.srrapero720.waterframes.custom.display.texture.TextureCache;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.custom.render.FramesRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;

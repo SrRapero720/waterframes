@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.custom.blocks;
 
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.custom.displayers.DisplayerApi;
-import me.srrapero720.waterframes.custom.displayers.texture.TextureCache;
+import me.srrapero720.waterframes.custom.display.IDisplay;
+import me.srrapero720.waterframes.custom.display.texture.TextureCache;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -66,7 +66,7 @@ public class TileFrame extends BlockEntity {
     public TextureCache cache;
 
     @OnlyIn(Dist.CLIENT)
-    public DisplayerApi display;
+    public IDisplay display;
 
     public TileFrame(BlockPos pos, BlockState state) {
         super(REGISTRY.blockEntityOnly("frame"), pos, state);
@@ -90,7 +90,7 @@ public class TileFrame extends BlockEntity {
         this.url = url;
     }
 
-    public DisplayerApi requestDisplay() {
+    public IDisplay requestDisplay() {
         String url = getURL();
         if (cache == null || !cache.url.equals(url)) {
             cache = TextureCache.get(url);
@@ -223,7 +223,7 @@ public class TileFrame extends BlockEntity {
 
 
             if (level.isClientSide) {
-                DisplayerApi display = be.requestDisplay();
+                IDisplay display = be.requestDisplay();
                 if (display != null) display.tick(be.url, be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}
             if (be.playing) be.tick++;
         }
