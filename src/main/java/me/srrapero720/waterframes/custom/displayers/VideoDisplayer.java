@@ -3,6 +3,7 @@ package me.srrapero720.waterframes.custom.displayers;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
+import me.srrapero720.watercore.api.thread.ThreadUtil;
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
@@ -28,13 +29,12 @@ public class VideoDisplayer extends DisplayerApi {
     
     public static void tick() {
         synchronized (OPEN_DISPLAYS) {
-            for (VideoDisplayer display : OPEN_DISPLAYS) {
-                if (Minecraft.getInstance().isPaused())
-                    if (display.stream) {
-                        if (display.player.mediaPlayer().status().isPlaying())
-                            display.player.mediaPlayer().controls().setPause(true);
-                    } else if (display.player.mediaPlayer().status().length() > 0 && display.player.mediaPlayer().status().isPlaying())
-                        display.player.mediaPlayer().controls().setPause(true);
+            for (var display: OPEN_DISPLAYS) {
+                if (Minecraft.getInstance().isPaused()) {
+                    var media = display.player.mediaPlayer();
+                    if (display.stream && media.status().isPlaying()) media.controls().setPause(true);
+                    else if (media.status().length() > 0 && media.status().isPlaying()) media.controls().setPause(true);
+                }
             }
         }
     }
@@ -54,8 +54,7 @@ public class VideoDisplayer extends DisplayerApi {
                 OPEN_DISPLAYS.add(display);
                 return display;
             }
-        } else
-            return null;
+        } else return null;
         TextureCache cache = TextureCache.get(VLC_DOWNLOAD_64);
         if (cache.ready())
             return cache.createDisplay(pos, VLC_DOWNLOAD_64, volume, minDistance, maxDistance, loop, true);
@@ -116,13 +115,15 @@ public class VideoDisplayer extends DisplayerApi {
         player.mediaPlayer().audio().setVolume((int) volume);
         lastSetVolume = volume;
         player.mediaPlayer().controls().setRepeat(loop);
-        player.mediaPlayer().media().start(url);
-        
+
+        ThreadUtil.thread(() -> {
+            player.mediaPlayer().media().start(url);
+        });
+
     }
     
     public int getVolume(float volume, float minDistance, float maxDistance) {
-        if (player == null)
-            return 0;
+        if (player == null) return 0;
         float distance = (float) pos.distance(Minecraft.getInstance().player.getPosition(CreativeCoreClient.getDeltaFrameTime()));
         if (minDistance > maxDistance) {
             float temp = maxDistance;

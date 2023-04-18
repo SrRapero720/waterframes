@@ -2,12 +2,11 @@ package me.srrapero720.waterframes.custom.displayers.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import me.srrapero720.gifs.GifDecoder;
 import me.srrapero720.waterframes.FramesConfig;
-import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.displayers.DisplayerApi;
 import me.srrapero720.waterframes.custom.displayers.ImageDisplayer;
 import me.srrapero720.waterframes.custom.displayers.VideoDisplayer;
-import me.srrapero720.gifs.GifDecoder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.event.world.WorldEvent;
@@ -21,21 +20,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 public class TextureCache {
     private static final Map<String, TextureCache> cached = new HashMap<>();
-    
-//    @SubscribeEvent
-//    public static void render(@NotNull RenderTickEvent event) {
-//        if (event.phase == Phase.END) {
-//            renderInternal();
-//        }
-//    }
 
     public static void renderInternal() {
-        for (Iterator<TextureCache> iterator = cached.values().iterator(); iterator.hasNext();) {
+        for (var iterator = cached.values().iterator(); iterator.hasNext();) {
             var type = iterator.next();
             if (!type.isUsed()) {
                 type.remove();
@@ -43,18 +34,9 @@ public class TextureCache {
             }
         }
     }
-    
-//    @SubscribeEvent
-//    public static void render(@NotNull ClientTickEvent event) {
-//        if (event.phase == Phase.START) tick();
-//    }
 
-    public static void tick() {
-        VideoDisplayer.tick();
-    }
+    public static void tick() { VideoDisplayer.tick(); }
 
-
-    
     public static void reloadAll() {
         for (var cache : cached.values())
             cache.reload();
@@ -105,8 +87,7 @@ public class TextureCache {
     }
     
     private void trySeek() {
-        if (seeker != null)
-            return;
+        if (seeker != null) return;
         synchronized (TextureSeeker.LOCK) {
             if (TextureSeeker.activeDownloads < TextureSeeker.MAXIMUM_ACTIVE_DOWNLOADS)
                 this.seeker = new TextureSeeker(this);

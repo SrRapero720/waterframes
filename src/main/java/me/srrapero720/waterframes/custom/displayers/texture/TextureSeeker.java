@@ -43,7 +43,7 @@ public class TextureSeeker extends Thread {
         synchronized (TextureSeeker.LOCK) {
             TextureSeeker.activeDownloads++;
         }
-        setName("OPF Download \"" + cache.url + "\"");
+        setName("WF Seeker \"" + cache.url + "\"");
         setDaemon(true);
         start();
     }
@@ -93,7 +93,7 @@ public class TextureSeeker extends Thread {
             exception = e;
         } catch (Exception e) {
             exception = e;
-            LOGGER.error("An exception occurred while loading LittleFrames image", e);
+            LOGGER.error("An exception occurred while loading Waterframes image", e);
         }
         if (!isVideo && !processed) {
             if (exception == null)
