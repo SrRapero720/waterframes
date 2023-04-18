@@ -24,7 +24,7 @@ build/
 *.project
 *.factorypath
 bin/
-run/
+run/*
 .settings/
 /.apt_generated/
 /.apt_generated_tests/
