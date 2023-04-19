@@ -1,12 +1,12 @@
-package me.srrapero720.waterframes.custom.display.texture;
+package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.srrapero720.gifs.GifDecoder;
 import me.srrapero720.waterframes.FramesConfig;
-import me.srrapero720.waterframes.custom.display.IDisplay;
-import me.srrapero720.waterframes.custom.display.MediaDisplay;
-import me.srrapero720.waterframes.custom.display.PictureDisplay;
+import me.srrapero720.waterframes.display.IDisplay;
+import me.srrapero720.waterframes.display.MediaDisplay;
+import me.srrapero720.waterframes.display.PictureDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.event.world.WorldEvent;
@@ -124,8 +124,7 @@ public class TextureCache {
     
     public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
         volume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
-        if (textures == null && !noVideo && !FramesConfig.DISABLE_VLC.get())
-            return MediaDisplay.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
+        if (textures == null && !noVideo && !FramesConfig.DISABLE_VLC.get()) return MediaDisplay.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
         return new PictureDisplay(this);
     }
     

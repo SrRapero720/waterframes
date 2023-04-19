@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.custom.display;
+package me.srrapero720.waterframes.display;
 
 public abstract class IDisplay {
     

@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.custom.render;
+package me.srrapero720.waterframes.custom.renderer;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -8,7 +8,7 @@ import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import me.srrapero720.waterframes.custom.blocks.TileFrame;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.custom.display.IDisplay;
+import me.srrapero720.waterframes.display.IDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;

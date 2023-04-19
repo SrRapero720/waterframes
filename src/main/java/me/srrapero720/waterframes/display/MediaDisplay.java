@@ -1,18 +1,18 @@
-package me.srrapero720.waterframes.custom.display;
+package me.srrapero720.waterframes.display;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.srrapero720.watercore.api.thread.ThreadUtil;
-import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent;
-import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
-import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
-import me.srrapero720.waterframes.custom.display.texture.TextureCache;
+import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.vlc.VLCDiscovery;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.client.CreativeCoreClient;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
+import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent;
+import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
+import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -116,9 +116,7 @@ public class MediaDisplay extends IDisplay {
         lastSetVolume = volume;
         player.mediaPlayer().controls().setRepeat(loop);
 
-        ThreadUtil.thread(() -> {
-            player.mediaPlayer().media().start(url);
-        });
+        ThreadUtil.thread(() -> player.mediaPlayer().media().start(url));
 
     }
     

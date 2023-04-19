@@ -2,8 +2,8 @@ package me.srrapero720.waterframes.custom.screen;
 
 import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.custom.blocks.TileFrame;
-import me.srrapero720.waterframes.custom.display.texture.TextureCache;
-import me.srrapero720.waterframes.custom.display.texture.TextureSeeker;
+import me.srrapero720.waterframes.display.texture.TextureCache;
+import me.srrapero720.waterframes.display.texture.TextureSeeker;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;

@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.custom.blocks;
 
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.custom.display.IDisplay;
-import me.srrapero720.waterframes.custom.display.texture.TextureCache;
+import me.srrapero720.waterframes.display.IDisplay;
+import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;

@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.custom.display.texture;
+package me.srrapero720.waterframes.display.texture;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

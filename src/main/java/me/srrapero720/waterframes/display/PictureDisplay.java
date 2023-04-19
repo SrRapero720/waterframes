@@ -1,7 +1,7 @@
-package me.srrapero720.waterframes.custom.display;
+package me.srrapero720.waterframes.display;
 
+import me.srrapero720.waterframes.display.texture.TextureCache;
 import team.creative.creativecore.client.CreativeCoreClient;
-import me.srrapero720.waterframes.custom.display.texture.TextureCache;
 
 public class PictureDisplay extends IDisplay {
     

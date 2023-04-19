@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.mixin;
 
-import me.srrapero720.waterframes.custom.display.texture.TextureCache;
+import me.srrapero720.waterframes.display.texture.TextureCache;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
