@@ -1,16 +1,19 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "###",
-        "#P#",
-        "###"
+        "iOi",
+        "OGO",
+        "iOi"
     ],
     "key": {
-        "#": {
+        "i": {
+            "item": "minecraft:iron_ingot"
+        },
+        "O": {
             "item": "minecraft:oak_log"
         },
-        "P": {
-            "item": "minecraft:painting"
+        "G": {
+            "item": "minecraft:glass_pane"
         }
     },
     "result": {
