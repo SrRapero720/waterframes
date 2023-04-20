@@ -78,7 +78,7 @@ dependencies {
 
     //DEPENDENCIES
     implementation files("libs/WATERCoRE-1.4.0-DEV20.jar")
-    implementation fg.deobf("curse.maven:fancyvideo-api-591686:3803736")
+    implementation fg.deobf("curse.maven:fancyvideo-api-591686:3865525")
     implementation fg.deobf("curse.maven:creativecore-257814:4394989")
 
     // UTIL
