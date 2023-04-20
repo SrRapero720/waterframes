@@ -95,7 +95,7 @@ public class FrameScreen extends GuiLayer {
     }
     
     public FrameScreen(TileFrame frame, int scaleSize) {
-        super("waterframe", 250, 200);
+        super("waterframe", 250, 210);
         this.frame = frame;
         this.scaleMultiplier = 1F / (scaleSize);
     }
