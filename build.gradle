@@ -25,7 +25,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 0- | Minor features (new language added)
 A/B/C/D | Patches or Hotfixes
 * */
-version = '1.1.0b'
+version = '1.1.0c'
 group= "me.srrapero720" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -88,7 +88,7 @@ dependencies {
 
     // MOD SUPPORT
     implementation fg.deobf("curse.maven:rubidium-574856:4451888")
-    implementation fg.deobf("curse.maven:oculus-581495:4451905")
+//    implementation fg.deobf("curse.maven:oculus-581495:4451905")
     implementation fg.deobf("curse.maven:video-player-645407:4348349")
 
     // MIXINS

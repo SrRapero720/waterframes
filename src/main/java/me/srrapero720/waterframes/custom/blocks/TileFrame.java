@@ -30,12 +30,10 @@ public class TileFrame extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
     public static @NotNull String replaceVariables(@NotNull String url) {
-        var resultGD = WCoreUtil.googleDriveDownload(url);
-        if (resultGD != null) return resultGD;
-        String result = url.replace("$(name)", Minecraft.getInstance().player.getDisplayName().getString()).replace("$(uuid)", Minecraft.getInstance().player.getStringUUID());
-        if (result.startsWith("minecraft://"))
-            result = result.replace("minecraft://", "file:///" + FMLPaths.GAMEDIR.get().toAbsolutePath().toString().replace("\\", "/") + "/");
-        return result;
+        return url.replaceAll("\\{playername}", WCoreUtil.mc().player.getName().getString())
+                .replaceAll("\\{displayname}", WCoreUtil.mc().player.getDisplayName().getString())
+                .replaceAll("\\{uuid}", WCoreUtil.mc().player.getStringUUID())
+                .replace("minecraft://",("file:///" + FMLPaths.GAMEDIR.get().toAbsolutePath()).replace("\\", "/") + "/");
     }
 
     private String url = "";
@@ -80,6 +78,8 @@ public class TileFrame extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
     public String getURL() {
+        if (WCoreUtil.isGoogleDrive(url)) return WCoreUtil.googleDriveDownload(url);
+
         return replaceVariables(url);
     }
 

@@ -100,14 +100,17 @@ public class WCoreUtil {
         return Float.parseFloat(sbFloat.toString());
     }
 
+    @Contract(pure = true)
+    public static boolean isGoogleDrive(@NotNull String url) {
+        return url.contains("drive.google.com/file/d/");
+    }
 
     // GOOGLE DRIVE DIRECT DOWNLOAD GENERATOR
-    public static String googleDriveDownload(String url) {
-        if (!url.contains("drive.google.com/file/d/")) return null;
+    public static String googleDriveDownload(@NotNull String url) {
         return ThreadUtil.tryAndReturn((defaultVar) -> {
             var url1 = new URL(url);
             var paths = url1.getPath().split("/");
             return GD_URL.replace("%FILE_ID%", paths[3]);
-        }, null);
+        }, url);
     }
 }
