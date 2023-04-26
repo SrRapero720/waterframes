@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -51,7 +50,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
     }
 
     public Frame() {
-        super(BlockBehaviour.Properties.of(Material.WOOD).explosionResistance(2.5F).destroyTime(2.0F).noOcclusion());
+        super(Properties.of(Material.WOOD).strength(0.25f, 2.5f).sound(SoundType.WOOD));
     }
 
     @Override
@@ -124,7 +123,6 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
 
     @Override
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, Random pRandom) {
-
         super.tick(pState, pLevel, pPos, pRandom);
     }
 
