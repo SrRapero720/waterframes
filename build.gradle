@@ -25,7 +25,7 @@ apply plugin: 'org.parchmentmc.librarian.forgegradle'
 0- | Minor features (new language added)
 A/B/C/D | Patches or Hotfixes
 * */
-version = '1.1.0d'
+version = '1.1.0e'
 group= "me.srrapero720" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
