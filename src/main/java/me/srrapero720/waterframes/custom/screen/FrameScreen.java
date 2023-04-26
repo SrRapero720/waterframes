@@ -2,13 +2,12 @@ package me.srrapero720.waterframes.custom.screen;
 
 import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.custom.blocks.TileFrame;
+import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.display.texture.TextureSeeker;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import team.creative.creativecore.common.gui.Align;
@@ -20,15 +19,10 @@ import team.creative.creativecore.common.gui.controls.parent.GuiTable;
 import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.style.GuiIcon;
-import team.creative.creativecore.common.gui.style.GuiStyle;
-import team.creative.creativecore.common.gui.style.display.DisplayColor;
-import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 import team.creative.creativecore.common.gui.sync.GuiSyncLocal;
 import team.creative.creativecore.common.util.mc.ColorUtils;
 import team.creative.creativecore.common.util.text.TextBuilder;
 import team.creative.creativecore.common.util.text.TextListBuilder;
-
-import java.util.List;
 
 public class FrameScreen extends GuiLayer {
     public TileFrame frame;
@@ -325,50 +319,4 @@ public class FrameScreen extends GuiLayer {
         
     }
 
-    public static class WidgetTextField extends team.creative.creativecore.common.gui.controls.simple.GuiTextfield {
-        public static final StyleDisplay WARN_DISABLED_BORDER = new DisplayColor(0.196F, 0, 0, 1);
-        public static final StyleDisplay WARN_DISABLED_BACKGROUND = new DisplayColor(0.588F, 0.352F, 0.352F, 1);
-        public static final StyleDisplay WARN_WARNING_BORDER = new DisplayColor(0.196F, 0, 0, 1);
-        public static final StyleDisplay WARN_WARNING_BACKGROUND = new DisplayColor(0.588F, 0.588F, 0.352F, 1);
-        private GuiButton saveButton;
-
-        public WidgetTextField(GuiButton saveButton, String name, String text) {
-            super(name, text);
-            this.saveButton = saveButton;
-        }
-
-        @Override
-        public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
-            if (!canUse(true))
-                return FramesConfig.ENABLE_WHITELIST.get() ? WARN_DISABLED_BORDER : WARN_WARNING_BORDER;
-            return super.getBorder(style, display);
-        }
-
-        @Override
-        public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
-            if (!canUse(true))
-                return FramesConfig.ENABLE_WHITELIST.get() ? WARN_DISABLED_BACKGROUND : WARN_WARNING_BACKGROUND;
-            return super.getBackground(style, display);
-        }
-
-        @Override
-        public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-            boolean pressed = super.keyPressed(keyCode, scanCode, modifiers);
-            saveButton.setEnabled(canUse(false));
-            return pressed;
-        }
-
-        @Override
-        public List<Component> getTooltip() {
-            if (!canUse(false))
-                return List.of(new TextComponent(ChatFormatting.RED.toString()).append(new TranslatableComponent("label.waterframes.not_whitelisted")));
-            else if (!canUse(true))
-                return List.of(new TextComponent(ChatFormatting.GOLD.toString()).append(new TranslatableComponent("label.waterframes.invalid_url")));
-            return null;
-        }
-
-        protected boolean canUse(boolean ignoreToggle) {
-            return FramesConfig.canUse(getPlayer(), getText(), ignoreToggle);
-        }
-    }
 }
