@@ -3,6 +3,7 @@
     "itemGroup.waterframes": "WATERFrAMES",
     "label.waterframes.not_whitelisted": "URL no permitida, no se puede cargar",
     "label.waterframes.whitelist_warning": "Aviso: Lista blanca de URLs no activada",
+    "label.waterframes.invalid_url": "Warning: Invalid URL",
     "gui.waterframes.flipx": "invertir (eje X)",
     "gui.waterframes.flipy": "invertir (eje Y)",
     "gui.waterframes.posx.left": "izquierda (x)",
@@ -11,7 +12,7 @@
     "gui.waterframes.posy.top": "arriba (y)",
     "gui.waterframes.posy.center": "centro (y)",
     "gui.waterframes.posy.bottom": "abajo (y)",
-    "gui.waterframes.visibleFrame": "marco visible",
+    "gui.waterframes.visibleFrame": "marco",
     "gui.waterframes.bothSides": "ambos lados",
     "gui.waterframes.rotation": "rotacion",
     "gui.waterframes.transparency": "transparencia",
@@ -40,6 +41,5 @@
     "config.waterframes.disableAdventure.comment": "Si esta activo, los jugadores en modo aventura no podran editar los marco",
     "config.waterframes.onlyCreative.comment": "Si esta activo, solo jugadores en creativo pueden editar los marcos",
     "config.waterframes.whitelistEnabled.comment": "Si esta activo, solo las URLs listadas pueden ser utilizadas en los maros",
-    "config.waterframes.whitelist.comment": "Lista de URLs permitidas en los marcos",
-    "label.waterframes.whitelist_warning.name": "Warning: Invalid URL"
+    "config.waterframes.whitelist.comment": "Lista de URLs permitidas en los marcos"
 }
