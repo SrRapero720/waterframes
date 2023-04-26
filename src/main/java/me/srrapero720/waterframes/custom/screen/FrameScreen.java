@@ -361,9 +361,9 @@ public class FrameScreen extends GuiLayer {
         @Override
         public List<Component> getTooltip() {
             if (!canUse(false))
-                return new TextBuilder().text(ChatFormatting.RED + "" + ChatFormatting.BOLD).translate("label.waterframes.not_whitelisted.name").build();
+                return List.of(new TextComponent(ChatFormatting.RED.toString()).append(new TranslatableComponent("label.waterframes.not_whitelisted")));
             else if (!canUse(true))
-                return new TextBuilder().text(ChatFormatting.GOLD + "").translate("label.waterframes.whitelist_warning.name").build();
+                return List.of(new TextComponent(ChatFormatting.GOLD.toString()).append(new TranslatableComponent("label.waterframes.invalid_url")));
             return null;
         }
 
