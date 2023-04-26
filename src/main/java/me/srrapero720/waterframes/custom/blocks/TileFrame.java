@@ -4,6 +4,7 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.display.IDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
+import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,6 +30,8 @@ public class TileFrame extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
     public static @NotNull String replaceVariables(@NotNull String url) {
+        var resultGD = WCoreUtil.googleDriveDownload(url);
+        if (resultGD != null) return resultGD;
         String result = url.replace("$(name)", Minecraft.getInstance().player.getDisplayName().getString()).replace("$(uuid)", Minecraft.getInstance().player.getStringUUID());
         if (result.startsWith("minecraft://"))
             result = result.replace("minecraft://", "file:///" + FMLPaths.GAMEDIR.get().toAbsolutePath().toString().replace("\\", "/") + "/");

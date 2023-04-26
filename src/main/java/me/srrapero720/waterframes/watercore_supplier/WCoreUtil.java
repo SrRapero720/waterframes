@@ -107,7 +107,7 @@ public class WCoreUtil {
         return ThreadUtil.tryAndReturn((defaultVar) -> {
             var url1 = new URL(url);
             var paths = url1.getPath().split("/");
-            return GD_URL.replace("%FILE_ID%", paths[2]);
+            return GD_URL.replace("%FILE_ID%", paths[3]);
         }, null);
     }
 }
