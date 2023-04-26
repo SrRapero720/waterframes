@@ -1,13 +1,13 @@
 {
     "type": "minecraft:crafting_shaped",
     "pattern": [
-        "iOi",
-        "OGO",
-        "iOi"
+        "iGi",
+        "GOG",
+        "iGi"
     ],
     "key": {
         "i": {
-            "item": "minecraft:iron_ingot"
+            "item": "minecraft:iron_nugget"
         },
         "O": {
             "item": "minecraft:oak_log"
