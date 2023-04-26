@@ -107,7 +107,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
         for (var direction : Direction.values()) {
             var neighborBlockPos = pos.relative(direction);
             var neighborBlockState = level.getBlockState(neighborBlockPos);
-            if (neighborBlockState.isSignalSource()) {
+            if (neighborBlockState.isSignalSource() && neighborBlockState.getSignal(level, neighborBlockPos, direction) != 0) {
                 hasSignal = true;
                 break;
             }
