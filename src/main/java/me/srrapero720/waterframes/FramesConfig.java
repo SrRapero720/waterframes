@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes;
 
-import me.srrapero720.watercore.api.thread.ThreadUtil;
+import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;

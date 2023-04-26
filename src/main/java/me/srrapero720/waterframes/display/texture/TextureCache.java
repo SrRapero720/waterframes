@@ -2,7 +2,7 @@ package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.srrapero720.gifs.GifDecoder;
+import me.srrapero720.waterframes.watercore_supplier.GifDecoder;
 import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.display.IDisplay;
 import me.srrapero720.waterframes.display.MediaDisplay;

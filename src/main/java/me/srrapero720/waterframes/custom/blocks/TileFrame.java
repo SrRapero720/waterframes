@@ -25,8 +25,6 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
-import static me.srrapero720.waterframes.WaterFrames.REGISTRY;
-
 public class TileFrame extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
@@ -69,7 +67,7 @@ public class TileFrame extends BlockEntity {
     public IDisplay display;
 
     public TileFrame(BlockPos pos, BlockState state) {
-        super(REGISTRY.blockEntityOnly("frame"), pos, state);
+        super(WaterFrames.TILE_FRAME.get(), pos, state);
     }
 
     @OnlyIn(Dist.CLIENT)

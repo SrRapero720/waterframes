@@ -3,9 +3,9 @@ package me.srrapero720.waterframes.display;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.srrapero720.watercore.api.thread.ThreadUtil;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.vlc.VLCDiscovery;
+import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.client.CreativeCoreClient;
@@ -117,7 +117,7 @@ public class MediaDisplay extends IDisplay {
         player.mediaPlayer().controls().setRepeat(loop);
 
         ThreadUtil.thread(() -> player.mediaPlayer().media().start(url));
-
+//        player.mediaPlayer().media().start(url);
     }
     
     public int getVolume(float volume, float minDistance, float maxDistance) {
@@ -230,14 +230,14 @@ public class MediaDisplay extends IDisplay {
     @Override
     public void pause(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
         if (player == null) return;
-        player.mediaPlayer().controls().setTime(tick * 50L);
+//        player.mediaPlayer().controls().setTime(tick * 50L);
         player.mediaPlayer().controls().pause();
     }
     
     @Override
     public void resume(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
         if (player == null) return;
-        player.mediaPlayer().controls().setTime(tick * 50L);
+//        player.mediaPlayer().controls().setTime(tick * 50L); -- causes crash
         player.mediaPlayer().controls().play();
     }
     
