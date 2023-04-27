@@ -17,7 +17,7 @@
  * Copyright 2009-2022 Caprica Software Limited.
  */
 
-package me.srrapero720.waterframes.vlc;
+package me.srrapero720.vlctool.strategy;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,7 +86,7 @@ abstract public class DirectoryProviderDiscoveryStrategyFixed extends BaseNative
     }
     
     private List<DiscoveryDirectoryProvider> getSupportedProviders() {
-        List<DiscoveryDirectoryProvider> result = new ArrayList<DiscoveryDirectoryProvider>();
+        List<DiscoveryDirectoryProvider> result = new ArrayList<>();
         for (DiscoveryDirectoryProvider service : directoryProviders) {
             if (service.supported()) {
                 result.add(service);

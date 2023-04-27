@@ -4,7 +4,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.srrapero720.waterframes.display.texture.TextureCache;
-import me.srrapero720.waterframes.vlc.VLCDiscovery;
+import me.srrapero720.vlctool.VLCDiscovery;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
@@ -48,16 +48,13 @@ public class MediaDisplay extends IDisplay {
     }
     
     public static IDisplay createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
-        if (VLCDiscovery.isLoadedOrRequest()) {
-            if (VLCDiscovery.isAvailable()) {
-                MediaDisplay display = new MediaDisplay(pos, url, volume, minDistance, maxDistance, loop);
-                OPEN_DISPLAYS.add(display);
-                return display;
-            }
-        } else return null;
-        TextureCache cache = TextureCache.get(VLC_DOWNLOAD_64);
-        if (cache.ready())
-            return cache.createDisplay(pos, VLC_DOWNLOAD_64, volume, minDistance, maxDistance, loop, true);
+        if (VLCDiscovery.isReadyOrRequest()) {
+            MediaDisplay display = new MediaDisplay(pos, url, volume, minDistance, maxDistance, loop);
+            OPEN_DISPLAYS.add(display);
+            return display;
+        }
+        var cache = TextureCache.get(VLC_DOWNLOAD_64);
+        if (cache.ready()) return cache.createDisplay(pos, VLC_DOWNLOAD_64, volume, minDistance, maxDistance, loop, true);
         return null;
     }
     

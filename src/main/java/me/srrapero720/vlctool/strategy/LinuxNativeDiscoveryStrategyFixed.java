@@ -17,7 +17,7 @@
  * Copyright 2009-2022 Caprica Software Limited.
  */
 
-package me.srrapero720.waterframes.vlc;
+package me.srrapero720.vlctool.strategy;
 
 import uk.co.caprica.vlcj.binding.LibC;
 import uk.co.caprica.vlcj.binding.RuntimeUtil;

@@ -1,5 +1,5 @@
 
-package me.srrapero720.waterframes.vlc;
+package me.srrapero720.vlctool.strategy;
 
 import java.nio.file.Path;
 
@@ -7,8 +7,6 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import uk.co.caprica.vlcj.binding.RuntimeUtil;
 import uk.co.caprica.vlcj.factory.discovery.provider.DiscoveryDirectoryProvider;
 
-@Deprecated(forRemoval = false)
-// I remove this because FancyVideo-API unwrap their vlc on game dir, and my cpde try to use it (and have broken things)
 public class LocalFileDiscoveryDirectoryProvider implements DiscoveryDirectoryProvider {
     
     @Override

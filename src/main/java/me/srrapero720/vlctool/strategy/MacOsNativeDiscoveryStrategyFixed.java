@@ -17,30 +17,31 @@
  * Copyright 2009-2022 Caprica Software Limited.
  */
 
-package me.srrapero720.waterframes.vlc;
+package me.srrapero720.vlctool.strategy;
 
 import uk.co.caprica.vlcj.binding.LibC;
 import uk.co.caprica.vlcj.binding.RuntimeUtil;
 
-/** Default implementation of a native discovery strategy that searches directories on the Windows operating system. */
-public class WindowsNativeDiscoveryStrategyFixed extends DirectoryProviderDiscoveryStrategyFixed {
-
-    private static final String[] FILENAME_PATTERNS = new String[] { "libvlc\\.dll", "libvlccore\\.dll" };
-
-    private static final String[] PLUGIN_PATH_FORMATS = new String[] { "%s\\plugins", "%s\\vlc\\plugins" };
-
-    public WindowsNativeDiscoveryStrategyFixed() {
+/** Default implementation of a native discovery strategy that searches directories on the macOS operating system. */
+public class MacOsNativeDiscoveryStrategyFixed extends DirectoryProviderDiscoveryStrategyFixed {
+    
+    private static final String[] FILENAME_PATTERNS = new String[] { "libvlc\\.dylib", "libvlccore\\.dylib" };
+    
+    /** Format string to prepare the plugin path environment variable value. */
+    private static final String[] PLUGIN_PATH_FORMATS = new String[] { "%s/plugins" };
+    
+    public MacOsNativeDiscoveryStrategyFixed() {
         super(FILENAME_PATTERNS, PLUGIN_PATH_FORMATS);
     }
-
+    
     @Override
     public boolean supported() {
-        return RuntimeUtil.isWindows();
+        return RuntimeUtil.isMac();
     }
-
+    
     @Override
     protected boolean setPluginPath(String pluginPath) {
-        return LibC.INSTANCE._putenv(String.format("%s=%s", PLUGIN_ENV_NAME, pluginPath)) == 0;
+        return LibC.INSTANCE.setenv(PLUGIN_ENV_NAME, pluginPath, 1) == 0;
     }
-
+    
 }

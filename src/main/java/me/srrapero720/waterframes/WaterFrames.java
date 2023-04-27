@@ -27,15 +27,16 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import team.creative.creativecore.common.network.CreativeNetwork;
 
 @Mod(WaterFrames.ID)
 public class WaterFrames {
     public static final String ID = "waterframes";
-    public static final Logger LOGGER = LogManager.getLogger(ID);
+    public static final Logger LOGGER = LoggerFactory.getLogger(ID);
 //    public static final WRegistry REGISTRY = new WRegistry(ID);
-    public static final CreativeNetwork NETWORK = new CreativeNetwork("1.2", LOGGER, new ResourceLocation(ID, "main"));
+    public static final CreativeNetwork NETWORK = new CreativeNetwork("1.2", LogManager.getLogger(ID), new ResourceLocation(ID, "main"));
 
     // EXTRAPOLAR
     public static final ForgeSmartTab TAB = new ForgeSmartTab("waterframes", new ResourceLocation(ID, "frame"));
