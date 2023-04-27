@@ -50,7 +50,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
     }
 
     public Frame() {
-        super(Properties.of(Material.WOOD).strength(0.25f, 2.5f).sound(SoundType.WOOD));
+        super(Properties.of(Material.WOOD).strength(0.25f, 2.5f).sound(SoundType.WOOD).noOcclusion());
     }
 
     @Override
