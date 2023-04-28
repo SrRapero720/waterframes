@@ -79,7 +79,7 @@ public class FramesConfig {
         // waterframes -> rendering
         BUILDER.push("tools");
         YOUTUBE_PROVIDER = BUILDER.comment("Check discord for more info: https://discord.gg/cuYAzzZ")
-                .define("youtubeUrlProvider", "https://sr-simple-youtube-downloader.herokuapp.com");
+                .define("youtubeMediaProvider", "");
 
         // ->
         BUILDER.pop();
