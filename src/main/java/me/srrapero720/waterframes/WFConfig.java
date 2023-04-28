@@ -79,7 +79,7 @@ public class WFConfig {
         // waterframes -> rendering
         BUILDER.push("tools");
         YOUTUBE_PROVIDER = BUILDER.comment("Check discord for more info: https://discord.gg/cuYAzzZ")
-                .define("youtubeMediaProvider", "");
+                .define("youtubeMediaProvider", "https://sr-simple-youtube-downloader.herokuapp.com");
 
         // ->
         BUILDER.pop();
