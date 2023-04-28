@@ -2,10 +2,11 @@ package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.Level;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.GameType;
+import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.net.URI;
@@ -90,18 +91,18 @@ public class WFConfig {
 
     public static boolean isDomainWhitelisted(String domain) {
         if (domain != null)
-            for (final var url: WHITELIST.get()) {
-                var uri = url.trim().toLowerCase(Locale.ROOT);
+            for (final String url: WHITELIST.get()) {
+                String uri = url.trim().toLowerCase(Locale.ROOT);
                 if (domain.endsWith("." + uri) || domain.equals(uri)) return true;
             }
         return false;
     }
 
-    public static boolean canUse(Player player, String url) { return canUse(player, url, false); }
+    public static boolean canUse(PlayerEntity player, String url) { return canUse(player, url, false); }
 
-    public static boolean canUse(Player player, String url, boolean ignoreToggle) {
-        var level = player.level;
-        var server = level.getServer();
+    public static boolean canUse(PlayerEntity player, String url, boolean ignoreToggle) {
+        World level = player.level;
+        MinecraftServer server = level.getServer();
         if (!level.isClientSide && (server.isSingleplayer() || player.hasPermissions(server.getOperatorUserPermissionLevel()))) return true;
 
         if (ENABLE_WHITELIST.get() || ignoreToggle) return ThreadUtil.tryAndReturn((defaultVar) ->
@@ -109,17 +110,18 @@ public class WFConfig {
         return true;
     }
 
-    public static GameType getGameType(Player player) {
-        if (player instanceof ServerPlayer serverPlayer) return serverPlayer.gameMode.getGameModeForPlayer();
+    public static GameType getGameType(PlayerEntity player) {
+        if (player instanceof ServerPlayerEntity) return ((ServerPlayerEntity) player).gameMode.getGameModeForPlayer();
+        assert Minecraft.getInstance().gameMode != null;
         return Minecraft.getInstance().gameMode.getPlayerMode();
     }
 
-    public static boolean canInteract(Player player, Level level) {
+    public static boolean canInteract(PlayerEntity player, World level) {
         if (ONLY_CREATIVE.get() && !player.isCreative()) return false;
 
-        var isOperator = Objects.requireNonNull(level.getServer()).isSingleplayer() || player.hasPermissions(level.getServer().getOperatorUserPermissionLevel());
+        boolean isOperator = Objects.requireNonNull(level.getServer()).isSingleplayer() || player.hasPermissions(level.getServer().getOperatorUserPermissionLevel());
         if (ONLY_ADMINS.get()) return isOperator;
-        else return isOperator || (player.getAbilities().mayBuild);
+        else return isOperator || (player.abilities.mayBuild);
     }
 
     public static String getYoutubeProvider() {

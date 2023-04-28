@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.custom.blocks;
 
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.custom.screen.FrameScreen;
+import net.minecraft.block.Block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -35,7 +36,7 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 import java.util.Random;
 
-public class Frame extends BaseEntityBlock implements BlockGuiCreator {
+public class Frame extends Block implements BlockGuiCreator {
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final BooleanProperty VISIBLE = BooleanProperty.create("visible");

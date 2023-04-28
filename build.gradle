@@ -17,7 +17,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 configurations {
     library
@@ -63,24 +63,19 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${project.mcV}-${project.fgV}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     //DEPENDENCIES
-    implementation fg.deobf("curse.maven:fancyvideo-api-591686:3822603")
-    implementation fg.deobf("curse.maven:creativecore-257814:4394989")
+    implementation fg.deobf("curse.maven:fancyvideo-api-591686:3727953")
+    implementation fg.deobf("curse.maven:creativecore-257814:3419983")
 
     // UTIL
-    implementation fg.deobf("curse.maven:ferritecore-429235:4074294")
-    implementation fg.deobf("curse.maven:fastload-630620:4271605")
-    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3544496")
-    implementation fg.deobf("curse.maven:spark-361579:3824951")
+    implementation fg.deobf("curse.maven:ferritecore-429235:4074330")
+    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3249059")
 
     // MOD SUPPORT
-    implementation fg.deobf("curse.maven:rubidium-574856:4451888")
-    implementation fg.deobf("curse.maven:oculus-581495:4451905")
-    implementation fg.deobf("curse.maven:video-player-645407:4348349")
-
-    // MIXINS
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    implementation fg.deobf("curse.maven:rubidium-574856:4397474")
+    implementation fg.deobf("curse.maven:oculus-581495:4300427")
 }
 
 mixin { add sourceSets.main, "waterframes.mixin-refmap.json" }
