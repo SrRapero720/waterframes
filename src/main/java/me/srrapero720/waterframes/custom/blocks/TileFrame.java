@@ -225,7 +225,7 @@ public class TileFrame extends BlockEntity {
 
             if (level.isClientSide) {
                 IDisplay display = be.requestDisplay();
-                if (display != null) display.tick(be.url, be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}
+                if (display != null) display.tick(be.getURL(), be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}
             if (be.playing) be.tick++;
         }
     }
