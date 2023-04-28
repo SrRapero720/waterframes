@@ -22,6 +22,7 @@ public class FramesConfig {
     public static final ForgeConfigSpec.BooleanValue ONLY_CREATIVE;
     public static final ForgeConfigSpec.BooleanValue ONLY_ADMINS;
     public static final ForgeConfigSpec.BooleanValue ENABLE_WHITELIST;
+    public static final ForgeConfigSpec.ConfigValue<String> YOUTUBE_PROVIDER;
     public static final ForgeConfigSpec.ConfigValue<List<String>> WHITELIST;
 
     static {
@@ -69,10 +70,16 @@ public class FramesConfig {
                 "wikimedia.org",
                 "ytimg.com",
                 "youtube.com",
+                "youtu.be",
                 "drive.google.com"
         ));
         // waterframes ->
         BUILDER.pop();
+
+        // waterframes -> rendering
+        BUILDER.push("tools");
+        YOUTUBE_PROVIDER = BUILDER.comment("Check discord for more info: https://discord.gg/cuYAzzZ")
+                .define("youtubeUrlProvider", "https://sr-simple-youtube-downloader.herokuapp.com");
 
         // ->
         BUILDER.pop();
@@ -113,5 +120,9 @@ public class FramesConfig {
         var isOperator = Objects.requireNonNull(level.getServer()).isSingleplayer() || player.hasPermissions(level.getServer().getOperatorUserPermissionLevel());
         if (ONLY_ADMINS.get()) return isOperator;
         else return isOperator || (player.getAbilities().mayBuild);
+    }
+
+    public static String getYoutubeProvider() {
+        return YOUTUBE_PROVIDER.get();
     }
 }

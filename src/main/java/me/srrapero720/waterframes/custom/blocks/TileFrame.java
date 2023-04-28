@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.custom.blocks;
 
+import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.display.IDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
@@ -31,7 +32,9 @@ public class TileFrame extends BlockEntity {
     @OnlyIn(Dist.CLIENT)
     public static @NotNull String parseUrl(@NotNull String url) {
         var extractor = new YTExtractor(url);
-        if (extractor.isValid()) return "https://sr-simple-youtube-downloader.herokuapp.com/execute/" + extractor;
+        var provider = FramesConfig.getYoutubeProvider();
+        if (extractor.isValid() && !provider.isEmpty()) return provider + "/execute/" + extractor;
+
         return url.replaceAll("\\{playername}", WCoreUtil.mc().player.getName().getString())
                 .replaceAll("\\{displayname}", WCoreUtil.mc().player.getDisplayName().getString())
                 .replaceAll("\\{uuid}", WCoreUtil.mc().player.getStringUUID())
