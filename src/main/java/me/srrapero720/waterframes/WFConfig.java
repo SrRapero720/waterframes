@@ -11,7 +11,7 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import java.net.URI;
 import java.util.*;
 
-public class FramesConfig {
+public class WFConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
 

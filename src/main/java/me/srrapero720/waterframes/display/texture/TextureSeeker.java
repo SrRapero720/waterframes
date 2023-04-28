@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.display.texture;
 
-import me.srrapero720.waterframes.FramesConfig;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.watercore_supplier.GifDecoder;
 import net.minecraft.client.Minecraft;
@@ -84,7 +84,7 @@ public class TextureSeeker extends Thread {
                 IOUtils.closeQuietly(in);
             }
         } catch (FoundVideoException e) {
-            if (!FramesConfig.DISABLE_VLC.get()) {
+            if (!WFConfig.DISABLE_VLC.get()) {
                 cache.processVideo();
                 isVideo = true;
             } else

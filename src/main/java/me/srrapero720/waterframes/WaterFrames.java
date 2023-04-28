@@ -64,7 +64,7 @@ public class WaterFrames {
         ITEMS.register(bus());
         TILES.register(bus());
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, FramesConfig.SPEC, "waterframes-server.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, WFConfig.SPEC, "waterframes-server.toml");
     }
 
 

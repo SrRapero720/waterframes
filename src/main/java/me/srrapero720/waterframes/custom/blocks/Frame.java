@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.custom.blocks;
 
-import me.srrapero720.waterframes.FramesConfig;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.custom.screen.FrameScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -95,7 +95,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
 
     @Override
     public InteractionResult use(BlockState state, @NotNull Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide && FramesConfig.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        if (!level.isClientSide && WFConfig.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
     }
 

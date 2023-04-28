@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.display;
 
 import me.srrapero720.waterframes.display.texture.TextureCache;
+import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import team.creative.creativecore.client.CreativeCoreClient;
 
 public class PictureDisplay extends IDisplay {
@@ -14,7 +15,7 @@ public class PictureDisplay extends IDisplay {
     
     @Override
     public void prepare(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
-        long time = tick * 50 + (playing ? (long) (CreativeCoreClient.getDeltaFrameTime() * 50) : 0);
+        long time = tick * 50L + (playing ? (long) (WCoreUtil.toDeltaFrames() * 50) : 0);
         if (texture.getDuration() > 0 && time > texture.getDuration())
             if (loop)
                 time %= texture.getDuration();

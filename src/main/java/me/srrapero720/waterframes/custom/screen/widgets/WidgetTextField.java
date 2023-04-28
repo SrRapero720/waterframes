@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.custom.screen.widgets;
 
-import me.srrapero720.waterframes.FramesConfig;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.custom.screen.widgets.constants.Constants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -30,7 +30,7 @@ public class WidgetTextField extends GuiTextfield {
     @Override
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
         if (!canUse(true))
-            return FramesConfig.ENABLE_WHITELIST.get() ? Constants.WARN_DISABLED_BACKGROUND : Constants.WARN_WARNING_BACKGROUND;
+            return WFConfig.ENABLE_WHITELIST.get() ? Constants.WARN_DISABLED_BACKGROUND : Constants.WARN_WARNING_BACKGROUND;
         return super.getBackground(style, display);
     }
 
@@ -49,6 +49,6 @@ public class WidgetTextField extends GuiTextfield {
     }
 
     protected boolean canUse(boolean ignoreToggle) {
-        return FramesConfig.canUse(getPlayer(), getText(), ignoreToggle);
+        return WFConfig.canUse(getPlayer(), getText(), ignoreToggle);
     }
 }

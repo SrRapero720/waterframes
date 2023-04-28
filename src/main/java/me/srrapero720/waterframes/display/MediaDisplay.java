@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
+import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import net.minecraft.client.Minecraft;
 import nick1st.fancyvideo.api.MediaPlayerHandler;
 import org.lwjgl.opengl.GL11;
@@ -120,7 +121,7 @@ public class MediaDisplay extends IDisplay {
     
     public int getVolume(float volume, float minDistance, float maxDistance) {
         if (player == null) return 0;
-        float distance = (float) pos.distance(Minecraft.getInstance().player.getPosition(CreativeCoreClient.getDeltaFrameTime()));
+        float distance = (float) pos.distance(Minecraft.getInstance().player.getPosition(WCoreUtil.toDeltaFrames()));
         if (minDistance > maxDistance) {
             float temp = maxDistance;
             maxDistance = minDistance;
@@ -164,7 +165,7 @@ public class MediaDisplay extends IDisplay {
                         player.mediaPlayer().controls().setPause(!realPlaying);
                     
                     if (player.mediaPlayer().status().isSeekable()) {
-                        long time = tick * tickTime + (realPlaying ? (long) (CreativeCoreClient.getDeltaFrameTime() * tickTime) : 0);
+                        long time = tick * tickTime + (realPlaying ? (long) (WCoreUtil.toDeltaFrames() * tickTime) : 0);
                         if (time > player.mediaPlayer().status().time() && loop)
                             time %= player.mediaPlayer().status().length();
                         if (Math.abs(time - player.mediaPlayer().status().time()) > ACCEPTABLE_SYNC_TIME && Math.abs(time - lastCorrectedTime) > ACCEPTABLE_SYNC_TIME) {

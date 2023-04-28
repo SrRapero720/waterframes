@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.custom.blocks;
 
-import me.srrapero720.waterframes.FramesConfig;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.display.IDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
@@ -32,7 +32,7 @@ public class TileFrame extends BlockEntity {
     @OnlyIn(Dist.CLIENT)
     public static @NotNull String parseUrl(@NotNull String url) {
         var extractor = new YTExtractor(url);
-        var provider = FramesConfig.getYoutubeProvider();
+        var provider = WFConfig.getYoutubeProvider();
         if (extractor.isValid() && !provider.isEmpty()) return provider + "/execute/" + extractor;
 
         return url.replaceAll("\\{playername}", WCoreUtil.mc().player.getName().getString())
