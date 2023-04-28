@@ -5,7 +5,7 @@ import me.srrapero720.waterframes.display.IDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
-import net.minecraft.client.Minecraft;
+import me.srrapero720.waterframes.watercore_supplier.YTExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -29,7 +29,9 @@ import team.creative.creativecore.common.util.math.vec.Vec3d;
 public class TileFrame extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
-    public static @NotNull String replaceVariables(@NotNull String url) {
+    public static @NotNull String parseUrl(@NotNull String url) {
+        var extractor = new YTExtractor(url);
+        if (extractor.isValid()) return "https://sr-simple-youtube-downloader.herokuapp.com/execute/" + extractor;
         return url.replaceAll("\\{playername}", WCoreUtil.mc().player.getName().getString())
                 .replaceAll("\\{displayname}", WCoreUtil.mc().player.getDisplayName().getString())
                 .replaceAll("\\{uuid}", WCoreUtil.mc().player.getStringUUID())
@@ -80,7 +82,7 @@ public class TileFrame extends BlockEntity {
     public String getURL() {
         if (WCoreUtil.isGoogleDrive(url)) return WCoreUtil.googleDriveDownload(url);
 
-        return replaceVariables(url);
+        return parseUrl(url);
     }
 
     public String getRealURL() {
@@ -225,7 +227,7 @@ public class TileFrame extends BlockEntity {
 
             if (level.isClientSide) {
                 IDisplay display = be.requestDisplay();
-                if (display != null) display.tick(be.url, be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}
+                if (display != null) display.tick(be.getURL(), be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}
             if (be.playing) be.tick++;
         }
     }
