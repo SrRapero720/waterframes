@@ -4,9 +4,9 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.srrapero720.waterframes.display.texture.TextureCache;
-import me.srrapero720.vlctool.VLCDiscovery;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
+import nick1st.fancyvideo.api.MediaPlayerHandler;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.client.CreativeCoreClient;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
@@ -19,10 +19,10 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 
 public class MediaDisplay extends IDisplay {
-
-    private static final String VLC_DOWNLOAD_64 = "https://i.imgur.com/2aN8ZQC.png";
+    private static final String VLC_FAILED = "https://i.imgur.com/UAXbZeM.jpg";
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
     
     private static final List<MediaDisplay> OPEN_DISPLAYS = new ArrayList<>();
@@ -41,21 +41,22 @@ public class MediaDisplay extends IDisplay {
     
     public static void unload() {
         synchronized (OPEN_DISPLAYS) {
-            for (MediaDisplay display : OPEN_DISPLAYS)
-                display.free();
+            for (var display : OPEN_DISPLAYS) display.free();
             OPEN_DISPLAYS.clear();
         }
     }
     
     public static IDisplay createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
-        if (VLCDiscovery.isReadyOrRequest()) {
-            MediaDisplay display = new MediaDisplay(pos, url, volume, minDistance, maxDistance, loop);
+        return ThreadUtil.tryAndReturn((defaultVar) -> {
+            var display = new MediaDisplay(pos, url, volume, minDistance, maxDistance, loop);
             OPEN_DISPLAYS.add(display);
             return display;
-        }
-        var cache = TextureCache.get(VLC_DOWNLOAD_64);
-        if (cache.ready()) return cache.createDisplay(pos, VLC_DOWNLOAD_64, volume, minDistance, maxDistance, loop, true);
-        return null;
+
+        }, ((Supplier<IDisplay>) () -> {
+            var cache = TextureCache.get(VLC_FAILED);
+            if (cache.ready()) return cache.createDisplay(pos, VLC_FAILED, volume, minDistance, maxDistance, loop, true);
+            return null;
+        }).get());
     }
     
     public volatile int width = 1;
@@ -69,7 +70,7 @@ public class MediaDisplay extends IDisplay {
     private boolean stream = false;
     private float lastSetVolume;
     private volatile boolean needsUpdate = false;
-    private ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock = new ReentrantLock();
     private volatile boolean first = true;
     private long lastCorrectedTime = Long.MIN_VALUE;
     
@@ -78,7 +79,7 @@ public class MediaDisplay extends IDisplay {
         this.pos = pos;
         texture = GlStateManager._genTexture();
         
-        player = new CallbackMediaPlayerComponent(VLCDiscovery.factory, null, null, false, (mediaPlayer, nativeBuffers, bufferFormat) -> {
+        player = new CallbackMediaPlayerComponent(MediaPlayerHandler.getInstance().getFactory(), null, null, false, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
             try {
                 buffer.put(nativeBuffers[0].asIntBuffer());
