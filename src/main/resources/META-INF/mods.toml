@@ -1,6 +1,6 @@
 modLoader="javafml"
 loaderVersion="[40,)"
-issueTrackerURL="https://github.com/SrRapero720/LittleFrames-1.18.2/issues"
+issueTrackerURL="https://github.com/SrRapero720/waterframes/issues"
 logoFile="pack.png"
 license="All rights reserved"
 
@@ -8,9 +8,15 @@ license="All rights reserved"
 	modId="waterframes"
 	version="${file.jarVersion}"
 	displayName="WATERFrAMES"
-	displayURL="https://www.curseforge.com/minecraft/mc-mods/littleframes-1-18-2"
-	authors="SrRapero720 | CoolDCB"
+	displayURL="https://www.curseforge.com/minecraft/mc-mods/waterframes"
+	credits="CreativeMD: Original author"
+	authors="SrRapero720: Proyect Owner --- CoolDCB: Porting help"
 	description='''
+	Show to all your friends your dank memes or rickroll
+	all the server using the official urlfrom youtube.
+	How more you need to know? is a mod to show media
+	in your game has a paint, tv. JUST DISPLAY IT
+
 	#ShowItIngame
 '''
 
@@ -18,7 +24,7 @@ license="All rights reserved"
 [[dependencies.waterframes]]
 	modId = "forge"
 	mandatory = true
-	versionRange = "[40.2,)"
+	versionRange = "[40,)"
 	ordering = "NONE"
 	side = "BOTH"
 
@@ -36,10 +42,9 @@ license="All rights reserved"
 	side="CLIENT"
 	versionRange="[1.1,)"
 
-## FURUTE REPLACEMENT FOR CreativeCore
 #[[dependencies.waterframes]]
 #    modId="watercore"
-#    mandatory=true
+#    mandatory=false
 #    ordering="NONE"
 #    side="BOTH"
 #    versionRange="[1.3,)"
