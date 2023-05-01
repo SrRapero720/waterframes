@@ -42,7 +42,7 @@ public class WaterFrames {
     public static final ForgeSmartTab TAB = new ForgeSmartTab("waterframes", new ResourceLocation(ID, "frame"));
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ID);
-    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, ID);
+    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ID);
 
     public static RegistryObject<Frame> FRAME;
     public static RegistryObject<BlockEntityType<TileFrame>> TILE_FRAME;

@@ -4,8 +4,6 @@ import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.custom.screen.widgets.constants.Constants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import team.creative.creativecore.common.gui.controls.simple.GuiButton;
 import team.creative.creativecore.common.gui.controls.simple.GuiTextfield;
 import team.creative.creativecore.common.gui.style.GuiStyle;
@@ -43,8 +41,8 @@ public class WidgetTextField extends GuiTextfield {
 
     @Override
     public List<Component> getTooltip() {
-        if (!canUse(false)) return List.of(new TextComponent(ChatFormatting.RED.toString()).append(new TranslatableComponent("label.waterframes.not_whitelisted")));
-        else if (!canUse(true)) return List.of(new TextComponent(ChatFormatting.GOLD.toString()).append(new TranslatableComponent("label.waterframes.invalid_url")));
+        if (!canUse(false)) return List.of(Component.literal(ChatFormatting.RED.toString()).append(Component.translatable("label.waterframes.not_whitelisted")));
+        else if (!canUse(true)) return List.of(Component.literal(ChatFormatting.GOLD.toString()).append(Component.translatable("label.waterframes.invalid_url")));
         return null;
     }
 

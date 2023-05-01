@@ -9,7 +9,7 @@ import me.srrapero720.waterframes.display.MediaDisplay;
 import me.srrapero720.waterframes.display.PictureDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -43,8 +43,8 @@ public class TextureCache {
     }
     
     @SubscribeEvent
-    public static void unload(WorldEvent.Unload event) {
-        if (event.getWorld().isClientSide()) {
+    public static void unload(LevelEvent.Unload event) {
+        if (event.getLevel().isClientSide()) {
             for (TextureCache cache : cached.values())
                 cache.remove();
             cached.clear();
