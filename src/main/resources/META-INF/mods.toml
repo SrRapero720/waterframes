@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[40,)"
+loaderVersion="[43,)"
 issueTrackerURL="https://github.com/SrRapero720/waterframes/issues"
 logoFile="pack.png"
 license="All rights reserved"
@@ -24,7 +24,7 @@ license="All rights reserved"
 [[dependencies.waterframes]]
 	modId = "forge"
 	mandatory = true
-	versionRange = "[40,)"
+	versionRange = "[43,)"
 	ordering = "NONE"
 	side = "BOTH"
 
@@ -33,14 +33,14 @@ license="All rights reserved"
 	mandatory=true
 	ordering="NONE"
 	side="BOTH"
-	versionRange="[2.6,)"
+	versionRange="[2.9,)"
 
 [[dependencies.waterframes]]
 	modId="fancyvideo_api"
 	mandatory=true
 	ordering="NONE"
 	side="CLIENT"
-	versionRange="[1.1,)"
+	versionRange="[2.2,)"
 
 #[[dependencies.waterframes]]
 #    modId="watercore"
