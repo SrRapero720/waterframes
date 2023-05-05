@@ -12,10 +12,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @OnlyIn(Dist.CLIENT)
 @Mixin(Minecraft.class)
 public class MinecraftMixin {
+
+    @Inject(method = "tick", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V"))
+    public void injectTick(CallbackInfo ci) {
+        TextureCache.tick();
+    }
+
     @OnlyIn(Dist.CLIENT)
-    @Inject(method = "runTick", at = @At("HEAD"))
+    @Inject(method = "runTick", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"))
     public void injectRunTick(boolean pRenderLevel, CallbackInfo ci) {
         TextureCache.renderInternal();
-        TextureCache.tick();
     }
 }

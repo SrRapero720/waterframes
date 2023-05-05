@@ -74,7 +74,8 @@ public class WaterFrames {
 
     @OnlyIn(Dist.CLIENT)
     public void client(final FMLClientSetupEvent event) {
+
         MinecraftForge.EVENT_BUS.register(TextureCache.class);
-        BlockEntityRenderers.register(TILE_FRAME.get(), FramesRenderer::new);
+        BlockEntityRenderers.register(TILE_FRAME.get(), (x) -> new FramesRenderer());
     }
 }
