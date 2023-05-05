@@ -1,21 +1,21 @@
 package me.srrapero720.waterframes.display;
 
-public abstract class IDisplay {
+public interface IDisplay {
     
-    public abstract int getWidth();
+    int getWidth();
     
-    public abstract int getHeight();
+    int getHeight();
     
-    public abstract void prepare(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
+    void prepare(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
     
-    public abstract void tick(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
+    void tick(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
     
-    public abstract void pause(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
+    void pause(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
     
-    public abstract void resume(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
+    void resume(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
     
-    public abstract int texture();
+    int texture();
     
-    public abstract void release();
+    void release();
     
 }

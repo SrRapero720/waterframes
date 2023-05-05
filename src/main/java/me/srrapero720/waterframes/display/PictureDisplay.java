@@ -4,7 +4,7 @@ import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import team.creative.creativecore.client.CreativeCoreClient;
 
-public class PictureDisplay extends IDisplay {
+public class PictureDisplay implements IDisplay {
     
     public final TextureCache texture;
     private int textureId;
