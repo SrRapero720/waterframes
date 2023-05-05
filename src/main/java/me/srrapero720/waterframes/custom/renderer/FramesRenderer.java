@@ -102,4 +102,14 @@ public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
         
         pose.popPose();
     }
+
+    private void add(VertexConsumer renderer, PoseStack stack, float x, float y, float z, float u, float v, int combinedLight) {
+        renderer.vertex(stack.last().pose(), x, y, z)
+                .color(1.0F, 1.0F, 1.0F, 1.0F)
+                .uv(u, v)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(combinedLight)
+                .normal(1.0F, 0.0F, 0.0F)
+                .endVertex();
+    }
 }
