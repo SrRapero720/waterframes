@@ -70,12 +70,12 @@ public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
         BoxFace face = BoxFace.get(facing);
         
         pose.pushPose();
-        
+
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-frame.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
 
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
         builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
