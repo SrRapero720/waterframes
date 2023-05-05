@@ -76,9 +76,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
 
     @Override
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getClickedFace())
-                .setValue(VISIBLE, true)
-                .setValue(POWERED, false);
+        return this.defaultBlockState().setValue(FACING, context.getClickedFace()).setValue(VISIBLE, true).setValue(POWERED, false);
     }
 
     @Override
@@ -120,12 +118,6 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
         }
 
         super.neighborChanged(state, level, pos, block, neighborPos, isMoving);
-    }
-
-
-    @Override
-    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
-        super.tick(pState, pLevel, pPos, pRandom);
     }
 
     @Override

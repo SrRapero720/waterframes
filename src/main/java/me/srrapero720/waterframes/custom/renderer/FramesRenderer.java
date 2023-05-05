@@ -28,12 +28,6 @@ import team.creative.creativecore.common.util.math.box.BoxFace;
 
 @OnlyIn(Dist.CLIENT)
 public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
-    final BlockEntityRendererProvider.Context context;
-
-    public FramesRenderer(BlockEntityRendererProvider.Context c) {
-        this.context = c;
-    }
-
     @Override
     public boolean shouldRenderOffScreen(TileFrame frame) {
         return frame.getSizeX() > 16 || frame.getSizeY() > 16;
@@ -76,12 +70,12 @@ public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
         BoxFace face = BoxFace.get(facing);
         
         pose.pushPose();
-        
+
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-frame.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
 
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorNormalShader);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
         builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
@@ -107,15 +101,5 @@ public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
         }
         
         pose.popPose();
-    }
-
-    private void add(VertexConsumer renderer, PoseStack stack, float x, float y, float z, float u, float v, int combinedLight) {
-        renderer.vertex(stack.last().pose(), x, y, z)
-                .color(1.0F, 1.0F, 1.0F, 1.0F)
-                .uv(u, v)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(combinedLight)
-                .normal(1.0F, 0.0F, 0.0F)
-                .endVertex();
     }
 }
