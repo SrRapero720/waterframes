@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-public class MediaDisplay extends IDisplay {
+public class MediaDisplay implements IDisplay {
     private static final String VLC_FAILED = "https://i.imgur.com/UAXbZeM.jpg";
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
     
