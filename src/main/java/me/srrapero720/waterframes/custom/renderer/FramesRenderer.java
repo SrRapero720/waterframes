@@ -70,7 +70,7 @@ public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
         BoxFace face = BoxFace.get(facing);
         
         pose.pushPose();
-        
+
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-frame.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
