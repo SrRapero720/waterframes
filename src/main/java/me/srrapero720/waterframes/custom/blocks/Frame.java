@@ -77,7 +77,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
     }
 
     @Override
-    public RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
+    public RenderShape getRenderShape(@NotNull BlockState state) { return RenderShape.MODEL; }
 
     @Override
     public VoxelShape getShape(@NotNull BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
@@ -97,21 +97,20 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
 
     @Override
     public void neighborChanged(@NotNull BlockState state, @NotNull Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
-        boolean hasSignal = false;
-        var frame = (TileFrame) level.getBlockEntity(pos);
-        for (var direction : Direction.values()) {
-            var neighborBlockPos = pos.relative(direction);
-            var neighborBlockState = level.getBlockState(neighborBlockPos);
-            if (neighborBlockState.isSignalSource() && neighborBlockState.getSignal(level, neighborBlockPos, direction) != 0) {
-                hasSignal = true;
-                break;
+        var frame = level.getBlockEntity(pos);
+        if (frame instanceof TileFrame tile) {
+            var signal = false;
+            for (var direction: Direction.values()) {
+                var neightborBP = pos.relative(direction);
+                var neightborST = level.getBlockState(neightborBP);
+                if (neightborST.isSignalSource() && neightborST.getSignal(level, neightborBP, direction) != 0) {
+                    signal = true;
+                    break;
+                }
             }
-        }
 
-        if (hasSignal) {
-            if (frame.playing) frame.pause();
-        } else {
-            if (!frame.playing) frame.play();
+            if (signal && tile.playing) tile.pause();
+            if (signal && !tile.playing) tile.play();
         }
 
         super.neighborChanged(state, level, pos, block, neighborPos, isMoving);
