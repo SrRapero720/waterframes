@@ -6,7 +6,6 @@ import me.srrapero720.waterframes.custom.screen.FrameScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -32,8 +31,6 @@ import team.creative.creativecore.common.gui.handler.BlockGuiCreator;
 import team.creative.creativecore.common.gui.handler.GuiCreator;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
-
-import java.util.Random;
 
 public class Frame extends BaseEntityBlock implements BlockGuiCreator {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
@@ -125,29 +122,22 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
     }
 
 
-
-    /* ---------------------------
-     *             TICKS
-     * --------------------------- */
-
+    /* ====================================================
+     *                      TICKERS
+     * ==================================================== */
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return TileFrame::tick;
     }
 
-    /* ---------------------------
-     *          GUI BASICS
-     * --------------------------- */
-
+    /* ====================================================
+     *                      GUI BASICS
+     * ==================================================== */
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new TileFrame(pos, state); }
     
     @Override
     public GuiLayer create(CompoundTag nbt, Level level, BlockPos pos, BlockState state, Player player) {
-        BlockEntity be = level.getBlockEntity(pos);
-        if (be instanceof TileFrame frame) return new FrameScreen(frame);
-        return null;
+        return (level.getBlockEntity(pos) instanceof TileFrame frame) ? new FrameScreen(frame) : null;
     }
-
-
 }
