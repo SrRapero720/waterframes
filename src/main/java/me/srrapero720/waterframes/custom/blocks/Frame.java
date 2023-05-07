@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.custom.blocks;
 
 import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.custom.blocks.property.VisibleProperty;
 import me.srrapero720.waterframes.custom.screen.FrameScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,7 +21,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
@@ -36,14 +36,14 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 import java.util.Random;
 
 public class Frame extends BaseEntityBlock implements BlockGuiCreator {
-    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
-    public static final BooleanProperty VISIBLE = BooleanProperty.create("visible");
+    public static final VisibleProperty VISIBLE = VisibleProperty.create();
     public static final float frameThickness = 0.0625F / 2F;
 
     public static @NotNull AlignedBox box(Direction direction) {
-        Facing facing = Facing.get(direction);
-        AlignedBox box = new AlignedBox();
+        var facing = Facing.get(direction);
+        var box = new AlignedBox();
+
         if (facing.positive) box.setMax(facing.axis, frameThickness);
         else box.setMin(facing.axis, 1 - frameThickness);
         return box;
@@ -69,13 +69,11 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> builder) {
-        builder.add(FACING, POWERED, VISIBLE);
-    }
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) { builder.add(FACING, VISIBLE); }
 
     @Override
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(FACING, context.getClickedFace()).setValue(VISIBLE, true).setValue(POWERED, false);
+        return this.defaultBlockState().setValue(FACING, context.getClickedFace()).setValue(VISIBLE, true);
     }
 
     @Override
