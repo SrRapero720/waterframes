@@ -1,10 +1,10 @@
 {
     "variants": {
-        "visible=true,facing=north": {"model": "waterframes:block/frame", "y": 180},
-        "visible=true,facing=south": { "model": "waterframes:block/frame"},
-        "visible=true,facing=west": {"model": "waterframes:block/frame", "y": -270},
-        "visible=true,facing=east": {"model": "waterframes:block/frame", "y": -90},
-        "visible=true,facing=up": {"model": "waterframes:block/frame","x": 90 },
-        "visible=true,facing=down": {"model": "waterframes:block/frame", "x": -90 }
+        "frame=true,facing=north": {"model": "waterframes:block/frame", "y": 180},
+        "frame=true,facing=south": { "model": "waterframes:block/frame"},
+        "frame=true,facing=west": {"model": "waterframes:block/frame", "y": -270},
+        "frame=true,facing=east": {"model": "waterframes:block/frame", "y": -90},
+        "frame=true,facing=up": {"model": "waterframes:block/frame","x": 90 },
+        "frame=true,facing=down": {"model": "waterframes:block/frame", "x": -90 }
     }
 }
