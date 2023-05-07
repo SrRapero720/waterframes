@@ -33,7 +33,7 @@ public class TileFrame extends BlockEntity {
     @OnlyIn(Dist.CLIENT)
     public static @NotNull String parseUrl(@NotNull String url) {
         var extractor = new YTExtractor(url);
-        var provider = WFConfig.getYoutubeProvider();
+        var provider = WFConfig.ytProvider();
         if (extractor.isValid() && !provider.isEmpty()) return provider + "/execute/" + extractor;
 
         return url.replaceAll("\\{playername}", WCoreUtil.mc().player.getName().getString())

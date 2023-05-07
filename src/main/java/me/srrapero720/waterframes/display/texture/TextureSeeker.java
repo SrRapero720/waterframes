@@ -84,11 +84,11 @@ public class TextureSeeker extends Thread {
                 IOUtils.closeQuietly(in);
             }
         } catch (FoundVideoException e) {
-            if (!WFConfig.DISABLE_VLC.get()) {
+            if (WFConfig.isDisabledVLC()) exception = e;
+            else {
                 cache.processVideo();
                 isVideo = true;
-            } else
-                exception = e;
+            }
         } catch (NoConnectionException e) {
             exception = e;
         } catch (Exception e) {

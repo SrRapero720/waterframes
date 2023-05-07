@@ -95,8 +95,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
 
     @Override
     public void neighborChanged(@NotNull BlockState state, @NotNull Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
-        var frame = level.getBlockEntity(pos);
-        if (frame instanceof TileFrame tile) {
+        if (!WFConfig.isDisabledRedstone() && level.getBlockEntity(pos) instanceof TileFrame tile) {
             var signal = false;
             for (var direction: Direction.values()) {
                 var neightborBP = pos.relative(direction);

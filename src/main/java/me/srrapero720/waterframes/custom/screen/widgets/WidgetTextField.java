@@ -1,16 +1,17 @@
 package me.srrapero720.waterframes.custom.screen.widgets;
 
+import me.srrapero720.waterframes.WFUtil;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.custom.screen.widgets.constants.Constants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import team.creative.creativecore.common.gui.controls.simple.GuiButton;
 import team.creative.creativecore.common.gui.controls.simple.GuiTextfield;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WidgetTextField extends GuiTextfield {
@@ -23,32 +24,30 @@ public class WidgetTextField extends GuiTextfield {
 
     @Override
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
-        if (!canUse(true)) return Constants.WARN_DISABLED_BORDER;
-        return super.getBorder(style, display);
+        return Constants.NORMAL_BORDER;
     }
 
     @Override
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
-        if (!canUse(true))
-            return WFConfig.ENABLE_WHITELIST.get() ? Constants.WARN_DISABLED_BACKGROUND : Constants.WARN_WARNING_BACKGROUND;
-        return super.getBackground(style, display);
+        return Constants.NORMAL_BACKGROUND;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         boolean pressed = super.keyPressed(keyCode, scanCode, modifiers);
-        saveButton.setEnabled(canUse(false));
+        saveButton.setEnabled(WFConfig.canUse(getPlayer(), getText()));
         return pressed;
     }
 
     @Override
     public List<Component> getTooltip() {
-        if (!canUse(false)) return List.of(new TextComponent(ChatFormatting.RED.toString()).append(new TranslatableComponent("label.waterframes.not_whitelisted")));
-        else if (!canUse(true)) return List.of(new TextComponent(ChatFormatting.GOLD.toString()).append(new TranslatableComponent("label.waterframes.invalid_url")));
-        return null;
-    }
+        var tooltips = new ArrayList<Component>();
 
-    protected boolean canUse(boolean ignoreToggle) {
-        return WFConfig.canUse(getPlayer(), getText(), ignoreToggle);
+        if (!WFConfig.domainAllowed(getText()))
+            tooltips.add(new TranslatableComponent("label.waterframes.not_whitelisted").withStyle(ChatFormatting.RED));
+        if (!WFUtil.validUrl(getText()))
+            tooltips.add(new TranslatableComponent("label.waterframes.invalid_url").withStyle(ChatFormatting.RED));
+
+        return tooltips.isEmpty() ? null : tooltips;
     }
 }

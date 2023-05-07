@@ -39,8 +39,8 @@ public class FrameScreen extends GuiLayer {
         String url = nbt.getString("url");
         if (WFConfig.canUse(getPlayer(), url)) {
             frame.setURL(url);
-            float sizeX = (float) Math.min(WFConfig.MAX_SIZE.get(), nbt.getFloat("x"));
-            float sizeY = (float) Math.min(WFConfig.MAX_SIZE.get(), nbt.getFloat("y"));
+            float sizeX = (float) Math.min(WFConfig.maxWidth(), nbt.getFloat("x"));
+            float sizeY = (float) Math.min(WFConfig.maxHeight(), nbt.getFloat("y"));
             int posX = nbt.getByte("posX");
             int posY = nbt.getByte("posY");
             if (posX == 0) {
@@ -67,7 +67,7 @@ public class FrameScreen extends GuiLayer {
                 frame.max.y = 1;
             }
             
-            frame.renderDistance = Math.min(WFConfig.MAX_RENDER_DISTANCE.get(), nbt.getInt("render"));
+            frame.renderDistance = Math.min(WFConfig.maxRenderDistance(), nbt.getInt("render"));
             frame.rotation = nbt.getFloat("rotation");
             frame.visibleFrame = nbt.getBoolean("visibleFrame");
             frame.bothSides = nbt.getBoolean("bothSides");
