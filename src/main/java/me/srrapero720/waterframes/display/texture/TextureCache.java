@@ -124,7 +124,7 @@ public class TextureCache {
     
     public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
         volume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
-        if (textures == null && !noVideo && !WFConfig.DISABLE_VLC.get()) return MediaDisplay.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
+        if (textures == null && !noVideo && !WFConfig.isDisabledVLC()) return MediaDisplay.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
         return new PictureDisplay(this);
     }
     
