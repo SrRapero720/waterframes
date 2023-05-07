@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.custom.screen;
 
 import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.custom.blocks.TileFrame;
+import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.display.texture.TextureSeeker;

@@ -85,6 +85,9 @@ dependencies {
     implementation fg.deobf("curse.maven:rubidium-574856:4451888")
     implementation fg.deobf("curse.maven:oculus-581495:4451905")
     implementation fg.deobf("curse.maven:video-player-645407:4348349")
+    implementation fg.deobf("com.simibubi.create:create-${mcV}:${createV}:slim") { transitive = false }
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mcV}:${flywheelV}")
+    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateV}")
 
     // MIXINS
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
