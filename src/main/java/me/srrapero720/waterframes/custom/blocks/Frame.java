@@ -77,7 +77,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
     }
 
     @Override
-    public RenderShape getRenderShape(@NotNull BlockState state) { return RenderShape.MODEL; }
+    public RenderShape getRenderShape(@NotNull BlockState state) { return state.getValue(VISIBLE) ? RenderShape.MODEL : RenderShape.INVISIBLE; }
 
     @Override
     public VoxelShape getShape(@NotNull BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
@@ -114,12 +114,6 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
         }
 
         super.neighborChanged(state, level, pos, block, neighborPos, isMoving);
-    }
-
-
-    @Override
-    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, Random pRandom) {
-        super.tick(pState, pLevel, pPos, pRandom);
     }
 
     @Override

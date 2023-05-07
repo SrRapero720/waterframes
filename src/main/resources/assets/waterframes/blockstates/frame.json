@@ -5,13 +5,6 @@
         "visible=true,facing=west": {"model": "waterframes:block/frame", "y": -270},
         "visible=true,facing=east": {"model": "waterframes:block/frame", "y": -90},
         "visible=true,facing=up": {"model": "waterframes:block/frame","x": 90 },
-        "visible=true,facing=down": {"model": "waterframes:block/frame", "x": -90 },
-
-        "visible=false,facing=north": {"model": "waterframes:block/frame_hidden", "y": 180},
-        "visible=false,facing=south": { "model": "waterframes:block/frame_hidden"},
-        "visible=false,facing=west": {"model": "waterframes:block/frame_hidden", "y": -270},
-        "visible=false,facing=east": {"model": "waterframes:block/frame_hidden", "y": -90},
-        "visible=false,facing=up": {"model": "waterframes:block/frame_hidden","x": 90 },
-        "visible=false,facing=down": {"model": "waterframes:block/frame_hidden", "x": -90 }
+        "visible=true,facing=down": {"model": "waterframes:block/frame", "x": -90 }
     }
 }
