@@ -19,11 +19,11 @@ import team.creative.creativecore.common.util.math.vec.Vec3d;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TextureCache {
-    private static final Map<String, TextureCache> cached = new HashMap<>();
+    private static final Map<String, TextureCache> cached = new LinkedHashMap<>();
 
     public static void renderInternal() {
         for (var iterator = cached.values().iterator(); iterator.hasNext();) {
