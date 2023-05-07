@@ -1,9 +1,9 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "waterframes:block/frame",
-		"1": "waterframes:block/frame_front",
-		"particle": "waterframes:block/frame"
+		"0": "waterframes:block/frame/back",
+		"1": "waterframes:block/frame/front",
+		"particle": "waterframes:block/frame/back"
 	},
 	"elements": [
 		{
