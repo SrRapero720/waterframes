@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.custom.blocks;
 
 import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.custom.blocks.property.VisibleProperty;
+import me.srrapero720.waterframes.custom.blocks.properties.VisibleProperty;
 import me.srrapero720.waterframes.custom.screen.FrameScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

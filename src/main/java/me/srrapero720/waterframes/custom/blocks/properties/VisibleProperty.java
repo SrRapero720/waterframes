@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.custom.blocks.property;
+package me.srrapero720.waterframes.custom.blocks.properties;
 
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 
