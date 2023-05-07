@@ -79,6 +79,7 @@ public class MediaDisplay implements IDisplay {
         super();
         this.pos = pos;
         texture = GlStateManager._genTexture();
+
         
         player = new CallbackMediaPlayerComponent(MediaPlayerHandler.getInstance().getFactory(), null, null, false, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
@@ -115,7 +116,7 @@ public class MediaDisplay implements IDisplay {
         lastSetVolume = volume;
         player.mediaPlayer().controls().setRepeat(loop);
 
-        ThreadUtil.thread(() -> player.mediaPlayer().media().start(url));
+        ThreadUtil.thread(() -> player.mediaPlayer().media().prepare(url));
 //        player.mediaPlayer().media().start(url);
     }
     
@@ -135,7 +136,13 @@ public class MediaDisplay implements IDisplay {
                 volume *= 1 - ((distance - minDistance) / (maxDistance - minDistance));
         return (int) (volume * 100F);
     }
-    
+
+    @Override
+    public int maxTick() {
+        if (player != null) return (int) player.mediaPlayer().media().info().duration();
+        return 0;
+    }
+
     @Override
     public void tick(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
         if (player == null)
