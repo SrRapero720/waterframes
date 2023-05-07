@@ -1,7 +1,8 @@
-package me.srrapero720.waterframes.custom.blocks;
+package me.srrapero720.waterframes.custom.tiles;
 
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.display.IDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;

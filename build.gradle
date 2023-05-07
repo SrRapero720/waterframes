@@ -45,7 +45,7 @@ minecraft {
         }
 
         server {
-            taskName "WF_1.18.2_Server"
+            taskName "WF_1.19.2_Server"
             workingDirectory project.file('run')
 
             property 'forge.logging.console.level', 'debug'
@@ -77,8 +77,8 @@ dependencies {
     implementation fg.deobf("curse.maven:creativecore-257814:4121643")
 
     // UTIL
-    implementation fg.deobf("curse.maven:ferritecore-429235:4117906")
-    implementation fg.deobf("curse.maven:fastload-630620:4505316")
+    implementation fg.deobf("curse.maven:ferritecore-429235:4074294")
+    implementation fg.deobf("curse.maven:fastload-630620:4271605")
     implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:3544496")
     implementation fg.deobf("curse.maven:spark-361579:4505309")
 
