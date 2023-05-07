@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.custom.tiles;
 
 import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.WFRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.display.IDisplay;
@@ -74,7 +75,7 @@ public class TileFrame extends BlockEntity {
     public IDisplay display;
 
     public TileFrame(BlockPos pos, BlockState state) {
-        super(WaterFrames.TILE_FRAME.get(), pos, state);
+        super(WFRegistry.TILE_FRAME.get(), pos, state);
     }
 
     @OnlyIn(Dist.CLIENT)

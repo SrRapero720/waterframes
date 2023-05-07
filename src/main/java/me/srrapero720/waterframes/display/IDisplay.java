@@ -9,6 +9,10 @@ public interface IDisplay {
     void prepare(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
     
     void tick(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
+
+    default int maxTick() {
+        return 0;
+    }
     
     void pause(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick);
     
