@@ -9,8 +9,7 @@ import me.srrapero720.waterframes.display.MediaDisplay;
 import me.srrapero720.waterframes.display.PictureDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.level.Level;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -19,11 +18,11 @@ import team.creative.creativecore.common.util.math.vec.Vec3d;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class TextureCache {
-    private static final Map<String, TextureCache> cached = new HashMap<>();
+    private static final Map<String, TextureCache> cached = new LinkedHashMap<>();
 
     public static void renderInternal() {
         for (var iterator = cached.values().iterator(); iterator.hasNext();) {
@@ -41,15 +40,11 @@ public class TextureCache {
         for (var cache : cached.values())
             cache.reload();
     }
-    
-    @SubscribeEvent
-    public static void unload(WorldEvent.Unload event) {
-        if (event.getWorld().isClientSide()) {
-            for (TextureCache cache : cached.values())
-                cache.remove();
-            cached.clear();
-            MediaDisplay.unload();
-        }
+
+    public static void unload(Level event) {
+        for (TextureCache cache : cached.values()) cache.remove();
+        cached.clear();
+        MediaDisplay.unload();
     }
     
     public static TextureCache get(String url) {

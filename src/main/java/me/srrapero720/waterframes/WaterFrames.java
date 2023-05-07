@@ -4,7 +4,6 @@ import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.custom.renderer.FramesRenderer;
-import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.ForgeSmartTab;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +13,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -35,7 +33,6 @@ import team.creative.creativecore.common.network.CreativeNetwork;
 public class WaterFrames {
     public static final String ID = "waterframes";
     public static final Logger LOGGER = LoggerFactory.getLogger(ID);
-//    public static final WRegistry REGISTRY = new WRegistry(ID);
     public static final CreativeNetwork NETWORK = new CreativeNetwork("1.2", LogManager.getLogger(ID), new ResourceLocation(ID, "main"));
 
     // EXTRAPOLAR
@@ -74,8 +71,6 @@ public class WaterFrames {
 
     @OnlyIn(Dist.CLIENT)
     public void client(final FMLClientSetupEvent event) {
-
-        MinecraftForge.EVENT_BUS.register(TextureCache.class);
         BlockEntityRenderers.register(TILE_FRAME.get(), (x) -> new FramesRenderer());
     }
 }
