@@ -42,9 +42,11 @@ public class TextureCache {
     }
 
     public static void unload(Level event) {
-        for (TextureCache cache : cached.values()) cache.remove();
-        cached.clear();
-        MediaDisplay.unload();
+        if (event != null && event.isClientSide()) {
+            for (TextureCache cache : cached.values()) cache.remove();
+            cached.clear();
+            MediaDisplay.unload();
+        }
     }
     
     public static TextureCache get(String url) {
