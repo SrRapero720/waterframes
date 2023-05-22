@@ -9,10 +9,9 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
-import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.custom.tiles.TileFrame;
+import me.srrapero720.waterframes.api.IDisplay;
+import me.srrapero720.waterframes.custom.blocks.Projector;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
-import me.srrapero720.waterframes.display.IDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -41,22 +40,22 @@ public class ProjectorRenderer implements BlockEntityRenderer<TileProjector> {
     }
     
     @Override
-    public void render(TileProjector frame, float partialTicks, PoseStack pose, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
-        if (frame.isURLEmpty() || frame.alpha == 0) {
-            if (frame.display != null) frame.display.release();
+    public void render(TileProjector projector, float partialTicks, PoseStack pose, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
+        if (projector.isURLEmpty() || projector.alpha == 0) {
+            if (projector.display != null) projector.display.release();
             return;
         }
         
-        IDisplay display = frame.requestDisplay();
+        IDisplay display = projector.requestDisplay();
         if (display == null) return;
         
-        display.prepare(frame.getURL(), frame.volume * Minecraft.getInstance().options
-                .getSoundSourceVolume(SoundSource.MASTER), frame.minDistance, frame.maxDistance, frame.playing, frame.loop, frame.tick);
+        display.prepare(projector.getURL(), projector.volume * Minecraft.getInstance().options
+                .getSoundSourceVolume(SoundSource.MASTER), projector.minDistance, projector.maxDistance, projector.playing, projector.loop, projector.tick);
         
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(frame.brightness, frame.brightness, frame.brightness, frame.alpha);
+        RenderSystem.setShaderColor(projector.brightness, projector.brightness, projector.brightness, projector.alpha);
         int texture = display.texture();
         
         if (texture == -1) return;
@@ -66,42 +65,45 @@ public class ProjectorRenderer implements BlockEntityRenderer<TileProjector> {
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         
-        Facing facing = Facing.get(frame.getBlockState().getValue(Frame.FACING));
-        AlignedBox box = frame.getBox();
+        Facing facing = Facing.get(projector.getBlockState().getValue(Projector.FACING));
+        AlignedBox box = projector.getBox();
         box.grow(facing.axis, 0.01F);
         BoxFace face = BoxFace.get(facing);
         
         pose.pushPose();
 
         pose.translate(0.5, 0.5, 0.5);
-        pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-frame.rotation)));
+        pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-projector.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
 
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
+
         builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
         Matrix4f mat = pose.last().pose();
         Matrix3f mat3f = pose.last().normal();
         Vec3i normal = face.facing.normal;
-        for (BoxCorner corner : face.corners)
+
+        for (int i = face.corners.length - 1; i >= 0; i--) {
+            BoxCorner corner = face.corners[i];
             builder.vertex(mat, box.get(corner.x), box.get(corner.y), box.get(corner.z))
-                    .uv(corner.isFacing(face.getTexU()) != frame.flipX ? 1 : 0, corner.isFacing(face.getTexV()) != frame.flipY ? 1 : 0).color(-1)
+                    .uv(corner.isFacing(face.getTexU()) != projector.flipX ? 1 : 0, corner.isFacing(face.getTexV()) != projector.flipY ? 1 : 0).color(-1)
                     .normal(mat3f, normal.getX(), normal.getY(), normal.getZ()).endVertex();
-        tesselator.end();
-        
-        if (frame.bothSides) {
-            builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
-            
-            for (int i = face.corners.length - 1; i >= 0; i--) {
-                BoxCorner corner = face.corners[i];
-                builder.vertex(mat, box.get(corner.x), box.get(corner.y), box.get(corner.z))
-                        .uv(corner.isFacing(face.getTexU()) != frame.flipX ? 1 : 0, corner.isFacing(face.getTexV()) != frame.flipY ? 1 : 0).color(-1)
-                        .normal(mat3f, normal.getX(), normal.getY(), normal.getZ()).endVertex();
-            }
-            tesselator.end();
         }
-        
+        tesselator.end();
+
+//        builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
+//
+//        for (int i = face.corners.length - 1; i >= 0; i--) {
+//            BoxCorner corner = face.corners[i];
+//            builder.vertex(mat, box.get(corner.x), box.get(corner.y), box.get(corner.z))
+//                    .uv(corner.isFacing(face.getTexU()) != projector.flipX ? 1 : 0, corner.isFacing(face.getTexV()) != projector.flipY ? 1 : 0).color(-1)
+//                    .normal(mat3f, normal.getX(), normal.getY(), normal.getZ()).endVertex();
+//        }
+//
+//        tesselator.end();
+
         pose.popPose();
     }
 }

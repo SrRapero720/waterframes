@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.display;
 
+import me.srrapero720.waterframes.api.IDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
-import team.creative.creativecore.client.CreativeCoreClient;
 
 public class PictureDisplay implements IDisplay {
     

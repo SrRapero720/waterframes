@@ -2,9 +2,10 @@ package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import me.srrapero720.waterframes.api.IMediaData;
 import me.srrapero720.waterframes.watercore_supplier.GifDecoder;
 import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.display.IDisplay;
+import me.srrapero720.waterframes.api.IDisplay;
 import me.srrapero720.waterframes.display.MediaDisplay;
 import me.srrapero720.waterframes.display.PictureDisplay;
 import net.minecraft.client.Minecraft;
@@ -24,7 +25,7 @@ import java.util.Map;
 public class TextureCache {
     private static final Map<String, TextureCache> cached = new LinkedHashMap<>();
 
-    public static void renderInternal() {
+    public static void tick() {
         for (var iterator = cached.values().iterator(); iterator.hasNext();) {
             var type = iterator.next();
             if (!type.isUsed()) {
@@ -34,17 +35,13 @@ public class TextureCache {
         }
     }
 
-    public static void tick() { MediaDisplay.tick(); }
-
     public static void reloadAll() {
-        for (var cache : cached.values())
-            cache.reload();
+        for (var cache : cached.values()) cache.reload();
     }
 
     public static void unload(Level event) {
         for (TextureCache cache : cached.values()) cache.remove();
         cached.clear();
-        MediaDisplay.unload();
     }
     
     public static TextureCache get(String url) {
@@ -91,7 +88,7 @@ public class TextureCache {
     
     private int getTexture(int index) {
         if (textures[index] == -1 && decoder != null) {
-            textures[index] = uploadFrame(decoder.getFrame(index), width, height);
+            textures[index] = IMediaData.processFrame(decoder.getFrame(index), width, height);
             remaining--;
             if (remaining <= 0)
                 decoder = null;
@@ -145,7 +142,7 @@ public class TextureCache {
     public void process(BufferedImage image) {
         width = image.getWidth();
         height = image.getHeight();
-        textures = new int[] { uploadFrame(image, width, height) };
+        textures = new int[] { IMediaData.processFrame(image, width, height) };
         delay = new long[] { 0 };
         duration = 0;
         seeker = null;
@@ -178,7 +175,8 @@ public class TextureCache {
         trySeek();
         return false;
     }
-    
+
+    @Deprecated
     public boolean isVideo() {
         return isVideo;
     }
@@ -206,77 +204,7 @@ public class TextureCache {
         if (textures != null) for (int texture: textures) GlStateManager._deleteTexture(texture);
     }
     
-    public int getWidth() {
-        return width;
-    }
-    
-    public int getHeight() {
-        return height;
-    }
-    
-    public long[] getDelay() {
-        return delay;
-    }
-    
-    public long getDuration() {
-        return duration;
-    }
-    
-    public boolean isAnimated() {
-        return textures.length > 1;
-    }
-    
-    public int getFrameCount() {
-        return textures.length;
-    }
-    
-    private static int uploadFrame(BufferedImage image, int width, int height) {
-        int[] pixels = new int[width * height];
-        image.getRGB(0, 0, width, height, pixels, 0, width);
-        boolean hasAlpha = false;
-        if (image.getColorModel().hasAlpha()) {
-            for (int pixel : pixels) {
-                if ((pixel >> 24 & 0xFF) < 0xFF) {
-                    hasAlpha = true;
-                    break;
-                }
-            }
-        }
-        int bytesPerPixel = hasAlpha ? 4 : 3;
-        ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bytesPerPixel);
-        for (int pixel : pixels) {
-            buffer.put((byte) ((pixel >> 16) & 0xFF)); // Red component
-            buffer.put((byte) ((pixel >> 8) & 0xFF)); // Green component
-            buffer.put((byte) (pixel & 0xFF)); // Blue component
-            if (hasAlpha) {
-                buffer.put((byte) ((pixel >> 24) & 0xFF)); // Alpha component. Only for RGBA
-            }
-        }
-        buffer.flip();
-
-        int textureID = GlStateManager._genTexture(); //Generate texture ID
-        RenderSystem.bindTexture(textureID); //Bind texture ID
-
-        //Setup wrap mode
-        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL12.GL_CLAMP_TO_EDGE);
-        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL12.GL_CLAMP_TO_EDGE);
-
-        //Setup texture scaling filtering
-        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-
-        if (!hasAlpha) RenderSystem.pixelStore(GL11.GL_UNPACK_ALIGNMENT, 1);
-
-
-        // fixes random crash, when values are too high it causes a jvm crash, caused weird behavior when game is paused
-        GL11.glPixelStorei(3314, 0);
-        GL11.glPixelStorei(3316, 0);
-        GL11.glPixelStorei(3315, 0);
-        
-        //Send texel data to OpenGL
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, hasAlpha ? GL11.GL_RGBA8 : GL11.GL_RGB8, width, height, 0, hasAlpha ? GL11.GL_RGBA : GL11.GL_RGB, GL11.GL_UNSIGNED_BYTE, buffer);
-        
-        //Return the texture ID so we can bind it later again
-        return textureID;
-    }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public long getDuration() { return duration; }
 }

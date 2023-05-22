@@ -133,8 +133,6 @@ public class ProjectorScreen extends GuiLayer {
 
             nbt.putBoolean("flipX", flipX.value);
             nbt.putBoolean("flipY", flipY.value);
-            nbt.putBoolean("visibleFrame", visibleFrame.value);
-            nbt.putBoolean("bothSides", bothSides.value);
 
             nbt.putInt("render", (int) renderDistance.value);
 

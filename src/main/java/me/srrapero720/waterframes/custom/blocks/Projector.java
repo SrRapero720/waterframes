@@ -6,6 +6,7 @@ import me.srrapero720.waterframes.custom.screen.ProjectorScreen;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -27,9 +28,21 @@ import org.jetbrains.annotations.Nullable;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.handler.BlockGuiCreator;
 import team.creative.creativecore.common.gui.handler.GuiCreator;
+import team.creative.creativecore.common.util.math.base.Facing;
+import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 public class Projector extends BaseEntityBlock implements BlockGuiCreator {
-    private static final DirectionProperty FACING = BlockStateProperties.FACING;
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+
+    public static @NotNull AlignedBox box(Direction direction) {
+        var facing = Facing.get(direction);
+        var box = new AlignedBox();
+
+        if (facing.positive) box.setMax(facing.axis, 16);
+        else box.setMin(facing.axis, 1 - 16);
+        return box;
+    }
+
     public Projector() {
         super(Properties.of(Material.METAL).strength(2.5f, 10.0f).sound(SoundType.METAL).noOcclusion());
     }

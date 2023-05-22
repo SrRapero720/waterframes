@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.display;
+package me.srrapero720.waterframes.api;
 
 public interface IDisplay {
     

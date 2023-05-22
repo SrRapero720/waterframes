@@ -3,13 +3,14 @@ package me.srrapero720.waterframes.display;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
+import me.srrapero720.waterframes.api.IDisplay;
+import me.srrapero720.waterframes.api.ITexture;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import net.minecraft.client.Minecraft;
 import nick1st.fancyvideo.api.MediaPlayerHandler;
 import org.lwjgl.opengl.GL11;
-import team.creative.creativecore.client.CreativeCoreClient;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent;
 import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
@@ -23,7 +24,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 public class MediaDisplay implements IDisplay {
-    private static final String VLC_FAILED = "https://i.imgur.com/UAXbZeM.jpg";
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
     
     private static final List<MediaDisplay> OPEN_DISPLAYS = new ArrayList<>();
@@ -54,8 +54,8 @@ public class MediaDisplay implements IDisplay {
             return display;
 
         }, ((Supplier<IDisplay>) () -> {
-            var cache = TextureCache.get(VLC_FAILED);
-            if (cache.ready()) return cache.createDisplay(pos, VLC_FAILED, volume, minDistance, maxDistance, loop, true);
+            var cache = TextureCache.get(ITexture.VLC_FAILED);
+            if (cache.ready()) return cache.createDisplay(pos, ITexture.VLC_FAILED, volume, minDistance, maxDistance, loop, true);
             return null;
         }).get());
     }

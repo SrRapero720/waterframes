@@ -3,9 +3,9 @@ package me.srrapero720.waterframes.custom.tiles;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WFRegistry;
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.custom.blocks.Frame;
+import me.srrapero720.waterframes.custom.blocks.Projector;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
-import me.srrapero720.waterframes.display.IDisplay;
+import me.srrapero720.waterframes.api.IDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import me.srrapero720.waterframes.watercore_supplier.YTExtractor;
@@ -37,9 +37,9 @@ public class TileProjector extends BlockEntity {
         var provider = WFConfig.ytProvider();
         if (extractor.isValid() && !provider.isEmpty()) return provider + "/execute/" + extractor;
 
-        return url.replaceAll("\\{playername}", WCoreUtil.mc().player.getName().getString())
-                .replaceAll("\\{displayname}", WCoreUtil.mc().player.getDisplayName().getString())
-                .replaceAll("\\{uuid}", WCoreUtil.mc().player.getStringUUID())
+        return url.replaceAll("\\{playername}", WCoreUtil.mine().player.getName().getString())
+                .replaceAll("\\{displayname}", WCoreUtil.mine().player.getDisplayName().getString())
+                .replaceAll("\\{uuid}", WCoreUtil.mine().player.getStringUUID())
                 .replace("minecraft://",("file:///" + FMLPaths.GAMEDIR.get().toAbsolutePath()).replace("\\", "/") + "/");
     }
 
@@ -115,9 +115,9 @@ public class TileProjector extends BlockEntity {
     }
 
     public AlignedBox getBox() {
-        Direction direction = getBlockState().getValue(Frame.FACING);
+        Direction direction = getBlockState().getValue(Projector.FACING);
         Facing facing = Facing.get(direction);
-        AlignedBox box = Frame.box(direction);
+        AlignedBox box = Projector.box(direction);
 
         Axis one = facing.one();
         Axis two = facing.two();
@@ -225,12 +225,6 @@ public class TileProjector extends BlockEntity {
 
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         if (blockEntity instanceof TileFrame be) {
-            if (state.getValue(Frame.VISIBLE) != be.visibleFrame) {
-                var brandNewState = state.setValue(Frame.VISIBLE, be.visibleFrame);
-                level.setBlock(pos, brandNewState, 0);
-            }
-
-
             if (level.isClientSide) {
                 IDisplay display = be.requestDisplay();
                 if (display != null) display.tick(be.getURL(), be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}

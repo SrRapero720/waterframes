@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.mixin;
 
+import me.srrapero720.waterframes.display.MediaDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -22,22 +23,28 @@ public class MinecraftMixin {
 
     @Inject(method = "tick", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V"))
     public void injectTick(CallbackInfo ci) {
-        TextureCache.tick();
+        MediaDisplay.tick();
     }
 
     @OnlyIn(Dist.CLIENT)
     @Inject(method = "runTick", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"))
     public void injectRunTick(boolean pRenderLevel, CallbackInfo ci) {
-        TextureCache.renderInternal();
+        TextureCache.tick();
     }
 
     @Inject(method = "clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/ClientPackSource;clearServerPack()V"))
     public void injectClearServerPack(Screen screen, CallbackInfo ci) {
-        if (level != null) TextureCache.unload(level);
+        if (level != null) {
+            TextureCache.unload(level);
+            MediaDisplay.unload();
+        }
     }
 
     @Inject(method = "setLevel", at = @At(value = "HEAD"))
     public void injectSetLevel(ClientLevel clientLevel, CallbackInfo ci) {
-        if (clientLevel != null) TextureCache.unload(clientLevel);
+        if (clientLevel != null) {
+            TextureCache.unload(clientLevel);
+            MediaDisplay.unload();
+        }
     }
 }

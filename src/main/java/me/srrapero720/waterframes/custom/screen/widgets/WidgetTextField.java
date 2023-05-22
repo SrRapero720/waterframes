@@ -43,7 +43,7 @@ public class WidgetTextField extends GuiTextfield {
     public List<Component> getTooltip() {
         var tooltips = new ArrayList<Component>();
 
-        if (!WFConfig.domainAllowed(getText()))
+        if (!WFConfig.canUse(getPlayer(), getText()))
             tooltips.add(new TranslatableComponent("label.waterframes.not_whitelisted").withStyle(ChatFormatting.RED));
         if (!WFUtil.validUrl(getText()))
             tooltips.add(new TranslatableComponent("label.waterframes.invalid_url").withStyle(ChatFormatting.RED));

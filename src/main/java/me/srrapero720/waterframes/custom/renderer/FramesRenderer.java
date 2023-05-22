@@ -8,7 +8,7 @@ import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.display.IDisplay;
+import me.srrapero720.waterframes.api.IDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -73,13 +73,28 @@ public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
         pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-frame.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
 
+        // MY CODE
+//        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+//        builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL); (I USE THIS)
+//        builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR); (RIGHT TEXT COLOR)
+
+        // OLD LF
+//        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+//        builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+
+        // NEW LF
+//        RenderSystem.setShader(GameRenderer::getPositionTexColorNormalShader);
+//        builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
+
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder builder = tesselator.getBuilder();
+//        builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
         builder.begin(Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL);
         Matrix4f mat = pose.last().pose();
         Matrix3f mat3f = pose.last().normal();
         Vec3i normal = face.facing.normal;
+
         for (BoxCorner corner : face.corners)
             builder.vertex(mat, box.get(corner.x), box.get(corner.y), box.get(corner.z))
                     .uv(corner.isFacing(face.getTexU()) != frame.flipX ? 1 : 0, corner.isFacing(face.getTexV()) != frame.flipY ? 1 : 0).color(-1)

@@ -4,7 +4,7 @@ import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WFRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.display.IDisplay;
+import me.srrapero720.waterframes.api.IDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
@@ -37,9 +37,9 @@ public class TileFrame extends BlockEntity {
         var provider = WFConfig.ytProvider();
         if (extractor.isValid() && !provider.isEmpty()) return provider + "/execute/" + extractor;
 
-        return url.replaceAll("\\{playername}", WCoreUtil.mc().player.getName().getString())
-                .replaceAll("\\{displayname}", WCoreUtil.mc().player.getDisplayName().getString())
-                .replaceAll("\\{uuid}", WCoreUtil.mc().player.getStringUUID())
+        return url.replaceAll("\\{playername}", WCoreUtil.mine().player.getName().getString())
+                .replaceAll("\\{displayname}", WCoreUtil.mine().player.getDisplayName().getString())
+                .replaceAll("\\{uuid}", WCoreUtil.mine().player.getStringUUID())
                 .replace("minecraft://",("file:///" + FMLPaths.GAMEDIR.get().toAbsolutePath()).replace("\\", "/") + "/");
     }
 

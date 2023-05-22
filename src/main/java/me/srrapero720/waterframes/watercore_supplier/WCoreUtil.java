@@ -36,9 +36,10 @@ public class WCoreUtil {
 
     @Contract(pure = true)
     @OnlyIn(Dist.CLIENT)
-    public static @NotNull Minecraft mc() { return Minecraft.getInstance(); }
+    public static Minecraft mine() { return Minecraft.getInstance(); }
+
     @OnlyIn(Dist.CLIENT)
-    public static float toDeltaFrames() { return mc().isPaused() ? 1.0F : mc().getFrameTime(); }
+    public static float toDeltaFrames() { return mine().isPaused() ? 1.0F : mine().getFrameTime(); }
 
     @Contract("_, _, _ -> new")
     public static @NotNull Vec3 calculateNearbyCenter(double x, double y, double z) {

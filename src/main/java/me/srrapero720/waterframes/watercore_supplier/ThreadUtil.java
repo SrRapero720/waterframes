@@ -28,8 +28,17 @@ public class ThreadUtil {
         } finally { if (finallyRunnable != null) finallyRunnable.run(returned); }
     }
 
-    public static void trySimple(SimpleTryRunnable runnable) { try { runnable.run(); } catch (Exception ignored) {} }
-    public static void trySimple(SimpleTryRunnable runnable, CatchRunnable catchRunnable) { try { runnable.run(); } catch (Exception e) { catchRunnable.run(e); } }
+    public static void trySimple(SimpleTryRunnable runnable) { trySimple(runnable, null, null); }
+    public static void trySimple(SimpleTryRunnable runnable, CatchRunnable catchRunnable) { trySimple(runnable, catchRunnable, null); }
+    public static void trySimple(SimpleTryRunnable runnable, CatchRunnable catchRunnable, FinallyRunnable finallyRunnable) {
+        try {
+            runnable.run();
+        } catch (Exception e) {
+            if (catchRunnable != null) catchRunnable.run(e);
+        } finally {
+            if (finallyRunnable != null) finallyRunnable.run();
+        }
+    }
 
     public static void threadTry(@NotNull TryRunnable toTry, @Nullable CatchRunnable toCatch, @Nullable FinallyRunnable toFinally) {
         threadTryArgument(null, (object -> toTry.run()), toCatch, (object -> { if (toFinally != null) toFinally.run(); }));

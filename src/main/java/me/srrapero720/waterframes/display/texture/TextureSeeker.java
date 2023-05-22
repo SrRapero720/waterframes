@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.display.texture;
 
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.rendering.images.PictureStorage;
 import me.srrapero720.waterframes.watercore_supplier.GifDecoder;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.io.IOUtils;
@@ -26,8 +27,6 @@ import java.util.Iterator;
 public class TextureSeeker extends Thread {
     
     public static final Logger LOGGER = LogManager.getLogger(WaterFrames.class);
-    
-    public static final TextureStorage TEXTURE_STORAGE = new TextureStorage();
     public static final DateFormat FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
     public static final Object LOCK = new Object();
     public static final int MAXIMUM_ACTIVE_DOWNLOADS = 5;
@@ -36,7 +35,7 @@ public class TextureSeeker extends Thread {
     
     private static final Minecraft mc = Minecraft.getInstance();
     
-    private TextureCache cache;
+    private final TextureCache cache;
     
     public TextureSeeker(TextureCache cache) {
         this.cache = cache;
@@ -106,7 +105,7 @@ public class TextureSeeker extends Thread {
                 cache.processFailed("download.exception.notfound");
             else
                 cache.processFailed("download.exception.invalid");
-            TEXTURE_STORAGE.deleteEntry(cache.url);
+            PictureStorage.deleteEntry(cache.url);
         }
         
         synchronized (TextureSeeker.LOCK) {
@@ -115,16 +114,16 @@ public class TextureSeeker extends Thread {
     }
     
     public static byte[] load(String url) throws IOException, FoundVideoException, NoConnectionException {
-        TextureStorage.CacheEntry entry = TEXTURE_STORAGE.getEntry(url);
+        PictureStorage.Entry entry = PictureStorage.getEntry(url);
         long requestTime = System.currentTimeMillis();
         URLConnection connection = new URL(url).openConnection();
         try {
             connection.addRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0");
             int responseCode = -1;
             if (connection instanceof HttpURLConnection httpConnection) {
-                if (entry != null && entry.getFile().exists()) {
-                    if (entry.getEtag() != null)
-                        httpConnection.setRequestProperty("If-None-Match", entry.getEtag());
+                if (entry != null && PictureStorage.getFile(entry.getUrl()).exists()) {
+                    if (entry.getTag() != null)
+                        httpConnection.setRequestProperty("If-None-Match", entry.getTag());
                     else if (entry.getTime() != -1)
                         httpConnection.setRequestProperty("If-Modified-Since", FORMAT.format(new Date(entry.getTime())));
                 }
@@ -168,11 +167,11 @@ public class TextureSeeker extends Thread {
                 }
                 if (entry != null) {
                     if (etag != null && !etag.isEmpty()) {
-                        entry.setEtag(etag);
+                        entry.setTag(etag);
                     }
                     entry.setTime(lastModifiedTimestamp);
                     if (responseCode == HttpURLConnection.HTTP_NOT_MODIFIED) {
-                        File file = entry.getFile();
+                        File file = PictureStorage.getFile(entry.getUrl());
                         if (file.exists()) {
                             FileInputStream fileStream = new FileInputStream(file);
                             try {
@@ -187,7 +186,7 @@ public class TextureSeeker extends Thread {
                 byte[] data = IOUtils.toByteArray(in);
                 if (readType(data) == null)
                     throw new FoundVideoException();
-                TEXTURE_STORAGE.save(url, etag, lastModifiedTimestamp, expireTimestamp, data);
+                PictureStorage.saveFile(url, etag, lastModifiedTimestamp, expireTimestamp, data);
                 return data;
             } finally {
                 IOUtils.closeQuietly(in);

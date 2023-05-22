@@ -1,7 +1,8 @@
 {
     "block.waterframes.frame": "Picture Frame",
-    "itemGroup.waterframes": "WATERFrAMES",
-    "label.waterframes.not_whitelisted": "URL not whitelisted, cannot save",
+    "block.waterframes.projector": "Picture Projector",
+    "itemGroup.waterframes": "WATERDiSPLAY",
+    "label.waterframes.not_whitelisted": "Error: URL not whitelisted",
     "label.waterframes.whitelist_warning": "Warning: URL Whitelist not enabled",
     "label.waterframes.invalid_url": "Warning: Invalid URL",
     "gui.waterframes.flipx": "flip (x-axis)",

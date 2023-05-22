@@ -95,6 +95,7 @@ public class WFConfig {
 
     public static boolean domainAllowed(@NotNull String domain) {
         if (DISABLE_WHITELIST.get()) return true;
+
         for (final var url: WHITELIST.get()) {
             var uri = url.trim().toLowerCase(Locale.ROOT);
             if (domain.endsWith("." + uri) || domain.equals(uri)) return true;
@@ -102,10 +103,11 @@ public class WFConfig {
         return false;
     }
 
-    public static boolean canUse(Player player, String url) {
+    public static boolean canUse(@NotNull Player player, String url) {
         var level = player.level;
         var server = level.getServer();
-        if (!level.isClientSide && (server.isSingleplayer() || player.hasPermissions(server.getOperatorUserPermissionLevel()))) return true;
+        if (level.isClientSide) return true;
+        if (server.isSingleplayer() || player.hasPermissions(server.getOperatorUserPermissionLevel())) return true;
 
         if (!DISABLE_WHITELIST.get()) return ThreadUtil.tryAndReturn((defaultVar) ->
                 domainAllowed(new URI(url.toLowerCase(Locale.ROOT)).getHost()), false);
