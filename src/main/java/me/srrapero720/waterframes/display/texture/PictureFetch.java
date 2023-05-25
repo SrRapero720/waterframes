@@ -1,9 +1,10 @@
-package me.srrapero720.waterframes.rendering.images;
+package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.logging.LogUtils;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WFUtil;
-import me.srrapero720.waterframes.display.texture.TextureSeeker;
+import me.srrapero720.waterframes.display.texture.PictureStorage;
+import me.srrapero720.waterframes.display.texture.TextureData;
 import me.srrapero720.waterframes.watercore_supplier.GifDecoder;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
@@ -22,13 +23,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @OnlyIn(Dist.CLIENT)
-public class PictureManager extends Thread {
+public class PictureFetch extends Thread {
     // MC
     private static final Minecraft MC = Minecraft.getInstance();
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final DateFormat FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
-    private static final Object LOCK = new Object();
+    public static final Object LOCK = new Object();
     private static final String USER_AGENT = WFUtil.getUserAgentBasedOnOS();
 
     // STATUS
@@ -36,17 +37,21 @@ public class PictureManager extends Thread {
     public static int ACTIVE_FETCH = 0;
 
 
-    private final PictureCache cache;
-    public PictureManager(PictureCache cache) {
+    private final TextureData cache;
+    public PictureFetch(TextureData cache) {
         this.cache = cache;
         setName("WF-Seeker");
         setDaemon(true);
         start();
     }
 
+    public static boolean canBeSeeked() {
+        synchronized(LOCK) { return ACTIVE_FETCH < MAX_FETCH; }
+    }
+
     @Override
     public void run() {
-        synchronized (TextureSeeker.LOCK) { TextureSeeker.activeDownloads++; }
+        synchronized (LOCK) { ACTIVE_FETCH++; }
 
         Exception exception = null;
         boolean isVideo = false;
@@ -99,8 +104,8 @@ public class PictureManager extends Thread {
             PictureStorage.deleteEntry(cache.url);
         }
 
-        synchronized (TextureSeeker.LOCK) {
-            TextureSeeker.activeDownloads--;
+        synchronized (LOCK) {
+            ACTIVE_FETCH--;
         }
     }
 

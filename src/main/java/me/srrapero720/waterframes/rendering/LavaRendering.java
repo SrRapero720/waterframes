@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.rendering;
 
-import me.srrapero720.waterframes.api.ITexture;
+import me.srrapero720.waterframes.api.IRendering;
 
-public class LavaTexture implements ITexture {
+public class LavaRendering implements IRendering {
     @Override
     public int width() {
         return 0;

@@ -1,29 +1,24 @@
 package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import me.srrapero720.waterframes.api.IMediaData;
+import me.srrapero720.waterframes.WFUtil;
 import me.srrapero720.waterframes.watercore_supplier.GifDecoder;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.api.IDisplay;
-import me.srrapero720.waterframes.display.MediaDisplay;
+import me.srrapero720.waterframes.display.VideoDisplay;
 import me.srrapero720.waterframes.display.PictureDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.nio.ByteBuffer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TextureCache {
-    private static final Map<String, TextureCache> cached = new LinkedHashMap<>();
+public class TextureData {
+    private static final Map<String, TextureData> cached = new LinkedHashMap<>();
 
     public static void tick() {
         for (var iterator = cached.values().iterator(); iterator.hasNext();) {
@@ -40,17 +35,17 @@ public class TextureCache {
     }
 
     public static void unload(Level event) {
-        for (TextureCache cache : cached.values()) cache.remove();
+        for (TextureData cache : cached.values()) cache.remove();
         cached.clear();
     }
     
-    public static TextureCache get(String url) {
-        TextureCache cache = cached.get(url);
+    public static TextureData get(String url) {
+        TextureData cache = cached.get(url);
         if (cache != null) {
             cache.use();
             return cache;
         }
-        cache = new TextureCache(url);
+        cache = new TextureData(url);
         cached.put(url, cache);
         return cache;
     }
@@ -63,7 +58,7 @@ public class TextureCache {
     private long duration;
     private boolean isVideo;
     
-    private TextureSeeker seeker;
+    private PictureFetch seeker;
     private boolean ready = false;
     private String error;
     
@@ -72,23 +67,20 @@ public class TextureCache {
     private GifDecoder decoder;
     private int remaining;
     
-    public TextureCache(String url) {
+    public TextureData(String url) {
         this.url = url;
-        use();
-        trySeek();
+        usage++;
+        if (PictureFetch.canBeSeeked()) this.seeker = new PictureFetch(this);
     }
     
     private void trySeek() {
         if (seeker != null) return;
-        synchronized (TextureSeeker.LOCK) {
-            if (TextureSeeker.activeDownloads < TextureSeeker.MAXIMUM_ACTIVE_DOWNLOADS && !this.url.isEmpty())
-                this.seeker = new TextureSeeker(this);
-        }
+        if (PictureFetch.canBeSeeked()) this.seeker = new PictureFetch(this);
     }
     
     private int getTexture(int index) {
         if (textures[index] == -1 && decoder != null) {
-            textures[index] = IMediaData.processFrame(decoder.getFrame(index), width, height);
+            textures[index] = WFUtil.preRender(decoder.getFrame(index), width, height);
             remaining--;
             if (remaining <= 0)
                 decoder = null;
@@ -116,7 +108,7 @@ public class TextureCache {
     
     public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
         volume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
-        if (textures == null && !noVideo && !WFConfig.isDisabledVLC()) return MediaDisplay.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
+        if (textures == null && !noVideo && !WFConfig.isDisabledVLC()) return VideoDisplay.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
         return new PictureDisplay(this);
     }
     
@@ -142,7 +134,7 @@ public class TextureCache {
     public void process(BufferedImage image) {
         width = image.getWidth();
         height = image.getHeight();
-        textures = new int[] { IMediaData.processFrame(image, width, height) };
+        textures = new int[] { WFUtil.preRender(image, width, height) };
         delay = new long[] { 0 };
         duration = 0;
         seeker = null;

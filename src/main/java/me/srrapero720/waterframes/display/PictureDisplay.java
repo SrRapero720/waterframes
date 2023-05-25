@@ -1,15 +1,15 @@
 package me.srrapero720.waterframes.display;
 
 import me.srrapero720.waterframes.api.IDisplay;
-import me.srrapero720.waterframes.display.texture.TextureCache;
+import me.srrapero720.waterframes.display.texture.TextureData;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 
 public class PictureDisplay implements IDisplay {
     
-    public final TextureCache texture;
+    public final TextureData texture;
     private int textureId;
     
-    public PictureDisplay(TextureCache texture) {
+    public PictureDisplay(TextureData texture) {
         this.texture = texture;
     }
     

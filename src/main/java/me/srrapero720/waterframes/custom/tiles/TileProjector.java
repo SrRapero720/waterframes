@@ -6,7 +6,7 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.blocks.Projector;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.api.IDisplay;
-import me.srrapero720.waterframes.display.texture.TextureCache;
+import me.srrapero720.waterframes.display.texture.TextureData;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import me.srrapero720.waterframes.watercore_supplier.YTExtractor;
 import net.minecraft.core.BlockPos;
@@ -70,7 +70,7 @@ public class TileProjector extends BlockEntity {
     public boolean playing = true;
 
     @OnlyIn(Dist.CLIENT)
-    public TextureCache cache;
+    public TextureData cache;
 
     @OnlyIn(Dist.CLIENT)
     public IDisplay display;
@@ -102,7 +102,7 @@ public class TileProjector extends BlockEntity {
     public IDisplay requestDisplay() {
         String url = getURL();
         if (cache == null || !cache.url.equals(url)) {
-            cache = TextureCache.get(url);
+            cache = TextureData.get(url);
             if (display != null)
                 display.release();
             display = null;

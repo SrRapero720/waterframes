@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.rendering.images;
+package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.logging.LogUtils;
 import me.srrapero720.waterframes.WFUtil;
@@ -21,7 +21,7 @@ import java.util.zip.GZIPOutputStream;
 public class PictureStorage {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final File dir = new File(Minecraft.getInstance().gameDirectory, "cache/waterframes");
-    private static final File index = new File(dir, "indexing");
+    private static final File index = new File(dir, "indexer");
     private static final Map<String, Entry> entries = new HashMap<>();
 
     static {

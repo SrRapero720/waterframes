@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.api;
 
-public interface ITexture {
+public interface IRendering {
     String VLC_FAILED = "https://i.imgur.com/UAXbZeM.jpg";
 
     int width();
@@ -16,7 +16,7 @@ public interface ITexture {
     void release();
 
 
-    default ITexture sync(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
+    default IRendering sync(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
         return this;
     }
 }

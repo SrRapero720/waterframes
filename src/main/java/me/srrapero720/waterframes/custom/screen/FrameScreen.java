@@ -3,8 +3,8 @@ package me.srrapero720.waterframes.custom.screen;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
-import me.srrapero720.waterframes.display.texture.TextureCache;
-import me.srrapero720.waterframes.display.texture.TextureSeeker;
+import me.srrapero720.waterframes.display.texture.TextureData;
+import me.srrapero720.waterframes.display.texture.PictureFetch;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
@@ -311,8 +311,8 @@ public class FrameScreen extends GuiLayer {
         save.setEnabled(WFConfig.canUse(getPlayer(), url.getText()));
         play_right.add(save);
         play_right.add(new GuiButton("reload", x -> {
-            synchronized (TextureSeeker.LOCK) {
-                if (Screen.hasShiftDown()) TextureCache.reloadAll();
+            synchronized (PictureFetch.LOCK) {
+                if (Screen.hasShiftDown()) TextureData.reloadAll();
                 else if (frame.cache != null) frame.cache.reload();
             }
         }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));

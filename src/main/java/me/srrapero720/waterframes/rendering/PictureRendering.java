@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.rendering;
 
-import me.srrapero720.waterframes.api.ITexture;
+import me.srrapero720.waterframes.api.IRendering;
 
-public class VLCTexture implements ITexture {
+public class PictureRendering implements IRendering {
     @Override
     public int width() {
         return 0;
@@ -30,26 +30,6 @@ public class VLCTexture implements ITexture {
 
     @Override
     public void prepare() {
-
-    }
-
-    @Override
-    public void tick() {
-
-    }
-
-    @Override
-    public void play() {
-
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void stop() {
 
     }
 

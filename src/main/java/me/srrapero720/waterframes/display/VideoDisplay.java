@@ -4,11 +4,12 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.srrapero720.waterframes.api.IDisplay;
-import me.srrapero720.waterframes.api.ITexture;
-import me.srrapero720.waterframes.display.texture.TextureCache;
+import me.srrapero720.waterframes.api.IRendering;
+import me.srrapero720.waterframes.display.texture.TextureData;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.sounds.SoundSource;
 import nick1st.fancyvideo.api.MediaPlayerHandler;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
@@ -23,10 +24,10 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-public class MediaDisplay implements IDisplay {
+public class VideoDisplay implements IDisplay {
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
     
-    private static final List<MediaDisplay> OPEN_DISPLAYS = new ArrayList<>();
+    private static final List<VideoDisplay> OPEN_DISPLAYS = new ArrayList<>();
     
     public static void tick() {
         synchronized (OPEN_DISPLAYS) {
@@ -49,13 +50,13 @@ public class MediaDisplay implements IDisplay {
     
     public static IDisplay createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         return ThreadUtil.tryAndReturn((defaultVar) -> {
-            var display = new MediaDisplay(pos, url, volume, minDistance, maxDistance, loop);
+            var display = new VideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
             OPEN_DISPLAYS.add(display);
             return display;
 
         }, ((Supplier<IDisplay>) () -> {
-            var cache = TextureCache.get(ITexture.VLC_FAILED);
-            if (cache.ready()) return cache.createDisplay(pos, ITexture.VLC_FAILED, volume, minDistance, maxDistance, loop, true);
+            var cache = TextureData.get(IRendering.VLC_FAILED);
+            if (cache.ready()) return cache.createDisplay(pos, IRendering.VLC_FAILED, volume, minDistance, maxDistance, loop, true);
             return null;
         }).get());
     }
@@ -75,7 +76,7 @@ public class MediaDisplay implements IDisplay {
     private volatile boolean first = true;
     private long lastCorrectedTime = Long.MIN_VALUE;
     
-    public MediaDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
+    public VideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         super();
         this.pos = pos;
         texture = GlStateManager._genTexture();
@@ -96,9 +97,9 @@ public class MediaDisplay implements IDisplay {
             public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
                 lock.lock();
                 try {
-                    MediaDisplay.this.width = sourceWidth;
-                    MediaDisplay.this.height = sourceHeight;
-                    MediaDisplay.this.first = true;
+                    VideoDisplay.this.width = sourceWidth;
+                    VideoDisplay.this.height = sourceHeight;
+                    VideoDisplay.this.first = true;
                     buffer = MemoryTracker.create(sourceWidth * sourceHeight * 4).asIntBuffer();
                     needsUpdate = true;
                 } finally {
@@ -123,6 +124,7 @@ public class MediaDisplay implements IDisplay {
     public int getVolume(float volume, float minDistance, float maxDistance) {
         if (player == null) return 0;
         float distance = (float) pos.distance(Minecraft.getInstance().player.getPosition(WCoreUtil.toDeltaFrames()));
+        float master = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
         if (minDistance > maxDistance) {
             float temp = maxDistance;
             maxDistance = minDistance;
@@ -130,11 +132,11 @@ public class MediaDisplay implements IDisplay {
         }
         
         if (distance > minDistance)
-            if (distance > maxDistance)
-                volume = 0;
-            else
-                volume *= 1 - ((distance - minDistance) / (maxDistance - minDistance));
-        return (int) (volume * 100F);
+            if (distance > maxDistance) volume = 0;
+            else volume *= 1 - ((distance - minDistance) / (maxDistance - minDistance));
+
+        // TODO: make complicated math to make a fancy Volume responsive.
+        return (int) ((volume * 100F));
     }
 
     @Override
@@ -170,7 +172,8 @@ public class MediaDisplay implements IDisplay {
                 if (player.mediaPlayer().status().length() > 0) {
                     if (player.mediaPlayer().status().isPlaying() != realPlaying)
                         player.mediaPlayer().controls().setPause(!realPlaying);
-                    
+
+                    // TODO: Check what is wrong here
                     if (player.mediaPlayer().status().isSeekable()) {
                         long time = tick * tickTime + (realPlaying ? (long) (WCoreUtil.toDeltaFrames() * tickTime) : 0);
                         if (time > player.mediaPlayer().status().time() && loop)

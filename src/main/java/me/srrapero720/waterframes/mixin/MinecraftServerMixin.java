@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.mixin;
 
-import me.srrapero720.waterframes.display.texture.TextureCache;
+import me.srrapero720.waterframes.display.texture.TextureData;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class MinecraftServerMixin {
     @Redirect(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;close()V"))
     public void injectStopServer(ServerLevel instance) {
         try {
-            if (instance.isClientSide) TextureCache.unload(instance);
+            if (instance.isClientSide) TextureData.unload(instance);
             instance.close();
         } catch (IOException var5) {
             LOGGER.error("Exception closing the level", var5);
