@@ -1,5 +1,5 @@
 package me.srrapero720.waterframes.custom.blocks;
 
-public class FrameRedstone extends Frame {
+public class FramePowered extends Frame {
 
 }
