@@ -1,6 +1,5 @@
 package me.srrapero720.waterframes;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -19,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WFUtil {
+public class DisplayUtil {
     public static String getUserAgentBasedOnOS() {
         var winLegacy = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:25.0) Gecko/20100101 Firefox/25.0";
         var winEdge = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36 Edg/112.0.1722.68";
@@ -36,7 +35,7 @@ public class WFUtil {
         var bufferedReader = new Stationary<BufferedReader>();
 
         return ThreadUtil.tryAndReturn(defaultVar -> {
-            var res = WFUtil.class.getClassLoader().getResourceAsStream(path);
+            var res = DisplayUtil.class.getClassLoader().getResourceAsStream(path);
             if (res != null) {
                 inputStream.set(new InputStreamReader(res, StandardCharsets.UTF_8));
                 bufferedReader.set(new BufferedReader(inputStream.get()));

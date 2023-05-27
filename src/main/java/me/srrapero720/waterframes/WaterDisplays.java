@@ -9,14 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.creative.creativecore.common.network.CreativeNetwork;
 
-@Mod(WaterFrames.ID)
-public class WaterFrames {
+@Mod(WaterDisplays.ID)
+public class WaterDisplays {
     public static final String ID = "waterframes";
     public static final Logger LOGGER = LoggerFactory.getLogger(ID);
     public static final CreativeNetwork NETWORK = new CreativeNetwork("1.2", LogManager.getLogger(ID), new ResourceLocation(ID, "main"));
 
     public static IEventBus bus() { return FMLJavaModLoadingContext.get().getModEventBus(); }
-    public WaterFrames() {
-        WFRegistry.register();
-    }
+    public WaterDisplays() { DisplayRegistry.register(); }
 }

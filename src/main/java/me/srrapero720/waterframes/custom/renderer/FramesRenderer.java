@@ -8,7 +8,7 @@ import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.api.IDisplay;
+import me.srrapero720.waterframes.api.RenderDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -43,7 +43,7 @@ public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
             return;
         }
         
-        IDisplay display = frame.requestDisplay();
+        RenderDisplay display = frame.requestDisplay();
         if (display == null) return;
         
         display.prepare(frame.getURL(), frame.volume * Minecraft.getInstance().options
@@ -53,7 +53,7 @@ public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShaderColor(frame.brightness, frame.brightness, frame.brightness, frame.alpha);
-        int texture = display.texture();
+        int texture = display.getTexID();
         
         if (texture == -1) return;
         RenderSystem.bindTexture(texture);

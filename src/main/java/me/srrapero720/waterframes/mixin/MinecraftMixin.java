@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.mixin;
 
-import me.srrapero720.waterframes.display.VideoDisplay;
+import me.srrapero720.waterframes.rendering.VLCRendering;
 import me.srrapero720.waterframes.display.texture.TextureData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -23,7 +23,7 @@ public class MinecraftMixin {
 
     @Inject(method = "tick", at = @At(value = "INVOKE", ordinal = 0, target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V"))
     public void injectTick(CallbackInfo ci) {
-        VideoDisplay.tick();
+        VLCRendering.tick();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -36,7 +36,7 @@ public class MinecraftMixin {
     public void injectClearServerPack(Screen screen, CallbackInfo ci) {
         if (level != null) {
             TextureData.unload(level);
-            VideoDisplay.unload();
+            VLCRendering.unload();
         }
     }
 
@@ -44,7 +44,7 @@ public class MinecraftMixin {
     public void injectSetLevel(ClientLevel clientLevel, CallbackInfo ci) {
         if (clientLevel != null) {
             TextureData.unload(clientLevel);
-            VideoDisplay.unload();
+            VLCRendering.unload();
         }
     }
 }

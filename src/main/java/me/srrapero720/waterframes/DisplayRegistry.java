@@ -25,11 +25,11 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
-public class WFRegistry {
-    public static final ForgeSmartTab TAB = new ForgeSmartTab("waterframes", new ResourceLocation(WaterFrames.ID, "frame"));
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, WaterFrames.ID);
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, WaterFrames.ID);
-    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, WaterFrames.ID);
+public class DisplayRegistry {
+    public static final ForgeSmartTab TAB = new ForgeSmartTab("waterframes", new ResourceLocation(WaterDisplays.ID, "frame"));
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, WaterDisplays.ID);
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, WaterDisplays.ID);
+    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, WaterDisplays.ID);
 
     public static RegistryObject<Frame> FRAME = BLOCKS.register("frame", Frame::new);
     public static RegistryObject<Projector> PROJECTOR = BLOCKS.register("projector", Projector::new);
@@ -41,22 +41,22 @@ public class WFRegistry {
         ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB)));
         ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB)));
 
-        BLOCKS.register(WaterFrames.bus());
-        ITEMS.register(WaterFrames.bus());
-        TILES.register(WaterFrames.bus());
+        BLOCKS.register(WaterDisplays.bus());
+        ITEMS.register(WaterDisplays.bus());
+        TILES.register(WaterDisplays.bus());
 
-        WaterFrames.bus().addListener(WFRegistry::common);
-        if (FMLEnvironment.dist.isClient()) WaterFrames.bus().addListener(WFRegistry::client);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, WFConfig.SPEC, "waterframes-server.toml");
+        WaterDisplays.bus().addListener(DisplayRegistry::common);
+        if (FMLEnvironment.dist.isClient()) WaterDisplays.bus().addListener(DisplayRegistry::client);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, DisplayConfig.SPEC, "waterframes-server.toml");
     }
 
     public static void common(final FMLCommonSetupEvent event) {
-        WaterFrames.NETWORK.registerType(FramesPacket.class, FramesPacket::new);
+        WaterDisplays.NETWORK.registerType(FramesPacket.class, FramesPacket::new);
     }
 
     @OnlyIn(Dist.CLIENT)
     public static void client(final FMLClientSetupEvent event) {
-        BlockEntityRenderers.register(WFRegistry.TILE_FRAME.get(), (x) -> new FramesRenderer());
-        BlockEntityRenderers.register(WFRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRenderer());
+        BlockEntityRenderers.register(DisplayRegistry.TILE_FRAME.get(), (x) -> new FramesRenderer());
+        BlockEntityRenderers.register(DisplayRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRenderer());
     }
 }

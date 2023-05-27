@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.custom.blocks;
 
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.custom.blocks.properties.VisibleProperty;
 import me.srrapero720.waterframes.custom.screen.FrameScreen;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
@@ -89,13 +89,13 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
 
     @Override
     public InteractionResult use(BlockState state, @NotNull Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide && WFConfig.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        if (!level.isClientSide && DisplayConfig.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public void neighborChanged(@NotNull BlockState state, @NotNull Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
-        if (!WFConfig.isDisabledRedstone() && level.getBlockEntity(pos) instanceof TileFrame tile) {
+        if (!DisplayConfig.isDisabledRedstone() && level.getBlockEntity(pos) instanceof TileFrame tile) {
             var signal = false;
             for (var direction: Direction.values()) {
                 var neightborBP = pos.relative(direction);

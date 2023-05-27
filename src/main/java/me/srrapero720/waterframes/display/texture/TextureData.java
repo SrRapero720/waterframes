@@ -1,12 +1,13 @@
 package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import me.srrapero720.waterframes.WFUtil;
+import me.srrapero720.waterframes.DisplayUtil;
 import me.srrapero720.waterframes.watercore_supplier.GifDecoder;
-import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.api.IDisplay;
-import me.srrapero720.waterframes.display.VideoDisplay;
-import me.srrapero720.waterframes.display.PictureDisplay;
+import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.api.RenderDisplay;
+import me.srrapero720.waterframes.rendering.VLCRendering;
+import me.srrapero720.waterframes.rendering.PictureRendering;
+import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
@@ -70,7 +71,7 @@ public class TextureData {
     public TextureData(String url) {
         this.url = url;
         usage++;
-        if (PictureFetch.canBeSeeked()) this.seeker = new PictureFetch(this);
+        if (PictureFetch.canBeSeeked() && url != null && !url.isEmpty()) this.seeker = new PictureFetch(this);
     }
     
     private void trySeek() {
@@ -80,7 +81,7 @@ public class TextureData {
     
     private int getTexture(int index) {
         if (textures[index] == -1 && decoder != null) {
-            textures[index] = WFUtil.preRender(decoder.getFrame(index), width, height);
+            textures[index] = DisplayUtil.preRender(decoder.getFrame(index), width, height);
             remaining--;
             if (remaining <= 0)
                 decoder = null;
@@ -101,15 +102,18 @@ public class TextureData {
         }
         return last;
     }
-    
-    public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
-        return createDisplay(pos, url, volume, minDistance, maxDistance, loop, false);
-    }
-    
-    public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
-        volume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
-        if (textures == null && !noVideo && !WFConfig.isDisabledVLC()) return VideoDisplay.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
-        return new PictureDisplay(this);
+
+    public RenderDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
+        var mcVolume = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
+        var vol = volume * (mcVolume * mcVolume);
+        var cache = TextureData.get(RenderDisplay.VLC_FAILED);
+
+        if (textures == null && !noVideo && !DisplayConfig.isDisabledVLC())
+            return ThreadUtil.tryAndReturn(defaultVar ->
+                    new VLCRendering(pos, url, vol, minDistance, maxDistance, loop),
+                    cache.ready() ? cache.createDisplay(pos, url, volume, minDistance, maxDistance, loop, noVideo) : null);
+
+        return new PictureRendering(this);
     }
     
     public String getError() {
@@ -134,7 +138,7 @@ public class TextureData {
     public void process(BufferedImage image) {
         width = image.getWidth();
         height = image.getHeight();
-        textures = new int[] { WFUtil.preRender(image, width, height) };
+        textures = new int[] { DisplayUtil.preRender(image, width, height) };
         delay = new long[] { 0 };
         duration = 0;
         seeker = null;

@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.URI;
 import java.util.*;
 
-public class WFConfig {
+public class DisplayConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
 
@@ -59,7 +59,7 @@ public class WFConfig {
         DISABLE_REDSTONE = BUILDER.comment("Disable pause trigger on redstone signal input").define("disableRedstone", true);
 
         DISABLE_WHITELIST = BUILDER.define("disableWhitelist", false);
-        WHITELIST = BUILDER.define("whitelist", WFUtil.getJsonArrayStringResource("whitelist_url.json"));
+        WHITELIST = BUILDER.define("whitelist", DisplayUtil.getJsonArrayStringResource("whitelist_url.json"));
 
 
         /* waterframes -> frames */

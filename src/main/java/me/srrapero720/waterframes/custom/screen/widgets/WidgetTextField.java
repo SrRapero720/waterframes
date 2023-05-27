@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.custom.screen.widgets;
 
-import me.srrapero720.waterframes.WFUtil;
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplayUtil;
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.custom.screen.widgets.constants.Constants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -35,7 +35,7 @@ public class WidgetTextField extends GuiTextfield {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         boolean pressed = super.keyPressed(keyCode, scanCode, modifiers);
-        saveButton.setEnabled(WFConfig.canUse(getPlayer(), getText()));
+        saveButton.setEnabled(DisplayConfig.canUse(getPlayer(), getText()));
         return pressed;
     }
 
@@ -43,9 +43,9 @@ public class WidgetTextField extends GuiTextfield {
     public List<Component> getTooltip() {
         var tooltips = new ArrayList<Component>();
 
-        if (!WFConfig.canUse(getPlayer(), getText()))
+        if (!DisplayConfig.canUse(getPlayer(), getText()))
             tooltips.add(new TranslatableComponent("label.waterframes.not_whitelisted").withStyle(ChatFormatting.RED));
-        if (!WFUtil.validUrl(getText()))
+        if (!DisplayUtil.validUrl(getText()))
             tooltips.add(new TranslatableComponent("label.waterframes.invalid_url").withStyle(ChatFormatting.RED));
 
         return tooltips.isEmpty() ? null : tooltips;

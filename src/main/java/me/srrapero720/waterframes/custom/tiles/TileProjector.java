@@ -1,11 +1,11 @@
 package me.srrapero720.waterframes.custom.tiles;
 
-import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.WFRegistry;
-import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.DisplayRegistry;
+import me.srrapero720.waterframes.WaterDisplays;
 import me.srrapero720.waterframes.custom.blocks.Projector;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
-import me.srrapero720.waterframes.api.IDisplay;
+import me.srrapero720.waterframes.api.RenderDisplay;
 import me.srrapero720.waterframes.display.texture.TextureData;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import me.srrapero720.waterframes.watercore_supplier.YTExtractor;
@@ -34,7 +34,7 @@ public class TileProjector extends BlockEntity {
     @OnlyIn(Dist.CLIENT)
     public static @NotNull String parseUrl(@NotNull String url) {
         var extractor = new YTExtractor(url);
-        var provider = WFConfig.ytProvider();
+        var provider = DisplayConfig.ytProvider();
         if (extractor.isValid() && !provider.isEmpty()) return provider + "/execute/" + extractor;
 
         return url.replaceAll("\\{playername}", WCoreUtil.mine().player.getName().getString())
@@ -73,10 +73,10 @@ public class TileProjector extends BlockEntity {
     public TextureData cache;
 
     @OnlyIn(Dist.CLIENT)
-    public IDisplay display;
+    public RenderDisplay display;
 
     public TileProjector(BlockPos pos, BlockState state) {
-        super(WFRegistry.TILE_PROJECTOR.get(), pos, state);
+        super(DisplayRegistry.TILE_PROJECTOR.get(), pos, state);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -99,7 +99,7 @@ public class TileProjector extends BlockEntity {
         this.url = url;
     }
 
-    public IDisplay requestDisplay() {
+    public RenderDisplay requestDisplay() {
         String url = getURL();
         if (cache == null || !cache.url.equals(url)) {
             cache = TextureData.get(url);
@@ -111,7 +111,7 @@ public class TileProjector extends BlockEntity {
             return null;
         if (display != null)
             return display;
-        return display = cache.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop);
+        return display = cache.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop, false);
     }
 
     public AlignedBox getBox() {
@@ -157,18 +157,18 @@ public class TileProjector extends BlockEntity {
 
     public void play() {
         playing = true;
-        WaterFrames.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
+        WaterDisplays.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
     }
 
     public void pause() {
         playing = false;
-        WaterFrames.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
+        WaterDisplays.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
     }
 
     public void stop() {
         playing = false;
         tick = 0;
-        WaterFrames.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
+        WaterDisplays.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
     }
 
     protected void savePicture(CompoundTag nbt) {
@@ -226,7 +226,7 @@ public class TileProjector extends BlockEntity {
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         if (blockEntity instanceof TileFrame be) {
             if (level.isClientSide) {
-                IDisplay display = be.requestDisplay();
+                RenderDisplay display = be.requestDisplay();
                 if (display != null) display.tick(be.getURL(), be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}
             if (be.playing) be.tick++;
         }

@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.custom.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
 import me.srrapero720.waterframes.display.texture.TextureData;
@@ -42,10 +42,10 @@ public class ProjectorScreen extends GuiLayer {
 
     public final GuiSyncLocal<CompoundTag> SET_DATA = getSyncHolder().register("set_data", nbt -> {
         String url = nbt.getString("url");
-        if (WFConfig.canUse(getPlayer(), url)) {
+        if (DisplayConfig.canUse(getPlayer(), url)) {
             frame.setURL(url);
-            float sizeX = (float) Math.min(WFConfig.maxWidth(), nbt.getFloat("x"));
-            float sizeY = (float) Math.min(WFConfig.maxHeight(), nbt.getFloat("y"));
+            float sizeX = (float) Math.min(DisplayConfig.maxWidth(), nbt.getFloat("x"));
+            float sizeY = (float) Math.min(DisplayConfig.maxHeight(), nbt.getFloat("y"));
             int posX = nbt.getByte("posX");
             int posY = nbt.getByte("posY");
             if (posX == 0) {
@@ -72,7 +72,7 @@ public class ProjectorScreen extends GuiLayer {
                 frame.max.y = 1;
             }
 
-            frame.renderDistance = Math.min(WFConfig.maxRenderDistance(), nbt.getInt("render"));
+            frame.renderDistance = Math.min(DisplayConfig.maxRenderDistance(), nbt.getInt("render"));
             frame.rotation = nbt.getFloat("rotation");
             frame.loop = nbt.getBoolean("loop");
             frame.flipX = nbt.getBoolean("flipX");
@@ -294,7 +294,7 @@ public class ProjectorScreen extends GuiLayer {
         play_left.add(new GuiIconButton("stop", GuiIcon.STOP, button -> STOP.send(EndTag.INSTANCE)));
 
 
-        save.setEnabled(WFConfig.canUse(getPlayer(), url.getText()));
+        save.setEnabled(DisplayConfig.canUse(getPlayer(), url.getText()));
         play_right.add(save);
         play_right.add(new GuiButton("reload", x -> {
             synchronized (PictureFetch.LOCK) {

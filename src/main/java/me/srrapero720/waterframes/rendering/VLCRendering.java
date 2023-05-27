@@ -1,60 +1,245 @@
 package me.srrapero720.waterframes.rendering;
 
-import me.srrapero720.waterframes.api.IRendering;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.MemoryTracker;
+import com.mojang.blaze3d.systems.RenderSystem;
+import me.srrapero720.waterframes.api.RenderDisplay;
+import me.srrapero720.waterframes.display.texture.TextureData;
+import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
+import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.sounds.SoundSource;
+import nick1st.fancyvideo.api.MediaPlayerHandler;
+import org.lwjgl.opengl.GL11;
+import team.creative.creativecore.common.util.math.vec.Vec3d;
+import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent;
+import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
+import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
 
-public class VLCRendering implements IRendering {
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
+
+public class VLCRendering extends RenderDisplay {
+    private static final int ACCEPTABLE_SYNC_TIME = 1000;
+    private static final List<VLCRendering> OPEN_DISPLAYS = new ArrayList<>();
+    
+    public static void tick() {
+        synchronized (OPEN_DISPLAYS) {
+            for (var display: OPEN_DISPLAYS) {
+                if (Minecraft.getInstance().isPaused()) {
+                    var media = display.player.mediaPlayer();
+                    if (display.stream && media.status().isPlaying()) media.controls().setPause(true);
+                    else if (media.status().length() > 0 && media.status().isPlaying()) media.controls().setPause(true);
+                }
+            }
+        }
+    }
+    
+    public static void unload() {
+        synchronized (OPEN_DISPLAYS) {
+            for (var display : OPEN_DISPLAYS) display.free();
+            OPEN_DISPLAYS.clear();
+        }
+    }
+    
+    public volatile int width = 1;
+    public volatile int height = 1;
+    
+    public CallbackMediaPlayerComponent player;
+    
+    private final Vec3d pos;
+    private volatile IntBuffer buffer;
+    public int texture;
+    private boolean stream = false;
+    private float lastSetVolume;
+    private volatile boolean needsUpdate = false;
+    private final ReentrantLock lock = new ReentrantLock();
+    private volatile boolean first = true;
+    private long lastCorrectedTime = Long.MIN_VALUE;
+    
+    public VLCRendering(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
+        super();
+        this.pos = pos;
+        texture = GlStateManager._genTexture();
+
+        
+        player = new CallbackMediaPlayerComponent(MediaPlayerHandler.getInstance().getFactory(), null, null, false, (mediaPlayer, nativeBuffers, bufferFormat) -> {
+            lock.lock();
+            ThreadUtil.trySimple(() -> {
+                buffer.put(nativeBuffers[0].asIntBuffer());
+                buffer.rewind();
+                needsUpdate = true;
+            }, null, lock::unlock);
+        }, new BufferFormatCallback() {
+            
+            @Override
+            public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
+                lock.lock();
+                try {
+                    VLCRendering.this.width = sourceWidth;
+                    VLCRendering.this.height = sourceHeight;
+                    VLCRendering.this.first = true;
+                    buffer = MemoryTracker.create(sourceWidth * sourceHeight * 4).asIntBuffer();
+                    needsUpdate = true;
+                } finally {
+                    lock.unlock();
+                }
+                return new BufferFormat("RGBA", sourceWidth, sourceHeight, new int[] { sourceWidth * 4 }, new int[] { sourceHeight });
+            }
+            
+            @Override
+            public void allocatedBuffers(ByteBuffer[] buffers) {}
+            
+        }, null);
+        volume = getVolume(volume, minDistance, maxDistance);
+        player.mediaPlayer().audio().setVolume((int) volume);
+        lastSetVolume = volume;
+        player.mediaPlayer().controls().setRepeat(loop);
+
+        ThreadUtil.thread(() -> {
+            player.mediaPlayer().media().start(url);
+            OPEN_DISPLAYS.add(VLCRendering.this);
+        });
+    }
+    
+    public int getVolume(float volume, float minDistance, float maxDistance) {
+        if (player == null) return 0;
+        float distance = (float) pos.distance(Minecraft.getInstance().player.getPosition(WCoreUtil.toDeltaFrames()));
+        if (minDistance > maxDistance) {
+            float temp = maxDistance;
+            maxDistance = minDistance;
+            minDistance = temp;
+        }
+        
+        if (distance > minDistance)
+            if (distance > maxDistance) volume = 0;
+            else volume *= 1 - ((distance - minDistance) / (maxDistance - minDistance));
+
+        // TODO: make complicated math to make a fancy Volume responsive. (DONE)
+        // TODO: Check if works
+        var gameVolume = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
+        return (int) ((volume * 100F) * (gameVolume * gameVolume));
+    }
+
     @Override
-    public int width() {
+    public int maxTick() {
+        if (player != null) return (int) player.mediaPlayer().media().info().duration();
         return 0;
     }
 
     @Override
-    public int height() {
-        return 0;
-    }
+    public void tick(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
+        if (player == null) return;
+        
+        volume = getVolume(volume, minDistance, maxDistance);
+        if (volume != lastSetVolume) {
+            player.mediaPlayer().audio().setVolume((int) volume);
+            lastSetVolume = volume;
+        }
+        
+        if (player.mediaPlayer().media().isValid()) {
+            boolean realPlaying = playing && !Minecraft.getInstance().isPaused();
+            
+            if (player.mediaPlayer().controls().getRepeat() != loop)
+                player.mediaPlayer().controls().setRepeat(loop);
+            long tickTime = 50;
+            long newDuration = player.mediaPlayer().status().length();
+            if (!stream && newDuration != -1 && newDuration != 0 && player.mediaPlayer().media().info().duration() == 0)
+                stream = true;
+            if (stream) {
+                if (player.mediaPlayer().status().isPlaying() != realPlaying)
+                    player.mediaPlayer().controls().setPause(!realPlaying);
+            } else {
+                if (player.mediaPlayer().status().length() > 0) {
+                    if (player.mediaPlayer().status().isPlaying() != realPlaying)
+                        player.mediaPlayer().controls().setPause(!realPlaying);
 
+                    // TODO: Check what is wrong here
+                    if (player.mediaPlayer().status().isSeekable()) {
+                        long time = tick * tickTime + (realPlaying ? (long) (WCoreUtil.toDeltaFrames() * tickTime) : 0);
+                        if (time > player.mediaPlayer().status().time() && loop)
+                            time %= player.mediaPlayer().status().length();
+                        if (Math.abs(time - player.mediaPlayer().status().time()) > ACCEPTABLE_SYNC_TIME && Math.abs(time - lastCorrectedTime) > ACCEPTABLE_SYNC_TIME) {
+                            lastCorrectedTime = time;
+                            player.mediaPlayer().controls().setTime(time);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     @Override
-    public int posTick() {
-        return 0;
+    public void prepare(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
+        if (player == null) return;
+        lock.lock();
+        try {
+            if (needsUpdate) {
+                // fixes random crash, when values are too high it causes a jvm crash, caused weird behavior when game is paused
+                GlStateManager._pixelStore(3314, 0);
+                GlStateManager._pixelStore(3316, 0);
+                GlStateManager._pixelStore(3315, 0);
+                RenderSystem.bindTexture(texture);
+                if (first) {
+                    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+                    first = false;
+                } else
+                    GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+                needsUpdate = false;
+            }
+        } finally {
+            lock.unlock();
+        }
+        
     }
-
-    @Override
-    public int durationTick() {
-        return 0;
+    
+    public void free() {
+        if (player != null)
+            player.mediaPlayer().release();
+        if (texture != -1) {
+            GlStateManager._deleteTexture(texture);
+            texture = -1;
+        }
+        player = null;
     }
-
-    @Override
-    public int tex() {
-        return 0;
-    }
-
-    @Override
-    public void prepare() {
-
-    }
-
-    @Override
-    public void tick() {
-
-    }
-
-    @Override
-    public void play() {
-
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void stop() {
-
-    }
-
+    
     @Override
     public void release() {
-
+        free();
+        synchronized (OPEN_DISPLAYS) {
+            OPEN_DISPLAYS.remove(this);
+        }
     }
+    
+    @Override
+    public int getTexID() { return texture; }
+    
+    @Override
+    public void pause(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
+        if (player == null) return;
+        player.mediaPlayer().controls().setTime(tick * 50L);
+        player.mediaPlayer().controls().pause();
+    }
+    
+    @Override
+    public void resume(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
+        if (player == null) return;
+        player.mediaPlayer().controls().setTime(tick * 50L);
+        player.mediaPlayer().controls().play();
+    }
+    
+    @Override
+    public int getWidth() {
+        return width;
+    }
+    
+    @Override
+    public int getHeight() {
+        return height;
+    }
+    
 }
