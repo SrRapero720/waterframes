@@ -35,9 +35,9 @@ public class PictureFetch extends Thread {
     public static int ACTIVE_FETCH = 0;
 
 
-    private final TextureData cache;
-    public PictureFetch(TextureData cache) {
-        this.cache = cache;
+    private final TextureData tex;
+    public PictureFetch(TextureData tex) {
+        this.tex = tex;
         setName("WF-Seeker");
         setDaemon(true);
         start();
@@ -55,7 +55,7 @@ public class PictureFetch extends Thread {
         boolean isVideo = false;
         boolean processed = false;
         try {
-            var data = load(cache.url);
+            var data = load(tex.url);
             var type = readType(data);
 
             try (var in = new ByteArrayInputStream(data)) {
@@ -64,7 +64,7 @@ public class PictureFetch extends Thread {
                     var status = gif.read(in);
 
                     if (status == GifDecoder.STATUS_OK) {
-                        MC.executeBlocking(() -> cache.process(gif));
+                        MC.executeBlocking(() -> tex.process(gif));
                         processed = true;
                     } else {
                         LOGGER.error("Failed to read gif: {}", status);
@@ -74,7 +74,7 @@ public class PictureFetch extends Thread {
                     try {
                         var image = ImageIO.read(in);
                         if (image != null) {
-                            MC.executeBlocking(() -> cache.process(image));
+                            MC.executeBlocking(() -> tex.process(image));
                             processed = true;
                         }
                     } catch (IOException e1) {
@@ -85,9 +85,9 @@ public class PictureFetch extends Thread {
             }
         } catch (Exception e) {
             if (!DisplayConfig.isDisabledVLC() && e instanceof VideoContentException) {
-                cache.processVideo();
+                tex.processVideo();
                 isVideo = true;
-            } else cache.processFailed("No image found");
+            } else tex.processFailed("No image found");
 
 
             exception = e;
@@ -95,11 +95,11 @@ public class PictureFetch extends Thread {
         }
 
         if (!isVideo && !processed) {
-            if (exception == null) cache.processFailed("download.exception.gif");
-            else if (exception.getMessage().startsWith("Server returned HTTP response code: 403")) cache.processFailed("download.exception.forbidden");
-            else if (exception.getMessage().startsWith("Server returned HTTP response code: 404")) cache.processFailed("download.exception.notfound");
-            else cache.processFailed("download.exception.invalid");
-            PictureStorage.deleteEntry(cache.url);
+            if (exception == null) tex.processFailed("download.exception.gif");
+            else if (exception.getMessage().startsWith("Server returned HTTP response code: 403")) tex.processFailed("download.exception.forbidden");
+            else if (exception.getMessage().startsWith("Server returned HTTP response code: 404")) tex.processFailed("download.exception.notfound");
+            else tex.processFailed("download.exception.invalid");
+            PictureStorage.deleteEntry(tex.url);
         }
 
         synchronized (LOCK) {
