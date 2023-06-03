@@ -35,11 +35,11 @@ license="All rights reserved"
 	versionRange="[2.6,)"
 
 [[dependencies.waterframes]]
-	modId="fancyvideo_api"
+	modId="watermedia"
 	mandatory=true
 	ordering="NONE"
 	side="CLIENT"
-	versionRange="[2.2,)"
+	versionRange="[0.1,)"
 
 #[[dependencies.waterframes]]
 #    modId="watercore"
