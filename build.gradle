@@ -42,6 +42,12 @@ minecraft {
 			property 'forge.logging.console.level', 'debug'
 			arg '--mixin.config'
 			arg 'waterframes.mixin.json'
+
+            mods {
+                watermedia {
+                    source sourceSets.main
+                }
+            }
         }
 
         server {
@@ -51,6 +57,12 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             arg '--mixin.config'
             arg 'waterframes.mixin.json'
+
+            mods {
+                watermedia {
+                    source sourceSets.main
+                }
+            }
         }
     }
 }
@@ -72,7 +84,6 @@ dependencies {
     minecraft "net.minecraftforge:forge:${project.mcV}-${project.fgV}"
 
     //DEPENDENCIES
-    implementation fg.deobf("curse.maven:fancyvideo-api-591686:3822603")
     implementation fg.deobf("curse.maven:creativecore-257814:4394989")
 
     // UTIL
@@ -88,6 +99,7 @@ dependencies {
     implementation fg.deobf("com.simibubi.create:create-${mcV}:${createV}:slim") { transitive = false }
     implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mcV}:${flywheelV}")
     implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateV}")
+    implementation fg.deobf(files("libs/watermedia-0.1.jar"))
 
     // MIXINS
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
