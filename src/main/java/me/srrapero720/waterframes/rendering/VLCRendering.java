@@ -96,7 +96,7 @@ public class VLCRendering extends RenderDisplay {
             
         }, null);
         volume = getVolume(volume, minDistance, maxDistance);
-        player.mediaPlayer().audio().setVolume((int) volume);
+        player.mediaPlayer().audio().setVolume((int) volume); // 0 - 100
         lastSetVolume = volume;
         player.mediaPlayer().controls().setRepeat(loop);
 
@@ -180,9 +180,9 @@ public class VLCRendering extends RenderDisplay {
         try {
             if (needsUpdate) {
                 // fixes random crash, when values are too high it causes a jvm crash, caused weird behavior when game is paused
-                GlStateManager._pixelStore(3314, 0);
-                GlStateManager._pixelStore(3316, 0);
-                GlStateManager._pixelStore(3315, 0);
+                GlStateManager._pixelStore(GL11.GL_UNPACK_ROW_LENGTH, GL11.GL_ZERO);
+                GlStateManager._pixelStore(GL11.GL_UNPACK_SKIP_PIXELS, GL11.GL_ZERO);
+                GlStateManager._pixelStore(GL11.GL_UNPACK_SKIP_ROWS, GL11.GL_ZERO);
                 RenderSystem.bindTexture(texture);
                 if (first) {
                     GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
