@@ -70,11 +70,11 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${project.mcV}-${project.fgV}"
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     //DEPENDENCIES
-    implementation fg.deobf("curse.maven:fancyvideo-api-591686:3865525")
-    implementation fg.deobf("curse.maven:creativecore-257814:4121643")
+    implementation fg.deobf(files("libs/watermedia-0.2.jar"))
+
+    implementation fg.deobf("curse.maven:creativecore-257814:4394989")
 
     // UTIL
     implementation fg.deobf("curse.maven:ferritecore-429235:4074294")
@@ -83,9 +83,15 @@ dependencies {
     implementation fg.deobf("curse.maven:spark-361579:4505309")
 
     // MOD SUPPORT
-    implementation fg.deobf("curse.maven:rubidium-574856:4448157")
-    implementation fg.deobf("curse.maven:oculus-581495:4299147")
-    implementation fg.deobf("curse.maven:video-player-645407:4348352")
+    implementation fg.deobf("curse.maven:rubidium-574856:4451888")
+//    implementation fg.deobf("curse.maven:oculus-581495:4451905")
+//    implementation fg.deobf("curse.maven:video-player-645407:4348349")
+    implementation fg.deobf("com.simibubi.create:create-${mcV}:${createV}:slim") { transitive = false }
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mcV}:${flywheelV}")
+    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateV}")
+
+    // MIXINS
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
 mixin { add sourceSets.main, "waterframes.mixin-refmap.json" }
