@@ -72,7 +72,8 @@ dependencies {
     minecraft "net.minecraftforge:forge:${project.mcV}-${project.fgV}"
 
     //DEPENDENCIES
-    implementation fg.deobf("curse.maven:fancyvideo-api-591686:3822603")
+    implementation fg.deobf(files("libs/watermedia-0.2.jar"))
+
     implementation fg.deobf("curse.maven:creativecore-257814:4394989")
 
     // UTIL

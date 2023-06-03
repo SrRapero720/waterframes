@@ -3,17 +3,15 @@ package me.srrapero720.waterframes.display;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
+import me.lib720.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
+import me.lib720.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
+import me.srrapero720.watermedia.api.player.VLCPlayer;
 import net.minecraft.client.Minecraft;
-import nick1st.fancyvideo.api.MediaPlayerHandler;
 import org.lwjgl.opengl.GL11;
-import team.creative.creativecore.client.CreativeCoreClient;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
-import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent;
-import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
-import uk.co.caprica.vlcj.player.embedded.videosurface.callback.BufferFormatCallback;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -32,9 +30,9 @@ public class MediaDisplay implements IDisplay {
         synchronized (OPEN_DISPLAYS) {
             for (var display: OPEN_DISPLAYS) {
                 if (Minecraft.getInstance().isPaused()) {
-                    var media = display.player.mediaPlayer();
-                    if (display.stream && media.status().isPlaying()) media.controls().setPause(true);
-                    else if (media.status().length() > 0 && media.status().isPlaying()) media.controls().setPause(true);
+                    var media = display.player;
+                    if (display.stream && media.isPlaying()) media.setPauseMode(true);
+                    else if (media.getNewDuration() > 0 && media.isPlaying()) media.setPauseMode(true);
                 }
             }
         }
@@ -63,7 +61,7 @@ public class MediaDisplay implements IDisplay {
     public volatile int width = 1;
     public volatile int height = 1;
     
-    public CallbackMediaPlayerComponent player;
+    public VLCPlayer player;
     
     private final Vec3d pos;
     private volatile IntBuffer buffer;
@@ -80,8 +78,7 @@ public class MediaDisplay implements IDisplay {
         this.pos = pos;
         texture = GlStateManager._genTexture();
 
-        
-        player = new CallbackMediaPlayerComponent(MediaPlayerHandler.getInstance().getFactory(), null, null, false, (mediaPlayer, nativeBuffers, bufferFormat) -> {
+        player = new VLCPlayer(url, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
             try {
                 buffer.put(nativeBuffers[0].asIntBuffer());
@@ -91,7 +88,7 @@ public class MediaDisplay implements IDisplay {
                 lock.unlock();
             }
         }, new BufferFormatCallback() {
-            
+
             @Override
             public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
                 lock.lock();
@@ -106,17 +103,18 @@ public class MediaDisplay implements IDisplay {
                 }
                 return new BufferFormat("RGBA", sourceWidth, sourceHeight, new int[] { sourceWidth * 4 }, new int[] { sourceHeight });
             }
-            
+
             @Override
             public void allocatedBuffers(ByteBuffer[] buffers) {}
-            
-        }, null);
-        volume = getVolume(volume, minDistance, maxDistance);
-        player.mediaPlayer().audio().setVolume((int) volume);
-        lastSetVolume = volume;
-        player.mediaPlayer().controls().setRepeat(loop);
 
-        ThreadUtil.thread(() -> player.mediaPlayer().media().prepare(url));
+        });
+
+        volume = getVolume(volume, minDistance, maxDistance);
+        player.setVolume((int) volume);
+        lastSetVolume = volume;
+        player.setRepeatMode(loop);
+
+        ThreadUtil.thread(() -> player.start());
 //        player.mediaPlayer().media().start(url);
     }
     
@@ -139,7 +137,7 @@ public class MediaDisplay implements IDisplay {
 
     @Override
     public int maxTick() {
-        if (player != null) return (int) player.mediaPlayer().media().info().duration();
+        if (player != null) return (int) player.getDuration();
         return 0;
     }
 
@@ -150,34 +148,34 @@ public class MediaDisplay implements IDisplay {
         
         volume = getVolume(volume, minDistance, maxDistance);
         if (volume != lastSetVolume) {
-            player.mediaPlayer().audio().setVolume((int) volume);
+            player.setVolume((int) volume);
             lastSetVolume = volume;
         }
         
-        if (player.mediaPlayer().media().isValid()) {
+        if (player.isValid()) {
             boolean realPlaying = playing && !Minecraft.getInstance().isPaused();
             
-            if (player.mediaPlayer().controls().getRepeat() != loop)
-                player.mediaPlayer().controls().setRepeat(loop);
+            if (player.getRepeatMode() != loop)
+                player.setRepeatMode(loop);
             long tickTime = 50;
-            long newDuration = player.mediaPlayer().status().length();
-            if (!stream && newDuration != -1 && newDuration != 0 && player.mediaPlayer().media().info().duration() == 0)
+            long newDuration = player.getNewDuration();
+            if (!stream && newDuration != -1 && newDuration != 0 && player.getDuration() == 0)
                 stream = true;
             if (stream) {
-                if (player.mediaPlayer().status().isPlaying() != realPlaying)
-                    player.mediaPlayer().controls().setPause(!realPlaying);
+                if (player.isPlaying() != realPlaying)
+                    player.setPauseMode(!realPlaying);
             } else {
-                if (player.mediaPlayer().status().length() > 0) {
-                    if (player.mediaPlayer().status().isPlaying() != realPlaying)
-                        player.mediaPlayer().controls().setPause(!realPlaying);
+                if (player.getNewDuration() > 0) {
+                    if (player.isPlaying() != realPlaying)
+                        player.setPauseMode(!realPlaying);
                     
-                    if (player.mediaPlayer().status().isSeekable()) {
+                    if (player.isSeekable()) {
                         long time = tick * tickTime + (realPlaying ? (long) (WCoreUtil.toDeltaFrames() * tickTime) : 0);
-                        if (time > player.mediaPlayer().status().time() && loop)
-                            time %= player.mediaPlayer().status().length();
-                        if (Math.abs(time - player.mediaPlayer().status().time()) > ACCEPTABLE_SYNC_TIME && Math.abs(time - lastCorrectedTime) > ACCEPTABLE_SYNC_TIME) {
+                        if (time > player.getTime() && loop)
+                            time %= player.getNewDuration();
+                        if (Math.abs(time - player.getTime()) > ACCEPTABLE_SYNC_TIME && Math.abs(time - lastCorrectedTime) > ACCEPTABLE_SYNC_TIME) {
                             lastCorrectedTime = time;
-                            player.mediaPlayer().controls().setTime(time);
+                            player.seekTo(time);
                         }
                     }
                 }
@@ -211,7 +209,7 @@ public class MediaDisplay implements IDisplay {
     
     public void free() {
         if (player != null)
-            player.mediaPlayer().release();
+            player.release();
         if (texture != -1) {
             GlStateManager._deleteTexture(texture);
             texture = -1;
@@ -235,15 +233,15 @@ public class MediaDisplay implements IDisplay {
     @Override
     public void pause(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
         if (player == null) return;
-//        player.mediaPlayer().controls().setTime(tick * 50L);
-        player.mediaPlayer().controls().pause();
+        player.seekGameTicksTo(tick);
+        player.pause();
     }
     
     @Override
     public void resume(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
         if (player == null) return;
-//        player.mediaPlayer().controls().setTime(tick * 50L); -- causes crash
-        player.mediaPlayer().controls().play();
+        player.seekGameTicksTo(tick);
+        player.play();
     }
     
     @Override
