@@ -8,7 +8,6 @@
   ],
   "minVersion": "0.8",
   "mixins": [
-    "MinecraftServerMixin",
-    "MixinNativeDiscovery"
+    "MinecraftServerMixin"
   ]
 }
