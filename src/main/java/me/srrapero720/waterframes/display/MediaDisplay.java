@@ -32,7 +32,7 @@ public class MediaDisplay implements IDisplay {
                 if (Minecraft.getInstance().isPaused()) {
                     var media = display.player;
                     if (display.stream && media.isPlaying()) media.setPauseMode(true);
-                    else if (media.getNewDuration() > 0 && media.isPlaying()) media.setPauseMode(true);
+                    else if (media.getMediaLength() > 0 && media.isPlaying()) media.setPauseMode(true);
                 }
             }
         }
@@ -158,21 +158,21 @@ public class MediaDisplay implements IDisplay {
             if (player.getRepeatMode() != loop)
                 player.setRepeatMode(loop);
             long tickTime = 50;
-            long newDuration = player.getNewDuration();
+            long newDuration = player.getMediaLength();
             if (!stream && newDuration != -1 && newDuration != 0 && player.getDuration() == 0)
                 stream = true;
             if (stream) {
                 if (player.isPlaying() != realPlaying)
                     player.setPauseMode(!realPlaying);
             } else {
-                if (player.getNewDuration() > 0) {
+                if (player.getMediaLength() > 0) {
                     if (player.isPlaying() != realPlaying)
                         player.setPauseMode(!realPlaying);
                     
                     if (player.isSeekable()) {
                         long time = tick * tickTime + (realPlaying ? (long) (WCoreUtil.toDeltaFrames() * tickTime) : 0);
                         if (time > player.getTime() && loop)
-                            time %= player.getNewDuration();
+                            time %= player.getMediaLength();
                         if (Math.abs(time - player.getTime()) > ACCEPTABLE_SYNC_TIME && Math.abs(time - lastCorrectedTime) > ACCEPTABLE_SYNC_TIME) {
                             lastCorrectedTime = time;
                             player.seekTo(time);
