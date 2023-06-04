@@ -72,9 +72,8 @@ dependencies {
     minecraft "net.minecraftforge:forge:${project.mcV}-${project.fgV}"
 
     //DEPENDENCIES
-    implementation fg.deobf(files("libs/WATERMeDIA-0.4.2-alpha.jar"))
-
     implementation fg.deobf("curse.maven:creativecore-257814:4394989")
+    implementation fg.deobf("curse.maven:watermedia-869524:4566440")
 
     // UTIL
     implementation fg.deobf("curse.maven:ferritecore-429235:4074294")
