@@ -39,7 +39,7 @@ license="All rights reserved"
 	mandatory=true
 	ordering="NONE"
 	side="CLIENT"
-	versionRange="[0.1,)"
+	versionRange="[0,)"
 
 #[[dependencies.waterframes]]
 #    modId="watercore"
