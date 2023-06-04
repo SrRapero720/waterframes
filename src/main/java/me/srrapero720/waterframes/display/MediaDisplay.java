@@ -9,6 +9,7 @@ import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import me.srrapero720.watermedia.api.player.VLCPlayer;
+import me.srrapero720.watermedia.util.TickMediaUtil;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
@@ -114,7 +115,7 @@ public class MediaDisplay implements IDisplay {
         lastSetVolume = volume;
         player.setRepeatMode(loop);
 
-        ThreadUtil.thread(() -> player.start());
+        player.start();
 //        player.mediaPlayer().media().start(url);
     }
     
@@ -137,14 +138,13 @@ public class MediaDisplay implements IDisplay {
 
     @Override
     public int maxTick() {
-        if (player != null) return (int) player.getDuration();
+        if (player != null) return (int) TickMediaUtil.msToGameTicks(player.getDuration());
         return 0;
     }
 
     @Override
     public void tick(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
-        if (player == null)
-            return;
+        if (player == null) return;
         
         volume = getVolume(volume, minDistance, maxDistance);
         if (volume != lastSetVolume) {
