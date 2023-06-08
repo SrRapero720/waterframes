@@ -79,8 +79,6 @@ public class TileFrame extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
     public String getURL() {
-        if (WCoreUtil.isGoogleDrive(url)) return WCoreUtil.googleDriveDownload(url);
-
         return parseUrl(url);
     }
 

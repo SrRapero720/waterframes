@@ -3,7 +3,7 @@ package me.srrapero720.waterframes.display.texture;
 import com.mojang.logging.LogUtils;
 import me.srrapero720.waterframes.DisplayUtil;
 import me.srrapero720.waterframes.DisplayConfig;
-import me.srrapero720.waterframes.watercore_supplier.GifDecoder;
+import me.srrapero720.watermedia.api.util.GifDecoder;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
