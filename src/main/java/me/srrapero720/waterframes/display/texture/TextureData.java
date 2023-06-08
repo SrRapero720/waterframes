@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import me.srrapero720.waterframes.DisplayConfig;
-import me.srrapero720.waterframes.DisplayUtil;
+import me.srrapero720.waterframes.FramesConfig;
+import me.srrapero720.waterframes.FramesUtil;
 import me.srrapero720.waterframes.api.RenderDisplay;
 import me.srrapero720.waterframes.rendering.PictureRendering;
 import me.srrapero720.waterframes.rendering.VLCRendering;
@@ -80,7 +80,7 @@ public class TextureData {
     
     private int getTexture(int index) {
         if (textures[index] == -1 && decoder != null) {
-            textures[index] = DisplayUtil.preRender(decoder.getFrame(index), width, height);
+            textures[index] = FramesUtil.preRender(decoder.getFrame(index), width, height);
             remaining--;
             if (remaining <= 0)
                 decoder = null;
@@ -107,7 +107,7 @@ public class TextureData {
         var vol = volume * (mcVolume * mcVolume);
         var cache = TextureData.get(RenderDisplay.VLC_FAILED);
 
-        if (textures == null && !noVideo && !DisplayConfig.isDisabledVLC())
+        if (textures == null && !noVideo && !FramesConfig.isDisabledVideos())
             return ThreadUtil.tryAndReturn(defaultVar ->
                     new VLCRendering(pos, url, vol, minDistance, maxDistance, loop),
                     cache.ready() ? cache.createDisplay(pos, url, volume, minDistance, maxDistance, loop, noVideo) : null);
@@ -137,7 +137,7 @@ public class TextureData {
     public void process(BufferedImage image) {
         width = image.getWidth();
         height = image.getHeight();
-        textures = new int[] { DisplayUtil.preRender(image, width, height) };
+        textures = new int[] { FramesUtil.preRender(image, width, height) };
         delay = new long[] { 0 };
         duration = 0;
         seeker = null;

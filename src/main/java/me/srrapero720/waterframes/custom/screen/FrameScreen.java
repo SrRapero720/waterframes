@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.custom.screen;
 
-import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.display.texture.TextureData;
@@ -37,10 +37,10 @@ public class FrameScreen extends GuiLayer {
     
     public final GuiSyncLocal<CompoundTag> SET_DATA = getSyncHolder().register("set_data", nbt -> {
         String url = nbt.getString("url");
-        if (DisplayConfig.canUse(getPlayer(), url)) {
+        if (FramesConfig.canUse(getPlayer(), url)) {
             frame.setURL(url);
-            float sizeX = (float) Math.min(DisplayConfig.maxWidth(), nbt.getFloat("x"));
-            float sizeY = (float) Math.min(DisplayConfig.maxHeight(), nbt.getFloat("y"));
+            float sizeX = (float) Math.min(FramesConfig.maxWidth(), nbt.getFloat("x"));
+            float sizeY = (float) Math.min(FramesConfig.maxHeight(), nbt.getFloat("y"));
             int posX = nbt.getByte("posX");
             int posY = nbt.getByte("posY");
             if (posX == 0) {
@@ -67,7 +67,7 @@ public class FrameScreen extends GuiLayer {
                 frame.max.y = 1;
             }
             
-            frame.renderDistance = Math.min(DisplayConfig.maxRenderDistance(), nbt.getInt("render"));
+            frame.renderDistance = Math.min(FramesConfig.maxRenderDistance(), nbt.getInt("render"));
             frame.rotation = nbt.getFloat("rotation");
             frame.visibleFrame = nbt.getBoolean("visibleFrame");
             frame.bothSides = nbt.getBoolean("bothSides");
@@ -308,7 +308,7 @@ public class FrameScreen extends GuiLayer {
         play_left.add(new GuiIconButton("stop", GuiIcon.STOP, button -> STOP.send(EndTag.INSTANCE)));
         play_left.add(new GuiCheckBox("loop", frame.loop).setTranslate("gui.waterframes.loop"));
 
-        save.setEnabled(DisplayConfig.canUse(getPlayer(), url.getText()));
+        save.setEnabled(FramesConfig.canUse(getPlayer(), url.getText()));
         play_right.add(save);
         play_right.add(new GuiButton("reload", x -> {
             synchronized (PictureFetch.LOCK) {

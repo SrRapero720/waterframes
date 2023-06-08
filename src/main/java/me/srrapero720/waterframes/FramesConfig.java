@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.net.URI;
 import java.util.*;
 
-public class DisplayConfig {
+public class FramesConfig {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
 
@@ -21,10 +21,7 @@ public class DisplayConfig {
     private static final ForgeConfigSpec.DoubleValue MAX_HEIGHT;
     private static final ForgeConfigSpec.IntValue MAX_RENDER_DISTANCE;
 
-    private static final ForgeConfigSpec.ConfigValue<String> YOUTUBE_PROVIDER;
-
-    private static final ForgeConfigSpec.BooleanValue DISABLE_VLC;
-    private static final ForgeConfigSpec.BooleanValue DISABLE_LAVA;
+    private static final ForgeConfigSpec.BooleanValue DISABLE_VIDEOS;
 
     private static final ForgeConfigSpec.BooleanValue DISABLE_ADVENTURE;
     private static final ForgeConfigSpec.BooleanValue DISABLE_SURVIVAL;
@@ -46,24 +43,20 @@ public class DisplayConfig {
         MAX_HEIGHT = BUILDER.defineInRange("maxHeight", 100.0D, 10.0D, 1000.0D);
         MAX_RENDER_DISTANCE = BUILDER.defineInRange("maxRenderDistance", 1000, 10, Integer.MAX_VALUE);
 
-        YOUTUBE_PROVIDER = BUILDER.comment("WIKI ABOUT IT: https://github.com/SrRapero720/waterframes/wiki/Youtube-Provider")
-                .define("youtubeMediaProvider", "https://sr-simple-youtube-downloader.herokuapp.com");
-
         DISABLE_ADVENTURE = BUILDER.define("disableUsageAdventure", true);
         DISABLE_SURVIVAL = BUILDER.define("disableUsageSurvival", false);
-        DISABLE_PLAYERS = BUILDER.comment("Only admins mode").define("disableUsageForPlayers", false);
+        DISABLE_PLAYERS = BUILDER.define("disableUsageForPlayers", false);
 
-        DISABLE_VLC = BUILDER.define("disableVLC", false);
-        DISABLE_LAVA = BUILDER.comment("Soon").define("disableLavaPlayer", false);
+        DISABLE_VIDEOS = BUILDER.define("disableVLC", false);
 
         DISABLE_REDSTONE = BUILDER.comment("Disable pause trigger on redstone signal input").define("disableRedstone", true);
 
         DISABLE_WHITELIST = BUILDER.define("disableWhitelist", false);
-        WHITELIST = BUILDER.define("whitelist", DisplayUtil.getJsonArrayStringResource("whitelist_url.json"));
+        WHITELIST = BUILDER.define("whitelist", FramesUtil.getJsonArrayStringResource("whitelist_url.json"));
 
 
         /* waterframes -> frames */
-        BUILDER.comment("Soon").push("frames");
+        BUILDER.push("frames");
 
         // waterframes ->
         BUILDER.pop();
@@ -87,11 +80,10 @@ public class DisplayConfig {
     public static double maxWidth() { return MAX_WIDTH.get(); }
     public static double maxHeight() { return MAX_HEIGHT.get(); }
     public static int maxRenderDistance() { return MAX_RENDER_DISTANCE.get(); }
-    public static boolean isDisabledVLC() { return DISABLE_VLC.get(); }
-    public static boolean isDisabledLavaPlayer() { return DISABLE_LAVA.get(); }
-    public static boolean isDisabledRedstone() { return DISABLE_REDSTONE.get(); }
+    public static boolean isDisabledVideos() { return DISABLE_VIDEOS.get(); }
 
-    public static String ytProvider() { return YOUTUBE_PROVIDER.get(); }
+    @Deprecated
+    public static boolean isDisabledRedstone() { return DISABLE_REDSTONE.get(); }
 
     public static boolean domainAllowed(@NotNull String domain) {
         if (DISABLE_WHITELIST.get()) return true;
@@ -120,11 +112,14 @@ public class DisplayConfig {
     }
 
     public static boolean canInteract(Player player, Level level) {
-        if (DISABLE_SURVIVAL.get() && !getGameType(player).equals(GameType.CREATIVE)) return false;
-        if (DISABLE_ADVENTURE.get() && getGameType(player).equals(GameType.ADVENTURE)) return false;
+        var server = player.getServer();
+        boolean isOperator = level.isClientSide() || (server != null && player.hasPermissions( server.getOperatorUserPermissionLevel()));
 
-        boolean isOperator = Objects.requireNonNull(level.getServer()).isSingleplayer() || player.hasPermissions(level.getServer().getOperatorUserPermissionLevel());
+        if (DISABLE_SURVIVAL.get() && !getGameType(player).equals(GameType.CREATIVE) && !isOperator) return false;
+        if (DISABLE_ADVENTURE.get() && getGameType(player).equals(GameType.ADVENTURE) && !isOperator) return false;
         if (DISABLE_PLAYERS.get()) return isOperator;
-        else return isOperator || (player.getAbilities().mayBuild);
+
+        else return player.getAbilities().mayBuild;
+
     }
 }

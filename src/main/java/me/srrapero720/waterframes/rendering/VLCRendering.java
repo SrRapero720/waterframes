@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static me.srrapero720.waterframes.WaterDisplays.LOGGER;
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 public class VLCRendering extends RenderDisplay {
     private static final int ACCEPTABLE_SYNC_TIME = 1000;

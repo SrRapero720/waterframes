@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.logging.LogUtils;
-import me.srrapero720.waterframes.DisplayUtil;
-import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.FramesUtil;
+import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.watermedia.api.util.GifDecoder;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
@@ -28,7 +28,7 @@ public class PictureFetch extends Thread {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final DateFormat FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
     public static final Object LOCK = new Object();
-    private static final String USER_AGENT = DisplayUtil.getUserAgentBasedOnOS();
+    private static final String USER_AGENT = FramesUtil.getUserAgentBasedOnOS();
 
     // STATUS
     public static final int MAX_FETCH = 5;
@@ -84,7 +84,7 @@ public class PictureFetch extends Thread {
                 }
             }
         } catch (Exception e) {
-            if (!DisplayConfig.isDisabledVLC() && e instanceof VideoContentException) {
+            if (!FramesConfig.isDisabledVideos() && e instanceof VideoContentException) {
                 tex.processVideo();
                 isVideo = true;
             } else tex.processFailed("No image found");

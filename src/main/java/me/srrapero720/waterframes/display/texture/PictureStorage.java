@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.logging.LogUtils;
-import me.srrapero720.waterframes.DisplayUtil;
+import me.srrapero720.waterframes.FramesUtil;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
@@ -27,7 +27,7 @@ public class PictureStorage {
     static {
         if (!dir.exists()) dir.mkdirs();
         if (index.exists()) {
-            var stream = new DisplayUtil.Stationary<DataInputStream>();
+            var stream = new FramesUtil.Stationary<DataInputStream>();
 
             ThreadUtil.trySimple(() -> {
                 stream.set(new DataInputStream(new GZIPInputStream(new FileInputStream(index))));

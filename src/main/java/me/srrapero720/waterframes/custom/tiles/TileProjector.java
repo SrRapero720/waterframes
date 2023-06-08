@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.custom.tiles;
 
-import me.srrapero720.waterframes.DisplayRegistry;
-import me.srrapero720.waterframes.WaterDisplays;
+import me.srrapero720.waterframes.FramesRegistry;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.blocks.Projector;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.api.RenderDisplay;
@@ -69,7 +69,7 @@ public class TileProjector extends BlockEntity {
     public RenderDisplay display;
 
     public TileProjector(BlockPos pos, BlockState state) {
-        super(DisplayRegistry.TILE_PROJECTOR.get(), pos, state);
+        super(FramesRegistry.TILE_PROJECTOR.get(), pos, state);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -149,18 +149,18 @@ public class TileProjector extends BlockEntity {
 
     public void play() {
         playing = true;
-        WaterDisplays.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
+        WaterFrames.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
     }
 
     public void pause() {
         playing = false;
-        WaterDisplays.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
+        WaterFrames.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
     }
 
     public void stop() {
         playing = false;
         tick = 0;
-        WaterDisplays.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
+        WaterFrames.NETWORK.sendToClient(new FramesPacket(worldPosition, playing, tick), level, worldPosition);
     }
 
     protected void savePicture(CompoundTag nbt) {
