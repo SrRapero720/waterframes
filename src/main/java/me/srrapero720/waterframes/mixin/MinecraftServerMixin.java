@@ -14,16 +14,9 @@ import java.io.IOException;
 
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
-
-    @Shadow @Final private static Logger LOGGER;
-
     @Redirect(method = "stopServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;close()V"))
-    public void injectStopServer(ServerLevel instance) {
-        try {
-            if (instance.isClientSide) TextureData.unload(instance);
-            instance.close();
-        } catch (IOException var5) {
-            LOGGER.error("Exception closing the level", var5);
-        }
+    public void injectStopServer(ServerLevel instance) throws IOException {
+        if (instance.isClientSide) TextureData.unload();
+        instance.close();
     }
 }

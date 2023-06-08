@@ -34,17 +34,13 @@ public class MinecraftMixin {
 
     @Inject(method = "clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/ClientPackSource;clearServerPack()V"))
     public void injectClearServerPack(Screen screen, CallbackInfo ci) {
-        if (level != null) {
-            TextureData.unload(level);
-            VLCRendering.unload();
-        }
+        TextureData.unload();
+        VLCRendering.unload();
     }
 
     @Inject(method = "setLevel", at = @At(value = "HEAD"))
     public void injectSetLevel(ClientLevel clientLevel, CallbackInfo ci) {
-        if (clientLevel != null) {
-            TextureData.unload(clientLevel);
-            VLCRendering.unload();
-        }
+        TextureData.unload();
+        VLCRendering.unload();
     }
 }
