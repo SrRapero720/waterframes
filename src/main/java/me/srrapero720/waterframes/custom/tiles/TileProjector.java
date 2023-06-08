@@ -1,6 +1,5 @@
 package me.srrapero720.waterframes.custom.tiles;
 
-import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.DisplayRegistry;
 import me.srrapero720.waterframes.WaterDisplays;
 import me.srrapero720.waterframes.custom.blocks.Projector;
@@ -8,7 +7,6 @@ import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.api.RenderDisplay;
 import me.srrapero720.waterframes.display.texture.TextureData;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
-import me.srrapero720.waterframes.watercore_supplier.YTExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -30,13 +28,8 @@ import team.creative.creativecore.common.util.math.vec.Vec2f;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 public class TileProjector extends BlockEntity {
-
     @OnlyIn(Dist.CLIENT)
     public static @NotNull String parseUrl(@NotNull String url) {
-        var extractor = new YTExtractor(url);
-        var provider = DisplayConfig.ytProvider();
-        if (extractor.isValid() && !provider.isEmpty()) return provider + "/execute/" + extractor;
-
         return url.replaceAll("\\{playername}", WCoreUtil.mine().player.getName().getString())
                 .replaceAll("\\{displayname}", WCoreUtil.mine().player.getDisplayName().getString())
                 .replaceAll("\\{uuid}", WCoreUtil.mine().player.getStringUUID())
