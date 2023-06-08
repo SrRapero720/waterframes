@@ -11,6 +11,16 @@ public class ThreadUtil {
 
     public static void printStackTrace(Exception e) { e.printStackTrace(); }
 
+    public static void tryFinally(SimpleTryRunnable runnable, FinallyRunnable finallyRunnable) {
+        try {
+            runnable.run();
+        } catch (Exception ignored) {
+
+        } finally {
+            finallyRunnable.run();
+        }
+    }
+
     public static <T> T tryAndReturn(ReturnableRunnable<T> runnable, T defaultVar) {
         return tryAndReturn(runnable, null, defaultVar);
     }
@@ -53,6 +63,7 @@ public class ThreadUtil {
         thread.setName("WATERCoRE-" + String.valueOf(Math.random() * 100).replace(".", "-"));
         thread.setDaemon(true);
         thread.setUncaughtExceptionHandler(EXCEPTION_HANDLER);
+        thread.setContextClassLoader(Thread.currentThread().getContextClassLoader());
         thread.start();
         return thread;
     }

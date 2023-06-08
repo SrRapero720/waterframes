@@ -1,16 +1,15 @@
 package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
-import me.srrapero720.waterframes.DisplayUtil;
-import me.srrapero720.waterframes.watercore_supplier.GifDecoder;
 import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.DisplayUtil;
 import me.srrapero720.waterframes.api.RenderDisplay;
-import me.srrapero720.waterframes.rendering.VLCRendering;
 import me.srrapero720.waterframes.rendering.PictureRendering;
+import me.srrapero720.waterframes.rendering.VLCRendering;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
+import me.srrapero720.watermedia.api.util.GifDecoder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.level.Level;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 import java.awt.*;
@@ -35,7 +34,7 @@ public class TextureData {
         for (var cache : cached.values()) cache.reload();
     }
 
-    public static void unload(Level event) {
+    public static void unload() {
         for (TextureData cache : cached.values()) cache.remove();
         cached.clear();
     }
