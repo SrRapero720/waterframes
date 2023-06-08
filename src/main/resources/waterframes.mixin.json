@@ -8,6 +8,7 @@
   ],
   "minVersion": "0.8",
   "mixins": [
-    "MinecraftServerMixin"
+    "MinecraftServerMixin",
+    "WM_INDEV"
   ]
 }
