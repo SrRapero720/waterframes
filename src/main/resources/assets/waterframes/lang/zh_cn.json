@@ -17,7 +17,7 @@
     "gui.waterframes.rotation": "旋转",
     "gui.waterframes.transparency": "透明度",
     "gui.waterframes.brightness": "亮度",
-    "gui.waterframes.distance": "间距",
+    "gui.waterframes.visible_distance": "间距",
     "gui.waterframes.volume": "体积",
     "gui.waterframes.range": "范围",
     "gui.waterframes.loop": "循环",

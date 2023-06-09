@@ -1,0 +1,7 @@
+[
+  "--aout", "directsound",
+  "--file-caching", "6000",
+  "--file-logging", "--logfile", "vlc-waveout.log", "--logmode", "text",
+  "--verbose", "2",
+  "--no-quiet"
+]

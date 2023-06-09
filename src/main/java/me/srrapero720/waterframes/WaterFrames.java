@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.display.texture.TextureData;
-import me.srrapero720.waterframes.rendering.VLCRendering;
+import me.srrapero720.waterframes.displays.VideoDisplay;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -23,24 +23,24 @@ public class WaterFrames {
     public static IEventBus bus() { return FMLJavaModLoadingContext.get().getModEventBus(); }
     public WaterFrames() { FramesRegistry.register(); }
 
-    @Mod.EventBusSubscriber(modid = WaterFrames.ID)
-    private static final class Events {
+    @Mod.EventBusSubscriber(modid = ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    public static final class Events {
 
         @SubscribeEvent
-        private static void onRenderTickEvent(TickEvent.RenderTickEvent event) {
+        public static void onRenderTickEvent(TickEvent.RenderTickEvent event) {
             if (event.phase == TickEvent.Phase.END) TextureData.tick();
         }
 
         @SubscribeEvent
-        private static void onClientTickEvent(TickEvent.ClientTickEvent event) {
-            if (event.phase == TickEvent.Phase.END) VLCRendering.tick();
+        public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
+            if (event.phase == TickEvent.Phase.END) VideoDisplay.tick();
         }
 
         @SubscribeEvent
-        private static void onUnloadingLevel(WorldEvent.Unload unload) {
+        public static void onUnloadingLevel(WorldEvent.Unload unload) {
             if (unload.getWorld() != null && unload.getWorld().isClientSide()) {
                 TextureData.unload();
-                VLCRendering.unload();
+                VideoDisplay.unload();
             }
         }
     }

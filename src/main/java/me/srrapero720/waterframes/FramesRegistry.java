@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes;
 
+import com.jozufozu.flywheel.event.ForgeEvents;
 import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.custom.blocks.Projector;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
@@ -23,6 +24,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.RegistryObject;
 
 public class FramesRegistry {

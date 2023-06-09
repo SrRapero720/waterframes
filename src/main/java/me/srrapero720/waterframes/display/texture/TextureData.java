@@ -3,9 +3,9 @@ package me.srrapero720.waterframes.display.texture;
 import com.mojang.blaze3d.platform.GlStateManager;
 import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.FramesUtil;
-import me.srrapero720.waterframes.api.RenderDisplay;
-import me.srrapero720.waterframes.rendering.PictureRendering;
-import me.srrapero720.waterframes.rendering.VLCRendering;
+import me.srrapero720.waterframes.api.IDisplay;
+import me.srrapero720.waterframes.displays.ImageDisplay;
+import me.srrapero720.waterframes.displays.VideoDisplay;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import me.srrapero720.watermedia.api.util.GifDecoder;
 import net.minecraft.client.Minecraft;
@@ -51,14 +51,14 @@ public class TextureData {
     }
     
     public final String url;
-    private int[] textures;
+    public int[] textures;
     private int width;
     private int height;
     private long[] delay;
     private long duration;
     private boolean isVideo;
     
-    private PictureFetch seeker;
+    private PictureSeeker seeker;
     private boolean ready = false;
     private String error;
     
@@ -70,12 +70,12 @@ public class TextureData {
     public TextureData(String url) {
         this.url = url;
         usage++;
-        if (PictureFetch.canBeSeeked() && url != null && !url.isEmpty()) this.seeker = new PictureFetch(this);
+        if (PictureSeeker.canSeek() && url != null && !url.isEmpty()) this.seeker = new PictureSeeker(this);
     }
     
     private void trySeek() {
         if (seeker != null) return;
-        if (PictureFetch.canBeSeeked()) this.seeker = new PictureFetch(this);
+        if (PictureSeeker.canSeek()) this.seeker = new PictureSeeker(this);
     }
     
     private int getTexture(int index) {
@@ -89,30 +89,27 @@ public class TextureData {
     }
     
     public int getTexture(long time) {
-        if (textures == null)
-            return -1;
-        if (textures.length == 1)
-            return getTexture(0);
+        if (textures == null) return -1;
+        if (textures.length == 1) return getTexture(0);
         int last = getTexture(0);
         for (int i = 1; i < delay.length; i++) {
-            if (delay[i] > time)
-                break;
+            if (delay[i] > time) break;
             last = getTexture(i);
         }
         return last;
     }
 
-    public RenderDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
+    public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
         var mcVolume = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
         var vol = volume * (mcVolume * mcVolume);
-        var cache = TextureData.get(RenderDisplay.VLC_FAILED);
+        var cache = TextureData.get(VideoDisplay.VLC_FAILED);
 
         if (textures == null && !noVideo && !FramesConfig.isDisabledVideos())
             return ThreadUtil.tryAndReturn(defaultVar ->
-                    new VLCRendering(pos, url, vol, minDistance, maxDistance, loop),
+                    new VideoDisplay(pos, url, vol, minDistance, maxDistance, loop),
                     cache.ready() ? cache.createDisplay(pos, url, volume, minDistance, maxDistance, loop, noVideo) : null);
 
-        return new PictureRendering(this);
+        return new ImageDisplay(this);
     }
     
     public String getError() {
@@ -165,8 +162,7 @@ public class TextureData {
     }
     
     public boolean ready() {
-        if (ready)
-            return true;
+        if (ready) return true;
         trySeek();
         return false;
     }

@@ -2,10 +2,12 @@ package me.srrapero720.waterframes.custom.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.FramesConfig;
+import me.srrapero720.waterframes.api.IDisplay;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
 import me.srrapero720.waterframes.display.texture.TextureData;
-import me.srrapero720.waterframes.display.texture.PictureFetch;
+import me.srrapero720.waterframes.display.texture.PictureSeeker;
+import me.srrapero720.waterframes.displays.VideoDisplay;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
@@ -23,84 +25,98 @@ import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.style.ControlFormatting;
 import team.creative.creativecore.common.gui.style.GuiIcon;
-import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.sync.GuiSyncLocal;
 import team.creative.creativecore.common.util.math.geo.Rect;
 import team.creative.creativecore.common.util.mc.ColorUtils;
 import team.creative.creativecore.common.util.text.TextBuilder;
+import team.creative.creativecore.common.util.text.TextListBuilder;
 
 public class ProjectorScreen extends GuiLayer {
-    public TileProjector frame;
+    public TileProjector projector;
 
     public float scaleMultiplier;
 
     public GuiTextfield url;
 
-    public final GuiSyncLocal<EndTag> PLAY = getSyncHolder().register("play", x -> frame.play());
-    public final GuiSyncLocal<EndTag> PAUSE = getSyncHolder().register("pause", x -> frame.pause());
-    public final GuiSyncLocal<EndTag> STOP = getSyncHolder().register("stop", x -> frame.stop());
+    public final GuiSyncLocal<EndTag> PLAY = getSyncHolder().register("play", x -> projector.play());
+    public final GuiSyncLocal<EndTag> PAUSE = getSyncHolder().register("pause", x -> projector.pause());
+    public final GuiSyncLocal<EndTag> STOP = getSyncHolder().register("stop", x -> projector.stop());
 
     public final GuiSyncLocal<CompoundTag> SET_DATA = getSyncHolder().register("set_data", nbt -> {
         String url = nbt.getString("url");
         if (FramesConfig.canUse(getPlayer(), url)) {
-            frame.setURL(url);
+            projector.setURL(url);
             float sizeX = (float) Math.min(FramesConfig.maxWidth(), nbt.getFloat("x"));
             float sizeY = (float) Math.min(FramesConfig.maxHeight(), nbt.getFloat("y"));
-            int posX = nbt.getByte("posX");
-            int posY = nbt.getByte("posY");
+
+            int posX = nbt.contains("posX", 99) ? nbt.getByte("posX") : 1;
+            int posY = nbt.contains("posY", 99) ? nbt.getByte("poxY") : 1;
             if (posX == 0) {
-                frame.min.x = 0;
-                frame.max.x = sizeX;
+                projector.min.x = 0;
+                projector.max.x = sizeX;
             } else if (posX == 1) {
                 float middle = sizeX / 2;
-                frame.min.x = 0.5F - middle;
-                frame.max.x = 0.5F + middle;
+                projector.min.x = 0.5F - middle;
+                projector.max.x = 0.5F + middle;
             } else {
-                frame.min.x = 1 - sizeX;
-                frame.max.x = 1;
+                projector.min.x = 1 - sizeX;
+                projector.max.x = 1;
             }
 
             if (posY == 0) {
-                frame.min.y = 0;
-                frame.max.y = sizeY;
+                projector.min.y = 0;
+                projector.max.y = sizeY;
             } else if (posY == 1) {
                 float middle = sizeY / 2;
-                frame.min.y = 0.5F - middle;
-                frame.max.y = 0.5F + middle;
+                projector.min.y = 0.5F - middle;
+                projector.max.y = 0.5F + middle;
             } else {
-                frame.min.y = 1 - sizeY;
-                frame.max.y = 1;
+                projector.min.y = 1 - sizeY;
+                projector.max.y = 1;
             }
 
-            frame.renderDistance = Math.min(FramesConfig.maxRenderDistance(), nbt.getInt("render"));
-            frame.rotation = nbt.getFloat("rotation");
-            frame.loop = nbt.getBoolean("loop");
-            frame.flipX = nbt.getBoolean("flipX");
-            frame.flipY = nbt.getBoolean("flipY");
-            frame.volume = nbt.getFloat("volume");
-            frame.minDistance = nbt.getFloat("min");
-            frame.maxDistance = nbt.getFloat("max");
-            frame.alpha = nbt.getFloat("transparency");
-            frame.brightness = nbt.getFloat("brightness");
+            projector.renderDistance = Math.min(FramesConfig.maxRenderDistance(), nbt.getInt("render"));
+            projector.rotation = nbt.getFloat("rotation");
+            projector.loop = nbt.getBoolean("loop");
+            projector.flipX = nbt.getBoolean("flipX");
+            projector.flipY = nbt.getBoolean("flipY");
+            projector.volume = nbt.getFloat("volume");
+            projector.minDistance = nbt.getFloat("min");
+            projector.maxDistance = nbt.getFloat("max");
+            projector.alpha = nbt.getFloat("transparency");
+            projector.brightness = nbt.getFloat("brightness");
         }
 
-        frame.markDirty();
+        projector.markDirty();
     });
 
-    public ProjectorScreen(TileProjector frame) {
-        this(frame, 16);
+    public ProjectorScreen(TileProjector projector) {
+        this(projector, 16);
     }
 
-    public ProjectorScreen(TileProjector frame, int scaleSize) {
-        super("waterframe", 250, 210);
-        this.frame = frame;
+    public ProjectorScreen(TileProjector projector, int scaleSize) {
+        super("waterframe", 260, 220);
+        this.projector = projector;
         this.scaleMultiplier = 1F / (scaleSize);
     }
-    
+
+    @Override
+    public void render(PoseStack pose, GuiChildControl control, Rect controlRect, Rect realRect, int mouseX, int mouseY) {
+        super.render(pose, control, controlRect, realRect, mouseX, mouseY);
+
+        GuiSlider seek = get("seek");
+        if (projector.display instanceof VideoDisplay display) {
+            seek.maxValue = display.getGameTickDuration();
+            seek.value = display.getGameTickTime();
+        }
+    }
+
     @Override
     public void create() {
+        var isVideo = projector.display != null && projector.display.getType().equals(IDisplay.Type.VIDEO);
+
         GuiButton save = new GuiButton("save", x -> {
-            CompoundTag nbt = new CompoundTag();
+            var nbt = new CompoundTag();
             GuiTextfield url = get("url");
             GuiCounterDecimal sizeX = get("sizeX");
             GuiCounterDecimal sizeY = get("sizeY");
@@ -111,10 +127,9 @@ public class ProjectorScreen extends GuiLayer {
 
             GuiCheckBox flipX = get("flipX");
             GuiCheckBox flipY = get("flipY");
-            GuiCheckBox visibleFrame = get("visibleFrame");
-            GuiCheckBox bothSides = get("bothSides");
 
             GuiSteppedSlider renderDistance = get("distance");
+            GuiSteppedSlider projection_distance = get("projection_distance");
 
             GuiSlider transparency = get("transparency");
             GuiSlider brightness = get("brightness");
@@ -124,8 +139,8 @@ public class ProjectorScreen extends GuiLayer {
             GuiSteppedSlider min = get("range_min");
             GuiSteppedSlider max = get("range_max");
 
-            nbt.putByte("posX",  (byte) 1);
-            nbt.putByte("posY", (byte) 1);
+            nbt.putByte("posX", (byte) buttonPosX.getState());
+            nbt.putByte("posY", (byte) buttonPosY.getState());
 
             nbt.putFloat("rotation", (float) rotation.value);
 
@@ -133,6 +148,7 @@ public class ProjectorScreen extends GuiLayer {
             nbt.putBoolean("flipY", flipY.value);
 
             nbt.putInt("render", (int) renderDistance.value);
+            nbt.putInt("projection_distance", (int) projection_distance.value);
 
             nbt.putFloat("transparency", (float) transparency.value);
             nbt.putFloat("brightness", (float) brightness.value);
@@ -149,26 +165,30 @@ public class ProjectorScreen extends GuiLayer {
         });
         save.setTranslate("gui.waterframes.save");
 
-        align = Align.STRETCH;
-        flow = GuiFlow.STACK_Y;
+        // Gui config
+        this.align = Align.STRETCH;
+        this.flow = GuiFlow.STACK_Y;
 
-        url = new WidgetTextField(save, "url", frame.getRealURL());
-        url.setMaxStringLength(2048);
-        add(url);
-        GuiLabel error = new GuiLabel("error").setDefaultColor(ColorUtils.RED);
-        if (frame.isClient() && frame.cache != null && frame.cache.getError() != null)
-            error.setTranslate(frame.cache.getError());
-        add(error);
+        // URL
+        this.url = new WidgetTextField(save, "url", projector.getRealURL());
+        this.url.setMaxStringLength(2048);
+        this.add(url);
 
-        // SIZE -----------------------
-        GuiParent size = new GuiParent(GuiFlow.STACK_X);
-        size.spacing = 16;
-        size.align = Align.STRETCH;
-        add(size);
+        // LABEL
+        var error = new GuiLabel("error").setDefaultColor(ColorUtils.RED);
+        if (projector.isClient() && projector.texture != null && projector.texture.getError() != null)
+            error.setTranslate(projector.texture.getError());
+        this.add(error);
+
+        // SIZE (PARENT9
+        var sizeParent = new GuiParent(GuiFlow.STACK_X);
+        sizeParent.spacing = 16;
+        sizeParent.align = Align.STRETCH;
+        add(sizeParent);
         GuiCounterDecimal counterDecimal;
 
-        // LEFT
-        size.add(counterDecimal = new GuiCounterDecimal("sizeX", frame.getSizeX(), 0, Float.MAX_VALUE) {
+        // SIZE (LEFT)
+        sizeParent.add(counterDecimal = new GuiCounterDecimal("sizeX", projector.getSizeX(), 0, Float.MAX_VALUE) {
             @Override
             public float stepUp(float value) {
                 int scaled = (int) (value / scaleMultiplier);
@@ -192,12 +212,12 @@ public class ProjectorScreen extends GuiLayer {
 
             float x = sizeXField.getValue();
 
-            if (frame.display != null)
-                sizeYField.setValue(frame.display.getHeight() / (frame.display.getWidth() / x));
+            if (projector.display != null)
+                sizeYField.setValue(projector.display.getHeight() / (projector.display.getWidth() / x));
         }).setTitle(new TextComponent("x->y")).setExpandableY());
 
-        // RIGHT
-        size.add(counterDecimal = new GuiCounterDecimal("sizeY", frame.getSizeY(), 0, Float.MAX_VALUE) {
+        // SIZE (RIGHT)
+        sizeParent.add(counterDecimal = new GuiCounterDecimal("sizeY", projector.getSizeY(), 0, Float.MAX_VALUE) {
             @Override
             public float stepUp(float value) {
                 int scaled = (int) (value / scaleMultiplier);
@@ -212,6 +232,8 @@ public class ProjectorScreen extends GuiLayer {
                 return Math.max(min, scaled * scaleMultiplier);
             }
         });
+
+
         counterDecimal.setExpandableX();
         counterDecimal.spacing = 2;
         counterDecimal.align = Align.CENTER;
@@ -221,17 +243,31 @@ public class ProjectorScreen extends GuiLayer {
 
             float y = sizeYField.getValue();
 
-            if (frame.display != null)
-                sizeXField.setValue(frame.display.getWidth() / (frame.display.getHeight() / y));
+            if (projector.display != null)
+                sizeXField.setValue(projector.display.getWidth() / (projector.display.getHeight() / y));
         }).setTitle(new TextComponent("y->x")).setExpandableY());
 
-        GuiParent flips = new GuiParent(GuiFlow.STACK_X);
-        flips.spacing = 4;
-        add(flips);
-        flips.add(new GuiCheckBox("flipX", frame.flipX).setTranslate("gui.waterframes.flipx"));
-        flips.add(new GuiCheckBox("flipY", frame.flipY).setTranslate("gui.waterframes.flipy"));
+        GuiTable flip_grid = new GuiTable();
+        GuiColumn flip_left;
+        GuiColumn flip_right;
+        this.add(flip_grid);
+
+        flip_grid.addRow(new GuiRow(flip_left = new GuiColumn(GuiFlow.STACK_X), flip_right = new GuiColumn(GuiFlow.STACK_Y)));
+        flip_grid.align = Align.CENTER;
+        flip_left.align = Align.LEFT;
+        flip_right.align = Align.RIGHT;
+
+        flip_left.add(new GuiStateButton("posX", projector.min.x == 0 ? 0 : projector.max.x == 1 ? 2 : 1, new TextListBuilder()
+                .addTranslated("gui.waterframes.posx.", "left", "center", "right")));
+
+        flip_left.add(new GuiStateButton("posY", projector.min.y == 0 ? 0 : projector.max.y == 1 ? 2 : 1, new TextListBuilder()
+                .addTranslated("gui.waterframes.posy.", "top", "center", "bottom")));
+
+        flip_right.add(new GuiCheckBox("flipX", projector.flipX).setTranslate("gui.waterframes.flipx"));
+        flip_right.add(new GuiCheckBox("flipY", projector.flipY).setTranslate("gui.waterframes.flipy"));
 
 
+        // MAIN OPTIONS
         GuiTable table = new GuiTable();
         table.spacing = 2;
         add(table);
@@ -239,88 +275,88 @@ public class ProjectorScreen extends GuiLayer {
         GuiColumn right;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
-        left.add(new GuiLabel("t_label").setTitle(new TranslatableComponent("gui.waterframes.rotation").append(":")));
-        right.add(new GuiSlider("rotation", 130, 10, frame.rotation, 0, 360));
+        left.add(new GuiLabel("r_label").setTitle(new TranslatableComponent("gui.waterframes.rotation")));
+        right.add(new GuiSlider("rotation", 120, 10, projector.rotation, 0, 360));
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
-        left.add(new GuiLabel("t_label").setTitle(new TranslatableComponent("gui.waterframes.transparency").append(":")));
-        right.add(new GuiSlider("transparency", 130, 10, frame.alpha, 0, 1));
+        left.add(new GuiLabel("t_label").setTitle(new TranslatableComponent("gui.waterframes.transparency")));
+        right.add(new GuiSlider("transparency", 120, 10, projector.alpha, 0, 1));
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
-        left.add(new GuiLabel("b_label").setTitle(new TranslatableComponent("gui.waterframes.brightness").append(":")));
-        right.add(new GuiSlider("brightness", 130, 10, frame.brightness, 0, 1));
+        left.add(new GuiLabel("b_label").setTitle(new TranslatableComponent("gui.waterframes.brightness")));
+        right.add(new GuiSlider("brightness", 120, 10, projector.brightness, 0, 1));
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
-        left.add(new GuiLabel("d_label").setTitle(new TranslatableComponent("gui.waterframes.distance").append(":")));
-        right.add(new GuiSteppedSlider("distance", 130, 10, frame.renderDistance, 5, 1024));
+        left.add(new GuiLabel("d_label").setTitle(new TranslatableComponent("gui.waterframes.visible_distance")));
+        right.add(new GuiSteppedSlider("distance", 120, 10, projector.renderDistance, 5, 1024));
         right.align = Align.RIGHT;
 
+        table.addRow(new GuiRow(right = new GuiColumn()));
+        right.align = Align.RIGHT;
+        right.add(new GuiCheckBox("loop", projector.loop).setTranslate("gui.waterframes.loop"));
 
-        GuiParent rendering = new GuiParent(GuiFlow.STACK_X);
-        rendering.align = Align.RIGHT;
-        rendering.spacing = 8;
-        add(rendering);
-        rendering.add(new GuiCheckBox("loop", frame.loop).setTranslate("gui.waterframes.loop"));
+        table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
+        left.add(new GuiLabel("p_label").setTitle(new TranslatableComponent("gui.waterframes.projection_distance")));
+        right.add(new GuiSteppedSlider("projection_distance", 120, 10, projector.projectionDistance, 4, 128));
+        right.align = Align.RIGHT;
 
-        GuiTable volume = new GuiTable();
-        add(volume);
-        GuiColumn volume_left;
-        GuiColumn volume_right;
-
-        volume.addRow(new GuiRow(volume_left = new GuiColumn(GuiFlow.STACK_X), volume_right = new GuiColumn(GuiFlow.STACK_X)));
-        volume_left.add(new GuiLabel("v_label").setTitle(new TranslatableComponent("gui.waterframes.volume").append(":")));
-        volume_right.add(new GuiSlider("volume", 130, 10, frame.volume, 0, 1));
-        volume_right.align = Align.RIGHT;
-
-        GuiParent range = new GuiParent(GuiFlow.STACK_X);
-        add(range);
-        range.add(new GuiLabel("range_label").setTitle(new TranslatableComponent("gui.waterframes.range").append(" (min/max):")));
-        range.add(new GuiSteppedSlider("range_min", 63, 10, (int) frame.minDistance, 0, 512).setExpandableX());
-        range.add(new GuiSteppedSlider("range_max", 63, 10, (int) frame.maxDistance, 0, 512).setExpandableX());
-
-        GuiTable playgrid = new GuiTable();
-        add(playgrid);
-        GuiColumn play_left;
-        GuiColumn play_right;
-
-        playgrid.addRow(new GuiRow(play_left = new GuiColumn(GuiFlow.STACK_X), play_right = new GuiColumn(GuiFlow.STACK_X)));
-        play_right.align = Align.RIGHT;
-
-        play_left.add(new GuiIconButton("play", GuiIcon.PLAY, button -> PLAY.send(EndTag.INSTANCE)));
-        play_left.add(new GuiIconButton("pause", GuiIcon.PAUSE, button -> PAUSE.send(EndTag.INSTANCE)));
-        play_left.add(new GuiIconButton("stop", GuiIcon.STOP, button -> STOP.send(EndTag.INSTANCE)));
+        // SEEK BAR
+        var seekParent = new GuiParent(GuiFlow.STACK_X);
+        seekParent.add(new GuiIconButton("play", GuiIcon.PLAY, button -> PLAY.send(EndTag.INSTANCE)));
+        seekParent.add(new GuiIconButton("pause", GuiIcon.PAUSE, button -> PAUSE.send(EndTag.INSTANCE)));
+        seekParent.add(new GuiIconButton("stop", GuiIcon.STOP, button -> STOP.send(EndTag.INSTANCE)));
 
 
+        GuiSlider slider;
+        seekParent.add(slider = new GuiSlider("seek", 150, 12, 0, 0, projector.display != null ? projector.display.maxTick() : 1) {
+                protected void renderContent(PoseStack pose, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
+                    double percent = this.getPercentage();
+                    int posX = (int) (control.getContentWidth() * percent);
+                    this.getStyle().get(ControlFormatting.ControlStyleFace.CLICKABLE, false).render(pose, 0, 0.0, posX, rect.getHeight());
+
+                    if (this.textfield != null) this.textfield.render(pose, control, rect, rect, mouseX, mouseY);
+                    else GuiRenderHelper.drawStringCentered(pose, this.getTextByValue(), (float) rect.getWidth(), (float) rect.getHeight(), -1, true);
+                }
+
+            @Override
+            public void setValue(double value) {
+                super.setValue(value);
+                if (projector.display instanceof VideoDisplay display) {
+                    display.player.seekGameTicksTo((int) value);
+                }
+            }
+        });
+        slider.setExpandableX();
+        slider.setEnabled(isVideo);
+        this.add(seekParent);
+
+        // VIDEO CONTROLLING
+        var vidVolume = new GuiParent(GuiFlow.STACK_X);
+        vidVolume.spacing = 4;
+        vidVolume.add(new GuiLabel("v_label").setTitle(new TranslatableComponent("gui.waterframes.volume")));
+        vidVolume.add(new GuiSlider("volume", 130, 10, projector.volume, 0, 1).setExpandableX());
+        vidVolume.add(new GuiLabel("range_label").setTitle(new TranslatableComponent("gui.waterframes.range")));
+        vidVolume.add(new GuiSteppedSlider("range_min", 70, 10, (int) projector.minDistance, 0, 512));
+        vidVolume.add(new GuiSteppedSlider("range_max", 70, 10, (int) projector.maxDistance, 0, 512));
+        this.add(vidVolume);
+        vidVolume.setEnabled(isVideo);
+
+        // SAVE, RELOAD
+        var vidSaving = new GuiParent(GuiFlow.STACK_X);
+        vidSaving.align = Align.RIGHT;
         save.setEnabled(FramesConfig.canUse(getPlayer(), url.getText()));
-        play_right.add(save);
-        play_right.add(new GuiButton("reload", x -> {
-            synchronized (PictureFetch.LOCK) {
+        vidSaving.add(save);
+        vidSaving.add(new GuiButton("reload", x -> {
+            if (PictureSeeker.canSeek()) {
                 if (Screen.hasShiftDown()) TextureData.reloadAll();
-                else if (frame.cache != null) frame.cache.reload();
+                else if (projector.texture != null) projector.texture.reload();
             }
         }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));
 
-
-        GuiParent footer = new GuiParent(GuiFlow.STACK_X);
-        add(footer);
-        footer.add(new GuiSlider("seek", 150, 12, frame.tick, 0, frame.display != null ? frame.display.maxTick() : 1) {
-
-            protected void renderContent(PoseStack pose, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
-                double percent = this.getPercentage();
-                int posX = (int) (control.getContentWidth() * percent);
-                GuiStyle style = this.getStyle();
-                style.get(ControlFormatting.ControlStyleFace.CLICKABLE, false).render(pose, 0, 0.0, posX, rect.getHeight());
-                if (this.textfield != null) {
-                    this.textfield.render(pose, control, rect, rect, mouseX, mouseY);
-                } else {
-                    GuiRenderHelper.drawStringCentered(pose, this.getTextByValue(), (float)rect.getWidth(), (float)rect.getHeight(), -1, true);
-                }
-
-            }
-        }.setExpandableX());
+        this.add(vidSaving);
     }
 
 }

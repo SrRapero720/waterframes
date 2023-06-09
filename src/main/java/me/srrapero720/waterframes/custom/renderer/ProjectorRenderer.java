@@ -9,7 +9,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
-import me.srrapero720.waterframes.api.RenderDisplay;
+import me.srrapero720.waterframes.api.IDisplay;
 import me.srrapero720.waterframes.custom.blocks.Projector;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
 import net.minecraft.client.Minecraft;
@@ -46,7 +46,7 @@ public class ProjectorRenderer implements BlockEntityRenderer<TileProjector> {
             return;
         }
         
-        RenderDisplay display = projector.requestDisplay();
+        IDisplay display = projector.requestDisplay();
         if (display == null) return;
         
         display.prepare(projector.getURL(), projector.volume * Minecraft.getInstance().options

@@ -2,8 +2,9 @@ package me.srrapero720.waterframes.custom.tiles;
 
 import me.srrapero720.waterframes.FramesRegistry;
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.api.TileWithDisplay;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.api.RenderDisplay;
+import me.srrapero720.waterframes.api.IDisplay;
 import me.srrapero720.waterframes.display.texture.TextureData;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
@@ -27,20 +28,9 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
-public class TileFrame extends BlockEntity {
-
-    @OnlyIn(Dist.CLIENT)
-    public static @NotNull String parseUrl(@NotNull String url) {
-        return url.replaceAll("\\{playername}", WCoreUtil.mine().player.getName().getString())
-                .replaceAll("\\{displayname}", WCoreUtil.mine().player.getDisplayName().getString())
-                .replaceAll("\\{uuid}", WCoreUtil.mine().player.getStringUUID())
-                .replace("mc://",("file:///" + FMLPaths.GAMEDIR.get().toAbsolutePath()).replace("\\", "/") + "/");
-    }
-
-    private String url = "";
+public class TileFrame extends TileWithDisplay {
     public Vec2f min = new Vec2f(0, 0);
     public Vec2f max = new Vec2f(1, 1);
-
 
     public float rotation = 0;
     public boolean flipX = false;
@@ -54,55 +44,25 @@ public class TileFrame extends BlockEntity {
 
     public int renderDistance = 128;
 
-    public float volume = 1;
-    public float minDistance = 5;
-    public float maxDistance = 20;
-
-    public boolean loop = true;
-    public int tick = 0;
-    public boolean playing = true;
-
-    @OnlyIn(Dist.CLIENT)
-    public TextureData cache;
-
-    @OnlyIn(Dist.CLIENT)
-    public RenderDisplay display;
-
     public TileFrame(BlockPos pos, BlockState state) {
         super(FramesRegistry.TILE_FRAME.get(), pos, state);
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public boolean isURLEmpty() {
-        return url.isEmpty();
-    }
 
-    @OnlyIn(Dist.CLIENT)
-    public String getURL() {
-        return parseUrl(url);
-    }
 
-    public String getRealURL() {
-        return url;
-    }
-
-    public void setURL(String url) {
-        this.url = url;
-    }
-
-    public RenderDisplay requestDisplay() {
+    public IDisplay requestDisplay() {
         String url = getURL();
-        if (cache == null || !cache.url.equals(url)) {
-            cache = TextureData.get(url);
+        if (texture == null || !texture.url.equals(url)) {
+            texture = TextureData.get(url);
             if (display != null)
                 display.release();
             display = null;
         }
-        if (!cache.isVideo() && (!cache.ready() || cache.getError() != null))
+        if (!texture.isVideo() && (!texture.ready() || texture.getError() != null))
             return null;
         if (display != null)
             return display;
-        return display = cache.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop, false);
+        return display = texture.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop, false);
     }
 
     public AlignedBox getBox() {
@@ -223,7 +183,7 @@ public class TileFrame extends BlockEntity {
 
 
             if (level.isClientSide) {
-                RenderDisplay display = be.requestDisplay();
+                IDisplay display = be.requestDisplay();
                 if (display != null) display.tick(be.getURL(), be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}
             if (be.playing) be.tick++;
         }

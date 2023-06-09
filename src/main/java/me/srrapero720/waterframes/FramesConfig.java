@@ -52,7 +52,7 @@ public class FramesConfig {
         DISABLE_REDSTONE = BUILDER.comment("Disable pause trigger on redstone signal input").define("disableRedstone", true);
 
         DISABLE_WHITELIST = BUILDER.define("disableWhitelist", false);
-        WHITELIST = BUILDER.define("whitelist", FramesUtil.getJsonArrayStringResource("whitelist_url.json"));
+        WHITELIST = BUILDER.define("whitelist", FramesUtil.getJsonListFromRes("whitelist_url.json"));
 
 
         /* waterframes -> frames */

@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.custom.packets;
 
+import me.srrapero720.waterframes.api.TileWithDisplay;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -8,7 +9,7 @@ import team.creative.creativecore.common.network.CreativePacket;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
 
 public class FramesPacket extends CreativePacket {
-    
+
     public BlockPos pos;
     public boolean playing;
     public int tick;
@@ -24,7 +25,7 @@ public class FramesPacket extends CreativePacket {
     @Override
     public void executeClient(Player player) {
         BlockEntity be = player.level.getBlockEntity(pos);
-        if (be instanceof TileFrame frame) {
+        if (be instanceof TileWithDisplay frame) {
             frame.playing = playing;
             frame.tick = tick;
             if (frame.display != null) {

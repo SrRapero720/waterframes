@@ -28,7 +28,7 @@ public class FramesUtil {
     }
 
 
-    public static List<String> getJsonArrayStringResource(String path) {
+    public static List<String> getJsonListFromRes(String path) {
         var LOGGER = LogUtils.getLogger();
 
         var inputStream = new Stationary<InputStreamReader>();

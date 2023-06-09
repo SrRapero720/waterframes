@@ -21,31 +21,27 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 @OnlyIn(Dist.CLIENT)
-public class PictureFetch extends Thread {
+public class PictureSeeker extends Thread {
     // MC
     private static final Minecraft MC = Minecraft.getInstance();
-
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final DateFormat FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
-    public static final Object LOCK = new Object();
+    private static final Object LOCK = new Object();
     private static final String USER_AGENT = FramesUtil.getUserAgentBasedOnOS();
+    private static final DateFormat FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
 
     // STATUS
-    public static final int MAX_FETCH = 5;
+    public static final int MAX_FETCH = 6;
     public static int ACTIVE_FETCH = 0;
 
-
-    private final TextureData tex;
-    public PictureFetch(TextureData tex) {
-        this.tex = tex;
-        setName("WF-Seeker");
+    private final TextureData texture;
+    public PictureSeeker(TextureData textureData) {
+        this.texture = textureData;
+        setName("WATERFrAMES-PIC");
         setDaemon(true);
         start();
     }
 
-    public static boolean canBeSeeked() {
-        synchronized(LOCK) { return ACTIVE_FETCH < MAX_FETCH; }
-    }
+    public static boolean canSeek() { synchronized(LOCK) { return ACTIVE_FETCH < MAX_FETCH; } }
 
     @Override
     public void run() {
@@ -55,7 +51,7 @@ public class PictureFetch extends Thread {
         boolean isVideo = false;
         boolean processed = false;
         try {
-            var data = load(tex.url);
+            var data = load(texture.url);
             var type = readType(data);
 
             try (var in = new ByteArrayInputStream(data)) {
@@ -64,7 +60,7 @@ public class PictureFetch extends Thread {
                     var status = gif.read(in);
 
                     if (status == GifDecoder.STATUS_OK) {
-                        MC.executeBlocking(() -> tex.process(gif));
+                        MC.executeBlocking(() -> texture.process(gif));
                         processed = true;
                     } else {
                         LOGGER.error("Failed to read gif: {}", status);
@@ -74,7 +70,7 @@ public class PictureFetch extends Thread {
                     try {
                         var image = ImageIO.read(in);
                         if (image != null) {
-                            MC.executeBlocking(() -> tex.process(image));
+                            MC.executeBlocking(() -> texture.process(image));
                             processed = true;
                         }
                     } catch (IOException e1) {
@@ -85,9 +81,9 @@ public class PictureFetch extends Thread {
             }
         } catch (Exception e) {
             if (!FramesConfig.isDisabledVideos() && e instanceof VideoContentException) {
-                tex.processVideo();
+                texture.processVideo();
                 isVideo = true;
-            } else tex.processFailed("No image found");
+            } else texture.processFailed("No image found");
 
 
             exception = e;
@@ -95,11 +91,11 @@ public class PictureFetch extends Thread {
         }
 
         if (!isVideo && !processed) {
-            if (exception == null) tex.processFailed("download.exception.gif");
-            else if (exception.getMessage().startsWith("Server returned HTTP response code: 403")) tex.processFailed("download.exception.forbidden");
-            else if (exception.getMessage().startsWith("Server returned HTTP response code: 404")) tex.processFailed("download.exception.notfound");
-            else tex.processFailed("download.exception.invalid");
-            PictureStorage.deleteEntry(tex.url);
+            if (exception == null) texture.processFailed("download.exception.gif");
+            else if (exception.getMessage().startsWith("Server returned HTTP response code: 403")) texture.processFailed("download.exception.forbidden");
+            else if (exception.getMessage().startsWith("Server returned HTTP response code: 404")) texture.processFailed("download.exception.notfound");
+            else texture.processFailed("download.exception.invalid");
+            PictureStorage.deleteEntry(texture.url);
         }
 
         synchronized (LOCK) {

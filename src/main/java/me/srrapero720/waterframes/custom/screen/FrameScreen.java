@@ -4,7 +4,7 @@ import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.display.texture.TextureData;
-import me.srrapero720.waterframes.display.texture.PictureFetch;
+import me.srrapero720.waterframes.display.texture.PictureSeeker;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
@@ -26,15 +26,12 @@ import team.creative.creativecore.common.util.text.TextListBuilder;
 
 public class FrameScreen extends GuiLayer {
     public TileFrame frame;
-    
     public float scaleMultiplier;
-    
     public GuiTextfield url;
     
     public final GuiSyncLocal<EndTag> PLAY = getSyncHolder().register("play", x -> frame.play());
     public final GuiSyncLocal<EndTag> PAUSE = getSyncHolder().register("pause", x -> frame.pause());
     public final GuiSyncLocal<EndTag> STOP = getSyncHolder().register("stop", x -> frame.stop());
-    
     public final GuiSyncLocal<CompoundTag> SET_DATA = getSyncHolder().register("set_data", nbt -> {
         String url = nbt.getString("url");
         if (FramesConfig.canUse(getPlayer(), url)) {
@@ -155,8 +152,8 @@ public class FrameScreen extends GuiLayer {
         url.setMaxStringLength(2048);
         add(url);
         GuiLabel error = new GuiLabel("error").setDefaultColor(ColorUtils.RED);
-        if (frame.isClient() && frame.cache != null && frame.cache.getError() != null)
-            error.setTranslate(frame.cache.getError());
+        if (frame.isClient() && frame.texture != null && frame.texture.getError() != null)
+            error.setTranslate(frame.texture.getError());
         add(error);
 
         // SIZE -----------------------
@@ -267,7 +264,7 @@ public class FrameScreen extends GuiLayer {
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
-        left.add(new GuiLabel("d_label").setTitle(new TranslatableComponent("gui.waterframes.distance").append(":")));
+        left.add(new GuiLabel("d_label").setTitle(new TranslatableComponent("gui.waterframes.visible_distance").append(":")));
         right.add(new GuiSteppedSlider("distance", 130, 10, frame.renderDistance, 5, 1024));
         right.align = Align.RIGHT;
 
@@ -311,9 +308,9 @@ public class FrameScreen extends GuiLayer {
         save.setEnabled(FramesConfig.canUse(getPlayer(), url.getText()));
         play_right.add(save);
         play_right.add(new GuiButton("reload", x -> {
-            synchronized (PictureFetch.LOCK) {
+            if (PictureSeeker.canSeek()) {
                 if (Screen.hasShiftDown()) TextureData.reloadAll();
-                else if (frame.cache != null) frame.cache.reload();
+                else if (frame.texture != null) frame.texture.reload();
             }
         }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));
         

@@ -1,13 +1,13 @@
-package me.srrapero720.waterframes.rendering;
+package me.srrapero720.waterframes.displays;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.lib720.caprica.vlcj4.factory.MediaPlayerFactory;
 import me.lib720.caprica.vlcj4.player.embedded.videosurface.callback.BufferFormat;
-import me.lib720.caprica.vlcj4.player.embedded.videosurface.callback.BufferFormatCallback;
-import me.srrapero720.waterframes.api.RenderDisplay;
-import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
+import me.lib720.caprica.vlcj4.player.embedded.videosurface.callback.UnAllocBufferFormatCallback;
+import me.srrapero720.waterframes.FramesUtil;
+import me.srrapero720.waterframes.api.IDisplay;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import me.srrapero720.watermedia.api.media.players.WaterVLCPlayer;
 import me.srrapero720.watermedia.vlc.VLCManager;
@@ -16,59 +16,51 @@ import net.minecraft.sounds.SoundSource;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+public class VideoDisplay extends IDisplay {
+    private static final MediaPlayerFactory FACTORY = VLCManager.createVLCPlayerFactory(FramesUtil.getJsonListFromRes("vlc_args.json").toArray(new String[0]));
+    public static final String VLC_FAILED = "https://i.imgur.com/UAXbZeM.jpg";
+    public static final int ACCEPTABLE_SYNC_TIME = 1000;
+    public static final List<VideoDisplay> OPEN_DISPLAYS = new ArrayList<>();
 
-public class VLCRendering extends RenderDisplay {
-    private static final int ACCEPTABLE_SYNC_TIME = 1000;
-    private static final List<VLCRendering> OPEN_DISPLAYS = new ArrayList<>();
-    
     public static void tick() {
         synchronized (OPEN_DISPLAYS) {
             for (var display: OPEN_DISPLAYS) {
                 if (Minecraft.getInstance().isPaused()) {
-                    var media = display.player;
-                    if (display.stream && media.isPlaying()) media.setPauseMode(true);
-                    else if (media.getMediaLength() > 0 && media.isPlaying()) media.setPauseMode(true);
+                    var player = display.player;
+                    if ((player.getMediaLength() > 0 || display.stream) && player.isPlaying()) player.setPauseMode(true);
                 }
             }
         }
     }
-    
+
     public static void unload() {
         synchronized (OPEN_DISPLAYS) {
-            for (var display : OPEN_DISPLAYS) display.free();
+            for (var display : OPEN_DISPLAYS) display.clear();
             OPEN_DISPLAYS.clear();
         }
     }
 
-    private static MediaPlayerFactory FACTORY;
-    private static final String[] DEFAULT_VLC_ARGS = new String[] {"--aout", "directsound", "--file-caching", "6000", "--file-logging", "--logfile", "vlc-waveout.log", "--logmode", "text", "--verbose", "2", "--no-quiet"};
-    
-    public volatile int width = 1;
-    public volatile int height = 1;
-    
     public WaterVLCPlayer player;
-
     private final Vec3d pos;
     private volatile IntBuffer buffer;
+    public volatile int width = 1;
+    public volatile int height = 1;
     public int texture;
     private boolean stream = false;
-    private float lastSetVolume;
-    private volatile boolean needsUpdate = false;
-    private final ReentrantLock lock = new ReentrantLock();
     private volatile boolean first = true;
-    private long lastCorrectedTime = Long.MIN_VALUE;
-    
-    public VLCRendering(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
-        super();
-        if (FACTORY == null) FACTORY = VLCManager.createVLCPlayerFactory(DEFAULT_VLC_ARGS);
+    private volatile boolean needsUpdate = false;
 
+    private float lastSetVolume;
+    private long lastCorrectedTime = Long.MIN_VALUE;
+    private final ReentrantLock lock = new ReentrantLock();
+
+    public VideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
+        super();
         this.player = new WaterVLCPlayer(url, FACTORY, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
 
@@ -76,32 +68,29 @@ public class VLCRendering extends RenderDisplay {
                 buffer.put(nativeBuffers[0].asIntBuffer());
                 buffer.rewind();
                 needsUpdate = true;
-            } catch (Exception e) {
-                LOGGER.error("Something is wrong processing buffers", e);
+            } finally {
+                lock.unlock();
             }
-
-            lock.unlock();
-        }, new BufferFormatCallback() {
+        }, new UnAllocBufferFormatCallback() {
             @Override
             public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
                 lock.lock();
 
-                ThreadUtil.trySimple(() -> {
+                try {
                     setWidth(sourceWidth);
                     setHeight(sourceHeight);
                     setFirstMode(true);
                     setBuffer(MemoryTracker.create(sourceWidth * sourceHeight * 4).asIntBuffer());
                     setNeedsUpdateMode(true);
-                });
-
-                lock.unlock();
+                } finally {
+                    lock.unlock();
+                }
 
                 return new BufferFormat("RGBA", sourceWidth, sourceHeight, new int[] { sourceWidth * 4 }, new int[] { sourceHeight });
             }
-
-            @Override
-            public void allocatedBuffers(ByteBuffer[] buffers) {}
         });
+
+        OPEN_DISPLAYS.add(this);
 
         // VARS
         this.pos = pos;
@@ -121,6 +110,43 @@ public class VLCRendering extends RenderDisplay {
     public synchronized void setNeedsUpdateMode(boolean mode) { this.needsUpdate = mode; }
     public synchronized void setBuffer(IntBuffer buffer) { this.buffer = buffer; }
 
+    // GETTERS
+    @Override public int getWidth() { return width; }
+    @Override public int getHeight() { return height; }
+    @Override public long getDuration() { return player.getDuration(); }
+    @Override public int getTexID() { return texture; }
+    @Override public int maxTick() { if (player != null) return (int) player.getGameTickDuration(); return 0; }
+    @Override public Type getType() { return Type.VIDEO; }
+
+    public int getGameTickTime() { return (int) player.getGameTickTime(); }
+    public int getGameTickDuration() { return (int) player.getGameTickMediaLength(); }
+
+    public void clear() {
+        if (player != null) player.release();
+        if (texture != -1) GlStateManager._deleteTexture(texture);
+        texture = -1;
+        player = null;
+    }
+
+    @Override
+    public void release() {
+        clear();
+        synchronized (OPEN_DISPLAYS) { OPEN_DISPLAYS.remove(this); }
+    }
+
+    @Override
+    public void pause(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
+        if (player == null) return;
+        player.seekGameTicksTo(tick);
+        player.pause();
+    }
+
+    @Override
+    public void resume(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
+        if (player == null) return;
+        player.seekGameTicksTo(tick);
+        player.play();
+    }
 
     public int getVolume(float volume, float minDistance, float maxDistance) {
         if (player == null) return 0;
@@ -136,16 +162,7 @@ public class VLCRendering extends RenderDisplay {
             if (distance > maxDistance) volume = 0;
             else volume *= 1 - ((distance - minDistance) / (maxDistance - minDistance));
 
-
-        var gameVolume = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
-
-        return (int) ((volume * 100) * gameVolume);
-    }
-
-    @Override
-    public int maxTick() {
-        if (player != null) return (int) player.getDuration();
-        return 0;
+        return (int) ((volume * 100F) * Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER));
     }
 
     @Override
@@ -204,57 +221,12 @@ public class VLCRendering extends RenderDisplay {
                 if (first) {
                     GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, width, height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
                     first = false;
-                } else
-                    GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+                } else GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, width, height, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+
                 needsUpdate = false;
             }
         } finally {
             lock.unlock();
         }
-        
     }
-    
-    public void free() {
-        if (player != null) {
-            player.stop();
-            player.release();
-        }
-        if (texture != -1) {
-            GlStateManager._deleteTexture(texture);
-            texture = -1;
-        }
-        player = null;
-    }
-    
-    @Override
-    public void release() {
-        free();
-        synchronized (OPEN_DISPLAYS) {
-            OPEN_DISPLAYS.remove(this);
-        }
-    }
-    
-    @Override
-    public int getTexID() { return texture; }
-    
-    @Override
-    public void pause(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
-        if (player == null) return;
-        player.seekGameTicksTo(tick);
-        player.setPauseMode(true);
-//        player.pause();
-    }
-    
-    @Override
-    public void resume(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
-        if (player == null) return;
-        player.seekGameTicksTo(tick);
-        player.play();
-    }
-    
-    @Override
-    public int getWidth() { return width; }
-    
-    @Override
-    public int getHeight() { return height; }
 }

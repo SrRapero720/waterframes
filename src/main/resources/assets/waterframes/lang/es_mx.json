@@ -17,7 +17,7 @@
     "gui.waterframes.rotation": "rotacion",
     "gui.waterframes.transparency": "transparencia",
     "gui.waterframes.brightness": "brillo",
-    "gui.waterframes.distance": "distancia",
+    "gui.waterframes.visible_distance": "distancia",
     "gui.waterframes.volume": "volumen",
     "gui.waterframes.range": "rango",
     "gui.waterframes.loop": "en bucle",
