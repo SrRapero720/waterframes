@@ -2,11 +2,9 @@ package me.srrapero720.waterframes.custom.tiles;
 
 import me.srrapero720.waterframes.FramesRegistry;
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.api.TileWithDisplay;
 import me.srrapero720.waterframes.custom.blocks.Projector;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
-import me.srrapero720.waterframes.api.IDisplay;
-import me.srrapero720.waterframes.display.texture.TextureData;
+import me.srrapero720.waterframes.displays.IDisplay;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -23,9 +21,8 @@ import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
-import team.creative.creativecore.common.util.math.vec.Vec3d;
 
-public class TileProjector extends TileWithDisplay {
+public class TileProjectorTile extends WFTile {
     public Vec2f min = new Vec2f(0, 0);
     public Vec2f max = new Vec2f(1, 1);
 
@@ -42,26 +39,14 @@ public class TileProjector extends TileWithDisplay {
     public int renderDistance = 128;
     public int projectionDistance = 4;
 
-    public TileProjector(BlockPos pos, BlockState state) {
+    public TileProjectorTile(BlockPos pos, BlockState state) {
         super(FramesRegistry.TILE_PROJECTOR.get(), pos, state);
-    }
-
-    public IDisplay requestDisplay() {
-        String url = getURL();
-        if (this.texture == null || !texture.url.equals(url)) {
-            texture = TextureData.get(url);
-            if (display != null) display.release();
-            display = null;
-        }
-        if (!texture.isVideo() && (!texture.ready() || texture.getError() != null)) return null;
-        if (display != null) return display;
-        return display = texture.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop, false);
     }
 
     public AlignedBox getBox() {
         Direction direction = getBlockState().getValue(Projector.FACING);
         Facing facing = Facing.get(direction);
-        AlignedBox box = Projector.box(direction);
+        AlignedBox box = Projector.box(direction, projectionDistance);
 
         Axis one = facing.one();
         Axis two = facing.two();
@@ -147,7 +132,7 @@ public class TileProjector extends TileWithDisplay {
         max.y = nbt.getFloat("maxy");
         rotation = nbt.getFloat("rotation");
         renderDistance = nbt.getInt("render");
-        projectionDistance = nbt.getInt("projection_distance");
+        projectionDistance = nbt.contains("projection_distance") ? nbt.getInt("projection_distance") : 8;
         visibleFrame = nbt.getBoolean("visibleFrame");
         bothSides = nbt.getBoolean("bothSides");
         flipX = nbt.getBoolean("flipX");
@@ -163,7 +148,7 @@ public class TileProjector extends TileWithDisplay {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
-        if (blockEntity instanceof TileFrame be) {
+        if (blockEntity instanceof TileProjectorTile be) {
             if (level.isClientSide) {
                 IDisplay display = be.requestDisplay();
                 if (display != null) display.tick(be.getURL(), be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}

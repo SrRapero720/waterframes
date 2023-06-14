@@ -1,7 +1,14 @@
-package me.srrapero720.waterframes.api;
+package me.srrapero720.waterframes.displays;
 
 public abstract class IDisplay {
+    protected int width;
+    protected int height;
+    protected boolean ready = false;
     public enum Type { VIDEO, IMAGE, GIF; }
+
+    public static IDisplay create() {
+        return null;
+    }
 
     public abstract int getWidth();
     public abstract int getHeight();

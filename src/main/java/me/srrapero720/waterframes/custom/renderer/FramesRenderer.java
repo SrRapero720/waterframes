@@ -6,9 +6,9 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
-import me.srrapero720.waterframes.custom.tiles.TileFrame;
+import me.srrapero720.waterframes.custom.tiles.TileFrameTile;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.api.IDisplay;
+import me.srrapero720.waterframes.displays.IDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -25,19 +25,19 @@ import team.creative.creativecore.common.util.math.box.BoxCorner;
 import team.creative.creativecore.common.util.math.box.BoxFace;
 
 @OnlyIn(Dist.CLIENT)
-public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
+public class FramesRenderer implements BlockEntityRenderer<TileFrameTile> {
     @Override
-    public boolean shouldRenderOffScreen(TileFrame frame) {
+    public boolean shouldRenderOffScreen(TileFrameTile frame) {
         return frame.getSizeX() > 16 || frame.getSizeY() > 16;
     }
     
     @Override
-    public boolean shouldRender(TileFrame frame, Vec3 vec) {
+    public boolean shouldRender(TileFrameTile frame, Vec3 vec) {
         return Vec3.atCenterOf(frame.getBlockPos()).closerThan(vec, frame.renderDistance);
     }
     
     @Override
-    public void render(TileFrame frame, float partialTicks, PoseStack pose, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
+    public void render(TileFrameTile frame, float partialTicks, PoseStack pose, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
         if (frame.isURLEmpty() || frame.alpha == 0) {
             if (frame.display != null) frame.display.release();
             return;

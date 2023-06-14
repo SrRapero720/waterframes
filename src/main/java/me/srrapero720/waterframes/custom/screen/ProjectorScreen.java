@@ -2,9 +2,9 @@ package me.srrapero720.waterframes.custom.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.FramesConfig;
-import me.srrapero720.waterframes.api.IDisplay;
+import me.srrapero720.waterframes.displays.IDisplay;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
-import me.srrapero720.waterframes.custom.tiles.TileProjector;
+import me.srrapero720.waterframes.custom.tiles.TileProjectorTile;
 import me.srrapero720.waterframes.display.texture.TextureData;
 import me.srrapero720.waterframes.display.texture.PictureSeeker;
 import me.srrapero720.waterframes.displays.VideoDisplay;
@@ -13,11 +13,18 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.CompoundContainer;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BookItem;
+import net.minecraft.world.item.ItemStack;
 import team.creative.creativecore.client.render.GuiRenderHelper;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.GuiChildControl;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.GuiParent;
+import team.creative.creativecore.common.gui.controls.collection.GuiStackSelector;
+import team.creative.creativecore.common.gui.controls.inventory.GuiSlot;
 import team.creative.creativecore.common.gui.controls.parent.GuiColumn;
 import team.creative.creativecore.common.gui.controls.parent.GuiRow;
 import team.creative.creativecore.common.gui.controls.parent.GuiTable;
@@ -32,7 +39,7 @@ import team.creative.creativecore.common.util.text.TextBuilder;
 import team.creative.creativecore.common.util.text.TextListBuilder;
 
 public class ProjectorScreen extends GuiLayer {
-    public TileProjector projector;
+    public TileProjectorTile projector;
 
     public float scaleMultiplier;
 
@@ -50,7 +57,7 @@ public class ProjectorScreen extends GuiLayer {
             float sizeY = (float) Math.min(FramesConfig.maxHeight(), nbt.getFloat("y"));
 
             int posX = nbt.contains("posX", 99) ? nbt.getByte("posX") : 1;
-            int posY = nbt.contains("posY", 99) ? nbt.getByte("poxY") : 1;
+            int posY = nbt.contains("posY", 99) ? nbt.getByte("posY") : 1;
             if (posX == 0) {
                 projector.min.x = 0;
                 projector.max.x = sizeX;
@@ -76,6 +83,7 @@ public class ProjectorScreen extends GuiLayer {
             }
 
             projector.renderDistance = Math.min(FramesConfig.maxRenderDistance(), nbt.getInt("render"));
+            projector.projectionDistance = nbt.getInt("projection_distance");
             projector.rotation = nbt.getFloat("rotation");
             projector.loop = nbt.getBoolean("loop");
             projector.flipX = nbt.getBoolean("flipX");
@@ -90,11 +98,11 @@ public class ProjectorScreen extends GuiLayer {
         projector.markDirty();
     });
 
-    public ProjectorScreen(TileProjector projector) {
+    public ProjectorScreen(TileProjectorTile projector) {
         this(projector, 16);
     }
 
-    public ProjectorScreen(TileProjector projector, int scaleSize) {
+    public ProjectorScreen(TileProjectorTile projector, int scaleSize) {
         super("waterframe", 260, 220);
         this.projector = projector;
         this.scaleMultiplier = 1F / (scaleSize);
@@ -209,6 +217,7 @@ public class ProjectorScreen extends GuiLayer {
         counterDecimal.add(new GuiButton("reX", but -> {
             GuiCounterDecimal sizeXField = get("sizeX", GuiCounterDecimal.class);
             GuiCounterDecimal sizeYField = get("sizeY", GuiCounterDecimal.class);
+
 
             float x = sizeXField.getValue();
 

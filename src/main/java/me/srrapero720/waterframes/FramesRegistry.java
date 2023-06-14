@@ -1,13 +1,12 @@
 package me.srrapero720.waterframes;
 
-import com.jozufozu.flywheel.event.ForgeEvents;
 import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.custom.blocks.Projector;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.custom.renderer.FramesRenderer;
 import me.srrapero720.waterframes.custom.renderer.ProjectorRenderer;
-import me.srrapero720.waterframes.custom.tiles.TileFrame;
-import me.srrapero720.waterframes.custom.tiles.TileProjector;
+import me.srrapero720.waterframes.custom.tiles.TileFrameTile;
+import me.srrapero720.waterframes.custom.tiles.TileProjectorTile;
 import me.srrapero720.waterframes.watercore_supplier.ForgeSmartTab;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
@@ -24,7 +23,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.RegistryObject;
 
 public class FramesRegistry {
@@ -36,8 +34,8 @@ public class FramesRegistry {
     public static RegistryObject<Frame> FRAME = BLOCKS.register("frame", Frame::new);
     public static RegistryObject<Projector> PROJECTOR = BLOCKS.register("projector", Projector::new);
 
-    public static RegistryObject<BlockEntityType<TileFrame>> TILE_FRAME = TILES.register("frame", () -> BlockEntityType.Builder.of(TileFrame::new, FRAME.get()).build(null));
-    public static RegistryObject<BlockEntityType<TileProjector>> TILE_PROJECTOR = TILES.register("projector", () -> BlockEntityType.Builder.of(TileProjector::new, PROJECTOR.get()).build(null));
+    public static RegistryObject<BlockEntityType<TileFrameTile>> TILE_FRAME = TILES.register("frame", () -> BlockEntityType.Builder.of(TileFrameTile::new, FRAME.get()).build(null));
+    public static RegistryObject<BlockEntityType<TileProjectorTile>> TILE_PROJECTOR = TILES.register("projector", () -> BlockEntityType.Builder.of(TileProjectorTile::new, PROJECTOR.get()).build(null));
 
     public static void register() {
         ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB)));

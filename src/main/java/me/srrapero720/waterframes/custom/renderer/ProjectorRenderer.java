@@ -9,9 +9,9 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
-import me.srrapero720.waterframes.api.IDisplay;
+import me.srrapero720.waterframes.displays.IDisplay;
 import me.srrapero720.waterframes.custom.blocks.Projector;
-import me.srrapero720.waterframes.custom.tiles.TileProjector;
+import me.srrapero720.waterframes.custom.tiles.TileProjectorTile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -28,19 +28,19 @@ import team.creative.creativecore.common.util.math.box.BoxCorner;
 import team.creative.creativecore.common.util.math.box.BoxFace;
 
 @OnlyIn(Dist.CLIENT)
-public class ProjectorRenderer implements BlockEntityRenderer<TileProjector> {
+public class ProjectorRenderer implements BlockEntityRenderer<TileProjectorTile> {
     @Override
-    public boolean shouldRenderOffScreen(TileProjector frame) {
+    public boolean shouldRenderOffScreen(TileProjectorTile frame) {
         return frame.getSizeX() > 16 || frame.getSizeY() > 16;
     }
     
     @Override
-    public boolean shouldRender(TileProjector frame, Vec3 vec) {
+    public boolean shouldRender(TileProjectorTile frame, Vec3 vec) {
         return Vec3.atCenterOf(frame.getBlockPos()).closerThan(vec, frame.renderDistance);
     }
     
     @Override
-    public void render(TileProjector projector, float partialTicks, PoseStack pose, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
+    public void render(TileProjectorTile projector, float partialTicks, PoseStack pose, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
         if (projector.isURLEmpty() || projector.alpha == 0) {
             if (projector.display != null) projector.display.release();
             return;

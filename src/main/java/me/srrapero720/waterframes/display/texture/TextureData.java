@@ -3,7 +3,7 @@ package me.srrapero720.waterframes.display.texture;
 import com.mojang.blaze3d.platform.GlStateManager;
 import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.FramesUtil;
-import me.srrapero720.waterframes.api.IDisplay;
+import me.srrapero720.waterframes.displays.IDisplay;
 import me.srrapero720.waterframes.displays.ImageDisplay;
 import me.srrapero720.waterframes.displays.VideoDisplay;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+@Deprecated
 public class TextureData {
     private static final Map<String, TextureData> cached = new LinkedHashMap<>();
 

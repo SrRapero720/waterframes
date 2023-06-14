@@ -2,7 +2,7 @@ package me.srrapero720.waterframes.custom.blocks;
 
 import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.custom.screen.ProjectorScreen;
-import me.srrapero720.waterframes.custom.tiles.TileProjector;
+import me.srrapero720.waterframes.custom.tiles.TileProjectorTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -32,12 +32,12 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 public class Projector extends BaseEntityBlock implements BlockGuiCreator {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
-    public static @NotNull AlignedBox box(Direction direction) {
+    public static @NotNull AlignedBox box(Direction direction, int distance) {
         var facing = Facing.get(direction);
         var box = new AlignedBox();
 
-        if (facing.positive) box.setMax(facing.axis, 16);
-        else box.setMin(facing.axis, 1 - 16);
+        if (facing.positive) box.setMax(facing.axis, distance);
+        else box.setMin(facing.axis, 1 - distance);
         return box;
     }
 
@@ -55,7 +55,7 @@ public class Projector extends BaseEntityBlock implements BlockGuiCreator {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new TileProjector(pPos, pState);
+        return new TileProjectorTile(pPos, pState);
     }
 
     @Override
@@ -66,6 +66,6 @@ public class Projector extends BaseEntityBlock implements BlockGuiCreator {
 
     @Override
     public GuiLayer create(CompoundTag compoundTag, Level level, BlockPos blockPos, BlockState blockState, Player player) {
-        return (level.getBlockEntity(blockPos) instanceof TileProjector frame) ? new ProjectorScreen(frame) : null;
+        return (level.getBlockEntity(blockPos) instanceof TileProjectorTile frame) ? new ProjectorScreen(frame) : null;
     }
 }

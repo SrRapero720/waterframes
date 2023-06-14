@@ -3,7 +3,7 @@ package me.srrapero720.waterframes.custom.blocks;
 import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.custom.blocks.properties.VisibleProperty;
 import me.srrapero720.waterframes.custom.screen.FrameScreen;
-import me.srrapero720.waterframes.custom.tiles.TileFrame;
+import me.srrapero720.waterframes.custom.tiles.TileFrameTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -95,7 +95,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
 
     @Override
     public void neighborChanged(@NotNull BlockState state, @NotNull Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
-        if (!FramesConfig.isDisabledRedstone() && level.getBlockEntity(pos) instanceof TileFrame tile) {
+        if (!FramesConfig.isDisabledRedstone() && level.getBlockEntity(pos) instanceof TileFrameTile tile) {
             var signal = false;
             for (var direction: Direction.values()) {
                 var neightborBP = pos.relative(direction);
@@ -117,7 +117,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
     public BlockState updateShape(BlockState pState, Direction pDirection, BlockState pNeighborState, LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pNeighborPos) {
         var be = pLevel.getBlockEntity(pCurrentPos);
         var state = pState;
-        if (be instanceof TileFrame wf) state = pState.setValue(VISIBLE, wf.visibleFrame);
+        if (be instanceof TileFrameTile wf) state = pState.setValue(VISIBLE, wf.visibleFrame);
         return super.updateShape(state, pDirection, pNeighborState, pLevel, pCurrentPos, pNeighborPos);
     }
 
@@ -127,17 +127,17 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
      * ==================================================== */
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        return TileFrame::tick;
+        return TileFrameTile::tick;
     }
 
     /* ====================================================
      *                      GUI BASICS
      * ==================================================== */
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new TileFrame(pos, state); }
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new TileFrameTile(pos, state); }
     
     @Override
     public GuiLayer create(CompoundTag nbt, Level level, BlockPos pos, BlockState state, Player player) {
-        return (level.getBlockEntity(pos) instanceof TileFrame frame) ? new FrameScreen(frame) : null;
+        return (level.getBlockEntity(pos) instanceof TileFrameTile frame) ? new FrameScreen(frame) : null;
     }
 }

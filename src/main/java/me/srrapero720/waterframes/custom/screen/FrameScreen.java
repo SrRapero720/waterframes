@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.custom.screen;
 
 import me.srrapero720.waterframes.FramesConfig;
-import me.srrapero720.waterframes.custom.tiles.TileFrame;
+import me.srrapero720.waterframes.custom.tiles.TileFrameTile;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.display.texture.TextureData;
 import me.srrapero720.waterframes.display.texture.PictureSeeker;
@@ -25,7 +25,7 @@ import team.creative.creativecore.common.util.text.TextBuilder;
 import team.creative.creativecore.common.util.text.TextListBuilder;
 
 public class FrameScreen extends GuiLayer {
-    public TileFrame frame;
+    public TileFrameTile frame;
     public float scaleMultiplier;
     public GuiTextfield url;
     
@@ -81,11 +81,11 @@ public class FrameScreen extends GuiLayer {
         frame.markDirty();
     });
     
-    public FrameScreen(TileFrame frame) {
+    public FrameScreen(TileFrameTile frame) {
         this(frame, 16);
     }
     
-    public FrameScreen(TileFrame frame, int scaleSize) {
+    public FrameScreen(TileFrameTile frame, int scaleSize) {
         super("waterframe", 250, 210);
         this.frame = frame;
         this.scaleMultiplier = 1F / (scaleSize);

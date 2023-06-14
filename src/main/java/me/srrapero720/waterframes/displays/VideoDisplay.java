@@ -7,9 +7,8 @@ import me.lib720.caprica.vlcj4.factory.MediaPlayerFactory;
 import me.lib720.caprica.vlcj4.player.embedded.videosurface.callback.BufferFormat;
 import me.lib720.caprica.vlcj4.player.embedded.videosurface.callback.UnAllocBufferFormatCallback;
 import me.srrapero720.waterframes.FramesUtil;
-import me.srrapero720.waterframes.api.IDisplay;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
-import me.srrapero720.watermedia.api.media.players.WaterVLCPlayer;
+import me.srrapero720.watermedia.api.media.players.VideoLanPlayer;
 import me.srrapero720.watermedia.vlc.VLCManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
@@ -32,7 +31,7 @@ public class VideoDisplay extends IDisplay {
             for (var display: OPEN_DISPLAYS) {
                 if (Minecraft.getInstance().isPaused()) {
                     var player = display.player;
-                    if ((player.getMediaLength() > 0 || display.stream) && player.isPlaying()) player.setPauseMode(true);
+                    if ((player.getDuration() > 0 || display.stream) && player.isPlaying()) player.setPauseMode(true);
                 }
             }
         }
@@ -45,7 +44,7 @@ public class VideoDisplay extends IDisplay {
         }
     }
 
-    public WaterVLCPlayer player;
+    public VideoLanPlayer player;
     private final Vec3d pos;
     private volatile IntBuffer buffer;
     public volatile int width = 1;
@@ -61,7 +60,7 @@ public class VideoDisplay extends IDisplay {
 
     public VideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         super();
-        this.player = new WaterVLCPlayer(url, FACTORY, (mediaPlayer, nativeBuffers, bufferFormat) -> {
+        this.player = new VideoLanPlayer(FACTORY, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
 
             try {
@@ -100,7 +99,7 @@ public class VideoDisplay extends IDisplay {
         // PLAYER
         player.setVolume((int) lastSetVolume); // 0 - 100
         player.setRepeatMode(loop);
-        player.start();
+        player.start(url);
     }
 
     // SETTERS
@@ -180,14 +179,14 @@ public class VideoDisplay extends IDisplay {
             
             if (player.getRepeatMode() != loop) player.setRepeatMode(loop);
             long tickTime = 50;
-            long newDuration = player.getMediaLength();
+            long newDuration = player.getDuration();
 
-            if (!stream && newDuration != -1 && newDuration != 0 && player.getDuration() == 0)
+            if (!stream && newDuration != -1 && newDuration != 0 && player.getStatusDuration() == 0)
                 stream = true;
             if (stream) {
                 if (player.isPlaying() != realPlaying) player.setPauseMode(!realPlaying);
             } else {
-                if (player.getMediaLength() > 0) {
+                if (player.getDuration() > 0) {
                     if (player.isPlaying() != realPlaying)
                         player.setPauseMode(!realPlaying);
 
@@ -195,7 +194,7 @@ public class VideoDisplay extends IDisplay {
                     if (player.isSeekable()) {
                         long time = tick * tickTime + (realPlaying ? (long) (WCoreUtil.toDeltaFrames() * tickTime) : 0);
                         if (time > player.getTime() && loop)
-                            time %= player.getMediaLength();
+                            time %= player.getDuration();
                         if (Math.abs(time - player.getTime()) > ACCEPTABLE_SYNC_TIME && Math.abs(time - lastCorrectedTime) > ACCEPTABLE_SYNC_TIME) {
                             lastCorrectedTime = time;
                             player.seekFastTo(time);

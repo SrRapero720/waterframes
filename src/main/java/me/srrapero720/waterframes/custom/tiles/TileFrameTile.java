@@ -2,12 +2,9 @@ package me.srrapero720.waterframes.custom.tiles;
 
 import me.srrapero720.waterframes.FramesRegistry;
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.api.TileWithDisplay;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.api.IDisplay;
-import me.srrapero720.waterframes.display.texture.TextureData;
+import me.srrapero720.waterframes.displays.IDisplay;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
-import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -20,15 +17,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.loading.FMLPaths;
-import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
-import team.creative.creativecore.common.util.math.vec.Vec3d;
 
-public class TileFrame extends TileWithDisplay {
+public class TileFrameTile extends WFTile {
     public Vec2f min = new Vec2f(0, 0);
     public Vec2f max = new Vec2f(1, 1);
 
@@ -44,25 +38,8 @@ public class TileFrame extends TileWithDisplay {
 
     public int renderDistance = 128;
 
-    public TileFrame(BlockPos pos, BlockState state) {
+    public TileFrameTile(BlockPos pos, BlockState state) {
         super(FramesRegistry.TILE_FRAME.get(), pos, state);
-    }
-
-
-
-    public IDisplay requestDisplay() {
-        String url = getURL();
-        if (texture == null || !texture.url.equals(url)) {
-            texture = TextureData.get(url);
-            if (display != null)
-                display.release();
-            display = null;
-        }
-        if (!texture.isVideo() && (!texture.ready() || texture.getError() != null))
-            return null;
-        if (display != null)
-            return display;
-        return display = texture.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop, false);
     }
 
     public AlignedBox getBox() {
@@ -175,7 +152,7 @@ public class TileFrame extends TileWithDisplay {
     }
 
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
-        if (blockEntity instanceof TileFrame be) {
+        if (blockEntity instanceof TileFrameTile be) {
             if (state.getValue(Frame.VISIBLE) != be.visibleFrame) {
                 var brandNewState = state.setValue(Frame.VISIBLE, be.visibleFrame);
                 level.setBlock(pos, brandNewState, 0);
