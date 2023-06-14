@@ -86,7 +86,7 @@ public class WFConfig {
     }
 
     public static boolean canUse(Player player, String url) {
-        var level = player.level;
+        var level = player.level();
         var server = level.getServer();
         if (level.isClientSide()) return true;
         if (server.isSingleplayer() || player.hasPermissions(server.getOperatorUserPermissionLevel())) return true;

@@ -93,7 +93,7 @@ public class FrameScreen extends GuiLayer {
     }
     
     public FrameScreen(TileFrame frame, int scaleSize) {
-        super("waterframe", 245, 235);
+        super("waterframe", 245, 220);
         this.frame = frame;
         this.scaleMultiplier = 1F / (scaleSize);
     }
@@ -202,7 +202,7 @@ public class FrameScreen extends GuiLayer {
 
             if (frame.display != null)
                 sizeYField.setValue(frame.display.getHeight() / (frame.display.getWidth() / x));
-        }).setTitle(Component.literal("x->y")).setExpandableY());
+        }).setTitle(Component.literal("x->y")));
 
         // RIGHT
         size.add(counterDecimal = new GuiCounterDecimal("sizeY", frame.getSizeY(), 0, Float.MAX_VALUE) {
@@ -231,7 +231,7 @@ public class FrameScreen extends GuiLayer {
 
             if (frame.display != null)
                 sizeXField.setValue(frame.display.getWidth() / (frame.display.getHeight() / y));
-        }).setTitle(Component.literal("y->x")).setExpandableY());
+        }).setTitle(Component.literal("y->x")));
 
 
         GuiTable flip_grid = new GuiTable();
@@ -262,22 +262,22 @@ public class FrameScreen extends GuiLayer {
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
         left.add(new GuiLabel("t_label").setTitle(Component.translatable("gui.waterframes.rotation").append(":")));
-        right.add(new GuiSlider("rotation", 130, 10, frame.rotation, 0, 360));
+        right.add(new GuiSlider("rotation", frame.rotation, 0, 360).setExpandableX());
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
         left.add(new GuiLabel("t_label").setTitle(Component.translatable("gui.waterframes.transparency").append(":")));
-        right.add(new GuiSlider("transparency", 130, 10, frame.alpha, 0, 1));
+        right.add(new GuiSlider("transparency", frame.alpha, 0, 1).setExpandableX());
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
         left.add(new GuiLabel("b_label").setTitle(Component.translatable("gui.waterframes.brightness").append(":")));
-        right.add(new GuiSlider("brightness", 130, 10, frame.brightness, 0, 1));
+        right.add(new GuiSlider("brightness", frame.brightness, 0, 1).setExpandableX());
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
         left.add(new GuiLabel("d_label").setTitle(Component.translatable("gui.waterframes.distance").append(":")));
-        right.add(new GuiSteppedSlider("distance", 130, 10, frame.renderDistance, 5, 1024));
+        right.add(new GuiSteppedSlider("distance", frame.renderDistance, 5, 1024).setExpandableX());
         right.align = Align.RIGHT;
 
 
@@ -295,14 +295,14 @@ public class FrameScreen extends GuiLayer {
 
         volume.addRow(new GuiRow(volume_left = new GuiColumn(GuiFlow.STACK_X), volume_right = new GuiColumn(GuiFlow.STACK_X)));
         volume_left.add(new GuiLabel("v_label").setTitle(Component.translatable("gui.waterframes.volume").append(":")));
-        volume_right.add(new GuiSlider("volume", 130, 10, frame.volume, 0, 1));
+        volume_right.add(new GuiSlider("volume", frame.volume, 0, 1).setExpandableX());
         volume_right.align = Align.RIGHT;
 
         GuiParent range = new GuiParent(GuiFlow.STACK_X);
         add(range);
         range.add(new GuiLabel("range_label").setTitle(Component.translatable("gui.waterframes.range").append(" (min/max):")));
-        range.add(new GuiSteppedSlider("range_min", 63, 10, (int) frame.minDistance, 0, 512).setExpandableX());
-        range.add(new GuiSteppedSlider("range_max", 63, 10, (int) frame.maxDistance, 0, 512).setExpandableX());
+        range.add(new GuiSteppedSlider("range_min", (int) frame.minDistance, 0, 512).setExpandableX());
+        range.add(new GuiSteppedSlider("range_max", (int) frame.maxDistance, 0, 512).setExpandableX());
 
         GuiTable playgrid = new GuiTable();
         add(playgrid);

@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -48,7 +47,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
     }
 
     public Frame() {
-        super(Properties.of(Material.WOOD).strength(0.25f, 2.5f).sound(SoundType.WOOD).noOcclusion());
+        super(Properties.copy(Blocks.OAK_WOOD).strength(0.25f, 2.5f).sound(SoundType.WOOD).noOcclusion());
     }
 
     @Override

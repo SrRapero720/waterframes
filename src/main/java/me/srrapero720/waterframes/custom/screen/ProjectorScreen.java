@@ -6,6 +6,7 @@ import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.display.texture.TextureSeeker;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
@@ -242,22 +243,22 @@ public class ProjectorScreen extends GuiLayer {
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
         left.add(new GuiLabel("t_label").setTitle(Component.translatable("gui.waterframes.rotation").append(":")));
-        right.add(new GuiSlider("rotation", 130, 10, frame.rotation, 0, 360));
+        right.add(new GuiSlider("rotation", frame.rotation, 0, 360));
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
         left.add(new GuiLabel("t_label").setTitle(Component.translatable("gui.waterframes.transparency").append(":")));
-        right.add(new GuiSlider("transparency", 130, 10, frame.alpha, 0, 1));
+        right.add(new GuiSlider("transparency", frame.alpha, 0, 1));
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
         left.add(new GuiLabel("b_label").setTitle(Component.translatable("gui.waterframes.brightness").append(":")));
-        right.add(new GuiSlider("brightness", 130, 10, frame.brightness, 0, 1));
+        right.add(new GuiSlider("brightness", frame.brightness, 0, 1));
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
         left.add(new GuiLabel("d_label").setTitle(Component.translatable("gui.waterframes.distance").append(":")));
-        right.add(new GuiSteppedSlider("distance", 130, 10, frame.renderDistance, 5, 1024));
+        right.add(new GuiSteppedSlider("distance", frame.renderDistance, 5, 1024));
         right.align = Align.RIGHT;
 
 
@@ -274,14 +275,14 @@ public class ProjectorScreen extends GuiLayer {
 
         volume.addRow(new GuiRow(volume_left = new GuiColumn(GuiFlow.STACK_X), volume_right = new GuiColumn(GuiFlow.STACK_X)));
         volume_left.add(new GuiLabel("v_label").setTitle(Component.translatable("gui.waterframes.volume").append(":")));
-        volume_right.add(new GuiSlider("volume", 130, 10, frame.volume, 0, 1));
+        volume_right.add(new GuiSlider("volume", frame.volume, 0, 1));
         volume_right.align = Align.RIGHT;
 
         GuiParent range = new GuiParent(GuiFlow.STACK_X);
         add(range);
         range.add(new GuiLabel("range_label").setTitle(Component.translatable("gui.waterframes.range").append(" (min/max):")));
-        range.add(new GuiSteppedSlider("range_min", 63, 10, (int) frame.minDistance, 0, 512).setExpandableX());
-        range.add(new GuiSteppedSlider("range_max", 63, 10, (int) frame.maxDistance, 0, 512).setExpandableX());
+        range.add(new GuiSteppedSlider("range_min", (int) frame.minDistance, 0, 512).setExpandableX());
+        range.add(new GuiSteppedSlider("range_max", (int) frame.maxDistance, 0, 512).setExpandableX());
 
         GuiTable playgrid = new GuiTable();
         add(playgrid);
@@ -308,17 +309,17 @@ public class ProjectorScreen extends GuiLayer {
 
         GuiParent footer = new GuiParent(GuiFlow.STACK_X);
         add(footer);
-        footer.add(new GuiSlider("seek", 150, 12, frame.tick, 0, frame.display != null ? frame.display.maxTick() : 1) {
+        footer.add(new GuiSlider("seek", frame.tick, 0, frame.display != null ? frame.display.maxTick() : 1) {
 
-            protected void renderContent(PoseStack pose, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
+            protected void renderContent(GuiGraphics graphics, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
                 double percent = this.getPercentage();
                 int posX = (int) (control.getContentWidth() * percent);
                 GuiStyle style = this.getStyle();
-                style.get(ControlFormatting.ControlStyleFace.CLICKABLE, false).render(pose, 0, 0.0, posX, rect.getHeight());
+                style.get(ControlFormatting.ControlStyleFace.CLICKABLE, false).render(graphics.pose(), 0, 0.0, posX, rect.getHeight());
                 if (this.textfield != null) {
-                    this.textfield.render(pose, control, rect, rect, mouseX, mouseY);
+                    this.textfield.render(graphics, control, rect, rect, 1.0f, mouseX, mouseY);
                 } else {
-                    GuiRenderHelper.drawStringCentered(pose, this.getTextByValue(), (float)rect.getWidth(), (float)rect.getHeight(), -1, true);
+                    GuiRenderHelper.drawStringCentered(graphics.pose(), this.getTextByValue(), (float)rect.getWidth(), (float)rect.getHeight(), -1, true);
                 }
 
             }

@@ -9,8 +9,10 @@ import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
 import me.srrapero720.waterframes.watercore_supplier.ForgeSmartTab;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -26,7 +28,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public class WFRegistry {
-    public static final ForgeSmartTab TAB = new ForgeSmartTab("waterframes", new ResourceLocation(WaterFrames.ID, "frame"));
+    public static final ForgeSmartTab TAB = new ForgeSmartTab(Component.translatable("itemGroup.waterframes"), new ResourceLocation(WaterFrames.ID, "frame"));
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, WaterFrames.ID);
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, WaterFrames.ID);
     public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, WaterFrames.ID);
@@ -38,7 +40,7 @@ public class WFRegistry {
 //    public static RegistryObject<BlockEntityType<TileProjector>> TILE_PROJECTOR = TILES.register("projector", () -> BlockEntityType.Builder.of(TileProjector::new, PROJECTOR.get()).build(null));
 
     public static void register() {
-        ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB)));
+        ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties()));
 //        ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB)));
 
         BLOCKS.register(WaterFrames.bus());
@@ -52,6 +54,7 @@ public class WFRegistry {
 
     public static void common(final FMLCommonSetupEvent event) {
         WaterFrames.NETWORK.registerType(FramesPacket.class, FramesPacket::new);
+
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -2,8 +2,12 @@ package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.display.MediaDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
+import me.srrapero720.waterframes.watercore_supplier.ForgeSmartTab;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -16,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import team.creative.creativecore.common.network.CreativeNetwork;
+import team.creative.creativecore.mixin.BufferBuilderAccessor;
 
 @Mod(WaterFrames.ID)
 public class WaterFrames {
@@ -46,6 +51,14 @@ public class WaterFrames {
         public static void onUnloadingLevel(LevelEvent.Unload unload) {
             if (unload.getLevel() != null && unload.getLevel().isClientSide()) {
                 TextureCache.unload();
+            }
+        }
+
+        @SubscribeEvent
+        public void buildContents(BuildCreativeModeTabContentsEvent event) {
+            if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+                event.accept(WFRegistry.FRAME);
+//                event.accept(BLOCK); // Takes in an ItemLike, assumes block has registered item
             }
         }
     }

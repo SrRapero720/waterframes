@@ -1,21 +1,9 @@
-buildscript {
-    repositories {
-        jcenter()
-        mavenCentral()
-        maven { url = 'https://repo.spongepowered.org/maven' }
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://maven.parchmentmc.org' }
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath "org.spongepowered:mixingradle:0.7-SNAPSHOT"
-        classpath 'org.parchmentmc:librarian:1.+'
-    }
+plugins {
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
-
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.spongepowered.mixin'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -32,11 +20,12 @@ minecraft.runs.all {
 }
 
 minecraft {
-    mappings channel: 'parchment', version: "${project.parchementV}-${project.mcV}"
+//    mappings channel: 'parchment', version: "${project.parchementV}-${project.mcV}"
+    mappings channel: 'official', version: "1.20.1"
 
     runs {
         client {
-            taskName "WF_1.19.2_Client"
+            taskName "WF_1.20_Client"
             workingDirectory project.file('run')
 			
 			property 'forge.logging.console.level', 'debug'
@@ -45,7 +34,7 @@ minecraft {
         }
 
         server {
-            taskName "WF_1.19.2_Server"
+            taskName "WF_1.20_Server"
             workingDirectory project.file('run')
 
             property 'forge.logging.console.level', 'debug'
@@ -58,6 +47,10 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    maven {
+        name = 'MinecraftForge'
+        url = 'https://maven.minecraftforge.net/'
+    }
     maven { url "https://maven.tterrag.com/" }
     maven {
         url 'https://www.cursemaven.com'
@@ -72,26 +65,43 @@ dependencies {
     minecraft "net.minecraftforge:forge:${project.mcV}-${project.fgV}"
 
     //DEPENDENCIES
-    implementation fg.deobf("curse.maven:creativecore-257814:4584615")
+    implementation fg.deobf("curse.maven:creativecore-257814:4577553")
     implementation fg.deobf("curse.maven:watermedia-869524:4583242")
 
     // UTIL
-    implementation fg.deobf("curse.maven:ferritecore-429235:4117906")
-    implementation fg.deobf("curse.maven:fastload-630620:4271606")
-    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:4327266")
-    implementation fg.deobf("curse.maven:spark-361579:4505309")
+//    implementation fg.deobf("curse.maven:ferritecore-429235:4574361")
+//    implementation fg.deobf("curse.maven:fastload-630620:4271606")
+//    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:4327266")
+//    implementation fg.deobf("curse.maven:spark-361579:4505309")
 
     // MOD SUPPORT
-    implementation fg.deobf("curse.maven:rubidium-574856:4568727")
-    implementation fg.deobf("com.simibubi.create:create-${mcV}:${createV}:slim") { transitive = false }
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mcV}:${flywheelV}")
-    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateV}")
+//    implementation fg.deobf("curse.maven:rubidium-574856:4568727")
+//    implementation fg.deobf("com.simibubi.create:create-${mcV}:${createV}:slim") { transitive = false }
+//    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mcV}:${flywheelV}")
+//    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateV}")
 
     // MIXINS
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 }
 
-mixin { add sourceSets.main, "waterframes.mixin-refmap.json" }
+//mixin { add sourceSets.main, "waterframes.mixin-refmap.json" }
+
+//def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
+//def replaceProperties = [
+//        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
+//        forge_version: forge_version, forge_version_range: forge_version_range,
+//        loader_version_range: loader_version_range,
+//        mod_id: mod_id, mod_name: name, mod_license: mod_license, mod_version: version,
+//        mod_authors: mod_authors, mod_description: mod_description
+//]
+//processResources {
+//    inputs.properties replaceProperties
+//    replaceProperties.put 'project', project
+//
+//    filesMatching(resourceTargets) {
+//        expand replaceProperties
+//    }
+//}
 
 jar {
     manifest {
