@@ -35,9 +35,6 @@ public class WFConfig {
     private static final ForgeConfigSpec.BooleanValue DISABLE_WHITELIST;
     private static final ForgeConfigSpec.ConfigValue<List<String>> WHITELIST;
 
-    // PROJECTOR
-    public static final ForgeConfigSpec.IntValue MAX_PROJECTION_DISTANCE;
-
     static {
         /* waterframes -> */
         BUILDER.push("waterframes");
@@ -61,22 +58,6 @@ public class WFConfig {
         DISABLE_WHITELIST = BUILDER.define("disableWhitelist", false);
         WHITELIST = BUILDER.define("whitelist", WFUtil.getJsonArrayStringResource("whitelist_url.json"));
 
-
-        /* waterframes -> frames */
-        BUILDER.comment("Soon").push("frames");
-
-        // waterframes ->
-        BUILDER.pop();
-
-        // waterframes -> projector
-        BUILDER.push("projector");
-        MAX_PROJECTION_DISTANCE = BUILDER.comment("Block distance of projection and projector")
-                .defineInRange("maxProjectionDistance", 10, 3, 100);
-
-
-        // waterframes ->
-        BUILDER.pop();
-
         // ->
         BUILDER.pop();
 
@@ -95,17 +76,20 @@ public class WFConfig {
 
     public static boolean domainAllowed(@NotNull String domain) {
         if (DISABLE_WHITELIST.get()) return true;
+
         for (final var url: WHITELIST.get()) {
             var uri = url.trim().toLowerCase(Locale.ROOT);
             if (domain.endsWith("." + uri) || domain.equals(uri)) return true;
         }
         return false;
+
     }
 
     public static boolean canUse(Player player, String url) {
         var level = player.level;
         var server = level.getServer();
-        if (!level.isClientSide && (server.isSingleplayer() || player.hasPermissions(server.getOperatorUserPermissionLevel()))) return true;
+        if (level.isClientSide()) return true;
+        if (server.isSingleplayer() || player.hasPermissions(server.getOperatorUserPermissionLevel())) return true;
 
         if (!DISABLE_WHITELIST.get()) return ThreadUtil.tryAndReturn((defaultVar) ->
                 domainAllowed(new URI(url.toLowerCase(Locale.ROOT)).getHost()), false);
@@ -118,11 +102,13 @@ public class WFConfig {
     }
 
     public static boolean canInteract(Player player, Level level) {
-        if (DISABLE_SURVIVAL.get() && !getGameType(player).equals(GameType.CREATIVE)) return false;
-        if (DISABLE_ADVENTURE.get() && getGameType(player).equals(GameType.ADVENTURE)) return false;
+        var server = player.getServer();
+        boolean isOperator = level.isClientSide() || (server != null && player.hasPermissions( server.getOperatorUserPermissionLevel()));
 
-        boolean isOperator = Objects.requireNonNull(level.getServer()).isSingleplayer() || player.hasPermissions(level.getServer().getOperatorUserPermissionLevel());
+        if (DISABLE_SURVIVAL.get() && !getGameType(player).equals(GameType.CREATIVE) && !isOperator) return false;
+        if (DISABLE_ADVENTURE.get() && getGameType(player).equals(GameType.ADVENTURE) && !isOperator) return false;
         if (DISABLE_PLAYERS.get()) return isOperator;
-        else return isOperator || (player.getAbilities().mayBuild);
+
+        else return player.getAbilities().mayBuild;
     }
 }

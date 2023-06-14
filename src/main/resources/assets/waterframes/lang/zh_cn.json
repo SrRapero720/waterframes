@@ -31,6 +31,7 @@
     "gui.waterframes.builder.thickness": "厚度:",
     "gui.waterframes.builder.craft": "技巧",
     "gui.waterframes.builder.failed": "丢失的配方",
+    "gui.waterframes.info.now_supports": "现在支持",
     "download.exception.forbidden": "禁用",
     "download.exception.notfound": "没有找到",
     "download.exception.invalid": "无法下载图像",

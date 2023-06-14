@@ -73,7 +73,7 @@ dependencies {
 
     //DEPENDENCIES
     implementation fg.deobf("curse.maven:creativecore-257814:4394989")
-    implementation fg.deobf("curse.maven:watermedia-869524:4566440")
+    implementation fg.deobf("curse.maven:watermedia-869524:4583242")
 
     // UTIL
     implementation fg.deobf("curse.maven:ferritecore-429235:4074294")

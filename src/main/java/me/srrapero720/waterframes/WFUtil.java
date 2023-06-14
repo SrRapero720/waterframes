@@ -1,6 +1,5 @@
 package me.srrapero720.waterframes;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.mojang.logging.LogUtils;

@@ -32,14 +32,14 @@ public class WFRegistry {
     public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, WaterFrames.ID);
 
     public static RegistryObject<Frame> FRAME = BLOCKS.register("frame", Frame::new);
-    public static RegistryObject<Projector> PROJECTOR = BLOCKS.register("projector", Projector::new);
+//    public static RegistryObject<Projector> PROJECTOR = BLOCKS.register("projector", Projector::new);
 
     public static RegistryObject<BlockEntityType<TileFrame>> TILE_FRAME = TILES.register("frame", () -> BlockEntityType.Builder.of(TileFrame::new, FRAME.get()).build(null));
-    public static RegistryObject<BlockEntityType<TileProjector>> TILE_PROJECTOR = TILES.register("projector", () -> BlockEntityType.Builder.of(TileProjector::new, PROJECTOR.get()).build(null));
+//    public static RegistryObject<BlockEntityType<TileProjector>> TILE_PROJECTOR = TILES.register("projector", () -> BlockEntityType.Builder.of(TileProjector::new, PROJECTOR.get()).build(null));
 
     public static void register() {
         ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB)));
-        ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB)));
+//        ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB)));
 
         BLOCKS.register(WaterFrames.bus());
         ITEMS.register(WaterFrames.bus());
@@ -47,7 +47,7 @@ public class WFRegistry {
 
         WaterFrames.bus().addListener(WFRegistry::common);
         if (FMLEnvironment.dist.isClient()) WaterFrames.bus().addListener(WFRegistry::client);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, WFConfig.SPEC, "waterframes-server.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, WFConfig.SPEC, "waterframes.toml");
     }
 
     public static void common(final FMLCommonSetupEvent event) {
@@ -57,6 +57,6 @@ public class WFRegistry {
     @OnlyIn(Dist.CLIENT)
     public static void client(final FMLClientSetupEvent event) {
         BlockEntityRenderers.register(WFRegistry.TILE_FRAME.get(), (x) -> new FramesRenderer());
-        BlockEntityRenderers.register(WFRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRenderer());
+//        BlockEntityRenderers.register(WFRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRenderer());
     }
 }

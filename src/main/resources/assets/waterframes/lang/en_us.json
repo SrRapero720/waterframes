@@ -31,6 +31,7 @@
     "gui.waterframes.builder.thickness": "thickness:",
     "gui.waterframes.builder.craft": "craft",
     "gui.waterframes.builder.failed": "missing recipe",
+    "gui.waterframes.info.now_supports": "Now supports",
     "download.exception.forbidden": "Forbidden",
     "download.exception.notfound": "Not found",
     "download.exception.invalid": "Could not download image",

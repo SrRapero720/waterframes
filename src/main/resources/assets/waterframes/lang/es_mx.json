@@ -29,6 +29,7 @@
     "gui.waterframes.builder.thickness": "grosor:",
     "gui.waterframes.builder.craft": "crear",
     "gui.waterframes.builder.failed": "receta faltante",
+    "gui.waterframes.info.now_supports": "Urls soportadas",
     "gui.waterframes.fitmode.CROP": "crop",
     "gui.waterframes.fitmode.STRETCH": "stretch",
     "download.exception.forbidden": "Forbidden",

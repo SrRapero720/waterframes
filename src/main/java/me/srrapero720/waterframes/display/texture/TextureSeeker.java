@@ -2,7 +2,7 @@ package me.srrapero720.waterframes.display.texture;
 
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.watercore_supplier.GifDecoder;
+import me.srrapero720.watermedia.api.util.GifDecoder;
 import net.minecraft.client.Minecraft;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -132,6 +132,7 @@ public class TextureSeeker extends Thread {
             }
             InputStream in = null;
             try {
+                if (responseCode == 400 || responseCode == 403) throw new FoundVideoException();
                 in = connection.getInputStream();
                 if (responseCode != HttpURLConnection.HTTP_NOT_MODIFIED) {
                     String type = connection.getContentType();

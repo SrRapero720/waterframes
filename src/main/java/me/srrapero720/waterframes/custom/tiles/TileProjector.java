@@ -70,7 +70,8 @@ public class TileProjector extends BlockEntity {
     public IDisplay display;
 
     public TileProjector(BlockPos pos, BlockState state) {
-        super(WFRegistry.TILE_PROJECTOR.get(), pos, state);
+//        super(WFRegistry.TILE_PROJECTOR.get(), pos, state);
+        super(null, pos, state);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -80,8 +81,6 @@ public class TileProjector extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
     public String getURL() {
-        if (WCoreUtil.isGoogleDrive(url)) return WCoreUtil.googleDriveDownload(url);
-
         return parseUrl(url);
     }
 
