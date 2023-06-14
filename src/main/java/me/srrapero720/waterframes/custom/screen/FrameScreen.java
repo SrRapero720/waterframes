@@ -325,7 +325,7 @@ public class FrameScreen extends GuiLayer {
                 else if (frame.cache != null) frame.cache.reload();
             }
         }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));
-        GuiLabel textfield = new GuiLabel("dummy").setTitle(Component.translatable("gui.waterframes.info.now_supports").withStyle(ChatFormatting.GOLD).append(": ").append("Youtube, Twitter (videos), Twitch, Kick.com, SoundCloud, Google drive, Vimeo").append(" - ").append(new TextComponent(WaterFrames.VERSION).withStyle(ChatFormatting.RED)));
+        GuiLabel textfield = new GuiLabel("dummy").setTitle(Component.translatable("gui.waterframes.info.now_supports").withStyle(ChatFormatting.GOLD).append(": ").append("Youtube, Twitter (videos), Twitch, Kick.com, SoundCloud, Google drive, Vimeo").append(" - ").append(Component.translatable(WaterFrames.VERSION).withStyle(ChatFormatting.RED)));
         this.add(textfield);
     }
 

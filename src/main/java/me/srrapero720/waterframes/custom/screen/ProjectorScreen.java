@@ -3,15 +3,13 @@ package me.srrapero720.waterframes.custom.screen;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
-import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.display.texture.TextureSeeker;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import team.creative.creativecore.client.render.GuiRenderHelper;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.GuiChildControl;
@@ -198,7 +196,7 @@ public class ProjectorScreen extends GuiLayer {
 
             if (frame.display != null)
                 sizeYField.setValue(frame.display.getHeight() / (frame.display.getWidth() / x));
-        }).setTitle(new TextComponent("x->y")).setExpandableY());
+        }).setTitle(Component.literal("x->y")).setExpandableY());
 
         // RIGHT
         size.add(counterDecimal = new GuiCounterDecimal("sizeY", frame.getSizeY(), 0, Float.MAX_VALUE) {
@@ -227,7 +225,7 @@ public class ProjectorScreen extends GuiLayer {
 
             if (frame.display != null)
                 sizeXField.setValue(frame.display.getWidth() / (frame.display.getHeight() / y));
-        }).setTitle(new TextComponent("y->x")).setExpandableY());
+        }).setTitle(Component.literal("y->x")).setExpandableY());
 
         GuiParent flips = new GuiParent(GuiFlow.STACK_X);
         flips.spacing = 4;
@@ -243,22 +241,22 @@ public class ProjectorScreen extends GuiLayer {
         GuiColumn right;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
-        left.add(new GuiLabel("t_label").setTitle(new TranslatableComponent("gui.waterframes.rotation").append(":")));
+        left.add(new GuiLabel("t_label").setTitle(Component.translatable("gui.waterframes.rotation").append(":")));
         right.add(new GuiSlider("rotation", 130, 10, frame.rotation, 0, 360));
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
-        left.add(new GuiLabel("t_label").setTitle(new TranslatableComponent("gui.waterframes.transparency").append(":")));
+        left.add(new GuiLabel("t_label").setTitle(Component.translatable("gui.waterframes.transparency").append(":")));
         right.add(new GuiSlider("transparency", 130, 10, frame.alpha, 0, 1));
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
-        left.add(new GuiLabel("b_label").setTitle(new TranslatableComponent("gui.waterframes.brightness").append(":")));
+        left.add(new GuiLabel("b_label").setTitle(Component.translatable("gui.waterframes.brightness").append(":")));
         right.add(new GuiSlider("brightness", 130, 10, frame.brightness, 0, 1));
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
-        left.add(new GuiLabel("d_label").setTitle(new TranslatableComponent("gui.waterframes.distance").append(":")));
+        left.add(new GuiLabel("d_label").setTitle(Component.translatable("gui.waterframes.distance").append(":")));
         right.add(new GuiSteppedSlider("distance", 130, 10, frame.renderDistance, 5, 1024));
         right.align = Align.RIGHT;
 
@@ -275,13 +273,13 @@ public class ProjectorScreen extends GuiLayer {
         GuiColumn volume_right;
 
         volume.addRow(new GuiRow(volume_left = new GuiColumn(GuiFlow.STACK_X), volume_right = new GuiColumn(GuiFlow.STACK_X)));
-        volume_left.add(new GuiLabel("v_label").setTitle(new TranslatableComponent("gui.waterframes.volume").append(":")));
+        volume_left.add(new GuiLabel("v_label").setTitle(Component.translatable("gui.waterframes.volume").append(":")));
         volume_right.add(new GuiSlider("volume", 130, 10, frame.volume, 0, 1));
         volume_right.align = Align.RIGHT;
 
         GuiParent range = new GuiParent(GuiFlow.STACK_X);
         add(range);
-        range.add(new GuiLabel("range_label").setTitle(new TranslatableComponent("gui.waterframes.range").append(" (min/max):")));
+        range.add(new GuiLabel("range_label").setTitle(Component.translatable("gui.waterframes.range").append(" (min/max):")));
         range.add(new GuiSteppedSlider("range_min", 63, 10, (int) frame.minDistance, 0, 512).setExpandableX());
         range.add(new GuiSteppedSlider("range_max", 63, 10, (int) frame.maxDistance, 0, 512).setExpandableX());
 

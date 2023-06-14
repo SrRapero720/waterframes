@@ -25,8 +25,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.creative.creativecore.common.gui.GuiLayer;
-import team.creative.creativecore.common.gui.handler.BlockGuiCreator;
-import team.creative.creativecore.common.gui.handler.GuiCreator;
+import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
+import team.creative.creativecore.common.gui.creator.GuiCreator;
 
 public class Projector extends BaseEntityBlock implements BlockGuiCreator {
     private static final DirectionProperty FACING = BlockStateProperties.FACING;

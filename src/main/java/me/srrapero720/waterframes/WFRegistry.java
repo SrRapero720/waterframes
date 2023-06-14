@@ -29,7 +29,7 @@ public class WFRegistry {
     public static final ForgeSmartTab TAB = new ForgeSmartTab("waterframes", new ResourceLocation(WaterFrames.ID, "frame"));
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, WaterFrames.ID);
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, WaterFrames.ID);
-    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, WaterFrames.ID);
+    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, WaterFrames.ID);
 
     public static RegistryObject<Frame> FRAME = BLOCKS.register("frame", Frame::new);
 //    public static RegistryObject<Projector> PROJECTOR = BLOCKS.register("projector", Projector::new);

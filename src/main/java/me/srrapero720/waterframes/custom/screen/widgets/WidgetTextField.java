@@ -46,6 +46,6 @@ public class WidgetTextField extends GuiTextfield {
     }
 
     protected boolean canUse(boolean ignoreToggle) {
-        return WFConfig.canUse(getPlayer(), getText(), ignoreToggle);
+        return WFConfig.canUse(getPlayer(), getText());
     }
 }
