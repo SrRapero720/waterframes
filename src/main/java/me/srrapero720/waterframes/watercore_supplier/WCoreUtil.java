@@ -17,13 +17,6 @@ import java.io.File;
 import java.net.URL;
 
 public class WCoreUtil {
-    public static final String OBJECT = "java/lang/Object";
-    public static final String GD_URL = "https://drive.google.com/uc?id=%FILE_ID%&export=download";
-    public static final File GAME_DIR = new File("");
-
-    public static int toTicks(final double sec) { return (int) (sec * 20); }
-
-
     // IS LOADED SOMETHING
     public static boolean isModFMLoading(String id) { return FMLLoader.getLoadingModList().getModFileById(id) != null; }
     public static boolean isModLoaded(String id) { return ModList.get().isLoaded(id); }
@@ -98,19 +91,5 @@ public class WCoreUtil {
         String twoPlaces = sbFloat.substring(start, end);
         sbFloat.replace(start, sbFloat.length(), twoPlaces);
         return Float.parseFloat(sbFloat.toString());
-    }
-
-    @Contract(pure = true)
-    public static boolean isGoogleDrive(@NotNull String url) {
-        return url.contains("drive.google.com/file/d/");
-    }
-
-    // GOOGLE DRIVE DIRECT DOWNLOAD GENERATOR
-    public static String googleDriveDownload(@NotNull String url) {
-        return ThreadUtil.tryAndReturn((defaultVar) -> {
-            var url1 = new URL(url);
-            var paths = url1.getPath().split("/");
-            return GD_URL.replace("%FILE_ID%", paths[3]);
-        }, url);
     }
 }

@@ -1,15 +1,19 @@
 package me.srrapero720.waterframes.custom.screen;
 
 import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.custom.tiles.TileFrame;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
+import me.srrapero720.waterframes.custom.screen.widgets.constants.Constants;
+import me.srrapero720.waterframes.custom.tiles.TileFrame;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.display.texture.TextureSeeker;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.GuiParent;
@@ -19,6 +23,8 @@ import team.creative.creativecore.common.gui.controls.parent.GuiTable;
 import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.style.GuiIcon;
+import team.creative.creativecore.common.gui.style.GuiStyle;
+import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 import team.creative.creativecore.common.gui.sync.GuiSyncLocal;
 import team.creative.creativecore.common.util.mc.ColorUtils;
 import team.creative.creativecore.common.util.text.TextBuilder;
@@ -89,11 +95,16 @@ public class FrameScreen extends GuiLayer {
     }
     
     public FrameScreen(TileFrame frame, int scaleSize) {
-        super("waterframe", 250, 210);
+        super("waterframe", 245, 235);
         this.frame = frame;
         this.scaleMultiplier = 1F / (scaleSize);
     }
-    
+
+    @Override
+    public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
+        return Constants.BACKGROUND_COLOR;
+    }
+
     @Override
     public void create() {
         GuiButton save = new GuiButton("save", x -> {
@@ -316,7 +327,8 @@ public class FrameScreen extends GuiLayer {
                 else if (frame.cache != null) frame.cache.reload();
             }
         }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));
-        
+        GuiLabel textfield = new GuiLabel("dummy").setTitle(new TranslatableComponent("gui.waterframes.info.now_supports").withStyle(ChatFormatting.GOLD).append(": ").append("Youtube, Twitter (videos), Twitch, Kick.com, SoundCloud, Google drive, Vimeo").append(" - ").append(new TextComponent(WaterFrames.VERSION).withStyle(ChatFormatting.RED)));
+        this.add(textfield);
     }
 
 }
