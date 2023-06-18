@@ -18,7 +18,9 @@ public class WidgetTextField extends GuiTextfield {
     private final GuiButton saveButton;
 
     public WidgetTextField(GuiButton saveButton, String name, String text) {
-        super(name, text);
+        super(name);
+        setMaxStringLength(2048);
+        setText(text);
         this.saveButton = saveButton;
     }
 

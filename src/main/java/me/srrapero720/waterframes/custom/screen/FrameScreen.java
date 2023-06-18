@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.custom.screen;
 
+import com.mojang.serialization.codecs.KeyDispatchCodec;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
@@ -163,7 +164,6 @@ public class FrameScreen extends GuiLayer {
         flow = GuiFlow.STACK_Y;
 
         url = new WidgetTextField(save, "url", frame.getRealURL());
-        url.setMaxStringLength(2048);
         add(url);
         GuiLabel error = new GuiLabel("error").setDefaultColor(ColorUtils.RED);
         if (frame.isClient() && frame.cache != null && frame.cache.getError() != null)
@@ -331,4 +331,19 @@ public class FrameScreen extends GuiLayer {
         this.add(textfield);
     }
 
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == 256) {
+            if (this.closeLayerUsingEscape()) {
+                this.closeTopLayer();
+            }
+            return true;
+        } else if (keyCode == this.getSettings().keyInventory.getKey().getValue()) {
+            return true;
+        } else if (super.keyPressed(keyCode, scanCode, modifiers)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
