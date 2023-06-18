@@ -28,7 +28,7 @@ minecraft {
     copyIdeResources = true
     runs {
         client {
-            taskName "WF_Client"
+            taskName "WFClient_${mcversion}"
             workingDirectory project.file('run')
 			
 			property 'forge.logging.console.level', 'debug'
@@ -43,7 +43,7 @@ minecraft {
         }
 
         server {
-            taskName "WF_Server"
+            taskName "WFServer_${mcversion}"
             workingDirectory project.file('run')
 
             property 'forge.logging.console.level', 'debug'
