@@ -92,7 +92,8 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     //DEPENDENCIES
-    implementation fg.deobf("curse.maven:watermedia-869524:${watermediaversion}")
+    implementation fg.deobf(files("libs/watermedia-1.2.2.jar"))
+//    implementation fg.deobf("curse.maven:watermedia-869524:${watermediaversion}")
     implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
 
     // UTIL
@@ -101,7 +102,8 @@ dependencies {
     implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:${lazyversion}")
     implementation fg.deobf("curse.maven:spark-361579:${sparkversion}")
     implementation fg.deobf("curse.maven:rubidium-574856:${rubidiumversion}")
-    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
+//    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
+
 
     // MOD SUPPORT
     implementation fg.deobf("com.simibubi.create:create-${mcversion}:${createversion}:slim") { transitive = false }
@@ -131,6 +133,7 @@ processResources {
 
 mixin { add sourceSets.main, "waterframes.mixin-refmap.json" }
 
+jar.archiveFileName = "${modid}-${mcversion}-${modversion}.jar"
 jar {
     manifest {
         attributes([

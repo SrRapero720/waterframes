@@ -3,13 +3,13 @@ package me.srrapero720.waterframes.display;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.lib720.caprica.vlcj4.player.embedded.videosurface.callback.BufferFormat;
-import me.lib720.caprica.vlcj4.player.embedded.videosurface.callback.UnAllocBufferFormatCallback;
+import me.lib720.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
+import me.lib720.caprica.vlcj.player.embedded.videosurface.callback.UnAllocBufferFormatCallback;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
-import me.srrapero720.watermedia.api.media.players.VideoLanPlayer;
-import me.srrapero720.watermedia.internal.util.WaterUtil;
+import me.srrapero720.watermedia.api.WaterMediaAPI;
+import me.srrapero720.watermedia.api.video.players.VideoLanPlayer;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
@@ -48,7 +48,7 @@ public class MediaDisplay implements IDisplay {
     public static IDisplay createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         return ThreadUtil.tryAndReturn((defaultVar) -> {
             var display = new MediaDisplay(pos, url, volume, minDistance, maxDistance, loop);
-            if (display.player.getRawPlayer() == null) throw new IllegalStateException("MediaDisplay uses a broken player");
+            if (display.player.getRawPlayerComponent() == null) throw new IllegalStateException("MediaDisplay uses a broken player");
             OPEN_DISPLAYS.add(display);
             return display;
 
@@ -78,7 +78,7 @@ public class MediaDisplay implements IDisplay {
         super();
         this.pos = pos;
         this.texture = GlStateManager._genTexture();
-        this.player = new VideoLanPlayer((mediaPlayer, nativeBuffers, bufferFormat) -> {
+        this.player = new VideoLanPlayer(null, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
             try {
                 buffer.put(nativeBuffers[0].asIntBuffer());
@@ -130,7 +130,7 @@ public class MediaDisplay implements IDisplay {
 
     @Override
     public int maxTick() {
-        if (player != null) return WaterUtil.msToGameTicks(player.getDuration());
+        if (player != null) return WaterMediaAPI.msToGameTicks(player.getDuration());
         return 0;
     }
 
@@ -140,6 +140,10 @@ public class MediaDisplay implements IDisplay {
         
         volume = getVolume(volume, minDistance, maxDistance);
         if (volume != lastSetVolume) {
+            // ENSURE PLAYER GET MUTED ON LONG DISTANCES
+            if (volume < 0.1) player.getRawPlayerComponent().mediaPlayer().audio().setMute(true);
+            if (volume >= 0.1) player.getRawPlayerComponent().mediaPlayer().audio().setMute(false);
+
             player.setVolume((int) volume);
             lastSetVolume = volume;
         }
@@ -200,13 +204,15 @@ public class MediaDisplay implements IDisplay {
     }
     
     public void free() {
-        if (player != null)
-            player.release();
+        ThreadUtil.thread(() -> {
+            if (player != null) player.release();
+            player = null;
+        });
         if (texture != -1) {
             GlStateManager._deleteTexture(texture);
             texture = -1;
         }
-        player = null;
+
     }
     
     @Override
