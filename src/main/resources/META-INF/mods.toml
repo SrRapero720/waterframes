@@ -1,43 +1,40 @@
 modLoader="javafml"
-loaderVersion="[43,)"
+loaderVersion="${loader_version_range}"
 issueTrackerURL="https://github.com/SrRapero720/waterframes/issues"
 logoFile="pack.png"
-license="All rights reserved"
+license="${mod_license}"
 
 [[mods]]
-	modId="waterframes"
-	version="${file.jarVersion}"
-	displayName="WATERFrAMES"
+	modId="${mod_id}"
+	version="${mod_version}"
+	displayName="${mod_name}"
 	displayURL="https://www.curseforge.com/minecraft/mc-mods/waterframes"
 	credits="Special thanks to CoolDCB and CreativeMD"
 	authors="SrRapero720"
-	description='''Show to all your friends your dank memes or rickroll
-	all the server using the official url from youtube.
-	How more you need to know? is a mod to show media
-	in your game has a paint, tv. #DisplayIt #ProjectIt #ShowIt
-'''
+	logoFile="pack.png"
+	description='''${mod_description}'''
 
 
-[[dependencies.waterframes]]
+[[dependencies.${mod_id}]]
 	modId = "forge"
 	mandatory = true
-	versionRange = "[43,)"
+	versionRange = "${loader_version_range}"
 	ordering = "NONE"
 	side = "BOTH"
 
-[[dependencies.waterframes]]
+[[dependencies.${mod_id}]]
 	modId="creativecore"
 	mandatory=true
 	ordering="NONE"
 	side="BOTH"
-	versionRange="[2.9,)"
+	versionRange="${creativecore_version_range}"
 
 [[dependencies.waterframes]]
 	modId="watermedia"
 	mandatory=true
 	ordering="NONE"
 	side="CLIENT"
-	versionRange="[1.1,)"
+	versionRange="${watermedia_version_range}"
 
 #[[dependencies.waterframes]]
 #    modId="watercore"

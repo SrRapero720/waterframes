@@ -3,14 +3,62 @@ plugins {
     id 'idea'
     id 'maven-publish'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-configurations {
-    library
-    implementation.extendsFrom library
+version = modversion
+group = modgroup
+base {
+    archivesName = modid
 }
+
+//apply plugin: 'net.minecraftforge.gradle'
+//apply plugin: 'org.spongepowered.mixin'
+
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
+
+println "Gradle Java: ${JavaVersion.current()}"
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+minecraft {
+    mappings channel: "${mappingsch}", version: "${mappings_version}-${mcversion}"
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    copyIdeResources = true
+    runs {
+        client {
+            taskName "WF_Client"
+            workingDirectory project.file('run')
+			
+			property 'forge.logging.console.level', 'debug'
+			arg '--mixin.config'
+			arg 'waterframes.mixin.json'
+
+            mods {
+                "${modid}" {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            taskName "WF_Server"
+            workingDirectory project.file('run')
+
+            property 'forge.logging.console.level', 'debug'
+            arg '--mixin.config'
+            arg 'waterframes.mixin.json'
+
+            mods {
+                "${modid}" {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
 
 minecraft.runs.all {
     // Tell forge to include your libraries in the classpath
@@ -19,38 +67,11 @@ minecraft.runs.all {
     }
 }
 
-minecraft {
-//    mappings channel: 'parchment', version: "${project.parchementV}-${project.mcV}"
-    mappings channel: 'official', version: "1.20.1"
-
-    runs {
-        client {
-            taskName "WF_1.20_Client"
-            workingDirectory project.file('run')
-			
-			property 'forge.logging.console.level', 'debug'
-			arg '--mixin.config'
-			arg 'waterframes.mixin.json'
-        }
-
-        server {
-            taskName "WF_1.20_Server"
-            workingDirectory project.file('run')
-
-            property 'forge.logging.console.level', 'debug'
-            arg '--mixin.config'
-            arg 'waterframes.mixin.json'
-        }
-    }
-}
-
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-    maven {
-        name = 'MinecraftForge'
-        url = 'https://maven.minecraftforge.net/'
-    }
+    jcenter()
+    mavenCentral()
     maven { url "https://maven.tterrag.com/" }
     maven {
         url 'https://www.cursemaven.com'
@@ -61,57 +82,64 @@ repositories {
     maven { url 'https://jitpack.io' }
 }
 
-dependencies {
-    minecraft "net.minecraftforge:forge:${project.mcV}-${project.fgV}"
-
-    //DEPENDENCIES
-    implementation fg.deobf("curse.maven:creativecore-257814:4577553")
-    implementation fg.deobf("curse.maven:watermedia-869524:4583242")
-
-    // UTIL
-//    implementation fg.deobf("curse.maven:ferritecore-429235:4574361")
-//    implementation fg.deobf("curse.maven:fastload-630620:4271606")
-//    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:4327266")
-//    implementation fg.deobf("curse.maven:spark-361579:4505309")
-
-    // MOD SUPPORT
-//    implementation fg.deobf("curse.maven:rubidium-574856:4568727")
-//    implementation fg.deobf("com.simibubi.create:create-${mcV}:${createV}:slim") { transitive = false }
-//    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mcV}:${flywheelV}")
-//    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateV}")
-
-    // MIXINS
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+configurations {
+    library
+    implementation.extendsFrom library
 }
 
-//mixin { add sourceSets.main, "waterframes.mixin-refmap.json" }
+dependencies {
+    minecraft "net.minecraftforge:forge:${project.mcversion}-${project.fgversion}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-//def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
-//def replaceProperties = [
-//        minecraft_version: minecraft_version, minecraft_version_range: minecraft_version_range,
-//        forge_version: forge_version, forge_version_range: forge_version_range,
-//        loader_version_range: loader_version_range,
-//        mod_id: mod_id, mod_name: name, mod_license: mod_license, mod_version: version,
-//        mod_authors: mod_authors, mod_description: mod_description
-//]
-//processResources {
-//    inputs.properties replaceProperties
-//    replaceProperties.put 'project', project
-//
-//    filesMatching(resourceTargets) {
-//        expand replaceProperties
-//    }
-//}
+    //DEPENDENCIES
+    implementation fg.deobf("curse.maven:watermedia-869524:${watermediaversion}")
+    implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
+
+    // UTIL
+    implementation fg.deobf("curse.maven:ferritecore-429235:${ferritecoreversion}")
+    implementation fg.deobf("curse.maven:fastload-630620:${fastloadversion}")
+    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:${lazyversion}")
+    implementation fg.deobf("curse.maven:spark-361579:${sparkversion}")
+    implementation fg.deobf("curse.maven:rubidium-574856:${rubidiumversion}")
+    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
+
+    // MOD SUPPORT
+    implementation fg.deobf("com.simibubi.create:create-${mcversion}:${createversion}:slim") { transitive = false }
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mcversion}:${flywheelversion}")
+    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateversion}")
+
+}
+
+def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
+def replaceProperties = [
+        minecraft_version: mcversion, minecraft_version_range: mcrange,
+        forge_version: fgversion, forge_version_range: fgrange,
+        loader_version_range: fgrange,
+        mod_id: modid, mod_name: modname, mod_license: modlicense, mod_version: modversion,
+        mod_authors: modauthor, mod_description: mod_description,
+        watermedia_version_range: watermediarange, creativecore_version_range: creativecorerange
+]
+processResources {
+    inputs.properties replaceProperties
+    replaceProperties.put 'project', project
+
+    filesMatching(resourceTargets) {
+        expand replaceProperties
+    }
+}
+
+
+mixin { add sourceSets.main, "waterframes.mixin-refmap.json" }
 
 jar {
     manifest {
         attributes([
-            "Specification-Title": project.name,
-            "Specification-Vendor": project.author,
-            "Specification-Version": project.version,
-            "Implementation-Title": project.name,
-            "Implementation-Version"  : project.version,
-            "Implementation-Vendor": project.author,
+            "Specification-Title": project.modname,
+            "Specification-Vendor": project.modauthor,
+            "Specification-Version": project.modversion,
+            "Implementation-Title": project.modname,
+            "Implementation-Version"  : project.modversion,
+            "Implementation-Vendor": project.modauthor,
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
             "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
             "TweakOrder": 0,
@@ -131,5 +159,5 @@ jar {
 
 jar.finalizedBy('reobfJar')
 tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
+    it.options.encoding = 'UTF-8'
 }
