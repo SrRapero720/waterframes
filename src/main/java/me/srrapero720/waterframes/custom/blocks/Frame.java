@@ -107,7 +107,7 @@ public class Frame extends BaseEntityBlock implements BlockGuiCreator {
             }
 
             if (signal && tile.playing) tile.pause();
-            if (signal && !tile.playing) tile.play();
+            if (!signal && !tile.playing) tile.play();
         }
 
         super.neighborChanged(state, level, pos, block, neighborPos, isMoving);
