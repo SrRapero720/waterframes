@@ -53,7 +53,7 @@ public class WFConfig {
         DISABLE_VLC = BUILDER.define("disableVLC", false);
         DISABLE_LAVA = BUILDER.comment("Soon").define("disableLavaPlayer", false);
 
-        DISABLE_REDSTONE = BUILDER.comment("Disable pause trigger on redstone signal input").define("disableRedstone", true);
+        DISABLE_REDSTONE = BUILDER.comment("Disable pause trigger on redstone signal input").define("disableRedstone", false);
 
         DISABLE_WHITELIST = BUILDER.define("disableWhitelist", false);
         WHITELIST = BUILDER.define("whitelist", WFUtil.getJsonArrayStringResource("whitelist_url.json"));
