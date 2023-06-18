@@ -21,8 +21,6 @@ public class WFConfig {
     private static final ForgeConfigSpec.DoubleValue MAX_HEIGHT;
     private static final ForgeConfigSpec.IntValue MAX_RENDER_DISTANCE;
 
-    private static final ForgeConfigSpec.ConfigValue<String> YOUTUBE_PROVIDER;
-
     private static final ForgeConfigSpec.BooleanValue DISABLE_VLC;
     private static final ForgeConfigSpec.BooleanValue DISABLE_LAVA;
 
@@ -42,9 +40,6 @@ public class WFConfig {
         MAX_WIDTH = BUILDER.defineInRange("maxWidth", 100.0D, 10.0D, 1000.0D);
         MAX_HEIGHT = BUILDER.defineInRange("maxHeight", 100.0D, 10.0D, 1000.0D);
         MAX_RENDER_DISTANCE = BUILDER.defineInRange("maxRenderDistance", 1000, 10, Integer.MAX_VALUE);
-
-        YOUTUBE_PROVIDER = BUILDER.comment("WIKI ABOUT IT: https://github.com/SrRapero720/waterframes/wiki/Youtube-Provider")
-                .define("youtubeMediaProvider", "https://sr-simple-youtube-downloader.herokuapp.com");
 
         DISABLE_ADVENTURE = BUILDER.define("disableUsageAdventure", true);
         DISABLE_SURVIVAL = BUILDER.define("disableUsageSurvival", false);
@@ -71,8 +66,6 @@ public class WFConfig {
     public static boolean isDisabledVLC() { return DISABLE_VLC.get(); }
     public static boolean isDisabledLavaPlayer() { return DISABLE_LAVA.get(); }
     public static boolean isDisabledRedstone() { return DISABLE_REDSTONE.get(); }
-
-    public static String ytProvider() { return YOUTUBE_PROVIDER.get(); }
 
     public static boolean domainAllowed(@NotNull String domain) {
         if (DISABLE_WHITELIST.get()) return true;
