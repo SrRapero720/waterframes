@@ -38,11 +38,6 @@ public class FramesPacket extends CreativePacket {
     
     @Override
     public void executeServer(ServerPlayer player) {
-        BlockEntity be = player.level.getBlockEntity(pos);
-        if (be instanceof TileFrame frame) {
-            frame.playing = playing;
-            frame.tick = 0;
-        }
     }
 
     @Override
