@@ -23,7 +23,7 @@ targetCompatibility = JavaVersion.VERSION_17
 println "Gradle Java: ${JavaVersion.current()}"
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: "${mappingsch}", version: "${mappings_version}-${mcversion}"
+    mappings channel: "${mappingsch}", version: "${mappings_version}"
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     copyIdeResources = true
     runs {
@@ -97,10 +97,10 @@ dependencies {
 
     // UTIL
     implementation fg.deobf("curse.maven:ferritecore-429235:${ferritecoreversion}")
-    implementation fg.deobf("curse.maven:fastload-630620:${fastloadversion}")
+//    implementation fg.deobf("curse.maven:fastload-630620:${fastloadversion}")
 //    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:${lazyversion}")
     implementation fg.deobf("curse.maven:spark-361579:${sparkversion}")
-    implementation fg.deobf("curse.maven:rubidium-574856:${rubidiumversion}")
+//    implementation fg.deobf("curse.maven:rubidium-574856:${rubidiumversion}")
 //    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
 
 
