@@ -2,14 +2,13 @@ package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.srrapero720.watermedia.api.util.GifDecoder;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.display.IDisplay;
 import me.srrapero720.waterframes.display.MediaDisplay;
 import me.srrapero720.waterframes.display.PictureDisplay;
+import me.srrapero720.watermedia.api.external.GifDecoder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.level.Level;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
