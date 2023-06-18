@@ -99,16 +99,16 @@ dependencies {
     // UTIL
     implementation fg.deobf("curse.maven:ferritecore-429235:${ferritecoreversion}")
     implementation fg.deobf("curse.maven:fastload-630620:${fastloadversion}")
-    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:${lazyversion}")
+//    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:${lazyversion}")
     implementation fg.deobf("curse.maven:spark-361579:${sparkversion}")
     implementation fg.deobf("curse.maven:rubidium-574856:${rubidiumversion}")
 //    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
 
 
     // MOD SUPPORT
-    implementation fg.deobf("com.simibubi.create:create-${mcversion}:${createversion}:slim") { transitive = false }
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mcversion}:${flywheelversion}")
-    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateversion}")
+//    implementation fg.deobf("com.simibubi.create:create-${mcversion}:${createversion}:slim") { transitive = false }
+//    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mcversion}:${flywheelversion}")
+//    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateversion}")
 
 }
 
