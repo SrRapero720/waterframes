@@ -205,10 +205,8 @@ public class MediaDisplay implements IDisplay {
     }
     
     public void free() {
-        ThreadUtil.thread(() -> {
-            if (player != null) player.release();
-            player = null;
-        });
+        if (player != null) player.release();
+        player = null;
         if (texture != -1) {
             GlStateManager._deleteTexture(texture);
             texture = -1;
