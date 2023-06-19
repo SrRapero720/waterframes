@@ -182,6 +182,7 @@ public class MediaDisplay implements IDisplay {
     @Override
     public void prepare(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
         if (player == null) return;
+
         lock.lock();
         try {
             if (needsUpdate) {
