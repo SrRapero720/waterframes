@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+
 public class MediaDisplay implements IDisplay {
     private static final String VLC_FAILED = "https://i.imgur.com/XCcN2uX.png";
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
@@ -155,15 +157,13 @@ public class MediaDisplay implements IDisplay {
                 player.setRepeatMode(loop);
             long tickTime = 50;
             long newDuration = player.getDuration();
-            if (!stream && newDuration != -1 && newDuration != 0 && player.getStatusDuration() == 0)
-                stream = true;
+            if (!stream && newDuration != -1 && newDuration != 0 && player.getStatusDuration() == 0) stream = true;
+            if (!stream && player.getRawPlayerComponent().mediaPlayer().media().info().mrl().contains(".m3u")) stream = true;
             if (stream) {
-                if (player.isPlaying() != realPlaying)
-                    player.setPauseMode(!realPlaying);
+                if (player.isPlaying() != realPlaying) player.setPauseMode(!realPlaying);
             } else {
                 if (player.getDuration() > 0) {
-                    if (player.isPlaying() != realPlaying)
-                        player.setPauseMode(!realPlaying);
+                    if (player.isPlaying() != realPlaying) player.setPauseMode(!realPlaying);
                     
                     if (player.isSeekable()) {
                         long time = tick * tickTime + (realPlaying ? (long) (WCoreUtil.toDeltaFrames() * tickTime) : 0);
@@ -172,6 +172,7 @@ public class MediaDisplay implements IDisplay {
                         if (Math.abs(time - player.getTime()) > ACCEPTABLE_SYNC_TIME && Math.abs(time - lastCorrectedTime) > ACCEPTABLE_SYNC_TIME) {
                             lastCorrectedTime = time;
                             player.seekTo(time);
+                            LOGGER.info("Seeking to {}", time);
                         }
                     }
                 }
