@@ -1,7 +1,6 @@
 package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
-import me.srrapero720.watermedia.MediaUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -52,7 +51,7 @@ public class WFConfig {
         DISABLE_REDSTONE = BUILDER.comment("Disable pause trigger on redstone signal input").define("disableRedstone", true);
 
         DISABLE_WHITELIST = BUILDER.define("disableWhitelist", false);
-        WHITELIST = BUILDER.define("whitelist", MediaUtil.getJsonListFromRes("whitelist_url.json", WFConfig.class.getClassLoader()));
+        WHITELIST = BUILDER.define("whitelist", WFUtil.getJsonArrayStringResource("whitelist_url.json"));
 
         // ->
         BUILDER.pop();
