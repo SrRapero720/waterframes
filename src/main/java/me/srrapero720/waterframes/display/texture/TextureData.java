@@ -7,7 +7,7 @@ import me.srrapero720.waterframes.displays.IDisplay;
 import me.srrapero720.waterframes.displays.ImageDisplay;
 import me.srrapero720.waterframes.displays.VideoDisplay;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
-import me.srrapero720.watermedia.api.util.GifDecoder;
+import me.srrapero720.watermedia.api.external.GifDecoder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import team.creative.creativecore.common.util.math.vec.Vec3d;

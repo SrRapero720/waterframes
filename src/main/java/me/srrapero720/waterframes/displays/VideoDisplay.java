@@ -3,13 +3,13 @@ package me.srrapero720.waterframes.displays;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.lib720.caprica.vlcj4.factory.MediaPlayerFactory;
-import me.lib720.caprica.vlcj4.player.embedded.videosurface.callback.BufferFormat;
-import me.lib720.caprica.vlcj4.player.embedded.videosurface.callback.UnAllocBufferFormatCallback;
+import me.lib720.caprica.vlcj.factory.MediaPlayerFactory;
+import me.lib720.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
+import me.lib720.caprica.vlcj.player.embedded.videosurface.callback.UnAllocBufferFormatCallback;
 import me.srrapero720.waterframes.FramesUtil;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
-import me.srrapero720.watermedia.api.media.players.VideoLanPlayer;
-import me.srrapero720.watermedia.vlc.VLCManager;
+import me.srrapero720.watermedia.api.WaterMediaAPI;
+import me.srrapero720.watermedia.api.video.players.VideoLanPlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import org.lwjgl.opengl.GL11;
@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class VideoDisplay extends IDisplay {
-    private static final MediaPlayerFactory FACTORY = VLCManager.createVLCPlayerFactory(FramesUtil.getJsonListFromRes("vlc_args.json").toArray(new String[0]));
+    private static final MediaPlayerFactory FACTORY = WaterMediaAPI.newVLCPlayerFactory(FramesUtil.getJsonListFromRes("vlc_args.json").toArray(new String[0]));
     public static final String VLC_FAILED = "https://i.imgur.com/UAXbZeM.jpg";
-    public static final int ACCEPTABLE_SYNC_TIME = 1000;
+    public static final int ACCEPTABLE_SYNC_TIME = 3000;
     public static final List<VideoDisplay> OPEN_DISPLAYS = new ArrayList<>();
 
     public static void tick() {
@@ -37,7 +37,7 @@ public class VideoDisplay extends IDisplay {
         }
     }
 
-    public static void unload() {
+    public static void clearAll() {
         synchronized (OPEN_DISPLAYS) {
             for (var display : OPEN_DISPLAYS) display.clear();
             OPEN_DISPLAYS.clear();
@@ -78,7 +78,7 @@ public class VideoDisplay extends IDisplay {
                 try {
                     setWidth(sourceWidth);
                     setHeight(sourceHeight);
-                    setFirstMode(true);
+                    setFirstMode();
                     setBuffer(MemoryTracker.create(sourceWidth * sourceHeight * 4).asIntBuffer());
                     setNeedsUpdateMode(true);
                 } finally {
@@ -103,11 +103,11 @@ public class VideoDisplay extends IDisplay {
     }
 
     // SETTERS
-    public synchronized void setWidth(int width) { this.width = width; }
-    public synchronized void setHeight(int height) { this.height = height; }
-    public synchronized void setFirstMode(boolean mode) { this.first = mode; }
-    public synchronized void setNeedsUpdateMode(boolean mode) { this.needsUpdate = mode; }
-    public synchronized void setBuffer(IntBuffer buffer) { this.buffer = buffer; }
+    private synchronized void setWidth(int width) { this.width = width; }
+    private synchronized void setHeight(int height) { this.height = height; }
+    private synchronized void setFirstMode() { this.first = true; }
+    private synchronized void setNeedsUpdateMode(boolean mode) { this.needsUpdate = mode; }
+    private synchronized void setBuffer(IntBuffer buffer) { this.buffer = buffer; }
 
     // GETTERS
     @Override public int getWidth() { return width; }

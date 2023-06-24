@@ -40,7 +40,7 @@ public class WaterFrames {
         public static void onUnloadingLevel(WorldEvent.Unload unload) {
             if (unload.getWorld() != null && unload.getWorld().isClientSide()) {
                 TextureData.unload();
-                VideoDisplay.unload();
+                VideoDisplay.clearAll();
             }
         }
     }
