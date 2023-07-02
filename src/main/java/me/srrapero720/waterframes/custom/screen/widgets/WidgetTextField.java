@@ -1,8 +1,9 @@
 package me.srrapero720.waterframes.custom.screen.widgets;
 
-import me.srrapero720.waterframes.FramesUtil;
+import me.srrapero720.waterframes.Util;
 import me.srrapero720.waterframes.FramesConfig;
 import me.srrapero720.waterframes.custom.screen.widgets.constants.Constants;
+import me.srrapero720.watermedia.api.WaterMediaAPI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -45,7 +46,7 @@ public class WidgetTextField extends GuiTextfield {
 
         if (!FramesConfig.canUse(getPlayer(), getText()))
             tooltips.add(new TranslatableComponent("label.waterframes.not_whitelisted").withStyle(ChatFormatting.RED));
-        if (!FramesUtil.validUrl(getText()))
+        if (!WaterMediaAPI.isURLValid(getText()))
             tooltips.add(new TranslatableComponent("label.waterframes.invalid_url").withStyle(ChatFormatting.RED));
 
         return tooltips.isEmpty() ? null : tooltips;

@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.custom.tiles;
 
 import me.srrapero720.waterframes.display.texture.TextureData;
-import me.srrapero720.waterframes.displays.IDisplay;
+import me.srrapero720.waterframes.displays.Display;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -27,7 +27,7 @@ public abstract class WFTile extends BlockEntity {
     public TextureData texture;
 
     @OnlyIn(Dist.CLIENT)
-    public IDisplay display;
+    public Display display;
 
     public WFTile(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
@@ -51,7 +51,7 @@ public abstract class WFTile extends BlockEntity {
                 .replace("mc://", ("file:///" + FMLPaths.GAMEDIR.get().toAbsolutePath()).replace("\\", "/") + "/");
     }
 
-    public IDisplay requestDisplay() {
+    public Display requestDisplay() {
         String url = getURL();
         if (texture == null || !texture.url.equals(url)) {
             texture = TextureData.get(url);

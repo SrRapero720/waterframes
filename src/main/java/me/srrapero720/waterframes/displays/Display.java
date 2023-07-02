@@ -1,12 +1,12 @@
 package me.srrapero720.waterframes.displays;
 
-public abstract class IDisplay {
+public abstract class Display {
     protected int width;
     protected int height;
     protected boolean ready = false;
     public enum Type { VIDEO, IMAGE, GIF; }
 
-    public static IDisplay create() {
+    public static Display create() {
         return null;
     }
 

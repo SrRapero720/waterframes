@@ -3,7 +3,7 @@ package me.srrapero720.waterframes.custom.tiles;
 import me.srrapero720.waterframes.FramesRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.displays.IDisplay;
+import me.srrapero720.waterframes.displays.Display;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -160,7 +160,7 @@ public class TileFrameTile extends WFTile {
 
 
             if (level.isClientSide) {
-                IDisplay display = be.requestDisplay();
+                Display display = be.requestDisplay();
                 if (display != null) display.tick(be.getURL(), be.volume, be.minDistance, be.maxDistance, be.playing, be.loop, be.tick);}
             if (be.playing) be.tick++;
         }

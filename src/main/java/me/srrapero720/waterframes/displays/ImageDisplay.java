@@ -1,13 +1,13 @@
 package me.srrapero720.waterframes.displays;
 
-import me.srrapero720.waterframes.FramesUtil;
 import me.srrapero720.waterframes.display.texture.TextureData;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
-import me.srrapero720.watermedia.api.util.GifDecoder;
+import me.srrapero720.watermedia.api.WaterMediaAPI;
+import me.srrapero720.watermedia.api.external.GifDecoder;
 
 import java.awt.image.BufferedImage;
 
-public class ImageDisplay extends IDisplay {
+public class ImageDisplay extends Display {
     private long duration;
     private long[] delay;
     private int[] textures;
@@ -22,7 +22,7 @@ public class ImageDisplay extends IDisplay {
     public ImageDisplay ready(BufferedImage image) {
         this.width = image.getWidth();
         this.height = image.getHeight();
-        this.textures = new int[] { FramesUtil.preRender(image, width, height) };
+        this.textures = new int[] { WaterMediaAPI.preRender(image, width, height) };
         this.delay = new long[] { 0 };
         this.duration = 0;
         this.ready = true;
@@ -70,7 +70,7 @@ public class ImageDisplay extends IDisplay {
 
     private int getTexture(int index) {
         if (textures[index] == -1 && decoder != null) {
-            textures[index] = FramesUtil.preRender(decoder.getFrame(index), width, height);
+            textures[index] = WaterMediaAPI.preRender(decoder.getFrame(index), width, height);
             remaining--;
             if (remaining <= 0)
                 decoder = null;

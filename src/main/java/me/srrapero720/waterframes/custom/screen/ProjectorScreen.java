@@ -2,29 +2,22 @@ package me.srrapero720.waterframes.custom.screen;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.FramesConfig;
-import me.srrapero720.waterframes.displays.IDisplay;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.custom.tiles.TileProjectorTile;
 import me.srrapero720.waterframes.display.texture.TextureData;
-import me.srrapero720.waterframes.display.texture.PictureSeeker;
+import me.srrapero720.waterframes.displays.Display;
 import me.srrapero720.waterframes.displays.VideoDisplay;
+import me.srrapero720.watermedia.api.images.PictureFetcher;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.world.CompoundContainer;
-import net.minecraft.world.Container;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BookItem;
-import net.minecraft.world.item.ItemStack;
 import team.creative.creativecore.client.render.GuiRenderHelper;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.GuiChildControl;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.GuiParent;
-import team.creative.creativecore.common.gui.controls.collection.GuiStackSelector;
-import team.creative.creativecore.common.gui.controls.inventory.GuiSlot;
 import team.creative.creativecore.common.gui.controls.parent.GuiColumn;
 import team.creative.creativecore.common.gui.controls.parent.GuiRow;
 import team.creative.creativecore.common.gui.controls.parent.GuiTable;
@@ -121,7 +114,7 @@ public class ProjectorScreen extends GuiLayer {
 
     @Override
     public void create() {
-        var isVideo = projector.display != null && projector.display.getType().equals(IDisplay.Type.VIDEO);
+        var isVideo = projector.display != null && projector.display.getType().equals(Display.Type.VIDEO);
 
         GuiButton save = new GuiButton("save", x -> {
             var nbt = new CompoundTag();
@@ -359,7 +352,7 @@ public class ProjectorScreen extends GuiLayer {
         save.setEnabled(FramesConfig.canUse(getPlayer(), url.getText()));
         vidSaving.add(save);
         vidSaving.add(new GuiButton("reload", x -> {
-            if (PictureSeeker.canSeek()) {
+            if (PictureFetcher.canSeek()) {
                 if (Screen.hasShiftDown()) TextureData.reloadAll();
                 else if (projector.texture != null) projector.texture.reload();
             }

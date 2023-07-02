@@ -1,5 +1,7 @@
 package me.srrapero720.waterframes;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
@@ -8,11 +10,19 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+
 public class FramesConfig {
+    public static final Gson GSON = new Gson();
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
 
@@ -34,6 +44,7 @@ public class FramesConfig {
 
     // PROJECTOR
     public static final ForgeConfigSpec.IntValue MAX_PROJECTION_DISTANCE;
+    private static final Marker IT = MarkerFactory.getMarker("Util");
 
     static {
         /* waterframes -> */
@@ -52,7 +63,7 @@ public class FramesConfig {
         DISABLE_REDSTONE = BUILDER.comment("Disable pause trigger on redstone signal input").define("disableRedstone", true);
 
         DISABLE_WHITELIST = BUILDER.define("disableWhitelist", false);
-        WHITELIST = BUILDER.define("whitelist", FramesUtil.getJsonListFromRes("whitelist_url.json"));
+        WHITELIST = BUILDER.define("whitelist", getJsonListFromRes("whitelist_url.json"));
 
 
         /* waterframes -> frames */
@@ -121,5 +132,16 @@ public class FramesConfig {
 
         else return player.getAbilities().mayBuild;
 
+    }
+
+    public static List<String> getJsonListFromRes(String path) {
+        try (var in = Util.class.getClassLoader().getResourceAsStream(path);
+             var res = (in != null) ? new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)) : null) {
+            if (res != null) return GSON.fromJson(res, new TypeToken<List<String>>() {}.getType());
+            else throw new IllegalArgumentException("File not found!");
+        } catch (Exception e) {
+            LOGGER.error(IT, "Exception trying to read JSON from {}", path, e);
+        }
+        return new ArrayList<>();
     }
 }

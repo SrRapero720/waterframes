@@ -18,7 +18,7 @@ import team.creative.creativecore.common.network.CreativeNetwork;
 public class WaterFrames {
     public static final String ID = "waterframes";
     public static final Logger LOGGER = LoggerFactory.getLogger(ID);
-    public static final CreativeNetwork NETWORK = new CreativeNetwork("1.2", LogManager.getLogger(ID), new ResourceLocation(ID, "main"));
+    public static final CreativeNetwork NETWORK = new CreativeNetwork("2.0", LogManager.getLogger(ID), new ResourceLocation(ID, "main"));
 
     public static IEventBus bus() { return FMLJavaModLoadingContext.get().getModEventBus(); }
     public WaterFrames() { FramesRegistry.register(); }

@@ -1,10 +1,10 @@
 package me.srrapero720.waterframes.custom.screen;
 
 import me.srrapero720.waterframes.FramesConfig;
-import me.srrapero720.waterframes.custom.tiles.TileFrameTile;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
+import me.srrapero720.waterframes.custom.tiles.TileFrameTile;
 import me.srrapero720.waterframes.display.texture.TextureData;
-import me.srrapero720.waterframes.display.texture.PictureSeeker;
+import me.srrapero720.watermedia.api.images.PictureFetcher;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
@@ -308,7 +308,7 @@ public class FrameScreen extends GuiLayer {
         save.setEnabled(FramesConfig.canUse(getPlayer(), url.getText()));
         play_right.add(save);
         play_right.add(new GuiButton("reload", x -> {
-            if (PictureSeeker.canSeek()) {
+            if (PictureFetcher.canSeek()) {
                 if (Screen.hasShiftDown()) TextureData.reloadAll();
                 else if (frame.texture != null) frame.texture.reload();
             }

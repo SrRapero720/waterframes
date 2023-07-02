@@ -1,8 +1,10 @@
 package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.logging.LogUtils;
-import me.srrapero720.waterframes.FramesUtil;
+import me.srrapero720.waterframes.Util;
 import me.srrapero720.waterframes.FramesConfig;
+import me.srrapero720.watermedia.api.images.LocalStorage;
+import me.srrapero720.watermedia.api.images.PictureFetcher;
 import me.srrapero720.watermedia.api.util.GifDecoder;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import net.minecraft.client.Minecraft;
@@ -26,7 +28,7 @@ public class PictureSeeker extends Thread {
     private static final Minecraft MC = Minecraft.getInstance();
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final Object LOCK = new Object();
-    private static final String USER_AGENT = FramesUtil.getUserAgentBasedOnOS();
+    private static final String USER_AGENT = Util.getUserAgent();
     private static final DateFormat FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
 
     // STATUS
@@ -95,7 +97,7 @@ public class PictureSeeker extends Thread {
             else if (exception.getMessage().startsWith("Server returned HTTP response code: 403")) texture.processFailed("download.exception.forbidden");
             else if (exception.getMessage().startsWith("Server returned HTTP response code: 404")) texture.processFailed("download.exception.notfound");
             else texture.processFailed("download.exception.invalid");
-            PictureStorage.deleteEntry(texture.url);
+            LocalStorage.deleteEntry(texture.url);
         }
 
         synchronized (LOCK) {
@@ -104,7 +106,7 @@ public class PictureSeeker extends Thread {
     }
 
     public static byte[] load(String url) throws IOException, VideoContentException {
-        var entry = PictureStorage.getEntry(url);
+        var entry = LocalStorage.getEntry(url);
         var requestTime = System.currentTimeMillis();
         var request = new URL(url).openConnection();
 
@@ -112,7 +114,7 @@ public class PictureSeeker extends Thread {
 
         request.addRequestProperty("User-Agent", USER_AGENT);
         if (request instanceof HttpURLConnection conn) {
-            if (entry != null && PictureStorage.getFile(entry.getUrl()).exists()) {
+            if (entry != null && LocalStorage.getFile(entry.getUrl()).exists()) {
                 if (entry.getTag() != null) conn.setRequestProperty("If-None-Match", entry.getTag());
                 else if (entry.getTime() != -1) conn.setRequestProperty("If-Modified-Since", FORMAT.format(new Date(entry.getTime())));
             }
@@ -150,19 +152,19 @@ public class PictureSeeker extends Thread {
                 if (tag != null && !tag.isEmpty()) freshTag = tag;
 
                 if (code == HttpURLConnection.HTTP_NOT_MODIFIED) {
-                    File file = PictureStorage.getFile(entry.getUrl());
+                    File file = LocalStorage.getFile(entry.getUrl());
 
                     if (file.exists()) try (var fileStream = new FileInputStream(file)) {
                         return IOUtils.toByteArray(fileStream);
                     } finally {
-                        PictureStorage.updateEntry(new PictureStorage.Entry(url, freshTag, lastTimestamp, expTimestamp));
+                        LocalStorage.updateEntry(new LocalStorage.Entry(url, freshTag, lastTimestamp, expTimestamp));
                     }
                 }
             }
 
             byte[] data = IOUtils.toByteArray(in);
             if (readType(data) == null) throw new VideoContentException();
-            PictureStorage.saveFile(url, tag, lastTimestamp, expTimestamp, data);
+            LocalStorage.saveFile(url, tag, lastTimestamp, expTimestamp, data);
             return data;
         } finally {
             if (request instanceof HttpURLConnection http) http.disconnect();

@@ -2,12 +2,14 @@ package me.srrapero720.waterframes.display.texture;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import me.srrapero720.waterframes.FramesConfig;
-import me.srrapero720.waterframes.FramesUtil;
-import me.srrapero720.waterframes.displays.IDisplay;
+import me.srrapero720.waterframes.displays.Display;
 import me.srrapero720.waterframes.displays.ImageDisplay;
 import me.srrapero720.waterframes.displays.VideoDisplay;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
+import me.srrapero720.watermedia.api.WaterMediaAPI;
 import me.srrapero720.watermedia.api.external.GifDecoder;
+import me.srrapero720.watermedia.api.images.PictureFetcher;
+import me.srrapero720.watermedia.api.images.RenderablePicture;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
@@ -59,7 +61,7 @@ public class TextureData {
     private long duration;
     private boolean isVideo;
     
-    private PictureSeeker seeker;
+    private PictureFetcher seeker;
     private boolean ready = false;
     private String error;
     
@@ -71,17 +73,27 @@ public class TextureData {
     public TextureData(String url) {
         this.url = url;
         usage++;
-        if (PictureSeeker.canSeek() && url != null && !url.isEmpty()) this.seeker = new PictureSeeker(this);
+        trySeek();
     }
     
     private void trySeek() {
         if (seeker != null) return;
-        if (PictureSeeker.canSeek()) this.seeker = new PictureSeeker(this);
+        if (PictureFetcher.canSeek()) this.seeker = new PictureFetcher(url) {
+            @Override
+            public void onFailed(Exception e) {
+
+            }
+
+            @Override
+            public void onSuccess(RenderablePicture renderablePicture) {
+
+            }
+        };
     }
     
     private int getTexture(int index) {
         if (textures[index] == -1 && decoder != null) {
-            textures[index] = FramesUtil.preRender(decoder.getFrame(index), width, height);
+            textures[index] = WaterMediaAPI.preRender(decoder.getFrame(index), width, height);
             remaining--;
             if (remaining <= 0)
                 decoder = null;
@@ -100,7 +112,7 @@ public class TextureData {
         return last;
     }
 
-    public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
+    public Display createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
         var mcVolume = Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
         var vol = volume * (mcVolume * mcVolume);
         var cache = TextureData.get(VideoDisplay.VLC_FAILED);
@@ -135,7 +147,7 @@ public class TextureData {
     public void process(BufferedImage image) {
         width = image.getWidth();
         height = image.getHeight();
-        textures = new int[] { FramesUtil.preRender(image, width, height) };
+        textures = new int[] { WaterMediaAPI.preRender(image, width, height) };
         delay = new long[] { 0 };
         duration = 0;
         seeker = null;

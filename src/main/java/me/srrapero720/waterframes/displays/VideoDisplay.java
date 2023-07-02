@@ -3,13 +3,10 @@ package me.srrapero720.waterframes.displays;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
-import me.lib720.caprica.vlcj.factory.MediaPlayerFactory;
 import me.lib720.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
 import me.lib720.caprica.vlcj.player.embedded.videosurface.callback.UnAllocBufferFormatCallback;
-import me.srrapero720.waterframes.FramesUtil;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
-import me.srrapero720.watermedia.api.WaterMediaAPI;
-import me.srrapero720.watermedia.api.video.players.VideoLanPlayer;
+import me.srrapero720.watermedia.api.video.VideoLANPlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
 import org.lwjgl.opengl.GL11;
@@ -20,10 +17,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class VideoDisplay extends IDisplay {
-    private static final MediaPlayerFactory FACTORY = WaterMediaAPI.newVLCPlayerFactory(FramesUtil.getJsonListFromRes("vlc_args.json").toArray(new String[0]));
+public class VideoDisplay extends Display {
     public static final String VLC_FAILED = "https://i.imgur.com/UAXbZeM.jpg";
-    public static final int ACCEPTABLE_SYNC_TIME = 3000;
+    public static final int ACCEPTABLE_SYNC_TIME = 5000;
     public static final List<VideoDisplay> OPEN_DISPLAYS = new ArrayList<>();
 
     public static void tick() {
@@ -44,7 +40,7 @@ public class VideoDisplay extends IDisplay {
         }
     }
 
-    public VideoLanPlayer player;
+    public VideoLANPlayer player;
     private final Vec3d pos;
     private volatile IntBuffer buffer;
     public volatile int width = 1;
@@ -60,7 +56,7 @@ public class VideoDisplay extends IDisplay {
 
     public VideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         super();
-        this.player = new VideoLanPlayer(FACTORY, (mediaPlayer, nativeBuffers, bufferFormat) -> {
+        this.player = new VideoLANPlayer(null, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
 
             try {
@@ -117,8 +113,8 @@ public class VideoDisplay extends IDisplay {
     @Override public int maxTick() { if (player != null) return (int) player.getGameTickDuration(); return 0; }
     @Override public Type getType() { return Type.VIDEO; }
 
-    public int getGameTickTime() { return (int) player.getGameTickTime(); }
-    public int getGameTickDuration() { return (int) player.getGameTickMediaLength(); }
+    public int getGameTickTime() { return player.getGameTickTime(); }
+    public int getGameTickDuration() { return player.getGameTickDuration(); }
 
     public void clear() {
         if (player != null) player.release();
@@ -181,8 +177,8 @@ public class VideoDisplay extends IDisplay {
             long tickTime = 50;
             long newDuration = player.getDuration();
 
-            if (!stream && newDuration != -1 && newDuration != 0 && player.getStatusDuration() == 0)
-                stream = true;
+            if (!stream && newDuration != -1 && newDuration != 0 && player.getMediaInfoDuration() == 0) stream = true;
+
             if (stream) {
                 if (player.isPlaying() != realPlaying) player.setPauseMode(!realPlaying);
             } else {
