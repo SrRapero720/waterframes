@@ -158,7 +158,8 @@ public class MediaDisplay implements IDisplay {
             long tickTime = 50;
             long newDuration = player.getDuration();
 
-            stream = (newDuration != -1 && newDuration != 0 && player.getMediaInfoDuration() == 0);
+            if (!stream && newDuration != -1 && newDuration != 0 && player.getMediaInfoDuration() == 0) stream = true;
+            if (!stream && player.isStream()) stream = true;
 
             if (stream) {
                 if (player.isPlaying() != realPlaying) player.setPauseMode(!realPlaying);
