@@ -9,7 +9,7 @@ import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import me.srrapero720.watermedia.api.WaterMediaAPI;
-import me.srrapero720.watermedia.api.video.players.VideoLanPlayer;
+import me.srrapero720.watermedia.api.video.VideoLANPlayer;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
@@ -50,7 +50,7 @@ public class MediaDisplay implements IDisplay {
     public static IDisplay createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         return ThreadUtil.tryAndReturn((defaultVar) -> {
             var display = new MediaDisplay(pos, url, volume, minDistance, maxDistance, loop);
-            if (display.player.getRawPlayerComponent() == null) throw new IllegalStateException("MediaDisplay uses a broken player");
+            if (display.player.getRaw() == null) throw new IllegalStateException("MediaDisplay uses a broken player");
             OPEN_DISPLAYS.add(display);
             return display;
 
@@ -64,7 +64,7 @@ public class MediaDisplay implements IDisplay {
     public volatile int width = 1;
     public volatile int height = 1;
     
-    public VideoLanPlayer player;
+    public VideoLANPlayer player;
     
     private final Vec3d pos;
     private volatile IntBuffer buffer;
@@ -80,7 +80,7 @@ public class MediaDisplay implements IDisplay {
         super();
         this.pos = pos;
         this.texture = GlStateManager._genTexture();
-        this.player = new VideoLanPlayer(null, (mediaPlayer, nativeBuffers, bufferFormat) -> {
+        this.player = new VideoLANPlayer(null, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
             try {
                 buffer.put(nativeBuffers[0].asIntBuffer());
@@ -143,8 +143,8 @@ public class MediaDisplay implements IDisplay {
         volume = getVolume(volume, minDistance, maxDistance);
         if (volume != lastSetVolume) {
             // ENSURE PLAYER GET MUTED ON LONG DISTANCES
-            if (volume < 0.1) player.getRawPlayerComponent().mediaPlayer().audio().setMute(true);
-            if (volume >= 0.1) player.getRawPlayerComponent().mediaPlayer().audio().setMute(false);
+            if (volume < 0.1) player.getRaw().mediaPlayer().audio().setMute(true);
+            if (volume >= 0.1) player.getRaw().mediaPlayer().audio().setMute(false);
 
             player.setVolume((int) volume);
             lastSetVolume = volume;
@@ -158,8 +158,7 @@ public class MediaDisplay implements IDisplay {
             long tickTime = 50;
             long newDuration = player.getDuration();
 
-            if (!stream && newDuration != -1 && newDuration != 0 && player.getStatusDuration() == 0) stream = true;
-            if (!stream && player.getRawPlayerComponent().mediaPlayer().media().info().mrl().contains(".m3u")) stream = true;
+            stream = (newDuration != -1 && newDuration != 0 && player.getMediaInfoDuration() == 0);
 
             if (stream) {
                 if (player.isPlaying() != realPlaying) player.setPauseMode(!realPlaying);
