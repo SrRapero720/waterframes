@@ -10,7 +10,7 @@ license="${mod_license}"
 	displayName="${mod_name}"
 	displayURL="https://www.curseforge.com/minecraft/mc-mods/waterframes"
 	credits="Special thanks to CoolDCB and CreativeMD"
-	authors="SrRapero720"
+	authors="${mod_authors}"
 	logoFile="pack.png"
 	description='''${mod_description}'''
 
