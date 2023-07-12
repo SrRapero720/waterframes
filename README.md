@@ -1,39 +1,32 @@
 # WATERFrAMES
-Based on the mod [/LittlePictureFrames](https://github.com/CreativeMD/LittleFrames) 
+Based on the mod [CreativeMD/LittlePictureFrames](https://github.com/CreativeMD/LittleFrames) 
 comes out [WATERFrAMES](https://www.curseforge.com/minecraft/mc-mods/waterframes)
 
-This is not just a backport of the mod. Currently i am working on enhance the entire mod with missing
-functions like play youtube videos, google drive files, gui enhance, bug fixes, and of course "LittleTiles"
-is not longer a dependency (thanks god).
+This mod is a backport + rewrite of the entire frame mod. this mod doesn't follow littletiles compatibility pipeline
+and keeps working standalone. Enhancing all functions and adding more blocks / items
 
-WATERFrAMES is for now not just a backport, is a addon of my main mod [WATERCoRE](https://www.curseforge.com/minecraft/mc-mods/watercore) 
-a enhanced backport of the original mod LittleFrames. if you want this mod on 
-1.19.x then uses the original one. I only give support/port to Forge LTS versions.
-
-Of course, CreativeMD can use code from this repo. so if he want he can port things from here to their code.
+You can use this mod with LittleFrames (until LT uses WATERMeDIA)
 
 ## DEPENDENCIES
-- [WATERCoRE](https://beta.curseforge.com/minecraft/mc-mods/watercore) - Util, Register.
-- [CreativeCore](https://beta.curseforge.com/minecraft/mc-mods/creativecore/files/4394989) - Networking and GUI
-- [FancyVideo-API](https://beta.curseforge.com/minecraft/mc-mods/fancyvideo-api) - Video (VLC) support
+- [CreativeCore](https://beta.curseforge.com/minecraft/mc-mods/creativecore/files/4394989)
+- [WATERMeDIA](https://beta.curseforge.com/minecraft/mc-mods/fancyvideo-api) - Video and Picture support
 
 ## FEATURES
-- Display pictures (supports gifs) and Videos (H.264 H.265)
-- Access to local media files (perfect to modpacks)
-- Easy customization
-- WIP: Play videos from Youtube, GoogleDrive and Stardeos.
+- Display pictures and videos using URL or local files
+- Compatibility with a lot of platforms (powered by WATERMeDIA)
+- Easy customization and configuration for modpacks and server owners
+- [WIP] Compatibility with CameraMod and ModernLife
 
-## IMPORTANT
-Currently i am working on remove CreativeCore as dependency and depends on WATERCoRE
-the main reason i not do that directly is because i need to create a lot of stuff for WATERCoRE. Like
-a Screen API (similar to Android API) and a networking API. for now CC is a good alternative but less 
-documented.
+## TOP DONATOR
+- wayerspork
 
 ## AUTHORS
 - [SrRapero720](https://github.com/SrRapero720) | Owner
-- [CoolDCB](https://github.com/CoolDCB) | Helper
-- [CreativeMD](https://github.com/CreativeMD) | Base autor
+- [CreativeMD](https://github.com/CreativeMD) | Original creator
+
+## CREDITS
+- [CoolDCB](https://github.com/CoolDCB) | Helps with backport
 
 # LICENCE
 All rights reserved<br>
-If you want any permission to use this code ask me first in [Discord](https://discord.gg/cuYAzzZ)<br>
+If you want any permission to use this code or a build ask me first in [Discord](https://discord.gg/cuYAzzZ)<br>
