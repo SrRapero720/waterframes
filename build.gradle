@@ -92,7 +92,7 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     //DEPENDENCIES
-    implementation fg.deobf("curse.maven:watermedia-869524:${watermediaversion}")
+    implementation "curse.maven:watermedia-869524:${watermediaversion}"
     implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
 
     // UTIL
