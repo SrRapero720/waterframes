@@ -5,7 +5,6 @@ import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
 import me.srrapero720.waterframes.display.texture.TextureCache;
-import me.srrapero720.waterframes.display.texture.TextureSeeker;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
@@ -27,7 +26,6 @@ import team.creative.creativecore.common.gui.sync.GuiSyncLocal;
 import team.creative.creativecore.common.util.math.geo.Rect;
 import team.creative.creativecore.common.util.mc.ColorUtils;
 import team.creative.creativecore.common.util.text.TextBuilder;
-import team.creative.creativecore.common.util.text.TextListBuilder;
 
 public class ProjectorScreen extends GuiLayer {
     public TileProjector frame;
@@ -299,10 +297,8 @@ public class ProjectorScreen extends GuiLayer {
         save.setEnabled(WFConfig.canUse(getPlayer(), url.getText()));
         play_right.add(save);
         play_right.add(new GuiButton("reload", x -> {
-            synchronized (TextureSeeker.LOCK) {
-                if (Screen.hasShiftDown()) TextureCache.reloadAll();
-                else if (frame.cache != null) frame.cache.reload();
-            }
+            if (Screen.hasShiftDown()) TextureCache.reloadAll();
+            else if (frame.cache != null) frame.cache.reload();
         }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));
 
 

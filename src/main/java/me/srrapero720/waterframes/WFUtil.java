@@ -6,6 +6,7 @@ import com.mojang.logging.LogUtils;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 
 import java.io.BufferedReader;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
@@ -13,30 +14,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WFUtil {
+    private static final Gson GSON = new Gson();
+
     public static List<String> getJsonArrayStringResource(String path) {
         var LOGGER = LogUtils.getLogger();
 
-        var inputStream = new Stationary<InputStreamReader>();
-        var bufferedReader = new Stationary<BufferedReader>();
+        List<String> result = null;
+        try (InputStream res = WFUtil.class.getResourceAsStream(path); BufferedReader reader = res != null ? new BufferedReader(new InputStreamReader(res)) : null) {
+            if (reader == null) throw new NullPointerException("Failed to read resource (not found)");
+            return result = GSON.fromJson(reader, new TypeToken<List<String>>() {}.getType());
+        } catch (Exception e) {
+            LOGGER.error("Exception trying to read JSON from {}", path, e);
+        } finally {
+            if (result != null) result.forEach(LOGGER::debug);
+        }
 
-        return ThreadUtil.tryAndReturn(defaultVar -> {
-            var res = WFUtil.class.getClassLoader().getResourceAsStream(path);
-            if (res != null) {
-                inputStream.set(new InputStreamReader(res, StandardCharsets.UTF_8));
-                bufferedReader.set(new BufferedReader(inputStream.get()));
-
-                return new Gson().fromJson(bufferedReader.get(), new TypeToken<List<String>>() {}.getType());
-            } else throw new IllegalArgumentException("File not found!");
-
-        }, e -> LOGGER.error("Exception trying to read JSON from {}", path, e), returnedVar -> {
-            returnedVar.forEach(LOGGER::debug);
-
-            // ENSURE NO MEMORY LEAKS
-            ThreadUtil.trySimple(() -> {
-                if (!bufferedReader.isEmpty()) bufferedReader.get().close();
-                if (!inputStream.isEmpty()) inputStream.get().close();
-            });
-        }, (List<String>) new ArrayList<String>());
+        return result == null ? new ArrayList<>() : result;
     }
 
     public static boolean validUrl(String url) {
@@ -44,17 +37,5 @@ public class WFUtil {
             new URI(url);
             return true;
         }, false);
-    }
-
-    public static class Stationary<T> {
-        protected T object;
-        public Stationary() { object = null; }
-        public Stationary(T obj) { object = obj; }
-
-        public void set(T obj) { object = obj; }
-        public T get() { return object; }
-        public boolean isEmpty() { return object == null; }
-
-        public boolean valid() { return true; }
     }
 }

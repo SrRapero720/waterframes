@@ -20,13 +20,11 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
-import static me.srrapero720.waterframes.WaterFrames.LOGGER;
-
-public class MediaDisplay implements IDisplay {
+public class VideoDisplay implements IDisplay {
     private static final String VLC_FAILED = "https://i.imgur.com/XCcN2uX.png";
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
     
-    private static final List<MediaDisplay> OPEN_DISPLAYS = new ArrayList<>();
+    private static final List<VideoDisplay> OPEN_DISPLAYS = new ArrayList<>();
     
     public static void tick() {
         synchronized (OPEN_DISPLAYS) {
@@ -49,7 +47,7 @@ public class MediaDisplay implements IDisplay {
     
     public static IDisplay createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         return ThreadUtil.tryAndReturn((defaultVar) -> {
-            var display = new MediaDisplay(pos, url, volume, minDistance, maxDistance, loop);
+            var display = new VideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
             if (display.player.getRaw() == null) throw new IllegalStateException("MediaDisplay uses a broken player");
             OPEN_DISPLAYS.add(display);
             return display;
@@ -76,7 +74,7 @@ public class MediaDisplay implements IDisplay {
     private volatile boolean first = true;
     private long lastCorrectedTime = Long.MIN_VALUE;
     
-    public MediaDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
+    public VideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
         super();
         this.pos = pos;
         this.texture = GlStateManager._genTexture();
@@ -94,9 +92,9 @@ public class MediaDisplay implements IDisplay {
             public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
                 lock.lock();
                 try {
-                    MediaDisplay.this.width = sourceWidth;
-                    MediaDisplay.this.height = sourceHeight;
-                    MediaDisplay.this.first = true;
+                    VideoDisplay.this.width = sourceWidth;
+                    VideoDisplay.this.height = sourceHeight;
+                    VideoDisplay.this.first = true;
                     buffer = MemoryTracker.create(sourceWidth * sourceHeight * 4).asIntBuffer();
                     needsUpdate = true;
                 } finally {
