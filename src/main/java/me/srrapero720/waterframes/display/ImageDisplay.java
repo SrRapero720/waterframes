@@ -1,25 +1,25 @@
 package me.srrapero720.waterframes.display;
 
-import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
-import team.creative.creativecore.client.CreativeCoreClient;
+import me.srrapero720.watermedia.api.WaterMediaAPI;
+import me.srrapero720.watermedia.api.images.RenderablePicture;
 
-public class PictureDisplay implements IDisplay {
+public class ImageDisplay implements IDisplay {
+    public static final IDisplay LOADING_GIF = new ImageDisplay(WaterMediaAPI.LOADING_GIF);
     
-    public final TextureCache texture;
+    public final RenderablePicture picture;
     private int textureId;
     
-    public PictureDisplay(TextureCache texture) {
-        this.texture = texture;
+    public ImageDisplay(RenderablePicture picture) {
+        this.picture = picture;
     }
     
     @Override
     public void prepare(String url, float volume, float minDistance, float maxDistance, boolean playing, boolean loop, int tick) {
         long time = tick * 50L + (playing ? (long) (WCoreUtil.toDeltaFrames() * 50) : 0);
-        if (texture.getDuration() > 0 && time > texture.getDuration())
-            if (loop)
-                time %= texture.getDuration();
-        textureId = texture.getTexture(time);
+        long duration = picture.duration;
+        if (duration > 0 && time > duration && loop) time %= duration;
+        textureId = picture.genTexture(time);
     }
     
     @Override
@@ -38,17 +38,13 @@ public class PictureDisplay implements IDisplay {
     
     @Override
     public void release() {
-        texture.unuse();
+//        picture.unuse();
     }
     
     @Override
-    public int getWidth() {
-        return texture.getWidth();
-    }
+    public int getWidth() { return picture.width; }
     
     @Override
-    public int getHeight() {
-        return texture.getHeight();
-    }
+    public int getHeight() { return picture.height; }
     
 }

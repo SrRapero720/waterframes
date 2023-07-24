@@ -25,6 +25,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
+@Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WFRegistry {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, WaterFrames.ID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, WaterFrames.ID);
@@ -65,5 +66,26 @@ public class WFRegistry {
 
     private static void creativeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == WATERTAB.getKey()) event.accept(FRAME);
+    }
+
+    @SubscribeEvent
+    public static void onRenderTickEvent(TickEvent.RenderTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) TextureCache.renderTick();
+    }
+
+    @SubscribeEvent
+    public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) {
+            VideoDisplay.tick();
+            TextureCache.clientTick();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onUnloadingLevel(WorldEvent.Unload unload) {
+        if (unload.getWorld() != null && unload.getWorld().isClientSide()) {
+            TextureCache.unload();
+            VideoDisplay.unload();
+        }
     }
 }
