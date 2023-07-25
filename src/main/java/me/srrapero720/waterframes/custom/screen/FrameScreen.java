@@ -348,7 +348,7 @@ public class FrameScreen extends GuiLayer {
 
         save.preferredWidth = 50;
         get("reload").preferredWidth = 50;
-        GuiLabel textfield = new GuiLabel("dummy").setTitle(Component.translatable("gui.waterframes.info.now_supports").withStyle(ChatFormatting.GOLD).append(": ").append("Youtube, Twitch, Kick.com, SoundCloud, Google Drive, Vimeo, OneDrive, Dropbox, Discord").append(" - ").append(new TextComponent("v").withStyle(ChatFormatting.DARK_RED)).append(Component.translatable(WaterFrames.VERSION).withStyle(ChatFormatting.RED)));
+        GuiLabel textfield = new GuiLabel("dummy").setTitle(Component.translatable("gui.waterframes.info.now_supports").withStyle(ChatFormatting.GOLD).append(": ").append("Youtube, Twitch, Kick.com, SoundCloud, Google Drive, Vimeo, OneDrive, Dropbox, Discord").append(" - ").append(Component.literal("v").withStyle(ChatFormatting.DARK_RED)).append(Component.translatable(WaterFrames.VERSION).withStyle(ChatFormatting.RED)));
         this.add(textfield);
     }
 }
