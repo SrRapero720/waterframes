@@ -20,6 +20,7 @@ public class WFConfig {
     private static final ForgeConfigSpec.DoubleValue MAX_WIDTH;
     private static final ForgeConfigSpec.DoubleValue MAX_HEIGHT;
     private static final ForgeConfigSpec.IntValue MAX_RENDER_DISTANCE;
+    private static final ForgeConfigSpec.IntValue MAX_AUDIO_DISTANCE;
 
     private static final ForgeConfigSpec.BooleanValue DISABLE_VLC;
     private static final ForgeConfigSpec.BooleanValue DISABLE_LAVA;
@@ -37,9 +38,10 @@ public class WFConfig {
         /* waterframes -> */
         BUILDER.push("waterframes");
 
-        MAX_WIDTH = BUILDER.defineInRange("maxWidth", 100.0D, 10.0D, 1000.0D);
-        MAX_HEIGHT = BUILDER.defineInRange("maxHeight", 100.0D, 10.0D, 1000.0D);
-        MAX_RENDER_DISTANCE = BUILDER.defineInRange("maxRenderDistance", 1000, 10, Integer.MAX_VALUE);
+        MAX_WIDTH = BUILDER.defineInRange("maxWidth", 100.0D, 8.0D, 1024.0D);
+        MAX_HEIGHT = BUILDER.defineInRange("maxHeight", 100.0D, 8.0D, 1024.0D);
+        MAX_RENDER_DISTANCE = BUILDER.defineInRange("maxRenderDistance", 128, 8, 1024);
+        MAX_AUDIO_DISTANCE = BUILDER.defineInRange("maxAudioDistance", 512, 20, 1024);
 
         DISABLE_ADVENTURE = BUILDER.define("disableUsageAdventure", true);
         DISABLE_SURVIVAL = BUILDER.define("disableUsageSurvival", false);
@@ -62,6 +64,7 @@ public class WFConfig {
 
     public static double maxWidth() { return MAX_WIDTH.get(); }
     public static double maxHeight() { return MAX_HEIGHT.get(); }
+    public static int maxAudioDistance() { return MAX_AUDIO_DISTANCE.get(); }
     public static int maxRenderDistance() { return MAX_RENDER_DISTANCE.get(); }
     public static boolean isDisabledVLC() { return DISABLE_VLC.get(); }
     public static boolean isDisabledLavaPlayer() { return DISABLE_LAVA.get(); }
