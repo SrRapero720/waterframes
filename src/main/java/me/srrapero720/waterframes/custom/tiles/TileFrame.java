@@ -1,14 +1,13 @@
 package me.srrapero720.waterframes.custom.tiles;
 
-import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WFRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.display.IDisplay;
+import me.srrapero720.waterframes.display.ImageDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
-import me.srrapero720.waterframes.watercore_supplier.YTExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -95,15 +94,21 @@ public class TileFrame extends BlockEntity {
     public IDisplay requestDisplay() {
         String url = getURL();
         if (cache == null || !cache.url.equals(url)) {
-            cache = TextureCache.get(url);
-            if (display != null)
-                display.release();
+            cache = TextureCache.find(url);
+            if (display != null) display.release();
             display = null;
         }
-        if (!cache.isVideo() && (!cache.ready() || cache.getError() != null))
+
+        if (!cache.isVideo() && (!cache.ready() || cache.getError() != null)) {
+            if (display != null) {
+                display.release();
+                display = null;
+            }
+            if (cache.getError() == null) return ImageDisplay.LOADING_GIF;
             return null;
-        if (display != null)
-            return display;
+        }
+        if (display != null) return display;
+
         return display = cache.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop);
     }
 
