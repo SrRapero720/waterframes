@@ -300,8 +300,14 @@ public class FrameScreen extends GuiLayer {
         GuiParent range = new GuiParent(GuiFlow.STACK_X);
         add(range);
         range.add(new GuiLabel("range_label").setTitle(new TranslatableComponent("gui.waterframes.range").append(" (min/max):")));
-        range.add(new GuiSteppedSlider("range_min", 63, 10, (int) frame.minDistance, 0, 512).setExpandableX());
-        range.add(new GuiSteppedSlider("range_max", 63, 10, (int) frame.maxDistance, 0, 512).setExpandableX());
+        range.add(new GuiSteppedSlider("range_min", 63, 10, (int) frame.minDistance, 0, WFConfig.maxAudioDistance()).setExpandableX());
+        range.add(new GuiSteppedSlider("range_max", 63, 10, (int) frame.maxDistance, 0, WFConfig.maxAudioDistance()) {
+            @Override
+            public void setValue(double value) {
+                super.setValue(value);
+                ((GuiSteppedSlider) get("range_min")).maxValue = value;
+            }
+        }.setExpandableX());
 
         GuiTable playgrid = new GuiTable();
         add(playgrid);
