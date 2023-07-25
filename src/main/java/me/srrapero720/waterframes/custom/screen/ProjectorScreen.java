@@ -1,11 +1,9 @@
 package me.srrapero720.waterframes.custom.screen;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
 import me.srrapero720.waterframes.display.texture.TextureCache;
-import me.srrapero720.waterframes.display.texture.TextureSeeker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;

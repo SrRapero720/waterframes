@@ -270,7 +270,7 @@ public class FrameScreen extends GuiLayer {
             public String getTextByValue() {
                 return "" + (int) (value * 100) + "%";
             }
-        });
+        }.setExpandableX());
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
@@ -280,7 +280,7 @@ public class FrameScreen extends GuiLayer {
             public String getTextByValue() {
                 return "" + (int) (value * 100) + "%";
             }
-        });
+        }.setExpandableX());
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
@@ -308,7 +308,7 @@ public class FrameScreen extends GuiLayer {
             public String getTextByValue() {
                 return "" + (int) (value * 100) + "%";
             }
-        });
+        }.setExpandableX());
         volume_right.align = Align.RIGHT;
 
         GuiParent range = new GuiParent(GuiFlow.STACK_X);
@@ -346,9 +346,7 @@ public class FrameScreen extends GuiLayer {
             else if (frame.cache != null) frame.cache.reload();
         }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));
 
-        save.preferredWidth = 50;
-        get("reload").preferredWidth = 50;
-        GuiLabel textfield = new GuiLabel("dummy").setTitle(Component.translatable("gui.waterframes.info.now_supports").withStyle(ChatFormatting.GOLD).append(": ").append("Youtube, Twitch, Kick.com, SoundCloud, Google Drive, Vimeo, OneDrive, Dropbox, Discord").append(" - ").append(new TextComponent("v").withStyle(ChatFormatting.DARK_RED)).append(Component.translatable(WaterFrames.VERSION).withStyle(ChatFormatting.RED)));
+        GuiLabel textfield = new GuiLabel("dummy").setTitle(Component.translatable("gui.waterframes.info.now_supports").withStyle(ChatFormatting.GOLD).append(": ").append("Youtube, Twitch, Kick.com, SoundCloud, Google Drive, Vimeo, OneDrive, Dropbox, Discord").append(" - ").append(Component.literal("v").withStyle(ChatFormatting.DARK_RED)).append(Component.translatable(WaterFrames.VERSION).withStyle(ChatFormatting.RED)));
         this.add(textfield);
     }
 }

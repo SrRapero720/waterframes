@@ -4,6 +4,8 @@ import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.custom.renderer.FramesRenderer;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
+import me.srrapero720.waterframes.display.VideoDisplay;
+import me.srrapero720.waterframes.display.texture.TextureCache;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -16,7 +18,11 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -36,13 +42,13 @@ public class WFRegistry {
     public static RegistryObject<BlockEntityType<TileFrame>> TILE_FRAME = TILES.register("frame", () -> BlockEntityType.Builder.of(TileFrame::new, FRAME.get()).build(null));
     public static final RegistryObject<CreativeModeTab> WATERTAB = TABS.register("tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
             .icon(() -> new ItemStack(FRAME.get()))
-            .title(Component.translatable("itemGroup.waterframes")).build()
+            .title(Component.translatable("itemGroup.waterframes"))
+            .build()
     );
 
 
     public static void register() {
         ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties()));
-
 
         BLOCKS.register(WaterFrames.bus());
         ITEMS.register(WaterFrames.bus());
@@ -82,8 +88,8 @@ public class WFRegistry {
     }
 
     @SubscribeEvent
-    public static void onUnloadingLevel(WorldEvent.Unload unload) {
-        if (unload.getWorld() != null && unload.getWorld().isClientSide()) {
+    public static void onUnloadingLevel(LevelEvent.Unload unload) {
+        if (unload.getLevel() != null && unload.getLevel().isClientSide()) {
             TextureCache.unload();
             VideoDisplay.unload();
         }
