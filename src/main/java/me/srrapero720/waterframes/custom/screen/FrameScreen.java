@@ -324,20 +324,4 @@ public class FrameScreen extends GuiLayer {
         GuiLabel textfield = new GuiLabel("dummy").setTitle(Component.translatable("gui.waterframes.info.now_supports").withStyle(ChatFormatting.GOLD).append(": ").append("Youtube, Twitter (videos), Twitch, Kick.com, SoundCloud, Google drive, Vimeo").append(" - ").append(Component.translatable(WaterFrames.VERSION).withStyle(ChatFormatting.RED)));
         this.add(textfield);
     }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (keyCode == 256) {
-            if (this.closeLayerUsingEscape()) {
-                this.closeTopLayer();
-            }
-            return true;
-        } else if (keyCode == this.getSettings().keyInventory.getKey().getValue()) {
-            return true;
-        } else if (super.keyPressed(keyCode, scanCode, modifiers)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 }
