@@ -38,7 +38,6 @@ public class TextureCache {
         if (this.seeker != null) return;
         if (PictureFetcher.canSeek() && !this.url.isEmpty()) {
             this.seeker = new FramePictureFetcher(this, url);
-            LOGGER.info("Stacktrace of tryseek", new RuntimeException("e"));
         }
     }
 
