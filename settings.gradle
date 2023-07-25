@@ -14,8 +14,8 @@ pluginManagement {
             content { includeGroup "curse.maven" }
         }
         maven {
-            name = 'MinecraftForge'
-            url = 'https://maven.minecraftforge.net/'
+            name = 'NeoForged'
+            url = 'https://maven.neoforged.net/releases'
         }
     }
 }

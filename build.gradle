@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'net.neoforged.gradle' version '[6.0.13, 6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
@@ -10,9 +10,7 @@ plugins {
 
 version = modversion
 group = modgroup
-base {
-    archivesName = modid
-}
+archivesBaseName = modid
 
 //apply plugin: 'net.minecraftforge.gradle'
 //apply plugin: 'org.spongepowered.mixin'
@@ -88,7 +86,7 @@ configurations {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${project.mcversion}-${project.fgversion}"
+    minecraft "net.neoforged:forge:${project.mcversion}-${project.fgversion}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     //DEPENDENCIES
