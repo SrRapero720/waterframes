@@ -1,6 +1,5 @@
 package me.srrapero720.waterframes.custom.tiles;
 
-import me.srrapero720.waterframes.WFRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
@@ -95,7 +94,7 @@ public class TileProjector extends BlockEntity {
     public IDisplay requestDisplay() {
         String url = getURL();
         if (cache == null || !cache.url.equals(url)) {
-            cache = TextureCache.get(url);
+            cache = TextureCache.find(url);
             if (display != null)
                 display.release();
             display = null;

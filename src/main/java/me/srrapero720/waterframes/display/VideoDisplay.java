@@ -53,7 +53,7 @@ public class VideoDisplay implements IDisplay {
             return display;
 
         }, ((Supplier<IDisplay>) () -> {
-            var cache = TextureCache.get(VLC_FAILED);
+            var cache = TextureCache.find(VLC_FAILED);
             if (cache.ready()) return cache.createDisplay(pos, VLC_FAILED, volume, minDistance, maxDistance, loop, true);
             return null;
         }).get());
