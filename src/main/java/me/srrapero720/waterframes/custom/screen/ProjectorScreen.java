@@ -77,7 +77,7 @@ public class ProjectorScreen extends GuiLayer {
             frame.flipY = nbt.getBoolean("flipY");
             frame.volume = nbt.getFloat("volume");
             frame.minDistance = nbt.getFloat("min");
-            frame.maxDistance = nbt.getFloat("max");
+            frame.maxDistance = Math.min(WFConfig.maxAudioDistance(), nbt.getFloat("max"));
             frame.alpha = nbt.getFloat("transparency");
             frame.brightness = nbt.getFloat("brightness");
         }
