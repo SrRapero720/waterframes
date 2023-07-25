@@ -265,12 +265,22 @@ public class FrameScreen extends GuiLayer {
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
         left.add(new GuiLabel("t_label").setTitle(Component.translatable("gui.waterframes.transparency").append(":")));
-        right.add(new GuiSlider("transparency", 130, 10, frame.alpha, 0, 1));
+        right.add(new GuiSlider("transparency", 130, 10, frame.alpha, 0, 1) {
+            @Override
+            public String getTextByValue() {
+                return "" + (int) (value * 100) + "%";
+            }
+        });
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
         left.add(new GuiLabel("b_label").setTitle(Component.translatable("gui.waterframes.brightness").append(":")));
-        right.add(new GuiSlider("brightness", 130, 10, frame.brightness, 0, 1));
+        right.add(new GuiSlider("brightness", 130, 10, frame.brightness, 0, 1) {
+            @Override
+            public String getTextByValue() {
+                return "" + (int) (value * 100) + "%";
+            }
+        });
         right.align = Align.RIGHT;
 
         table.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
@@ -293,18 +303,26 @@ public class FrameScreen extends GuiLayer {
 
         volume.addRow(new GuiRow(volume_left = new GuiColumn(GuiFlow.STACK_X), volume_right = new GuiColumn(GuiFlow.STACK_X)));
         volume_left.add(new GuiLabel("v_label").setTitle(Component.translatable("gui.waterframes.volume").append(":")));
-        volume_right.add(new GuiSlider("volume", 130, 10, frame.volume, 0, 1));
+        volume_right.add(new GuiSlider("volume", 130, 10, frame.volume, 0, 1) {
+            @Override
+            public String getTextByValue() {
+                return "" + (int) (value * 100) + "%";
+            }
+        });
         volume_right.align = Align.RIGHT;
 
         GuiParent range = new GuiParent(GuiFlow.STACK_X);
         add(range);
         range.add(new GuiLabel("range_label").setTitle(Component.translatable("gui.waterframes.range").append(" (min/max):")));
         range.add(new GuiSteppedSlider("range_min", 63, 10, (int) frame.minDistance, 0, WFConfig.maxAudioDistance()).setExpandableX());
-        range.add(new GuiSteppedSlider("range_max", 63, 10, (int) frame.maxDistance, 0, WFConfig.maxAudioDistance()) {
+        range.add(new GuiSteppedSlider("range_max", 63, 10, (int) frame.maxDistance, 1, WFConfig.maxAudioDistance()) {
             @Override
             public void setValue(double value) {
-                super.setValue(value);
-                ((GuiSteppedSlider) get("range_min")).maxValue = value;
+                super.setValue((int) value);
+                GuiSteppedSlider range_min = get("range_min");
+                range_min.maxValue = (int) value;
+
+                if (range_min.getValue() > this.value) range_min.setValue(value >= 0 ? (int) value : 0);
             }
         }.setExpandableX());
 
@@ -327,7 +345,10 @@ public class FrameScreen extends GuiLayer {
             if (Screen.hasShiftDown()) TextureCache.reloadAll();
             else if (frame.cache != null) frame.cache.reload();
         }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));
-        GuiLabel textfield = new GuiLabel("dummy").setTitle(Component.translatable("gui.waterframes.info.now_supports").withStyle(ChatFormatting.GOLD).append(": ").append("Youtube, Twitter (videos), Twitch, Kick.com, SoundCloud, Google drive, Vimeo").append(" - ").append(Component.translatable(WaterFrames.VERSION).withStyle(ChatFormatting.RED)));
+
+        save.preferredWidth = 50;
+        get("reload").preferredWidth = 50;
+        GuiLabel textfield = new GuiLabel("dummy").setTitle(Component.translatable("gui.waterframes.info.now_supports").withStyle(ChatFormatting.GOLD).append(": ").append("Youtube, Twitch, Kick.com, SoundCloud, Google Drive, Vimeo, OneDrive, Dropbox, Discord").append(" - ").append(new TextComponent("v").withStyle(ChatFormatting.DARK_RED)).append(Component.translatable(WaterFrames.VERSION).withStyle(ChatFormatting.RED)));
         this.add(textfield);
     }
 }
