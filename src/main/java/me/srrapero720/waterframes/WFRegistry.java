@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -79,8 +79,8 @@ public class WFRegistry {
     }
 
     @SubscribeEvent
-    public static void onUnloadingLevel(WorldEvent.Unload unload) {
-        if (unload.getWorld() != null && unload.getWorld().isClientSide()) {
+    public static void onUnloadingLevel(LevelEvent.Unload unload) {
+        if (unload.getLevel() != null && unload.getLevel().isClientSide()) {
             TextureCache.unload();
             VideoDisplay.unload();
         }
