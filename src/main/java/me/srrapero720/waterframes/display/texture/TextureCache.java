@@ -4,6 +4,8 @@ import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.display.IDisplay;
 import me.srrapero720.waterframes.display.ImageDisplay;
 import me.srrapero720.waterframes.display.VideoDisplay;
+import me.srrapero720.watermedia.Util;
+import me.srrapero720.watermedia.api.WaterMediaAPI;
 import me.srrapero720.watermedia.api.images.PictureFetcher;
 import me.srrapero720.watermedia.api.images.RenderablePicture;
 import net.minecraft.client.Minecraft;
@@ -51,13 +53,13 @@ public class TextureCache {
         }
     }
 
-    public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
-        return createDisplay(pos, url, volume, minDistance, maxDistance, loop, false);
+    public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean playing) {
+        return createDisplay(pos, url, volume, minDistance, maxDistance, loop, playing, false);
     }
     
-    public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean noVideo) {
+    public IDisplay createDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean playing, boolean noVideo) {
         volume *= Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER);
-        if (picture == null && !noVideo && !WFConfig.isDisabledVLC()) return VideoDisplay.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
+        if (picture == null && !noVideo && !WFConfig.isDisabledVLC()) return VideoDisplay.createVideoDisplay(pos, url, volume, minDistance, maxDistance, loop, playing);
 
         return new ImageDisplay(picture) {
             @Override
