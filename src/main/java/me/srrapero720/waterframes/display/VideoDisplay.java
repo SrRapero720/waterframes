@@ -44,10 +44,10 @@ public class VideoDisplay implements IDisplay {
         }
     }
     
-    public static IDisplay createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
+    public static IDisplay createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean playing) {
         return ThreadUtil.tryAndReturn((defaultVar) -> {
-            var display = new VideoDisplay(pos, url, volume, minDistance, maxDistance, loop);
-            if (display.player.getRaw() == null) throw new IllegalStateException("MediaDisplay uses a broken player");
+            var display = new VideoDisplay(pos, url, volume, minDistance, maxDistance, loop, playing);
+            if (display.player.raw() == null) throw new IllegalStateException("MediaDisplay uses a broken player");
             OPEN_DISPLAYS.add(display);
             return display;
 
@@ -65,7 +65,7 @@ public class VideoDisplay implements IDisplay {
     
     private final Vec3d pos;
     private volatile IntBuffer buffer;
-    public int texture;
+    private int texture;
     private boolean stream = false;
     private float lastSetVolume;
     private volatile boolean needsUpdate = false;
@@ -73,7 +73,7 @@ public class VideoDisplay implements IDisplay {
     private volatile boolean first = true;
     private long lastCorrectedTime = Long.MIN_VALUE;
     
-    public VideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop) {
+    public VideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean playing) {
         super();
         this.pos = pos;
         this.texture = GlStateManager._genTexture();
@@ -106,6 +106,7 @@ public class VideoDisplay implements IDisplay {
         lastSetVolume = getVolume(volume, minDistance, maxDistance);
         player.setVolume((int) lastSetVolume);
         player.setRepeatMode(loop);
+        player.setPauseMode(!playing);
         player.start(url);
     }
     
@@ -140,8 +141,8 @@ public class VideoDisplay implements IDisplay {
         volume = getVolume(volume, minDistance, maxDistance);
         if (volume != lastSetVolume) {
             // ENSURE PLAYER GET MUTED ON LONG DISTANCES
-            if (volume < 0.1) player.getRaw().mediaPlayer().audio().setMute(true);
-            if (volume >= 0.1) player.getRaw().mediaPlayer().audio().setMute(false);
+            if (volume < 0.1) player.setMuteMode(true);
+            if (volume >= 0.1) player.setMuteMode(false);
 
             player.setVolume((int) volume);
             lastSetVolume = volume;
@@ -150,8 +151,7 @@ public class VideoDisplay implements IDisplay {
         if (player.isValid()) {
             boolean realPlaying = playing && !Minecraft.getInstance().isPaused();
             
-            if (player.getRepeatMode() != loop)
-                player.setRepeatMode(loop);
+            if (player.getRepeatMode() != loop) player.setRepeatMode(loop);
             long tickTime = 50;
             long newDuration = player.getDuration();
 

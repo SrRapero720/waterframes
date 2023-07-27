@@ -103,7 +103,7 @@ public class TileProjector extends BlockEntity {
             return null;
         if (display != null)
             return display;
-        return display = cache.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop);
+        return display = cache.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop, playing);
     }
 
     public AlignedBox getBox() {
