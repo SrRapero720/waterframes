@@ -21,7 +21,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 public class VideoDisplay implements IDisplay {
-    private static final String VLC_FAILED = "https://i.imgur.com/XCcN2uX.png";
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
     
     private static final List<VideoDisplay> OPEN_DISPLAYS = new ArrayList<>();
@@ -53,8 +52,8 @@ public class VideoDisplay implements IDisplay {
             return display;
 
         }, ((Supplier<IDisplay>) () -> {
-            var cache = TextureCache.find(VLC_FAILED);
-            if (cache.ready()) return cache.createDisplay(pos, VLC_FAILED, volume, minDistance, maxDistance, loop, true);
+            var cache = TextureCache.DEF_VLC_FAILED;
+            if (cache.ready()) return cache.createDisplay(pos, null, volume, minDistance, maxDistance, loop, true);
             return null;
         }).get());
     }

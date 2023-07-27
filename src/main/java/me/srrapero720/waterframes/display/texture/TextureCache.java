@@ -19,6 +19,10 @@ import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 public class TextureCache {
     private static final Map<String, TextureCache> CACHE = new HashMap<>();
+    public static final TextureCache DEF_VLC_FAILED = new TextureCache((Util.ARCH.wrapped) ? WaterMediaAPI.VLC_FAILED_INSTALL : WaterMediaAPI.VLC_FAILED) {
+        @Override
+        public void remove() {} // DISABLE IT
+    };
 
     public final String url;
     private volatile PictureFetcher seeker;
@@ -32,6 +36,12 @@ public class TextureCache {
         this.url = url;
         use();
         attemptToLoad();
+    }
+
+    public TextureCache(RenderablePicture picture) {
+        url = null;
+        process(picture);
+        use();
     }
     
     private synchronized void attemptToLoad() {
@@ -54,8 +64,6 @@ public class TextureCache {
             public void release() { deuse(); }
         };
     }
-    
-
 
     public void process(RenderablePicture picture) {
         if (ready) return;
