@@ -20,7 +20,7 @@ public class WFUtil {
         var LOGGER = LogUtils.getLogger();
 
         List<String> result = null;
-        try (InputStream res = WFUtil.class.getResourceAsStream(path); BufferedReader reader = res != null ? new BufferedReader(new InputStreamReader(res)) : null) {
+        try (InputStream res = WFUtil.class.getClassLoader().getResourceAsStream(path); BufferedReader reader = res != null ? new BufferedReader(new InputStreamReader(res)) : null) {
             if (reader == null) throw new NullPointerException("Failed to read resource (not found)");
             return result = GSON.fromJson(reader, new TypeToken<List<String>>() {}.getType());
         } catch (Exception e) {
