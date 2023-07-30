@@ -8,6 +8,7 @@ import me.srrapero720.waterframes.display.ImageDisplay;
 import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -239,14 +240,12 @@ public class TileFrame extends BlockEntity {
 
     @Override
     public void setRemoved() {
-        if (this.level.isClientSide && display != null)
-            display.release();
+        if (this.level.isClientSide && display != null) display.release();
     }
 
     @Override
     public void onChunkUnloaded() {
-        if (this.level.isClientSide && display != null)
-            display.release();
+        if (this.level.isClientSide && display != null) display.release();
     }
 
     public void markDirty() {

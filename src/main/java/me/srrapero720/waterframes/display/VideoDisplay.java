@@ -9,7 +9,7 @@ import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import me.srrapero720.watermedia.api.WaterMediaAPI;
-import me.srrapero720.watermedia.api.video.VideoLANPlayer;
+import me.srrapero720.watermedia.api.video.SafeVideoLANPlayer;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
@@ -61,7 +61,7 @@ public class VideoDisplay implements IDisplay {
     public volatile int width = 1;
     public volatile int height = 1;
     
-    public VideoLANPlayer player;
+    public SafeVideoLANPlayer player;
     
     private final Vec3d pos;
     private volatile IntBuffer buffer;
@@ -77,7 +77,8 @@ public class VideoDisplay implements IDisplay {
         super();
         this.pos = pos;
         this.texture = GlStateManager._genTexture();
-        this.player = new VideoLANPlayer(null, (mediaPlayer, nativeBuffers, bufferFormat) -> {
+        var THREAD = Thread.currentThread();
+        this.player = new SafeVideoLANPlayer(null, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
             try {
                 buffer.put(nativeBuffers[0].asIntBuffer());
@@ -99,7 +100,7 @@ public class VideoDisplay implements IDisplay {
                 } finally {
                     lock.unlock();
                 }
-                return new BufferFormat("RGBA", sourceWidth, sourceHeight, new int[] { sourceWidth * 4 }, new int[] { sourceHeight });
+                return new BufferFormat("RGBA", sourceWidth, sourceHeight, new int[]{sourceWidth * 4}, new int[]{sourceHeight});
             }
         });
 
@@ -161,13 +162,13 @@ public class VideoDisplay implements IDisplay {
             if (stream) {
                 if (player.isPlaying() != realPlaying) player.setPauseMode(!realPlaying);
             } else {
-                if (player.getDuration() > 0) {
+                if (newDuration > 0) {
                     if (player.isPlaying() != realPlaying) player.setPauseMode(!realPlaying);
                     
                     if (player.isSeekable()) {
                         long time = tick * tickTime + (realPlaying ? (long) (WCoreUtil.toDeltaFrames() * tickTime) : 0);
                         if (time > player.getTime() && loop)
-                            time %= player.getDuration();
+                            time %= newDuration;
                         if (Math.abs(time - player.getTime()) > ACCEPTABLE_SYNC_TIME && Math.abs(time - lastCorrectedTime) > ACCEPTABLE_SYNC_TIME) {
                             lastCorrectedTime = time;
                             player.seekTo(time);
