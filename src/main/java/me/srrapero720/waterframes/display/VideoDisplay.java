@@ -77,7 +77,6 @@ public class VideoDisplay implements IDisplay {
         super();
         this.pos = pos;
         this.texture = GlStateManager._genTexture();
-        var THREAD = Thread.currentThread();
         this.player = new SafeVideoLANPlayer(null, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
             try {
