@@ -4,7 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.custom.tiles.TileProjector;
-import me.srrapero720.waterframes.display.texture.TextureCache;
+import me.srrapero720.watermedia.api.images.ImageCache;
+import me.srrapero720.watermedia.api.images.ImageFetch;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
@@ -157,8 +158,21 @@ public class ProjectorScreen extends GuiLayer {
         url.setMaxStringLength(2048);
         add(url);
         GuiLabel error = new GuiLabel("error").setDefaultColor(ColorUtils.RED);
-        if (frame.isClient() && frame.cache != null && frame.cache.getError() != null)
-            error.setTranslate(frame.cache.getError());
+        if (frame.isClient() && frame.cache != null) {
+            if (frame.cache.getStatus().equals(ImageCache.Status.FAILED)) {
+                Exception e = frame.cache.getException();
+                if (frame.cache.isVideo()) {
+                    if (WFConfig.isDisabledVLC()) error.setTitle(new TextComponent("Image not found"));
+                } else {
+                    if (e instanceof ImageFetch.GifDecodingException) error.setTranslate("download.exception.gif");
+                    else if (e.getMessage().startsWith("Server returned HTTP response code: 403")) error.setTranslate("download.exception.forbidden");
+                    else if (e.getMessage().startsWith("Server returned HTTP response code: 404")) error.setTranslate("download.exception.notfound");
+                    else error.setTranslate("download.exception.invalid");
+                }
+            } else if (frame.cache.getStatus().equals(ImageCache.Status.READY)) {
+                error.setTitle(new TextComponent("Loading")).setDefaultColor(ColorUtils.LIGHT_BLUE);
+            }
+        }
         add(error);
 
         // SIZE -----------------------
@@ -298,7 +312,7 @@ public class ProjectorScreen extends GuiLayer {
         save.setEnabled(WFConfig.canUse(getPlayer(), url.getText()));
         play_right.add(save);
         play_right.add(new GuiButton("reload", x -> {
-            if (Screen.hasShiftDown()) TextureCache.reloadAll();
+            if (Screen.hasShiftDown()) ImageCache.reloadAll();
             else if (frame.cache != null) frame.cache.reload();
         }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));
 

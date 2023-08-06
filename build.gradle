@@ -93,7 +93,7 @@ dependencies {
 
     //DEPENDENCIES
 //    implementation "curse.maven:watermedia-869524:${watermediaversion}"
-    implementation files("libs/watermedia-1.3.32.jar")
+    implementation files("libs/watermedia-2.0.0-alpha10.jar")
     implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
 
     // UTIL

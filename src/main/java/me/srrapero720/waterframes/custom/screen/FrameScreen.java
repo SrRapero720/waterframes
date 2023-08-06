@@ -5,7 +5,8 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.screen.widgets.WidgetTextField;
 import me.srrapero720.waterframes.custom.screen.widgets.constants.Constants;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
-import me.srrapero720.waterframes.display.texture.TextureCache;
+import me.srrapero720.watermedia.api.images.ImageCache;
+import me.srrapero720.watermedia.api.images.ImageFetch;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
@@ -163,8 +164,24 @@ public class FrameScreen extends GuiLayer {
         url = new WidgetTextField(save, "url", frame.getRealURL());
         add(url);
         GuiLabel error = new GuiLabel("error").setDefaultColor(ColorUtils.RED);
-        if (frame.isClient() && frame.cache != null && frame.cache.getError() != null)
-            error.setTranslate(frame.cache.getError());
+        if (frame.isClient() && frame.cache != null) {
+            if (frame.cache.getStatus().equals(ImageCache.Status.FAILED)) {
+                Exception e = frame.cache.getException();
+                if (frame.cache.isVideo()) {
+                    if (WFConfig.isDisabledVLC()) error.setTitle(new TextComponent("Image not found"));
+                } else {
+                    if (e instanceof ImageFetch.GifDecodingException) error.setTranslate("download.exception.gif");
+                    else if (e.getMessage().startsWith("Server returned HTTP response code: 403")) error.setTranslate("download.exception.forbidden");
+                    else if (e.getMessage().startsWith("Server returned HTTP response code: 404")) error.setTranslate("download.exception.notfound");
+                    else error.setTranslate("download.exception.invalid");
+                }
+            } else if (frame.cache.getStatus().equals(ImageCache.Status.LOADING)) {
+                error.setTitle(new TextComponent("Loading")).setDefaultColor(ColorUtils.LIGHT_BLUE);
+            } else if (frame.cache.getStatus().equals(ImageCache.Status.READY)) {
+                error.setTitle(new TextComponent("Completed")).setDefaultColor(ColorUtils.GREEN);
+            }
+        }
+
         add(error);
 
         // SIZE -----------------------
@@ -343,7 +360,7 @@ public class FrameScreen extends GuiLayer {
         save.setEnabled(WFConfig.canUse(getPlayer(), url.getText()));
         play_right.add(save);
         play_right.add(new GuiButton("reload", x -> {
-            if (Screen.hasShiftDown()) TextureCache.reloadAll();
+            if (Screen.hasShiftDown()) ImageCache.reloadAll();
             else if (frame.cache != null) frame.cache.reload();
         }).setTranslate("gui.waterframes.reload").setTooltip(new TextBuilder().translate("gui.waterframes.reload.tooltip").build()));
 

@@ -4,12 +4,10 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.MemoryTracker;
 import com.mojang.blaze3d.systems.RenderSystem;
 import me.lib720.caprica.vlcj.player.embedded.videosurface.callback.BufferFormat;
-import me.lib720.caprica.vlcj.player.embedded.videosurface.callback.UnAllocBufferFormatCallback;
-import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.ThreadUtil;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import me.srrapero720.watermedia.api.WaterMediaAPI;
-import me.srrapero720.watermedia.api.video.SafeVideoLANPlayer;
+import me.srrapero720.watermedia.api.players.VideoPlayer;
 import net.minecraft.client.Minecraft;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
@@ -18,7 +16,6 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Supplier;
 
 public class VideoDisplay implements IDisplay {
     private static final int ACCEPTABLE_SYNC_TIME = 1000;
@@ -44,24 +41,20 @@ public class VideoDisplay implements IDisplay {
         }
     }
     
-    public static IDisplay createVideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean playing) {
+    public static IDisplay create(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean playing) {
         return ThreadUtil.tryAndReturn((defaultVar) -> {
             var display = new VideoDisplay(pos, url, volume, minDistance, maxDistance, loop, playing);
-            if (display.player.raw() == null) throw new IllegalStateException("MediaDisplay uses a broken player");
+            if (display.player.raw == null) throw new IllegalStateException("MediaDisplay uses a broken player");
             OPEN_DISPLAYS.add(display);
             return display;
 
-        }, ((Supplier<IDisplay>) () -> {
-            var cache = TextureCache.DEF_VLC_FAILED;
-            if (cache.ready()) return cache.createDisplay(pos, null, volume, minDistance, maxDistance, loop, true);
-            return null;
-        }).get());
+        }, ImageDisplay.VLC_FAILED);
     }
     
     public volatile int width = 1;
     public volatile int height = 1;
     
-    public SafeVideoLANPlayer player;
+    public VideoPlayer player;
     
     private final Vec3d pos;
     private volatile IntBuffer buffer;
@@ -77,7 +70,7 @@ public class VideoDisplay implements IDisplay {
         super();
         this.pos = pos;
         this.texture = GlStateManager._genTexture();
-        this.player = new SafeVideoLANPlayer(null, (mediaPlayer, nativeBuffers, bufferFormat) -> {
+        this.player = new VideoPlayer(null, (mediaPlayer, nativeBuffers, bufferFormat) -> {
             lock.lock();
             try {
                 buffer.put(nativeBuffers[0].asIntBuffer());
@@ -86,21 +79,18 @@ public class VideoDisplay implements IDisplay {
             } finally {
                 lock.unlock();
             }
-        }, new UnAllocBufferFormatCallback() {
-            @Override
-            public BufferFormat getBufferFormat(int sourceWidth, int sourceHeight) {
-                lock.lock();
-                try {
-                    VideoDisplay.this.width = sourceWidth;
-                    VideoDisplay.this.height = sourceHeight;
-                    VideoDisplay.this.first = true;
-                    buffer = MemoryTracker.create(sourceWidth * sourceHeight * 4).asIntBuffer();
-                    needsUpdate = true;
-                } finally {
-                    lock.unlock();
-                }
-                return new BufferFormat("RGBA", sourceWidth, sourceHeight, new int[]{sourceWidth * 4}, new int[]{sourceHeight});
+        }, (sourceWidth, sourceHeight) -> {
+            lock.lock();
+            try {
+                VideoDisplay.this.width = sourceWidth;
+                VideoDisplay.this.height = sourceHeight;
+                VideoDisplay.this.first = true;
+                buffer = MemoryTracker.create(sourceWidth * sourceHeight * 4).asIntBuffer();
+                needsUpdate = true;
+            } finally {
+                lock.unlock();
             }
+            return new BufferFormat("RGBA", sourceWidth, sourceHeight, new int[]{sourceWidth * 4}, new int[]{sourceHeight});
         });
 
         lastSetVolume = getVolume(volume, minDistance, maxDistance);
@@ -130,7 +120,7 @@ public class VideoDisplay implements IDisplay {
 
     @Override
     public int maxTick() {
-        if (player != null) return WaterMediaAPI.msToGameTicks(player.getDuration());
+        if (player != null) return WaterMediaAPI.math_millisToTicks(player.getDuration());
         return 0;
     }
 

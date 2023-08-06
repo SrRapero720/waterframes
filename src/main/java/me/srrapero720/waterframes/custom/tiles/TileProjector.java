@@ -4,8 +4,11 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.custom.blocks.Frame;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.display.IDisplay;
-import me.srrapero720.waterframes.display.texture.TextureCache;
+import me.srrapero720.waterframes.display.ImageDisplay;
+import me.srrapero720.waterframes.display.VideoDisplay;
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
+import me.srrapero720.watermedia.api.images.ImageCache;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -25,6 +28,8 @@ import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
+
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 public class TileProjector extends BlockEntity {
 
@@ -63,7 +68,7 @@ public class TileProjector extends BlockEntity {
     public boolean playing = true;
 
     @OnlyIn(Dist.CLIENT)
-    public TextureCache cache;
+    public ImageCache cache;
 
     @OnlyIn(Dist.CLIENT)
     public IDisplay display;
@@ -93,17 +98,50 @@ public class TileProjector extends BlockEntity {
 
     public IDisplay requestDisplay() {
         String url = getURL();
-        if (cache == null || !cache.url.equals(url)) {
-            cache = TextureCache.find(url);
-            if (display != null)
-                display.release();
+        if (cache == null || !cache.originalURL.equals(url)) {
+            cache = ImageCache.findOrCreate(url, Minecraft.getInstance()::execute);
+            if (display != null) display.release();
             display = null;
         }
-        if (!cache.isVideo() && (!cache.ready() || cache.getError() != null))
-            return null;
-        if (display != null)
-            return display;
-        return display = cache.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop, playing);
+
+        switch (cache.getStatus()) {
+            case READY -> {
+                if (display != null) return display;
+                if (cache.isVideo()) return display = VideoDisplay.create(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop, playing);
+                else return display = new ImageDisplay(cache);
+            }
+            case WAITING -> {
+                cache.load();
+                return display;
+            }
+            case LOADING -> {
+                cleanDisplay(); // ensure display is cleaned
+                return ImageDisplay.LOADING_GIF;
+            }
+            case FORGOTTEN -> {
+                LOGGER.warn("Cached picture is forgotten, cleaning and reloading");
+                cleanDisplay();
+                cache = null;
+                return null;
+            }
+            case FAILED -> {
+                cleanDisplay();
+                return null;
+            }
+            default -> {
+                LOGGER.warn("WATERMeDIA Behavior is modified, this shouldn't be executed");
+                return null;
+            }
+        }
+
+//        return display = cache.createDisplay(new Vec3d(worldPosition), url, volume, minDistance, maxDistance, loop, playing);
+    }
+
+    private void cleanDisplay() {
+        if (display != null) {
+            display.release();
+            display = null;
+        }
     }
 
     public AlignedBox getBox() {

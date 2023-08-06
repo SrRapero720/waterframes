@@ -1,17 +1,10 @@
 package me.srrapero720.waterframes;
 
-import com.google.gson.JsonParser;
-import com.sun.jna.Native;
-import com.sun.jna.Structure;
 import me.srrapero720.waterframes.custom.blocks.Frame;
-import me.srrapero720.waterframes.custom.blocks.Projector;
 import me.srrapero720.waterframes.custom.packets.FramesPacket;
 import me.srrapero720.waterframes.custom.renderer.FramesRenderer;
-import me.srrapero720.waterframes.custom.renderer.ProjectorRenderer;
 import me.srrapero720.waterframes.custom.tiles.TileFrame;
-import me.srrapero720.waterframes.custom.tiles.TileProjector;
 import me.srrapero720.waterframes.display.VideoDisplay;
-import me.srrapero720.waterframes.display.texture.TextureCache;
 import me.srrapero720.waterframes.watercore_supplier.ForgeSmartTab;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
@@ -33,7 +26,6 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import org.apache.commons.io.IOUtils;
 
 @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WFRegistry {
@@ -67,21 +59,18 @@ public class WFRegistry {
 
     @SubscribeEvent
     public static void onRenderTickEvent(TickEvent.RenderTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) TextureCache.renderTick();
     }
 
     @SubscribeEvent
     public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) {
             VideoDisplay.tick();
-            TextureCache.clientTick();
         }
     }
 
     @SubscribeEvent
     public static void onUnloadingLevel(WorldEvent.Unload unload) {
         if (unload.getWorld() != null && unload.getWorld().isClientSide()) {
-            TextureCache.unload();
             VideoDisplay.unload();
         }
     }

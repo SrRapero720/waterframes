@@ -2,16 +2,26 @@ package me.srrapero720.waterframes.display;
 
 import me.srrapero720.waterframes.watercore_supplier.WCoreUtil;
 import me.srrapero720.watermedia.api.WaterMediaAPI;
-import me.srrapero720.watermedia.api.images.RenderablePicture;
+import me.srrapero720.watermedia.api.images.ImageCache;
+import me.srrapero720.watermedia.api.images.ImageRenderer;
+import me.srrapero720.watermedia.util.WaterOs;
 
 public class ImageDisplay implements IDisplay {
     public static final IDisplay LOADING_GIF = new ImageDisplay(WaterMediaAPI.LOADING_GIF);
+    public static final IDisplay VLC_FAILED = new ImageDisplay(WaterOs.getArch().wrapped ? WaterMediaAPI.VLC_FAILED : WaterMediaAPI.VLC_FAILED_INSTALL);
     
-    public final RenderablePicture picture;
+    public final ImageRenderer picture;
+    public final ImageCache cache;
     private int textureId;
     
-    public ImageDisplay(RenderablePicture picture) {
+    public ImageDisplay(ImageRenderer picture) {
         this.picture = picture;
+        this.cache = null;
+    }
+
+    public ImageDisplay(ImageCache cache) {
+        this.cache = cache;
+        this.picture = cache.getRenderer();
     }
     
     @Override
@@ -19,7 +29,7 @@ public class ImageDisplay implements IDisplay {
         long time = tick * 50L + (playing ? (long) (WCoreUtil.toDeltaFrames() * 50) : 0);
         long duration = picture.duration;
         if (duration > 0 && time > duration && loop) time %= duration;
-        textureId = picture.genTexture(time);
+        textureId = picture.textureId(time);
     }
     
     @Override
@@ -38,7 +48,7 @@ public class ImageDisplay implements IDisplay {
     
     @Override
     public void release() {
-//        picture.unuse();
+        if (cache != null) cache.deuse();
     }
     
     @Override
