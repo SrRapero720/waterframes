@@ -146,8 +146,11 @@ public class ProjectorScreen extends GuiLayer {
         widgetMediaSettings.addOnFirst(new GuiCheckBox("loop", projector.data.loop).setTranslate("gui.waterframes.loop"));
 
         widgetMediaSettings.getSecondRow().setAlign(Align.RIGHT).setExpandableX();
-        widgetMediaSettings.addOnSecond(new GuiStateButton("audio_origin", projector.data.audioOrigin, new TextListBuilder()
-                .addTranslated("gui.waterframes.audiocenter.", "origin", "center", "projection")));
+        widgetMediaSettings.addOnSecond(new WidgetParent()
+                .add2(new GuiStateButton("audio_origin", projector.data.audioOrigin, new TextListBuilder()
+                        .addTranslated("gui.waterframes.audiocenter.", "block", "projection", "between")))
+                .setAlign(Align.RIGHT));
+
         widgetMediaSettings.addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
                 .add2(new WidgetIcon("v_icon", 12, 12, CustomIcons.VOLUME))
                 .add2(new WidgetSlider("volume", 130, 10, projector.data.volume, 0, (double) WaterConfig.maxAudioVolume() / 100, WidgetSlider.PERCENT).setExpandableX())
