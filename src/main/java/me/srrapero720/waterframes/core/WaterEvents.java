@@ -1,10 +1,10 @@
 package me.srrapero720.waterframes.core;
 
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.client.displays.VideoDisplay;
-import me.srrapero720.waterframes.client.renderer.FramesRenderer;
-import me.srrapero720.waterframes.client.renderer.ProjectorRenderer;
-import me.srrapero720.waterframes.common.packets.ActionPacket;
+import me.srrapero720.waterframes.api.displays.VideoDisplay;
+import me.srrapero720.waterframes.custom.rendering.FrameRender;
+import me.srrapero720.waterframes.custom.rendering.ProjectorRender;
+import me.srrapero720.waterframes.custom.packets.ActionPacket;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -39,8 +39,8 @@ public class WaterEvents {
 
         @OnlyIn(Dist.CLIENT)
         private static void client() {
-            BlockEntityRenderers.register(WaterRegistry.TILE_FRAME.get(), (x) -> new FramesRenderer());
-            BlockEntityRenderers.register(WaterRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRenderer());
+            BlockEntityRenderers.register(WaterRegistry.TILE_FRAME.get(), (x) -> new FrameRender());
+            BlockEntityRenderers.register(WaterRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRender());
         }
 
         @OnlyIn(Dist.CLIENT)

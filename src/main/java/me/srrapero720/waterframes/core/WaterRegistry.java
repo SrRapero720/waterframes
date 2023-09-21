@@ -1,10 +1,10 @@
 package me.srrapero720.waterframes.core;
 
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.common.blocks.FrameBlock;
-import me.srrapero720.waterframes.common.blocks.ProjectorBlock;
-import me.srrapero720.waterframes.common.blockentities.BEFrame;
-import me.srrapero720.waterframes.common.blockentities.BEProjector;
+import me.srrapero720.waterframes.custom.block.FrameBlock;
+import me.srrapero720.waterframes.custom.block.ProjectorBlock;
+import me.srrapero720.waterframes.custom.block.entity.FrameTile;
+import me.srrapero720.waterframes.custom.block.entity.ProjectorTile;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -38,8 +38,8 @@ public class WaterRegistry {
     public static final RegistryObject<Item> PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB)));
 
     /* TILES */
-    public static final RegistryObject<BlockEntityType<BEFrame>> TILE_FRAME = tile("frame", BEFrame::new, FRAME);
-    public static final RegistryObject<BlockEntityType<BEProjector>> TILE_PROJECTOR = tile("projector", BEProjector::new, PROJECTOR);
+    public static final RegistryObject<BlockEntityType<FrameTile>> TILE_FRAME = tile("frame", FrameTile::new, FRAME);
+    public static final RegistryObject<BlockEntityType<ProjectorTile>> TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR);
 
     public static void init(IEventBus bus) {
         BLOCKS.register(bus);
