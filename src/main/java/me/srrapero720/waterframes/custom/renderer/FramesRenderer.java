@@ -99,5 +99,7 @@ public class FramesRenderer implements BlockEntityRenderer<TileFrame> {
         }
         
         pose.popPose();
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableBlend();
     }
 }
