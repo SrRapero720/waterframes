@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.custom.block.entity;
 
 import me.srrapero720.waterframes.api.block.entity.BasicBlockEntity;
-import me.srrapero720.waterframes.api.data.FrameData;
+import me.srrapero720.waterframes.custom.data.FrameData;
 import me.srrapero720.waterframes.custom.block.FrameBlock;
 import me.srrapero720.waterframes.core.WaterRegistry;
 import net.minecraft.core.BlockPos;

@@ -2,16 +2,20 @@ package me.srrapero720.waterframes.api.displays;
 
 import com.mojang.blaze3d.platform.MemoryTracker;
 import me.srrapero720.waterframes.api.data.BasicData;
+import me.srrapero720.waterframes.core.WaterNet;
+import me.srrapero720.waterframes.core.tools.MathTool;
 import me.srrapero720.waterframes.core.tools.TimerTool;
 import me.srrapero720.watermedia.api.WaterMediaAPI;
 import me.srrapero720.watermedia.api.player.SyncVideoPlayer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @OnlyIn(Dist.CLIENT)
 public class VideoDisplay extends BaseDisplay {
@@ -19,17 +23,17 @@ public class VideoDisplay extends BaseDisplay {
     private static final int SYNC_TIME = 1500;
 
     public SyncVideoPlayer videoPlayer;
-    private final Vec3d pos;
-    private float lastSetVolume = 0;
+    private Vec3d pos;
+    private final AtomicInteger currentVolumen = new AtomicInteger(0);
     private long lastCorrectedTime = Long.MIN_VALUE;
     private boolean stream = false;
+
     public VideoDisplay(Vec3d pos, String url, float volume, float minDistance, float maxDistance, boolean loop, boolean playing) {
-        super();
         this.pos = pos;
         this.videoPlayer = new SyncVideoPlayer(null, Minecraft.getInstance(), MemoryTracker::create);
 
-        lastSetVolume = getVolume(volume, minDistance, maxDistance);
-        videoPlayer.setVolume((int) lastSetVolume);
+        currentVolumen.set(getVolume(volume, minDistance, maxDistance));
+        videoPlayer.setVolume(currentVolumen.get());
         videoPlayer.setRepeatMode(loop);
         videoPlayer.setPauseMode(!playing);
         videoPlayer.start(url);
@@ -48,7 +52,7 @@ public class VideoDisplay extends BaseDisplay {
 
         if (distance > minDistance)
             volume = (distance > maxDistance) ? 0 : volume * (1 - ((distance - minDistance) / (maxDistance - minDistance)));
-        return (int) (volume * 100F);
+        return (int) (volume);
     }
 
     @Override
@@ -57,41 +61,37 @@ public class VideoDisplay extends BaseDisplay {
         return 0;
     }
 
-    @Override
-    public void tick(BasicData data) {
-        if (videoPlayer == null) return;
+    public void syncTick() {
+        if (syncTick) return;
+        WaterNet.syncMaxTickTime(pos.toBlockPos(), maxTick());
+        syncTick = true;
+    }
 
-        var volume = getVolume(data.volume, data.minVolumeDistance, data.maxVolumeDistance);
-        if (volume != lastSetVolume) {
-            videoPlayer.setVolume(volume);
-            lastSetVolume = volume;
-        }
+    @Override
+    public void tick(BlockPos pos, BasicData data) {
+        if (videoPlayer == null) return;
+        this.pos = new Vec3d(pos);
+
+        this.syncTick();
+        data.tickMax = maxTick();
+
+        int volume = getVolume(data.volume, data.minVolumeDistance, data.maxVolumeDistance);
+        if (!currentVolumen.compareAndSet(volume, volume)) videoPlayer.setVolume(volume);
 
         if (videoPlayer.isValid()) {
-            boolean realPlaying = data.playing && !Minecraft.getInstance().isPaused();
-
             if (videoPlayer.getRepeatMode() != data.loop) videoPlayer.setRepeatMode(data.loop);
-            long tickTime = 50;
-            long currentDuration = videoPlayer.getMediaInfoDuration();
-
-            if (!stream && currentDuration != -1 && currentDuration != 0 && videoPlayer.getMediaInfoDuration() == 0) stream = true;
             if (!stream && videoPlayer.isLive()) stream = true;
 
-            if (stream) {
-                if (videoPlayer.isPlaying() != realPlaying) videoPlayer.setPauseMode(!realPlaying);
-            } else {
-                if (currentDuration > 0) {
-                    if (videoPlayer.isPlaying() != realPlaying) videoPlayer.setPauseMode(!realPlaying);
+            boolean realPlaying = data.playing && !Minecraft.getInstance().isPaused();
 
-                    if (videoPlayer.isSeekAble()) {
-                        long time = data.tick * tickTime + (realPlaying ? (long) (TimerTool.deltaFrames() * tickTime) : 0);
-                        if (time > videoPlayer.getTime() && data.loop) time %= currentDuration;
+            videoPlayer.setPauseMode(!realPlaying);
+            if (!stream && videoPlayer.isSeekAble()) {
+                long time = WaterMediaAPI.math_ticksToMillis(data.tick) + (realPlaying ? WaterMediaAPI.math_ticksToMillis((int) TimerTool.deltaFrames()) : 0);
+                if (time > videoPlayer.getTime() && data.loop) time = MathTool.floorMod(time, videoPlayer.getMediaInfoDuration());
 
-                        if (Math.abs(time - videoPlayer.getTime()) > SYNC_TIME && Math.abs(time - lastCorrectedTime) > SYNC_TIME) {
-                            lastCorrectedTime = time;
-                            videoPlayer.seekTo(time);
-                        }
-                    }
+                if (Math.abs(time - videoPlayer.getTime()) > SYNC_TIME && Math.abs(time - lastCorrectedTime) > SYNC_TIME) {
+                    lastCorrectedTime = time;
+                    videoPlayer.seekTo(time);
                 }
             }
         }

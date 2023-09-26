@@ -53,7 +53,7 @@ public abstract class BasicData {
     public boolean loop = true;
     public boolean playing = true;
     public int tick = 0;
-    public int tickMax = 0;
+    public int tickMax = -1;
 
     public int getPosX() { return min.x == 0 ? 0 : max.x == 1 ? 2 : 1; }
     public int getPosY() { return min.y == 0 ? 0 : max.y == 1 ? 2 : 1; }
@@ -75,7 +75,7 @@ public abstract class BasicData {
         nbt.putInt(VOL_RANGE_MAX, maxVolumeDistance);
         nbt.putBoolean(PLAYING, playing);
         nbt.putInt(TICK, tick);
-        nbt.putInt(TICK_MAX, 0);
+        nbt.putInt(TICK_MAX, tickMax);
         nbt.putBoolean(LOOP, loop);
     }
 
@@ -151,7 +151,10 @@ public abstract class BasicData {
     public static <D extends BasicData, T extends BasicBlockEntity<?>> void sync(T block, Player player, CompoundTag nbt, ExtraData<D> extra) {
         String url = nbt.getString("url");
         if (WaterConfig.canUse(player, url)) {
-            if (!block.getUrl().equals(url)) block.data.tick = 0;
+            if (!block.getUrl().equals(url)) {
+                block.data.tick = 0;
+                block.data.tickMax = -1;
+            }
             block.setUrl(url);
 
             float width = (float) MathTool.min(WaterConfig.maxWidth(), nbt.getFloat("width"));

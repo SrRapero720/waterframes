@@ -1,15 +1,15 @@
 package me.srrapero720.waterframes.custom.screen;
 
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.api.data.ProjectorData;
-import me.srrapero720.waterframes.custom.packets.ActionPacket;
-import me.srrapero720.waterframes.common.screen.widgets.*;
-import me.srrapero720.waterframes.custom.screen.widgets.custom.CustomStyles;
-import me.srrapero720.waterframes.custom.screen.widgets.custom.CustomIcons;
+import me.srrapero720.waterframes.api.data.BasicData;
 import me.srrapero720.waterframes.core.WaterConfig;
+import me.srrapero720.waterframes.core.WaterNet;
 import me.srrapero720.waterframes.custom.block.entity.ProjectorTile;
-import me.srrapero720.waterframes.custom.rendering.screen.widgets.*;
+import me.srrapero720.waterframes.custom.data.ProjectorData;
+import me.srrapero720.waterframes.custom.packets.ActionPacket;
 import me.srrapero720.waterframes.custom.screen.widgets.*;
+import me.srrapero720.waterframes.custom.screen.widgets.custom.CustomIcons;
+import me.srrapero720.waterframes.custom.screen.widgets.custom.CustomStyles;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
@@ -24,12 +24,11 @@ import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 import team.creative.creativecore.common.gui.sync.GuiSyncLocal;
-import team.creative.creativecore.common.util.text.TextBuilder;
 import team.creative.creativecore.common.util.text.TextListBuilder;
 
 public class ProjectorScreen extends GuiLayer {
     public ProjectorTile projector;
-    public GuiTextfield widgetUrl;
+    public GuiTextfield inputUrl;
     public float scaleMultiplier;
 
     public final GuiSyncLocal<EndTag> PLAY = getSyncHolder().register("play", x -> projector.play());
@@ -55,19 +54,18 @@ public class ProjectorScreen extends GuiLayer {
 
     @Override
     public void create() {
-        GuiButton widgetSave = (GuiButton) new GuiButton("save", x -> SET_DATA.send(ProjectorData.build(this))).setTranslate("gui.waterframes.save");
-        widgetUrl = new WidgetTextField(widgetSave, "url", projector.getUrl());
-        widgetUrl.setSuggestion("https://i.imgur.com/1yCDs5C.mp4");
+        GuiButton buttonSave = (GuiButton) new GuiButton("save", x -> SET_DATA.send(ProjectorData.build(this))).setTranslate("gui.waterframes.save");
+        inputUrl = new WidgetTextField(buttonSave, BasicData.URL, projector.getUrl()).setSuggest("https://i.imgur.com/1yCDs5C.mp4");
 
-        WidgetDoubleTable widgetUrlStatus = new WidgetDoubleTable(() -> new WidgetColum(GuiFlow.STACK_Y)).setSpacing(4);
-
-        widgetUrlStatus.addOnFirst(new WidgetLabel("media_label", 0.8f).setTitle(new TextComponent("URL")));
-        widgetUrlStatus.addOnFirst(widgetUrl.setExpandableX());
-        if (isClient()) widgetUrlStatus.addOnSecond(new WidgetStatusIcon("", 25, 25, CustomIcons.STATUS_OK, () -> projector.imageCache));
+        WidgetDoubleTable parentURL = new WidgetDoubleTable(GuiFlow.STACK_Y)
+                .addOnFirst(new WidgetLabel("media_label", 0.75f).setTitle(new TextComponent("URL")))
+                .addOnFirst(inputUrl.setExpandableX())
+                .addOnSecondIf(new WidgetStatusIcon("", 25, 25, CustomIcons.STATUS_OK, () -> projector.imageCache), isClient())
+                .setSpacing(4);
 
         // IMAGE SIZE
-        GuiParent widgetSizeParent = new WidgetParent(GuiFlow.STACK_X).setSpacing(8).setAlign(Align.STRETCH);
-        widgetSizeParent.add(new WidgetCounterDecimal("width", projector.getSizeX(), 0, WaterConfig.maxWidth(), scaleMultiplier)
+        GuiParent parentSize = new WidgetParent(GuiFlow.STACK_X).setSpacing(8).setAlign(Align.STRETCH);
+        parentSize.add(new WidgetCounterDecimal("width", projector.getSizeX(), 0, WaterConfig.maxWidth(), scaleMultiplier)
                 .expandX()
                 .setSpacing(0)
                 .setAlign(Align.CENTER)
@@ -82,7 +80,7 @@ public class ProjectorScreen extends GuiLayer {
                 }).setTitle(new TextComponent("x->y")))
         );
 
-        widgetSizeParent.add(new WidgetCounterDecimal("height", projector.getSizeY(), 0, (float) WaterConfig.maxHeight(), scaleMultiplier)
+        parentSize.add(new WidgetCounterDecimal("height", projector.getSizeY(), 0, WaterConfig.maxHeight(), scaleMultiplier)
                 .expandX()
                 .setSpacing(0)
                 .setAlign(Align.CENTER)
@@ -96,105 +94,81 @@ public class ProjectorScreen extends GuiLayer {
                         sizeXField.setValue(projector.display.width() / (projector.display.height() / y));
                 }).setTitle(new TextComponent("y->x"))));
 
-        widgetSizeParent.add(new WidgetParent(GuiFlow.STACK_Y)
-                .add2(new GuiCheckBox("flip_x", projector.data.flipX).setTranslate("gui.waterframes.flipx"))
-                .add2(new GuiCheckBox("flip_y", projector.data.flipY).setTranslate("gui.waterframes.flipy")));
+        parentSize.add(new WidgetParent(GuiFlow.STACK_Y)
+                .add2(new GuiCheckBox(BasicData.FLIP_X, projector.data.flipX).setTranslate("gui.waterframes.flipx"))
+                .add2(new GuiCheckBox(BasicData.FLIP_Y, projector.data.flipY).setTranslate("gui.waterframes.flipy")));
 
 
-        WidgetDoubleTable widgetImageSettings = new WidgetDoubleTable(() -> new WidgetColum(GuiFlow.STACK_Y)).setSpacing(2);
-        widgetImageSettings.setExpandableY();
+        WidgetDoubleTable parentTexSettings = new WidgetDoubleTable(GuiFlow.STACK_Y).setSpacing(2).expandY()
+                .addOnFirst(new WidgetParent(GuiFlow.STACK_X)
+                        .add2(new WidgetIcon("r_icon", 12, 12, CustomIcons.ROTATION))
+                        .add2(new WidgetSlider(BasicData.ROTATION, 130, 10, projector.data.rotation, 0, 360, WidgetSlider.ANGLE)))
+                .addOnFirst(new WidgetParent(GuiFlow.STACK_X)
+                        .add2(new WidgetIcon("t_icon", 12, 12, CustomIcons.TRANSPARENCY))
+                        .add2(new WidgetSlider(BasicData.ALPHA, 130, 10, projector.data.alpha, 0, 1, WidgetSlider.PERCENT)))
+                .addOnFirst(new WidgetParent(GuiFlow.STACK_X)
+                        .add2(new WidgetIcon("b_icon", 12, 12, CustomIcons.BRIGHTNESS))
+                        .add2(new WidgetSlider(BasicData.BRIGHTNESS, 130, 10, projector.data.brightness, 0, 1, WidgetSlider.PERCENT)))
+                .addOnFirst(new WidgetParent(GuiFlow.STACK_X)
+                        .add2(new WidgetIcon("d_icon", 12, 12, CustomIcons.DISTANCE))
+                        .add2(new GuiSteppedSlider(BasicData.RENDER_DISTANCE, 130, 10, projector.data.renderDistance, 5, 1024)))
+                .addOnFirst(new WidgetParent(GuiFlow.STACK_X)
+                        .add2(new WidgetIcon("pd_icon", 12, 12, CustomIcons.PROJECTION_DISTANCE))
+                        .add2(new GuiSteppedSlider(ProjectorData.PROJECTION_DISTANCE, 130, 10, projector.data.projectionDistance, 4, 128)))
+                // IMAGE POSITION
+                .addOnSecond(new WidgetIcon("posView", 40, 35, CustomIcons.POS_CORD[projector.data.getPosX()][projector.data.getPosY()]))
+                .addOnSecond(new GuiStateButton("pos_x", projector.data.getPosX(), new TextListBuilder()
+                        .addTranslated("gui.waterframes.posx.", "left", "center", "right")))
+                .addOnSecond(new GuiStateButton("pos_y", projector.data.getPosY(), new TextListBuilder()
+                        .addTranslated("gui.waterframes.posy.", "top", "center", "bottom")));
 
-        // ROTATION
-        widgetImageSettings.addOnFirst(new WidgetParent(GuiFlow.STACK_X)
-                .add2(new WidgetIcon("r_icon", 12, 12, CustomIcons.ROTATION))
-                .add2(new WidgetSlider("rotation", 130, 10, projector.data.rotation, 0, 360, WidgetSlider.ANGLE)));
+        parentTexSettings.getSecondRow().setAlign(Align.CENTER);
 
-        // TRANSPARENCY
-        widgetImageSettings.addOnFirst(new WidgetParent(GuiFlow.STACK_X)
-                .add2(new WidgetIcon("t_icon", 12, 12, CustomIcons.TRANSPARENCY))
-                .add2(new WidgetSlider("alpha", 130, 10, projector.data.alpha, 0, 1, WidgetSlider.PERCENT)));
-
-        // BRIGHTNESS
-        widgetImageSettings.addOnFirst(new WidgetParent(GuiFlow.STACK_X)
-                .add2(new WidgetIcon("b_icon", 12, 12, CustomIcons.BRIGHTNESS))
-                .add2(new WidgetSlider("brightness", 130, 10, projector.data.brightness, 0, 1, WidgetSlider.PERCENT)));
-
-        // DISTANCE
-        widgetImageSettings.addOnFirst(new WidgetParent(GuiFlow.STACK_X)
-                .add2(new WidgetIcon("d_icon", 12, 12, CustomIcons.DISTANCE))
-                .add2(new GuiSteppedSlider("render_distance", 130, 10, projector.data.renderDistance, 5, 1024)));
-
-        // PROJECTION DISTANCE
-        widgetImageSettings.addOnFirst(new WidgetParent(GuiFlow.STACK_X)
-                .add2(new WidgetIcon("pd_icon", 12, 12, CustomIcons.PROJECTION_DISTANCE))
-                .add2(new GuiSteppedSlider("projection_distance", 130, 10, projector.data.projectionDistance, 4, 128)));
-
-        // IMAGE POSITION
-        widgetImageSettings.getSecondRow().setAlign(Align.CENTER);
-        widgetImageSettings.addOnSecond(new WidgetIcon("posView", 40, 35, CustomIcons.POS_CORD[projector.data.getPosX()][projector.data.getPosY()]));
-        widgetImageSettings.addOnSecond(new GuiStateButton("pos_x", projector.data.getPosX(), new TextListBuilder()
-                .addTranslated("gui.waterframes.posx.", "left", "center", "right")));
-
-        widgetImageSettings.addOnSecond(new GuiStateButton("pos_y", projector.data.getPosY(), new TextListBuilder()
-                .addTranslated("gui.waterframes.posy.", "top", "center", "bottom")));
-
-
-        WidgetDoubleTable widgetMediaSettings = new WidgetDoubleTable(() -> new WidgetColum(GuiFlow.STACK_Y)).setSpacing(2);
-        widgetMediaSettings.getFirstRow().setExpandableX();
-        widgetMediaSettings.addOnFirst(new WidgetParent("", GuiFlow.STACK_X)
-                .add2(new GuiIconButton("play", CustomIcons.PLAY, button -> PLAY.send(EndTag.INSTANCE)))
-                .add2(new GuiIconButton("pause", CustomIcons.PAUSE, button -> PAUSE.send(EndTag.INSTANCE)))
-                .add2(new GuiIconButton("stop", CustomIcons.STOP, button -> STOP.send(EndTag.INSTANCE))));
-        widgetMediaSettings.addOnFirst(new GuiCheckBox("loop", projector.data.loop).setTranslate("gui.waterframes.loop"));
-
-        widgetMediaSettings.getSecondRow().setAlign(Align.RIGHT).setExpandableX();
-        widgetMediaSettings.addOnSecond(new WidgetParent()
-                .add2(new GuiStateButton("audio_origin", projector.data.audioOrigin, new TextListBuilder()
-                        .addTranslated("gui.waterframes.audiocenter.", "block", "projection", "between")))
-                .setAlign(Align.RIGHT));
-
-        widgetMediaSettings.addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
-                .add2(new WidgetIcon("v_icon", 12, 12, CustomIcons.VOLUME))
-                .add2(new WidgetSlider("volume", 130, 10, projector.data.volume, 0, (double) WaterConfig.maxAudioVolume() / 100, WidgetSlider.PERCENT).setExpandableX())
-                .setAlign(Align.RIGHT));
-
+        WidgetDoubleTable parentMedia = new WidgetDoubleTable(() -> new WidgetColum(GuiFlow.STACK_Y)).setSpacing(2);
         GuiSteppedSlider rangeMin;
-        widgetMediaSettings.addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
-                .add2(new WidgetIcon("v_icon", 12, 12, CustomIcons.VOLUME_RANGE_MIN))
-                .add2(rangeMin = (GuiSteppedSlider) new GuiSteppedSlider("volume_min_range", 63, 10, projector.data.minVolumeDistance, 0, 512).setExpandableX())
-                .add2(new WidgetIcon("v_icon", 12, 12, CustomIcons.VOLUME_RANGE_MAX))
-                .add2(new GuiSteppedSlider("volume_max_range", 63, 10, projector.data.maxVolumeDistance, 0, WaterConfig.maxAudioDistance()) {
-                    @Override
-                    public void setValue(double value) {
-                        super.setValue((int) value);
-                        rangeMin.maxValue = (int) value;
 
-                        if (rangeMin.getValue() > this.value) rangeMin.setValue(value >= 0 ? (int) value : 0);
-                    }
-                }.setExpandableX())
+        parentMedia.addOnFirst(new WidgetParent("", GuiFlow.STACK_X)
+                        .add2(new GuiIconButton("play", CustomIcons.PLAY, button -> PLAY.send(EndTag.INSTANCE)))
+                        .add2(new GuiIconButton("pause", CustomIcons.PAUSE, button -> PAUSE.send(EndTag.INSTANCE)))
+                        .add2(new GuiIconButton("stop", CustomIcons.STOP, button -> STOP.send(EndTag.INSTANCE))))
+                .addOnFirst(new GuiCheckBox("loop", projector.data.loop).setTranslate("gui.waterframes.loop"))
+                .addOnSecond(new WidgetParent()
+                        .add2(new GuiStateButton(ProjectorData.AUDIO_ORIGIN, projector.data.audioOrigin, new TextListBuilder()
+                                .addTranslated("gui.waterframes.audiocenter.", "block", "projection", "between")))
+                        .setAlign(Align.RIGHT))
+                .addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
+                        .add2(new WidgetIcon("v_icon", 12, 12, CustomIcons.VOLUME))
+                        .add2(new WidgetSlider(BasicData.VOLUME, 130, 10, projector.data.volume, 0, WaterConfig.maxAudioVolume(), WidgetSlider.PERCENT).setExpandableX())
+                        .setAlign(Align.RIGHT))
+                .addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
+                        .add2(new WidgetIcon("v_icon", 12, 12, CustomIcons.VOLUME_RANGE_MIN))
+                        .add2(rangeMin = (GuiSteppedSlider) new GuiSteppedSlider(BasicData.VOL_RANGE_MIN, 63, 10, projector.data.minVolumeDistance, 0, Math.min(WaterConfig.maxAudioDistance(), projector.data.maxVolumeDistance)).setExpandableX())
+                        .add2(new WidgetIcon("v_icon", 12, 12, CustomIcons.VOLUME_RANGE_MAX))
+                        .add2(new WidgetSteppedSlider(BasicData.VOL_RANGE_MAX, rangeMin, 63, 10, projector.data.maxVolumeDistance, 0, WaterConfig.maxAudioDistance()).setExpandableX())
                 .setAlign(Align.RIGHT));
 
-        WidgetDoubleTable widgetScreenActions = new WidgetDoubleTable().setSpacing(2);
-        widgetScreenActions.addOnFirst(new GuiButton("reload_all", x -> ImageAPI.reloadCache())
-                .setTitle(new TextComponent("Reload All")).setTooltip(new TextBuilder().translate("WARNING: reload can stun or crash your game").build()));
+        parentMedia.getFirstRow().setExpandableX();
+        parentMedia.getSecondRow().setAlign(Align.RIGHT).setExpandableX();
 
-        widgetScreenActions.addOnSecond(widgetSave);
-        widgetSave.setEnabled(WaterConfig.canUse(getPlayer(), widgetUrl.getText()));
+        WidgetDoubleTable parentControls = new WidgetDoubleTable()
+                .addOnFirst(new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTitle(new TextComponent("Reload All")))
+                .addOnSecond(buttonSave.setEnabled(WaterConfig.canUse(getPlayer(), inputUrl.getText())))
+                .addOnSecond(new GuiButton("reload", x -> projector.imageCache.reload()).setTranslate("gui.waterframes.reload"))
+                .setSpacing(2);
+        parentControls.getSecondRow().setAlign(Align.RIGHT);
 
-        widgetScreenActions.getSecondRow().setAlign(Align.RIGHT);
-        widgetScreenActions.addOnSecond(new GuiButton("reload", x -> projector.imageCache.reload()).setTranslate("gui.waterframes.reload"));
 
-        this.add(widgetUrlStatus);
-        this.add(widgetSizeParent);
+        this.add(parentURL);
+        this.add(parentSize);
         this.add(new WidgetLabel("tex_label", 0.8f).setTitle(new TextComponent("Texture settings")));
-        this.add(widgetImageSettings);
+        this.add(parentTexSettings);
         this.add(new WidgetLabel("media_label", 0.8f).setTitle(new TextComponent("Media settings")));
-        this.add(widgetMediaSettings);
+        this.add(parentMedia);
         this.add(new WidgetSeekBar("seek", 150, 12, projector.data.tick, 0, projector.display != null ? projector.display.maxTick() : 1, () -> projector.data.tick)
                 .addOnMouseGrab(seekBar -> projector.data.tick = (int) seekBar.value)
-                .addOnMouseRelease(seekBar -> WaterFrames.NETWORK.sendToServer(new ActionPacket(projector.getBlockPos(), projector.data.playing, (int) seekBar.value)))
+                .addOnMouseRelease(seekBar -> WaterNet.syncPlaybackState(projector.getBlockPos(), projector.data.playing, (int) seekBar.value))
                 .setExpandableX());
-        this.add(widgetScreenActions);
+        this.add(parentControls);
     }
 
     @Override
@@ -202,6 +176,5 @@ public class ProjectorScreen extends GuiLayer {
         super.tick();
         WidgetIcon posIc = get("posView");
         posIc.setIcon(CustomIcons.POS_CORD[((GuiStateButton) get("pos_x")).getState()][((GuiStateButton) get("pos_y")).getState()]);
-
     }
 }

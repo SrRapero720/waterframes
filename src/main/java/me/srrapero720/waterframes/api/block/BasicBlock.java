@@ -22,9 +22,7 @@ import team.creative.creativecore.common.gui.handler.BlockGuiCreator;
 import team.creative.creativecore.common.gui.handler.GuiCreator;
 
 public abstract class BasicBlock extends BaseEntityBlock implements BlockGuiCreator {
-    protected BasicBlock(Properties pProperties) {
-        super(pProperties);
-    }
+    protected BasicBlock(Properties pProperties) { super(pProperties); }
 
     public abstract DirectionProperty getFacing();
 
@@ -56,15 +54,14 @@ public abstract class BasicBlock extends BaseEntityBlock implements BlockGuiCrea
         return state.setValue(getFacing(), mirror.mirror(state.getValue(getFacing())));
     }
 
-    // REDSTONE LOGIC
     @Override
     public void neighborChanged(@NotNull BlockState state, @NotNull Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
         if (!WaterConfig.isDisabledRedstone() && level.getBlockEntity(pos) instanceof ProjectorTile tile) {
-            var signal = false;
-            for (var direction: Direction.values()) {
-                var neightborPos = pos.relative(direction);
-                var neightborState = level.getBlockState(neightborPos);
-                if (neightborState.isSignalSource() && neightborState.getSignal(level, neightborPos, direction) != 0) {
+            boolean signal = false;
+            for (Direction direction: Direction.values()) {
+                BlockPos neighborPose = pos.relative(direction);
+                BlockState neighborState = level.getBlockState(neighborPose);
+                if (neighborState.isSignalSource() && neighborState.getSignal(level, neighborPose, direction) != 0) {
                     signal = true;
                     break;
                 }

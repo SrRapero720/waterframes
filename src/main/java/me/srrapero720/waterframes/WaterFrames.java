@@ -21,7 +21,6 @@ public class WaterFrames {
     public static final String ID = "waterframes";
     public static final String VERSION = ModList.get().getModFileById(ID).versionString();
     public static final Logger LOGGER = LogManager.getLogger(ID);
-    public static final CreativeNetwork NETWORK = new CreativeNetwork("1.2", LOGGER, new ResourceLocation(ID, "main"));
     private static final Marker IT = MarkerFactory.getMarker("Bootstrap");
 
     // BOOTSTRAP

@@ -13,9 +13,12 @@ public class WidgetDoubleTable extends GuiTable {
 
     private WidgetColum first;
     private WidgetColum second;
+    private GuiFlow columFlow;
     private final Supplier<WidgetColum> factory;
-    public WidgetDoubleTable() {
-        this(DEFAULT_FACTORY);
+    public WidgetDoubleTable() { this(DEFAULT_FACTORY); }
+    public WidgetDoubleTable(GuiFlow columGuiFlow) {
+        this(columGuiFlow, DEFAULT_FACTORY);
+        this.columFlow = columGuiFlow;
     }
 
     public WidgetDoubleTable(Supplier<WidgetColum> columFactory) {
@@ -24,8 +27,19 @@ public class WidgetDoubleTable extends GuiTable {
         this.createRow();
     }
 
+    public WidgetDoubleTable(GuiFlow columGuiFlow, Supplier<WidgetColum> columFactory) {
+        super();
+        this.factory = columFactory;
+        this.columFlow = columGuiFlow;
+        this.createRow();
+    }
+
     public WidgetDoubleTable createRow() {
         this.addRow(new GuiRow(first = factory.get(), second = factory.get()));
+        if (columFlow != null) {
+            first.setFlow(columFlow);
+            second.setFlow(columFlow);
+        }
         return this;
     }
 
@@ -40,6 +54,11 @@ public class WidgetDoubleTable extends GuiTable {
 
     public WidgetDoubleTable addOnSecond(GuiControl control) {
         this.second.add(control);
+        return this;
+    }
+
+    public WidgetDoubleTable addOnSecondIf(GuiControl control, boolean conditional) {
+        if (conditional) this.second.add(control);
         return this;
     }
 
@@ -59,6 +78,16 @@ public class WidgetDoubleTable extends GuiTable {
 
     public WidgetDoubleTable setAlign(Align aligh) {
         this.align = aligh;
+        return this;
+    }
+
+    public WidgetDoubleTable expandX() {
+        this.setExpandableX();
+        return this;
+    }
+
+    public WidgetDoubleTable expandY() {
+        this.setExpandableY();
         return this;
     }
 }

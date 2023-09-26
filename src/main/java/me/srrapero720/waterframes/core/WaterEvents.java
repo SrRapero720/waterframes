@@ -27,7 +27,9 @@ public class WaterEvents {
     @Mod.EventBusSubscriber(value = { Dist.CLIENT, Dist.DEDICATED_SERVER }, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
     private static class Common {
         private static void init(FMLCommonSetupEvent event) { common(); }
-        private static void common() { WaterFrames.NETWORK.registerType(ActionPacket.class, ActionPacket::new); }
+        private static void common() {
+            WaterNet.register();
+        }
     }
 
     @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)

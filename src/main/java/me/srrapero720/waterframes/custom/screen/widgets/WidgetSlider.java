@@ -3,9 +3,9 @@ package me.srrapero720.waterframes.custom.screen.widgets;
 import team.creative.creativecore.common.gui.controls.simple.GuiSlider;
 
 public class WidgetSlider extends GuiSlider {
-    public static final ValueParser NONE = v -> (float) Math.round(v * 100.0) / 100 + "";
-    public static final ValueParser PERCENT = v -> (int) (v * 100.0d) + "%";
-    public static final ValueParser ANGLE = v -> Math.round(v) + "°";
+    public static final ValueParser NONE = (v, max) -> (float) Math.round(v * 100.0) / 100 + "";
+    public static final ValueParser PERCENT = (v, max) -> (int) ((v / max) * 100.0d) + "%";
+    public static final ValueParser ANGLE = (v, max) -> Math.round(v) + "°";
 
     public final ValueParser parser;
 
@@ -21,10 +21,10 @@ public class WidgetSlider extends GuiSlider {
 
     @Override
     public String getTextByValue() {
-        return parser.get(value);
+        return parser.get(value, maxValue);
     }
 
     public interface ValueParser {
-        String get(double value);
+        String get(double value, double max);
     }
 }

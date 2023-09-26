@@ -2,15 +2,16 @@ package me.srrapero720.waterframes.api.displays;
 
 import me.lib720.watermod.safety.TryCore;
 import me.srrapero720.waterframes.api.data.BasicData;
+import me.srrapero720.waterframes.core.WaterNet;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.image.ImageRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class BaseDisplay {
-
     public static BaseDisplay create(ImageRenderer image) { return new ImageDisplay(image); }
     public static BaseDisplay create(ImageCache image) { return new ImageDisplay(image); }
     public static BaseDisplay create(Vec3d pos, BasicData data) { return create(pos, data, false); }
@@ -22,6 +23,8 @@ public abstract class BaseDisplay {
             return defaultVar;
         }, ImageDisplay.VLC_FAILED);
     }
+
+    protected boolean syncTick = false;
     public abstract int width();
     public abstract int height();
     public abstract int texture();
@@ -30,6 +33,6 @@ public abstract class BaseDisplay {
     public abstract void prepare(BasicData data);
     public void pause(BasicData data) {}
     public void resume(BasicData data) {}
-    public void tick(BasicData data) {}
+    public void tick(BlockPos pos, BasicData data) {}
     public abstract void release();
 }

@@ -6,6 +6,7 @@ import me.srrapero720.waterframes.custom.screen.widgets.custom.CustomStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import org.jetbrains.annotations.Nullable;
 import team.creative.creativecore.common.gui.controls.simple.GuiButton;
 import team.creative.creativecore.common.gui.controls.simple.GuiTextfield;
 import team.creative.creativecore.common.gui.style.GuiStyle;
@@ -16,6 +17,7 @@ import java.util.List;
 
 public class WidgetTextField extends GuiTextfield {
     private final GuiButton saveButton;
+    private String suggestion_c = "";
 
     public WidgetTextField(GuiButton saveButton, String name, String text) {
         super(name);
@@ -39,6 +41,29 @@ public class WidgetTextField extends GuiTextfield {
         boolean pressed = super.keyPressed(keyCode, scanCode, modifiers);
         saveButton.setEnabled(WaterConfig.canUse(getPlayer(), getText()));
         return pressed;
+    }
+
+    public WidgetTextField setSuggest(String suggest) {
+        setSuggestion(suggest);
+        return this;
+    }
+
+    @Override
+    public void setSuggestion(@Nullable String p_195612_1_) {
+        if (getText().isEmpty()) super.setSuggestion(p_195612_1_);
+        suggestion_c = p_195612_1_;
+    }
+
+    @Override
+    public void focus() {
+        super.setSuggestion("");
+        super.focus();
+    }
+
+    @Override
+    public void looseFocus() {
+        if (getText().isEmpty()) super.setSuggestion(suggestion_c);
+        super.looseFocus();
     }
 
     @Override

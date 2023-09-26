@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.api.block.entity;
 
 import me.srrapero720.waterframes.api.data.BasicData;
+import me.srrapero720.waterframes.core.WaterNet;
 import me.srrapero720.waterframes.custom.block.entity.FrameTile;
 import me.srrapero720.waterframes.core.tools.UrlTool;
 import me.srrapero720.waterframes.WaterFrames;
@@ -66,7 +67,7 @@ public abstract class BasicBlockEntity<DATA extends BasicData> extends BlockEnti
             case READY -> {
                 if (display != null) return display;
                 if (imageCache.isVideo()) return display = BaseDisplay.create(new Vec3d(worldPosition), data, false);
-                else return display = new ImageDisplay(imageCache);
+                else return display = BaseDisplay.create(imageCache);
             }
             case WAITING -> {
                 cleanDisplay();
@@ -117,17 +118,9 @@ public abstract class BasicBlockEntity<DATA extends BasicData> extends BlockEnti
         released.set(true);
     }
 
-    public void play() {
-        WaterFrames.NETWORK.sendToClient(new ActionPacket(worldPosition, data.playing = true, data.tick), level, worldPosition);
-    }
-
-    public void pause() {
-        WaterFrames.NETWORK.sendToClient(new ActionPacket(worldPosition, data.playing = false, data.tick), level, worldPosition);
-    }
-
-    public void stop() {
-        WaterFrames.NETWORK.sendToClient(new ActionPacket(worldPosition, data.playing = false, data.tick = 0), level, worldPosition);
-    }
+    public void play() { WaterNet.sendPlaybackState(worldPosition, level, data.playing = true, data.tick); }
+    public void pause() { WaterNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick); }
+    public void stop() { WaterNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick = 0); }
 
     public void setDirty() {
         if (this.level != null) {
@@ -162,9 +155,15 @@ public abstract class BasicBlockEntity<DATA extends BasicData> extends BlockEnti
         if (blockEntity instanceof BasicBlockEntity<?> be) {
             if (be.isClient()) {
                 BaseDisplay display = be.requestDisplay();
-                if (display != null && display.canTick()) display.tick(be.data);
+                if (display != null && display.canTick()) display.tick(pos, be.data);
             }
-            if (be.data.playing) be.data.tick++;
+            if (be.data.playing) {
+                if (be.data.tickMax != -1 && (be.data.tick > be.data.tickMax)) {
+                    if (be.data.loop) be.data.tick = 0;
+                } else {
+                    be.data.tick++;
+                }
+            }
 
             // EXTRA IMPORTANT TICKERS FOR OTHER TILES
             if (blockEntity instanceof FrameTile frame) FrameTile.tick(level, pos, state, frame);

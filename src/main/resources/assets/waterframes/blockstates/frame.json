@@ -5,6 +5,13 @@
         "frame=true,facing=west": {"model": "waterframes:block/frame", "y": -270},
         "frame=true,facing=east": {"model": "waterframes:block/frame", "y": -90},
         "frame=true,facing=up": {"model": "waterframes:block/frame","x": 90 },
-        "frame=true,facing=down": {"model": "waterframes:block/frame", "x": -90 }
+        "frame=true,facing=down": {"model": "waterframes:block/frame", "x": -90 },
+
+        "frame=false,facing=north": {"model": "waterframes:block/frame", "y": 180},
+        "frame=false,facing=south": { "model": "waterframes:block/frame"},
+        "frame=false,facing=west": {"model": "waterframes:block/frame", "y": -270},
+        "frame=false,facing=east": {"model": "waterframes:block/frame", "y": -90},
+        "frame=false,facing=up": {"model": "waterframes:block/frame","x": 90 },
+        "frame=false,facing=down": {"model": "waterframes:block/frame", "x": -90 }
     }
 }

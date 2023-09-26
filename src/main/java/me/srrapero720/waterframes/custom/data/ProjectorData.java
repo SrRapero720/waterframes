@@ -1,5 +1,6 @@
-package me.srrapero720.waterframes.api.data;
+package me.srrapero720.waterframes.custom.data;
 
+import me.srrapero720.waterframes.api.data.BasicData;
 import me.srrapero720.waterframes.custom.block.entity.ProjectorTile;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
