@@ -9,7 +9,7 @@ You can use this mod with LittleFrames (until LT uses WATERMeDIA)
 
 ## DEPENDENCIES
 - [CreativeCore](https://beta.curseforge.com/minecraft/mc-mods/creativecore/files/4394989)
-- [WATERMeDIA](https://beta.curseforge.com/minecraft/mc-mods/fancyvideo-api) - Video and Picture support
+- [WATERMeDIA](https://beta.curseforge.com/minecraft/mc-mods/watermedia) - Video and Picture support
 
 ## FEATURES
 - Display pictures and videos using URL or local files
