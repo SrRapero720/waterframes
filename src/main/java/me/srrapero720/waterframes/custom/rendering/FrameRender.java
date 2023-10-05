@@ -6,9 +6,9 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
+import me.srrapero720.waterframes.api.display.IDisplay;
 import me.srrapero720.waterframes.custom.block.entity.FrameTile;
 import me.srrapero720.waterframes.custom.block.FrameBlock;
-import me.srrapero720.waterframes.api.displays.BaseDisplay;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -33,14 +33,14 @@ public class FrameRender implements BlockEntityRenderer<FrameTile> {
     @Override
     public void render(FrameTile frame, float partialTicks, PoseStack pose, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
         if (frame.getUrl().isEmpty() || frame.data.alpha == 0) {
-            if (frame.display != null) frame.display.release();
+            if (frame.display != null) frame.display.release(false);
             return;
         }
         
-        BaseDisplay display = frame.requestDisplay();
+        IDisplay display = frame.requestDisplay();
         if (display == null) return;
         
-        display.prepare(frame.data);
+        display.preRender();
 
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();

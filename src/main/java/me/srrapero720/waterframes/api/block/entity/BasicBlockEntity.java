@@ -1,13 +1,11 @@
 package me.srrapero720.waterframes.api.block.entity;
 
 import me.srrapero720.waterframes.api.data.BasicData;
+import me.srrapero720.waterframes.api.display.IDisplay;
+import me.srrapero720.waterframes.api.display.MediaDisplay;
 import me.srrapero720.waterframes.core.WaterNet;
-import me.srrapero720.waterframes.custom.block.entity.FrameTile;
 import me.srrapero720.waterframes.core.tools.UrlTool;
-import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.api.displays.BaseDisplay;
-import me.srrapero720.waterframes.api.displays.ImageDisplay;
-import me.srrapero720.waterframes.custom.packets.ActionPacket;
+import me.srrapero720.waterframes.custom.block.entity.FrameTile;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import net.minecraft.client.Minecraft;
@@ -32,7 +30,7 @@ import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 public abstract class BasicBlockEntity<DATA extends BasicData> extends BlockEntity {
     public final DATA data;
     @OnlyIn(Dist.CLIENT) public volatile ImageCache imageCache;
-    @OnlyIn(Dist.CLIENT) public volatile BaseDisplay display;
+    @OnlyIn(Dist.CLIENT) public volatile IDisplay display;
     @OnlyIn(Dist.CLIENT) public volatile String parsedUrl;
     @OnlyIn(Dist.CLIENT) private final AtomicBoolean released = new AtomicBoolean(false);
 
@@ -51,7 +49,7 @@ public abstract class BasicBlockEntity<DATA extends BasicData> extends BlockEnti
     public String getParsedUrl() { return UrlTool.fixUrl(this.data.url); }
 
     @OnlyIn(Dist.CLIENT)
-    public synchronized BaseDisplay requestDisplay() {
+    public synchronized IDisplay requestDisplay() {
         String url = getParsedUrl();
         if (released.get()) {
             imageCache = null;
@@ -60,27 +58,27 @@ public abstract class BasicBlockEntity<DATA extends BasicData> extends BlockEnti
 
         if (imageCache == null || !imageCache.url.equals(url)) {
             imageCache = ImageAPI.getCache(url, Minecraft.getInstance());
-            cleanDisplay();
+            cleanDisplay(false);
         }
 
         switch (imageCache.getStatus()) {
-            case READY -> {
+            case LOADING, FAILED, READY -> {
                 if (display != null) return display;
-                if (imageCache.isVideo()) return display = BaseDisplay.create(new Vec3d(worldPosition), data, false);
-                else return display = BaseDisplay.create(imageCache);
+                return display = new MediaDisplay(imageCache, new Vec3d(worldPosition), data);
             }
+
             case WAITING -> {
-                cleanDisplay();
+                cleanDisplay(false);
                 imageCache.load();
                 return display;
             }
-            case LOADING -> { return ImageDisplay.LOADING_GIF; }
+
             case FORGOTTEN -> {
                 LOGGER.warn("Cached picture is forgotten, cleaning and reloading");
                 imageCache = null;
                 return null;
             }
-            case FAILED -> { return null; }
+
             default -> {
                 LOGGER.warn("WATERMeDIA Behavior is modified, this shouldn't be executed");
                 return null;
@@ -105,16 +103,16 @@ public abstract class BasicBlockEntity<DATA extends BasicData> extends BlockEnti
 
 
     @OnlyIn(Dist.CLIENT)
-    private void cleanDisplay() {
+    private void cleanDisplay(boolean quiet) {
         if (display != null) {
-            display.release();
+            display.release(quiet);
             display = null;
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     private void release() {
-        cleanDisplay();
+        cleanDisplay(false);
         released.set(true);
     }
 
@@ -154,8 +152,8 @@ public abstract class BasicBlockEntity<DATA extends BasicData> extends BlockEnti
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
         if (blockEntity instanceof BasicBlockEntity<?> be) {
             if (be.isClient()) {
-                BaseDisplay display = be.requestDisplay();
-                if (display != null && display.canTick()) display.tick(pos, be.data);
+                IDisplay display = be.requestDisplay();
+                if (display != null && display.canTick()) display.tick(pos);
             }
             if (be.data.playing) {
                 if (be.data.tickMax != -1 && (be.data.tick > be.data.tickMax)) {

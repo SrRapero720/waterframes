@@ -9,9 +9,9 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
+import me.srrapero720.waterframes.api.display.IDisplay;
 import me.srrapero720.waterframes.custom.block.ProjectorBlock;
 import me.srrapero720.waterframes.custom.block.entity.ProjectorTile;
-import me.srrapero720.waterframes.api.displays.BaseDisplay;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -42,14 +42,16 @@ public class ProjectorRender implements BlockEntityRenderer<ProjectorTile> {
     @Override
     public void render(ProjectorTile block, float partialTicks, PoseStack pose, MultiBufferSource buffer, int combinedLight, int combinedOverlay) {
         if (block.getUrl().isEmpty() || block.data.alpha == 0) {
-            if (block.display != null) block.display.release();
+            if (block.display != null) block.display.release(false);
             return;
         }
         
-        BaseDisplay display = block.requestDisplay();
+        IDisplay display = block.requestDisplay();
         if (display == null) return;
         
-        display.prepare(block.data);
+        display.preRender();
+
+
         
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();

@@ -11,8 +11,10 @@ version = modversion
 group = modgroup
 archivesBaseName = modid
 
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 println "Gradle Java: ${JavaVersion.current()}"
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
@@ -80,7 +82,7 @@ dependencies {
 
     //DEPENDENCIES
 //    implementation fg.deobf(fileTree('libs') { include '*.jar' })
-    implementation "com.github.SrRapero720.watermedia:build:2.0.5"
+    implementation "com.github.SrRapero720.watermedia:build:2.0.8"
     implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
 
     // UTIL
