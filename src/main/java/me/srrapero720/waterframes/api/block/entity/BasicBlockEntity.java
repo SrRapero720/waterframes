@@ -18,9 +18,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
+import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -50,6 +52,11 @@ public abstract class BasicBlockEntity<DATA extends BasicData> extends BlockEnti
 
     @OnlyIn(Dist.CLIENT)
     public synchronized IDisplay requestDisplay() {
+        if (getUrl().isEmpty() && display != null) {
+            cleanDisplay(false);
+            return null;
+        }
+
         String url = getParsedUrl();
         if (released.get()) {
             imageCache = null;
@@ -85,6 +92,8 @@ public abstract class BasicBlockEntity<DATA extends BasicData> extends BlockEnti
             }
         }
     }
+
+    public abstract AlignedBox getBox();
 
     public float getSizeX() { return this.data.max.x - this.data.min.x; }
     public float getSizeY() { return this.data.max.y - this.data.min.y; }

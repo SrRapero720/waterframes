@@ -50,7 +50,7 @@ public class FrameBlock extends BasicBlock implements SimpleWaterloggedBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(FACING, VISIBLE, WATERLOGGED);
+        builder.add(getFacing(), VISIBLE, WATERLOGGED);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class FrameBlock extends BasicBlock implements SimpleWaterloggedBlock {
     @Override
     @NotNull
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
-        return super.getStateForPlacement(context).setValue(FACING, context.getClickedFace()).setValue(VISIBLE, true).setValue(WATERLOGGED, false);
+        return super.getStateForPlacement(context).setValue(getFacing(), context.getClickedFace()).setValue(VISIBLE, true).setValue(WATERLOGGED, false);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class FrameBlock extends BasicBlock implements SimpleWaterloggedBlock {
 
     @Override
     public DirectionProperty getFacing() {
-        return FACING;
+        return FrameTile.getDefaultDirectionalProperty();
     }
 
     public static class VisibleProperty extends BooleanProperty {

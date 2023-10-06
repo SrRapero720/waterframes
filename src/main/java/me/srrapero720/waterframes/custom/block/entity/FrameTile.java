@@ -8,6 +8,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -20,6 +22,7 @@ public class FrameTile extends BasicBlockEntity<FrameData> {
         super(new FrameData(), WaterRegistry.TILE_FRAME.get(), pos, state);
     }
 
+    @Override
     public AlignedBox getBox() {
         Direction direction = getBlockState().getValue(FrameBlock.FACING);
         Facing facing = Facing.get(direction);
@@ -39,6 +42,10 @@ public class FrameTile extends BasicBlockEntity<FrameData> {
         box.setMin(two, this.data.min.y);
         box.setMax(two, this.data.max.y);
         return box;
+    }
+
+    public static DirectionProperty getDefaultDirectionalProperty() {
+        return BlockStateProperties.FACING;
     }
 
     @Override

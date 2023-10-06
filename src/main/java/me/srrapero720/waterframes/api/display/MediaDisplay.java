@@ -51,6 +51,7 @@ public class MediaDisplay implements IDisplay {
         this.mediaPlayer.setRepeatMode(blockData.loop);
         this.mediaPlayer.setPauseMode(!blockData.playing);
         this.mediaPlayer.start(blockData.url);
+        DisplayManager.add(this);
     }
 
     @Override
@@ -75,7 +76,7 @@ public class MediaDisplay implements IDisplay {
     public int texture() {
         return switch (displayMode) {
             case PICTURE -> this.imageCache.getRenderer().texture(blockData.tick, (blockData.playing ? MathAPI.tickToMs(TimerTool.deltaFrames()) : 0), blockData.loop);
-            case VIDEO -> this.mediaPlayer.getWidth();
+            case VIDEO -> this.mediaPlayer.getTexture();
             case AUDIO -> -1;
         };
     }
@@ -95,6 +96,7 @@ public class MediaDisplay implements IDisplay {
     }
 
     @Override
+    @Deprecated
     public void preRender() {
         switch (displayMode) {
             case PICTURE -> {} // Deprecated feature

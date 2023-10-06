@@ -12,6 +12,7 @@ public interface IDisplay {
     public abstract long duration();
 
     // RENDERING
+    @Deprecated
     public abstract void preRender();
 
     // TICK

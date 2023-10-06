@@ -164,7 +164,7 @@ public class ProjectorScreen extends GuiLayer {
         this.add(parentTexSettings);
         this.add(new WidgetLabel("media_label", 0.8f).setTitle(new TextComponent("Media settings")));
         this.add(parentMedia);
-        this.add(new WidgetSeekBar("seek", 150, 12, projector.data.tick, 0, projector.display != null ? projector.display.maxTick() : 1, () -> projector.data.tick)
+        this.add(new WidgetSeekBar("seek", 150, 12, projector.data.tick, 0, projector.display != null ? projector.display.durationInTicks() : 1, () -> projector.data.tick)
                 .addOnMouseGrab(seekBar -> projector.data.tick = (int) seekBar.value)
                 .addOnMouseRelease(seekBar -> WaterNet.syncPlaybackState(projector.getBlockPos(), projector.data.playing, (int) seekBar.value))
                 .setExpandableX());

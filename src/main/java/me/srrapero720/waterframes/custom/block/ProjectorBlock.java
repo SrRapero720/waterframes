@@ -55,6 +55,6 @@ public class ProjectorBlock extends BasicBlock {
 
     @Override
     public DirectionProperty getFacing() {
-        return FACING;
+        return ProjectorTile.getDefaultDirectionalProperty();
     }
 }

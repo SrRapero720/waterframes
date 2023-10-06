@@ -14,16 +14,17 @@ import java.util.Collections;
 import java.util.function.Supplier;
 
 public class WidgetStatusIcon extends WidgetIcon {
-    private final Supplier<ImageCache> cache;
-    public WidgetStatusIcon(String name, int width, int height, GuiIcon icon, Supplier<ImageCache> cache) {
+    private final Supplier<ImageCache> cacheSupplier;
+    public WidgetStatusIcon(String name, int width, int height, GuiIcon icon, Supplier<ImageCache> cacheSupplier) {
         super(name, width, height, icon);
-        this.cache = cache;
+        this.cacheSupplier = cacheSupplier;
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     protected void renderContent(PoseStack pose, GuiChildControl guiChildControl, Rect rect, int i, int i1) {
-        icon = switch (cache.get().getStatus()) {
+        ImageCache cache = cacheSupplier.get();
+        icon = switch (cache != null ? cache.getStatus() : ImageCache.Status.FAILED) {
             case READY -> {
                 setTooltip(new TextBuilder().build());
                 yield  CustomIcons.STATUS_OK;
@@ -33,7 +34,7 @@ public class WidgetStatusIcon extends WidgetIcon {
                 yield CustomIcons.STATUS_ALERT;
             }
             case WAITING, FORGOTTEN -> {
-                if (cache.get().url.isEmpty()) {
+                if (cacheSupplier.get().url.isEmpty()) {
                     setTooltip(Collections.emptyList());
                     yield CustomIcons.STATUS_CHILL;
                 } else {
@@ -42,7 +43,11 @@ public class WidgetStatusIcon extends WidgetIcon {
                 }
             }
             case FAILED -> {
-                setTooltip(new TextBuilder(cache.get().getException().getMessage()).build());
+                if (cache != null) {
+                    setTooltip(new TextBuilder(cacheSupplier.get().getException().getMessage()).build());
+                } else {
+                    setTooltip(new TextBuilder("Cannot get status").build());
+                }
                 yield CustomIcons.STATUS_ERROR;
             }
         };

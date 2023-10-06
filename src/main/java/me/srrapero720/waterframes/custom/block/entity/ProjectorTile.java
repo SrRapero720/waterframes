@@ -8,6 +8,8 @@ import me.srrapero720.waterframes.core.WaterRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -20,10 +22,11 @@ public class ProjectorTile extends BasicBlockEntity<ProjectorData> {
         super(new ProjectorData(), WaterRegistry.TILE_PROJECTOR.get(), pos, state);
     }
 
+    @Override
     public AlignedBox getBox() {
         Direction direction = getBlockState().getValue(ProjectorBlock.FACING);
         Facing facing = Facing.get(direction);
-        AlignedBox box = FrameBlock.box(direction, (float) data.projectionDistance + 0.99f);
+        AlignedBox box = FrameBlock.box(direction, (float) data.projectionDistance + 0.991f);
 
         Axis one = facing.one();
         Axis two = facing.two();
@@ -39,6 +42,10 @@ public class ProjectorTile extends BasicBlockEntity<ProjectorData> {
         box.setMin(two, this.data.min.y);
         box.setMax(two, this.data.max.y);
         return box;
+    }
+
+    public static DirectionProperty getDefaultDirectionalProperty() {
+        return BlockStateProperties.HORIZONTAL_FACING;
     }
 
     @Override

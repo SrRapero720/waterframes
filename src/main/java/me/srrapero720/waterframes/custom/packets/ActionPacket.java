@@ -29,9 +29,9 @@ public class ActionPacket extends CreativePacket {
             tile.data.tick = tick;
             if (tile.display != null) {
                 if (playing)
-                    tile.display.resume(tile.data);
+                    tile.display.resume();
                 else
-                    tile.display.pause(tile.data);
+                    tile.display.pause();
             }
         }
     }
