@@ -1,8 +1,11 @@
 {
-  "required": false,
+  "required": true,
   "compatibilityLevel": "JAVA_17",
+  "package": "me.srrapero720.waterframes.mixin",
   "refmap": "waterframes.mixin-refmap.json",
-  "client": [],
   "minVersion": "0.8",
+  "client": [
+    "MinecraftMixin"
+  ],
   "mixins": []
 }
