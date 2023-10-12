@@ -57,7 +57,7 @@ public class WidgetDoubleTable extends GuiTable {
         return this;
     }
 
-    public WidgetDoubleTable addOnSecondIf(GuiControl control, boolean conditional) {
+    public WidgetDoubleTable addOnSecondIf(boolean conditional, GuiControl control) {
         if (conditional) this.second.add(control);
         return this;
     }

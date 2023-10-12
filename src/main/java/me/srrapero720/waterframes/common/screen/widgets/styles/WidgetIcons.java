@@ -1,12 +1,10 @@
-package me.srrapero720.waterframes.common.screen.widgets.custom;
+package me.srrapero720.waterframes.common.screen.widgets.styles;
 
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.common.data.DisplayData;
-import me.srrapero720.waterframes.common.screen.widgets.WidgetSlider;
 import net.minecraft.resources.ResourceLocation;
 import team.creative.creativecore.common.gui.style.GuiIcon;
 
-public class CustomIcons {
+public class WidgetIcons {
     public static final ResourceLocation location = new ResourceLocation(WaterFrames.ID, "textures/screen_atlas.png");
 
     // VOLUME COLUM (chunk 0)
@@ -65,17 +63,17 @@ public class CustomIcons {
 
     public static GuiIcon getVolumeIcon(int volume) {
         if (volume > 100) {
-            return CustomIcons.VOLUME_OVERFLOW;
+            return WidgetIcons.VOLUME_OVERFLOW;
         } else if (volume >= 90){
-            return CustomIcons.VOLUME;
+            return WidgetIcons.VOLUME;
         } else if (volume >= 65) {
-            return CustomIcons.VOLUME_3;
+            return WidgetIcons.VOLUME_3;
         } else if (volume >= 35) {
-            return CustomIcons.VOLUME_2;
+            return WidgetIcons.VOLUME_2;
         } else if (volume >= 1) {
-            return CustomIcons.VOLUME_1;
+            return WidgetIcons.VOLUME_1;
         } else {
-            return CustomIcons.VOLUME_MUTED;
+            return WidgetIcons.VOLUME_MUTED;
         }
     }
 }

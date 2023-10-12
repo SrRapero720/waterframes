@@ -2,7 +2,7 @@ package me.srrapero720.waterframes.common.screen.widgets;
 
 import me.srrapero720.waterframes.util.FrameTools;
 import me.srrapero720.waterframes.util.FrameConfig;
-import me.srrapero720.waterframes.common.screen.widgets.custom.CustomStyles;
+import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -14,12 +14,13 @@ import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class WidgetTextField extends GuiTextfield {
-    private final GuiButton saveButton;
+    private final Supplier<GuiButton> saveButton;
     private String suggestion_c = "";
 
-    public WidgetTextField(GuiButton saveButton, String name, String text) {
+    public WidgetTextField(Supplier<GuiButton> saveButton, String name, String text) {
         super(name);
         setMaxStringLength(2048);
         setText(text);
@@ -28,23 +29,33 @@ public class WidgetTextField extends GuiTextfield {
 
     @Override
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
-        return CustomStyles.NORMAL_BORDER;
+        return WidgetStyles.NORMAL_BORDER;
     }
 
     @Override
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
-        return CustomStyles.NORMAL_BACKGROUND;
+        return WidgetStyles.NORMAL_BACKGROUND;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         boolean pressed = super.keyPressed(keyCode, scanCode, modifiers);
-        saveButton.setEnabled(FrameConfig.canUse(getPlayer(), getText()));
+        saveButton.get().setEnabled(FrameConfig.canUse(getPlayer(), getText()));
         return pressed;
     }
 
     public WidgetTextField setSuggest(String suggest) {
         setSuggestion(suggest);
+        return this;
+    }
+
+    public WidgetTextField expandX() {
+        this.setExpandableX();
+        return this;
+    }
+
+    public WidgetTextField expandY() {
+        this.setExpandableY();
         return this;
     }
 

@@ -2,7 +2,7 @@ package me.srrapero720.waterframes.common.screen.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.srrapero720.waterframes.common.screen.widgets.custom.CustomStyles;
+import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetStyles;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -62,7 +62,7 @@ public class WidgetIcon extends GuiControl {
     @Override
     @OnlyIn(Dist.CLIENT)
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
-        return CustomStyles.NO_BACKGROUND;
+        return WidgetStyles.NO_BACKGROUND;
     }
 
     @Override

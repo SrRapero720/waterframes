@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.common.screen.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.srrapero720.waterframes.common.screen.widgets.custom.CustomIcons;
+import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetIcons;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -27,19 +27,19 @@ public class WidgetStatusIcon extends WidgetIcon {
         icon = switch (cache != null ? cache.getStatus() : ImageCache.Status.FAILED) {
             case READY -> {
                 setTooltip(new TextBuilder().build());
-                yield  CustomIcons.STATUS_OK;
+                yield  WidgetIcons.STATUS_OK;
             }
             case LOADING -> {
                 setTooltip(new TextBuilder("Loading media").build());
-                yield CustomIcons.STATUS_ALERT;
+                yield WidgetIcons.STATUS_ALERT;
             }
             case WAITING, FORGOTTEN -> {
                 if (cacheSupplier.get().url.isEmpty()) {
                     setTooltip(Collections.emptyList());
-                    yield CustomIcons.STATUS_CHILL;
+                    yield WidgetIcons.STATUS_CHILL;
                 } else {
                     setTooltip(new TextBuilder("Something wrong happens").build());
-                    yield CustomIcons.STATUS_PEM;
+                    yield WidgetIcons.STATUS_PEM;
                 }
             }
             case FAILED -> {
@@ -48,7 +48,7 @@ public class WidgetStatusIcon extends WidgetIcon {
                 } else {
                     setTooltip(new TextBuilder("Cannot get status").build());
                 }
-                yield CustomIcons.STATUS_ERROR;
+                yield WidgetIcons.STATUS_ERROR;
             }
         };
         super.renderContent(pose, guiChildControl, rect, i, i1);
