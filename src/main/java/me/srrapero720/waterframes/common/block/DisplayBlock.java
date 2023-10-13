@@ -31,6 +31,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     public static @NotNull AlignedBox box(Direction direction, Float projectionDistance) {
         var facing = Facing.get(direction);
+
         var box = new AlignedBox();
 
         if (facing.positive) box.setMax(facing.axis, projectionDistance);

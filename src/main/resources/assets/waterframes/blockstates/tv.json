@@ -1,0 +1,31 @@
+{
+  "variants": {
+    "facing=north,attached_face=north": {"model": "waterframes:block/tv_wrong_wall", "y": 180},
+    "facing=north,attached_face=south": {"model": "waterframes:block/tv_wall", "y": 180},
+    "facing=north,attached_face=west": {"model": "waterframes:block/tv_sideright", "y": 180},
+    "facing=north,attached_face=east": {"model": "waterframes:block/tv_sideleft", "y": 180},
+    "facing=north,attached_face=up": {"model": "waterframes:block/tv_floor", "y": 180},
+    "facing=north,attached_face=down": {"model": "waterframes:block/tv_top", "y": 180},
+
+    "facing=south,attached_face=north": { "model": "waterframes:block/tv_wall"},
+    "facing=south,attached_face=south": { "model": "waterframes:block/tv_wrong_wall"},
+    "facing=south,attached_face=west": { "model": "waterframes:block/tv_sideleft"},
+    "facing=south,attached_face=east": { "model": "waterframes:block/tv_sideright"},
+    "facing=south,attached_face=up": { "model": "waterframes:block/tv_floor"},
+    "facing=south,attached_face=down": { "model": "waterframes:block/tv_top"},
+
+    "facing=west,attached_face=north": {"model": "waterframes:block/tv_sideleft", "y": -270},
+    "facing=west,attached_face=south": {"model": "waterframes:block/tv_sideright", "y": -270},
+    "facing=west,attached_face=west": {"model": "waterframes:block/tv_wrong_wall", "y": -270},
+    "facing=west,attached_face=east": {"model": "waterframes:block/tv_wall", "y": -270},
+    "facing=west,attached_face=up": {"model": "waterframes:block/tv_floor", "y": -270},
+    "facing=west,attached_face=down": {"model": "waterframes:block/tv_top", "y": -270},
+
+    "facing=east,attached_face=north": {"model": "waterframes:block/tv_sideright", "y": -90},
+    "facing=east,attached_face=south": {"model": "waterframes:block/tv_sideleft", "y": -90},
+    "facing=east,attached_face=west": {"model": "waterframes:block/tv_wall", "y": -90},
+    "facing=east,attached_face=east": {"model": "waterframes:block/tv_wrong_wall", "y": -90},
+    "facing=east,attached_face=up": {"model": "waterframes:block/tv_floor", "y": -90},
+    "facing=east,attached_face=down": {"model": "waterframes:block/tv_top", "y": -90}
+  }
+}

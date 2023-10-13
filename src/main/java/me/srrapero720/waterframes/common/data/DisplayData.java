@@ -33,7 +33,6 @@ public abstract class DisplayData {
     public static final String TICK = "tick";
     public static final String TICK_MAX = "tick_max";
 
-
     public String url = "";
     public Vec2f min = new Vec2f(0, 0);
     public Vec2f max = new Vec2f(1, 1);

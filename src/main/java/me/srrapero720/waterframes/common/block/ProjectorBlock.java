@@ -28,13 +28,13 @@ public class ProjectorBlock extends DisplayBlock {
 
     @Override
     public VoxelShape getInteractionShape(@NotNull BlockState state, BlockGetter level, BlockPos pos) {
-        return DisplayBlock.box(state.getValue(FACING), 1.0f).voxelShape();
+        return box(state.getValue(getFacing()), 1.0f).voxelShape();
     }
 
     @Override
     public @NotNull BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
         Direction current = context.getHorizontalDirection();
-        return this.defaultBlockState().setValue(FACING, context.getPlayer().isCrouching() ? current.getOpposite() : current);
+        return this.defaultBlockState().setValue(getFacing(), context.getPlayer().isCrouching() ? current.getOpposite() : current);
     }
 
     @Nullable
@@ -48,6 +48,8 @@ public class ProjectorBlock extends DisplayBlock {
 
     @Override
     public DirectionProperty getFacing() {
-        return ProjectorTile.getDefaultDirectionalProperty();
+        return FACING;
     }
+
+
 }
