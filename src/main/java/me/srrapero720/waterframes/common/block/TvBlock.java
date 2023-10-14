@@ -35,9 +35,10 @@ public class TvBlock extends DisplayBlock {
     }
 
     public static @NotNull AlignedBox box(Direction direction, Direction attachedBlockFace, boolean renderMode) {
-        var facing = Facing.get(direction);
-        var facingClockWise = Facing.get(direction.getClockWise());
-        var box = new AlignedBox();
+        Facing facing = Facing.get(direction);
+        Facing facingClockWise = Facing.get(direction.getClockWise());
+        Facing wide = Facing.get(attachedBlockFace);
+        AlignedBox box = new AlignedBox();
 
         // SETUP PROFUNDITY
         if (attachedBlockFace.getOpposite() == direction || attachedBlockFace == direction) {
@@ -59,30 +60,28 @@ public class TvBlock extends DisplayBlock {
         }
 
         // SETUP HEIGHT
+        float renderMargin = renderMode ? 0.5f : 0;
         if (attachedBlockFace == Direction.DOWN) {
-            float renderMargin = renderMode ? 0.5f : 0;
             box.setMax(Facing.UP.axis, ((10f - renderMargin) / 16.0f)); // render: 9.5
             box.setMin(Facing.UP.axis, -((10f - renderMargin) / 16.0f)); // render: 9.5
         } else if (attachedBlockFace.getOpposite() == direction || attachedBlockFace == direction) {
-            box.setMax(Facing.UP.axis, (20.0f / 16.0f));
-            box.setMin(Facing.UP.axis, 0);
+            box.setMax(Facing.UP.axis, ((20.0f - renderMargin) / 16.0f));
+            box.setMin(Facing.UP.axis, (0f + renderMargin));
         } else {
-            float renderMargin = renderMode ? 0.5f : 0;
             box.setMax(Facing.UP.axis, ((23.0f - renderMargin) / 16.0f)); // render: 22.5
             box.setMin(Facing.UP.axis, ((3.0f + renderMargin) / 16.0f)); // render: 3.5
         }
 
         // SETUP WIDE
-        Facing wide = Facing.get(attachedBlockFace);
+
+        renderMargin = renderMode ? 1f : 0;
         if (attachedBlockFace == Direction.DOWN || attachedBlockFace == Direction.UP) {
-            float renderMargin = renderMode ? 1f : 0;
             box.setMax(facingClockWise.axis, ((24f - renderMargin) / 16f)); // render: 23
             box.setMin(facingClockWise.axis, 1 - ((24f - renderMargin) / 16f)); // render: 23
         } else if (attachedBlockFace.getOpposite() == direction || attachedBlockFace == direction) {
-            box.setMax(facingClockWise.axis, (24f / 16f));
-            box.setMin(facingClockWise.axis, 1 - (24f / 16f));
+            box.setMax(facingClockWise.axis, ((24f - renderMargin) / 16f));
+            box.setMin(facingClockWise.axis, 1 - ((24f - renderMargin) / 16f));
         } else {
-            float renderMargin = renderMode ? 1f : 0f;
             if (wide.positive) {
                 box.setMax(wide.axis, (32f - renderMargin) / 16f); // render: 31f / 16f
                 box.setMin(wide.axis, (0f + renderMargin) / 16f); // render: 1f / 16f
