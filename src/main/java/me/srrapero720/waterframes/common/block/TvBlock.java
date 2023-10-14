@@ -62,11 +62,11 @@ public class TvBlock extends DisplayBlock {
         // SETUP HEIGHT
         float renderMargin = renderMode ? 0.5f : 0;
         if (attachedBlockFace == Direction.DOWN) {
-            box.setMax(Facing.UP.axis, ((10f - renderMargin) / 16.0f)); // render: 9.5
-            box.setMin(Facing.UP.axis, -((10f - renderMargin) / 16.0f)); // render: 9.5
+            box.setMax(Facing.UP.axis, ((10f - renderMargin) / 16f)); // render: 9.5
+            box.setMin(Facing.UP.axis, -((10f - renderMargin) / 16f)); // render: 9.5
         } else if (attachedBlockFace.getOpposite() == direction || attachedBlockFace == direction) {
-            box.setMax(Facing.UP.axis, ((20.0f - renderMargin) / 16.0f));
-            box.setMin(Facing.UP.axis, (0f + renderMargin));
+            box.setMax(Facing.UP.axis, ((20f - renderMargin) / 16f));
+            box.setMin(Facing.UP.axis, (0f + renderMargin) / 16f);
         } else {
             box.setMax(Facing.UP.axis, ((23.0f - renderMargin) / 16.0f)); // render: 22.5
             box.setMin(Facing.UP.axis, ((3.0f + renderMargin) / 16.0f)); // render: 3.5
