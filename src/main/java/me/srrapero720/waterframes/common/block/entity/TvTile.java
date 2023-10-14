@@ -16,7 +16,7 @@ public class TvTile extends DisplayTile<TvData> {
 
     @Override
     public AlignedBox getBox() {
-        return TvBlock.renderBox(getBlockState().getValue(TvBlock.FACING), getBlockState().getValue(TvBlock.ATTACHED_FACE));
+        return TvBlock.box(getBlockState().getValue(TvBlock.FACING), getBlockState().getValue(TvBlock.ATTACHED_FACE), true);
     }
 
     @Override

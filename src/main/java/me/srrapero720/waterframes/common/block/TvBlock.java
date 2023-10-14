@@ -28,71 +28,71 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 public class TvBlock extends DisplayBlock {
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+
+
     public TvBlock() {
         super(Properties.of(Material.METAL).strength(2.5f, 10.0f).sound(SoundType.METAL).noOcclusion());
     }
 
-    public static @NotNull AlignedBox box(Direction direction, Direction attachedBlockFace, float scale) {
+    public static @NotNull AlignedBox box(Direction direction, Direction attachedBlockFace, boolean renderMode) {
         var facing = Facing.get(direction);
+        var facingClockWise = Facing.get(direction.getClockWise());
         var box = new AlignedBox();
 
-        if (facing.positive) {
-            box.setMax(facing.axis, (4.0f / 16.0f));
-            box.setMin(facing.axis, (2.0f / 16.0f));
+        // SETUP PROFUNDITY
+        if (attachedBlockFace.getOpposite() == direction || attachedBlockFace == direction) {
+            if (facing.positive) {
+                box.setMax(facing.axis, 1f - (3f / 16.0f));
+                box.setMin(facing.axis, 1f - (5f / 16.0f));
+            } else {
+                box.setMax(facing.axis, (5f / 16.0f));
+                box.setMin(facing.axis, (3f / 16.0f));
+            }
         } else {
-            box.setMax(facing.axis, 1f - (2.0f / 16.0f));
-            box.setMin(facing.axis, 1f - (4.0f / 16.0f));
+            if (facing.positive) {
+                box.setMax(facing.axis, (4.0f / 16.0f));
+                box.setMin(facing.axis, (2.0f / 16.0f));
+            } else {
+                box.setMax(facing.axis, 1f - (2.0f / 16.0f));
+                box.setMin(facing.axis, 1f - (4.0f / 16.0f));
+            }
         }
 
+        // SETUP HEIGHT
         if (attachedBlockFace == Direction.DOWN) {
-            box.setMax(Facing.UP.axis, (10f / 16.0f));
-            box.setMin(Facing.UP.axis, -(10f / 16.0f));
+            float renderMargin = renderMode ? 0.5f : 0;
+            box.setMax(Facing.UP.axis, ((10f - renderMargin) / 16.0f)); // render: 9.5
+            box.setMin(Facing.UP.axis, -((10f - renderMargin) / 16.0f)); // render: 9.5
+        } else if (attachedBlockFace.getOpposite() == direction || attachedBlockFace == direction) {
+            box.setMax(Facing.UP.axis, (20.0f / 16.0f));
+            box.setMin(Facing.UP.axis, 0);
         } else {
-            box.setMax(Facing.UP.axis, (23.0f / 16.0f));
-            box.setMin(Facing.UP.axis, (3.0f / 16.0f));
+            float renderMargin = renderMode ? 0.5f : 0;
+            box.setMax(Facing.UP.axis, ((23.0f - renderMargin) / 16.0f)); // render: 22.5
+            box.setMin(Facing.UP.axis, ((3.0f + renderMargin) / 16.0f)); // render: 3.5
         }
 
-        var wide = Facing.get(direction.getClockWise());
+        // SETUP WIDE
+        Facing wide = Facing.get(attachedBlockFace);
         if (attachedBlockFace == Direction.DOWN || attachedBlockFace == Direction.UP) {
-            box.setMax(wide.axis, (24f / 16f));
-            box.setMin(wide.axis, 1 - (24f / 16f));
+            float renderMargin = renderMode ? 1f : 0;
+            box.setMax(facingClockWise.axis, ((24f - renderMargin) / 16f)); // render: 23
+            box.setMin(facingClockWise.axis, 1 - ((24f - renderMargin) / 16f)); // render: 23
+        } else if (attachedBlockFace.getOpposite() == direction || attachedBlockFace == direction) {
+            box.setMax(facingClockWise.axis, (24f / 16f));
+            box.setMin(facingClockWise.axis, 1 - (24f / 16f));
         } else {
-            box.setMax(wide.axis, 2);
-            box.setMin(wide.axis, 0);
+            float renderMargin = renderMode ? 1f : 0f;
+            if (wide.positive) {
+                box.setMax(wide.axis, (32f - renderMargin) / 16f); // render: 31f / 16f
+                box.setMin(wide.axis, (0f + renderMargin) / 16f); // render: 1f / 16f
+            } else {
+                box.setMax(wide.axis, (16f - renderMargin) / 16f); // render: 15f / 16f
+                box.setMin(wide.axis, -((16f - renderMargin) / 16f)); // render: 15f / 16f
+            }
         }
 
-        box.scale(scale);
-        return box;
-    }
-
-    public static @NotNull AlignedBox renderBox(Direction direction, Direction attachedBlockFace) {
-        var facing = Facing.get(direction);
-        var box = new AlignedBox();
-
-        if (facing.positive) {
-            box.setMax(facing.axis, (4.0f / 16.0f));
-            box.setMin(facing.axis, (2.0f / 16.0f));
-        } else {
-            box.setMax(facing.axis, 1f - (2.0f / 16.0f));
-            box.setMin(facing.axis, 1f - (4.0f / 16.0f));
-        }
-
-        if (attachedBlockFace == Direction.DOWN) {
-            box.setMax(Facing.UP.axis, (11f / 16.0f));
-            box.setMin(Facing.UP.axis, -(11f / 16.0f));
-        } else {
-            box.setMax(Facing.UP.axis, (22.0f / 16.0f));
-            box.setMin(Facing.UP.axis, (4.0f / 16.0f));
-        }
-
-        var wide = Facing.get(direction.getClockWise());
-        if (attachedBlockFace == Direction.DOWN || attachedBlockFace == Direction.UP) {
-            box.setMax(wide.axis, (23f / 16f));
-            box.setMin(wide.axis, 1 - (23f / 16f));
-        } else {
-            box.setMax(wide.axis, (31f / 16f));
-            box.setMin(wide.axis, (1f / 16f));
-        }
+        if (!renderMode) box.scale(1.01f);
         return box;
     }
 
@@ -112,17 +112,17 @@ public class TvBlock extends DisplayBlock {
 
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return TvBlock.box(state.getValue(getFacing()), state.getValue(ATTACHED_FACE), 1.01f).voxelShape();
+        return TvBlock.box(state.getValue(getFacing()), state.getValue(ATTACHED_FACE), false).voxelShape();
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return TvBlock.box(state.getValue(getFacing()), state.getValue(ATTACHED_FACE), 1.01f).voxelShape();
+        return TvBlock.box(state.getValue(getFacing()), state.getValue(ATTACHED_FACE), false).voxelShape();
     }
 
     @Override
     public VoxelShape getInteractionShape(@NotNull BlockState state, BlockGetter level, BlockPos pos) {
-        return TvBlock.box(state.getValue(getFacing()), state.getValue(ATTACHED_FACE), 1.01f).voxelShape();
+        return TvBlock.box(state.getValue(getFacing()), state.getValue(ATTACHED_FACE), false).voxelShape();
     }
 
     @Nullable
