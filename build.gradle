@@ -90,7 +90,7 @@ dependencies {
     implementation fg.deobf("curse.maven:fastload-630620:${fastloadversion}")
     implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:${lazyversion}")
     implementation fg.deobf("curse.maven:spark-361579:${sparkversion}")
-    implementation fg.deobf("curse.maven:rubidium-574856:${rubidiumversion}")
+    implementation fg.deobf("curse.maven:embeddium-908741:${embeddiumversion}")
     implementation fg.deobf("curse.maven:worldedit-225608:3697298")
 //    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
 
