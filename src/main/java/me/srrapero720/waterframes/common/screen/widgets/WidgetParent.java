@@ -56,6 +56,11 @@ public class WidgetParent extends GuiParent {
         return this;
     }
 
+    public WidgetParent add2If(boolean conditional, GuiControl control) {
+        if (conditional) this.add(control);
+        return this;
+    }
+
     @Override
     public double getScaleFactor() {
         return scale;

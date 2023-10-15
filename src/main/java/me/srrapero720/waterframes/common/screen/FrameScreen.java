@@ -48,7 +48,7 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
 
     @Override
     protected void onCreate() {
-        this.urlTextField = new WidgetTextField(() -> this.saveBtn, DisplayData.URL, tileBlock.getUrl()).setSuggest("https://i.imgur.com/1yCDs5C.mp4").expandX();
+        this.urlTextField = new WidgetTextFieldTrigger(() -> this.saveBtn, DisplayData.URL, tileBlock.getUrl()).setSuggest("https://i.imgur.com/1yCDs5C.mp4").expandX();
         this.urlValueTable = new WidgetDoubleTable(GuiFlow.STACK_Y)
                 .addOnFirst(new WidgetLabel("media_label", 0.75f).setTitle(new TextComponent("URL")))
                 .addOnFirst(urlTextField)

@@ -1,7 +1,6 @@
 package me.srrapero720.waterframes.common.screen;
 
 import me.srrapero720.waterframes.common.data.DisplayData;
-import me.srrapero720.waterframes.common.data.FrameData;
 import me.srrapero720.waterframes.util.FrameConfig;
 import me.srrapero720.waterframes.util.FrameNet;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
@@ -14,10 +13,8 @@ import net.minecraft.nbt.EndTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
 import team.creative.creativecore.common.gui.Align;
-import team.creative.creativecore.common.gui.GuiParent;
 import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
-import team.creative.creativecore.common.gui.sync.GuiSyncLocal;
 import team.creative.creativecore.common.util.text.TextListBuilder;
 
 public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
@@ -54,7 +51,7 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
 
     @Override
     public void onCreate() {
-        this.urlTextField = new WidgetTextField(() -> this.saveBtn, DisplayData.URL, tileBlock.getUrl()).setSuggest("https://i.imgur.com/1yCDs5C.mp4").expandX();
+        this.urlTextField = new WidgetTextFieldTrigger(() -> this.saveBtn, DisplayData.URL, tileBlock.getUrl()).setSuggest("https://i.imgur.com/1yCDs5C.mp4").expandX();
         this.urlValueTable = new WidgetDoubleTable(GuiFlow.STACK_Y)
                 .addOnFirst(new WidgetLabel("media_label", 0.75f).setTitle(new TextComponent("URL")))
                 .addOnFirst(urlTextField)

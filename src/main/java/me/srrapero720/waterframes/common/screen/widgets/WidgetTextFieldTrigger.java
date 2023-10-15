@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.common.screen.widgets;
 
-import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetStyles;
-import me.srrapero720.waterframes.util.FrameConfig;
 import me.srrapero720.waterframes.util.FrameTools;
+import me.srrapero720.waterframes.util.FrameConfig;
+import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -16,13 +16,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class WidgetTextField extends GuiTextfield {
+public class WidgetTextFieldTrigger extends GuiTextfield {
+    private final Supplier<GuiButton> saveButton;
     private String suggestion_c = "";
 
-    public WidgetTextField(String name, String text) {
+    public WidgetTextFieldTrigger(Supplier<GuiButton> saveButton, String name, String text) {
         super(name);
-        setMaxStringLength(2048);
-        setText(text);
+        this.setMaxStringLength(2048);
+        this.setSuggest("https://i.imgur.com/1yCDs5C.mp4");
+        this.setText(text);
+        this.saveButton = saveButton;
     }
 
     @Override
@@ -35,17 +38,24 @@ public class WidgetTextField extends GuiTextfield {
         return WidgetStyles.NORMAL_BACKGROUND;
     }
 
-    public WidgetTextField setSuggest(String suggest) {
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        boolean pressed = super.keyPressed(keyCode, scanCode, modifiers);
+        saveButton.get().setEnabled(FrameConfig.canUse(getPlayer(), getText()));
+        return pressed;
+    }
+
+    public WidgetTextFieldTrigger setSuggest(String suggest) {
         setSuggestion(suggest);
         return this;
     }
 
-    public WidgetTextField expandX() {
+    public WidgetTextFieldTrigger expandX() {
         this.setExpandableX();
         return this;
     }
 
-    public WidgetTextField expandY() {
+    public WidgetTextFieldTrigger expandY() {
         this.setExpandableY();
         return this;
     }
@@ -68,8 +78,14 @@ public class WidgetTextField extends GuiTextfield {
         super.looseFocus();
     }
 
-    public WidgetTextField setWidth(int width) {
+    public WidgetTextFieldTrigger setWidth(int width) {
         this.preferredWidth = width;
+        this.hasPreferredDimensions = true;
+        return this;
+    }
+
+    public WidgetTextFieldTrigger setHeight(int height) {
+        this.preferredHeight = height;
         this.hasPreferredDimensions = true;
         return this;
     }

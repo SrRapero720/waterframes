@@ -17,10 +17,20 @@ public class WidgetColum extends GuiColumn {
         super(width);
     }
 
-    public WidgetColum(int width, GuiFlow flow) {
+    public WidgetColum(int width, GuiFlow flow, Align align) {
         super(width, flow);
+        this.align = align;
     }
 
+    public WidgetColum(int width, Align align) {
+        super(width);
+        this.align = align;
+    }
+
+    public WidgetColum(GuiFlow flow, Align align) {
+        super(flow);
+        this.align = align;
+    }
 
     public WidgetColum setFlow(GuiFlow flow) {
         this.flow = flow;
@@ -34,6 +44,11 @@ public class WidgetColum extends GuiColumn {
 
     public WidgetColum setAlign(Align aligh) {
         this.align = aligh;
+        return this;
+    }
+
+    public WidgetColum setWidth(int width) {
+        this.preferredWidth = width;
         return this;
     }
 }

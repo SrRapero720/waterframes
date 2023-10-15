@@ -34,17 +34,17 @@ public class FrameRegistry {
     public static final RegistryObject<FrameBlock> FRAME = BLOCKS.register("frame", () -> new FrameBlock());
     public static final RegistryObject<ProjectorBlock> PROJECTOR = BLOCKS.register("projector", ProjectorBlock::new);
 //    public static final RegistryObject<ProjectorBlock> DARK_PROJECTOR = BLOCKS.register("dark_projector", ProjectorBlock::new);
-    public static final RegistryObject<TvBlock> TV = BLOCKS.register("tv", TvBlock::new);
+//    public static final RegistryObject<TvBlock> TV = BLOCKS.register("tv", TvBlock::new);
 
     /* ITEMS */
     public static final RegistryObject<Item> FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB)));
     public static final RegistryObject<Item> PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB)));
-    public static final RegistryObject<Item> TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties().tab(TAB)));
+//    public static final RegistryObject<Item> TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties().tab(TAB)));
 
     /* TILES */
     public static final RegistryObject<BlockEntityType<FrameTile>> TILE_FRAME = tile("frame", FrameTile::new, FRAME);
     public static final RegistryObject<BlockEntityType<ProjectorTile>> TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR);
-    public static final RegistryObject<BlockEntityType<TvTile>> TILE_TV = tile("tv", TvTile::new, TV);
+//    public static final RegistryObject<BlockEntityType<TvTile>> TILE_TV = tile("tv", TvTile::new, TV);
 
     public static void init(IEventBus bus) {
         BLOCKS.register(bus);

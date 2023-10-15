@@ -18,6 +18,8 @@ public abstract class DisplayScreen<T extends DisplayTile<?>> extends GuiLayer {
     protected final GuiSyncLocal<EndTag> playAction;
     protected final GuiSyncLocal<EndTag> pauseAction;
     protected final GuiSyncLocal<EndTag> stopAction;
+    protected final GuiSyncLocal<EndTag> fastForward;
+    protected final GuiSyncLocal<EndTag> fastBackwards;
     protected final GuiSyncLocal<CompoundTag> syncAction;
 
     protected final T tileBlock;
@@ -31,6 +33,8 @@ public abstract class DisplayScreen<T extends DisplayTile<?>> extends GuiLayer {
         this.playAction = getSyncHolder().register("play", x -> tileBlock.play());
         this.pauseAction = getSyncHolder().register("pause", x -> tileBlock.pause());
         this.stopAction = getSyncHolder().register("stop", x -> tileBlock.stop());
+        this.fastForward = getSyncHolder().register("forward", x -> tileBlock.fastforward());
+        this.fastBackwards = getSyncHolder().register("backwards", x -> tileBlock.fastbackwards());
         this.syncAction = getSyncHolder().register("sync", nbt -> syncData(tileBlock, getPlayer(), nbt));
     }
 

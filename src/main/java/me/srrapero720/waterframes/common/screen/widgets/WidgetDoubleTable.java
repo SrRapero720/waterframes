@@ -48,12 +48,30 @@ public class WidgetDoubleTable extends GuiTable {
         return this;
     }
 
+    public WidgetDoubleTable addOnFirstNewParent(GuiFlow flow, GuiControl ...control) {
+        WidgetParent parent = new WidgetParent(flow);
+        for (int i = 0; i < control.length; i++) {
+            parent.add2(control[i]);
+        }
+        this.first.add(parent);
+        return this;
+    }
+
     public WidgetColum getFirstRow() {
         return first;
     }
 
     public WidgetDoubleTable addOnSecond(GuiControl control) {
         this.second.add(control);
+        return this;
+    }
+
+    public WidgetDoubleTable addOnSecondNewParent(GuiFlow flow, GuiControl ...control) {
+        WidgetParent parent = new WidgetParent(flow);
+        for (int i = 0; i < control.length; i++) {
+            parent.add2(control[i]);
+        }
+        this.second.add(parent);
         return this;
     }
 

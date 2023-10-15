@@ -3,10 +3,13 @@ package me.srrapero720.waterframes.util;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.packets.ActionPacket;
 import me.srrapero720.waterframes.common.packets.SyncTickPacket;
+import me.srrapero720.waterframes.common.packets.SyncUrlListPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import team.creative.creativecore.common.network.CreativeNetwork;
+
+import java.util.List;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
@@ -23,6 +26,10 @@ public class FrameNet {
 
     public static void syncMaxTickTime(BlockPos pos, int maxTick) {
         NETWORK.sendToServer(new SyncTickPacket(pos, maxTick));
+    }
+
+    public static void syncUrlList(BlockPos pos, List<String> urlList, int index) {
+        NETWORK.sendToServer(new SyncUrlListPacket(pos, urlList, index));
     }
 
     static void register() {

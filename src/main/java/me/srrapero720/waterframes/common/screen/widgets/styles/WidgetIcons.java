@@ -56,6 +56,11 @@ public class WidgetIcons {
     public static final GuiIcon PLAY = create(15, 0);
     public static final GuiIcon PAUSE = create(15, 1);
     public static final GuiIcon STOP = create(15, 2);
+    public static final GuiIcon SKIP_10 = create(15, 3);
+    public static final GuiIcon BACK_10 = create(15, 4);
+    public static final GuiIcon NEXT_MEDIA = create(15, 5);
+    public static final GuiIcon BACK_MEDIA = create(15, 6);
+    public static final GuiIcon ADD = create(15, 7);
 
     private static GuiIcon create(int chunkX, int chunkY) {
         return new GuiIcon(location, 16 * chunkX, 16 * chunkY, 16, 16);

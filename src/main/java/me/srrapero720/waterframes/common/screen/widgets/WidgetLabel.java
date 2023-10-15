@@ -102,7 +102,7 @@ public class WidgetLabel extends GuiControl {
     }
 
     public int preferredWidth() {
-        return (int) (this.text.getTotalWidth() * scale) + 5;
+        return (int) (this.text.getTotalWidth() * scale) + 8;
     }
 
     public int getMinHeight() {
@@ -110,6 +110,6 @@ public class WidgetLabel extends GuiControl {
     }
 
     public int preferredHeight() {
-        return (int) (this.text.getTotalHeight() * scale) + 1;
+        return (int) (this.text.getTotalHeight() * scale) + 2;
     }
 }
