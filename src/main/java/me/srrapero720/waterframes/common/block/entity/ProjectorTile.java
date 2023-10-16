@@ -27,18 +27,18 @@ public class ProjectorTile extends DisplayTile<ProjectorData> {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public AABB getRenderBoundingBox() { return getBox().getBB(getBlockPos()); }
+    public AABB getRenderBoundingBox() { return getRenderBox().getBB(getBlockPos()); }
 
     @Override
-    public AlignedBox getBox() {
-        return getBox(ProjectorBlock.FACING, data.projectionDistance + 0.99f, false);
+    public AlignedBox getRenderBox() {
+        return getRenderBox(ProjectorBlock.FACING, data.projectionDistance + 0.99f);
     }
 
     @Override
-    public AlignedBox getGifBox() {
+    public AlignedBox getRenderGifBox() {
         Direction direction = getBlockState().getValue(ProjectorBlock.FACING);
         Facing facing = Facing.get(direction);
-        AlignedBox box = DisplayBlock.box(direction, data.projectionDistance + 0.97f);
+        AlignedBox box = DisplayBlock.getBlockBox(direction, data.projectionDistance + 0.97f);
 
         Axis one = facing.one();
         Axis two = facing.two();

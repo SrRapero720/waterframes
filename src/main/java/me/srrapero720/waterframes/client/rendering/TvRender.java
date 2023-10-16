@@ -6,13 +6,10 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
-import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -45,7 +42,7 @@ public class TvRender implements BlockEntityRenderer<TvTile> {
         RenderSystem.setShaderColor(block.data.brightness, block.data.brightness, block.data.brightness, block.data.alpha);
 
         Facing facing = Facing.get(block.getBlockState().getValue(ProjectorBlock.FACING).getOpposite());
-        AlignedBox alignedBox = block.getBox();
+        AlignedBox alignedBox = block.getRenderBox();
         alignedBox.grow(facing.axis, 0.01f);
         BoxFace boxFace = BoxFace.get(facing);
 

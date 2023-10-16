@@ -29,9 +29,8 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCreator {
     protected DisplayBlock(Properties pProperties) { super(pProperties); }
 
-    public static @NotNull AlignedBox box(Direction direction, Float projectionDistance) {
+    public static @NotNull AlignedBox getBlockBox(Direction direction, Float projectionDistance) {
         var facing = Facing.get(direction);
-
         var box = new AlignedBox();
 
         if (facing.positive) box.setMax(facing.axis, projectionDistance);

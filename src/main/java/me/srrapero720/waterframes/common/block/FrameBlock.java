@@ -67,12 +67,12 @@ public class FrameBlock extends DisplayBlock implements SimpleWaterloggedBlock {
 
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return box(state.getValue(getFacing()), THICKNESS).voxelShape();
+        return getBlockBox(state.getValue(getFacing()), THICKNESS).voxelShape();
     }
 
     @Override
     public @NotNull VoxelShape getInteractionShape(@NotNull BlockState state, BlockGetter level, BlockPos pos) {
-        return box(state.getValue(getFacing()), THICKNESS).voxelShape();
+        return getBlockBox(state.getValue(getFacing()), THICKNESS).voxelShape();
     }
 
     @Override

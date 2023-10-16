@@ -47,7 +47,7 @@ public class ProjectorRender implements BlockEntityRenderer<ProjectorTile> {
         RenderSystem.setShaderColor(block.data.brightness, block.data.brightness, block.data.brightness, block.data.alpha);
 
         Facing facing = Facing.get(block.getBlockState().getValue(ProjectorBlock.FACING));
-        AlignedBox alignedBox = block.getBox();
+        AlignedBox alignedBox = block.getRenderBox();
         BoxFace boxFace = BoxFace.get(facing);
 
         if (display.isLoading()) {

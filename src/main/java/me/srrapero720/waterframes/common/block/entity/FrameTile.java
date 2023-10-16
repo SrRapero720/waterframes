@@ -27,18 +27,18 @@ public class FrameTile extends DisplayTile<FrameData> {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public AABB getRenderBoundingBox() { return getBox().getBB(getBlockPos()); }
+    public AABB getRenderBoundingBox() { return getRenderBox().getBB(getBlockPos()); }
 
     @Override
-    public AlignedBox getBox() {
-        return getBox(FrameBlock.FACING, FrameBlock.THICKNESS, false);
+    public AlignedBox getRenderBox() {
+        return getRenderBox(FrameBlock.FACING, FrameBlock.THICKNESS);
     }
 
     @Override
-    public AlignedBox getGifBox() {
+    public AlignedBox getRenderGifBox() {
         Direction direction = getBlockState().getValue(FrameBlock.FACING);
         Facing facing = Facing.get(direction);
-        AlignedBox box = DisplayBlock.box(direction, FrameBlock.THICKNESS);
+        AlignedBox box = DisplayBlock.getBlockBox(direction, FrameBlock.THICKNESS);
 
         Axis one = facing.one();
         Axis two = facing.two();

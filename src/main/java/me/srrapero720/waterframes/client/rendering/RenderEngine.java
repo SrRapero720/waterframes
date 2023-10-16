@@ -67,7 +67,7 @@ public class RenderEngine {
     static void renderVertexGif(DisplayTile<?> block, PoseStack pose, BoxFace boxFace, boolean inverted) {
         pose.pushPose();
         Vec3i normal = boxFace.facing.normal;
-        AlignedBox alignedBox = block.getGifBox();
+        AlignedBox alignedBox = block.getRenderGifBox();
         alignedBox.grow(boxFace.facing.axis, 0.02f);
 
         int texture = LOADING_GIF.texture(DisplayControl.getTickTime(), MathAPI.tickToMs(FrameTools.deltaFrames()), true);

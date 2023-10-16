@@ -28,7 +28,7 @@ public class ProjectorBlock extends DisplayBlock {
 
     @Override
     public VoxelShape getInteractionShape(@NotNull BlockState state, BlockGetter level, BlockPos pos) {
-        return box(state.getValue(getFacing()), 1.0f).voxelShape();
+        return getBlockBox(state.getValue(getFacing()), 1.0f).voxelShape();
     }
 
     @Override

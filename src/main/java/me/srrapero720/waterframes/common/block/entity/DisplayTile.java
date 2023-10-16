@@ -41,10 +41,10 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
     @OnlyIn(Dist.CLIENT) private final AtomicBoolean released = new AtomicBoolean(false);
 
 
-    public AlignedBox getBox(DirectionProperty directionProperty, float thickness, boolean gifSquare) {
+    public AlignedBox getRenderBox(DirectionProperty directionProperty, float thickness) {
         Direction direction = getBlockState().getValue(directionProperty);
         Facing facing = Facing.get(direction);
-        AlignedBox box = DisplayBlock.box(direction, thickness);
+        AlignedBox box = DisplayBlock.getBlockBox(direction, thickness);
 
         Axis one = facing.one();
         Axis two = facing.two();
@@ -54,24 +54,16 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
             two = facing.one();
         }
 
-        if (gifSquare) {
-            box.setMin(one, 0.1f);
-            box.setMax(one, 0.9f);
+        box.setMin(one, this.data.min.x);
+        box.setMax(one, this.data.max.x);
 
-            box.setMin(two, 0.1f);
-            box.setMax(two, 0.9f);
-        } else {
-            box.setMin(one, this.data.min.x);
-            box.setMax(one, this.data.max.x);
-
-            box.setMin(two, this.data.min.y);
-            box.setMax(two, this.data.max.y);
-        }
+        box.setMin(two, this.data.min.y);
+        box.setMax(two, this.data.max.y);
 
         return box;
     }
-    public abstract AlignedBox getBox();
-    public abstract AlignedBox getGifBox();
+    public abstract AlignedBox getRenderBox();
+    public abstract AlignedBox getRenderGifBox();
 
     public DisplayTile(DATA data, BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);

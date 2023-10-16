@@ -37,7 +37,7 @@ public class FrameRender implements BlockEntityRenderer<FrameTile> {
         RenderSystem.setShaderColor(block.data.brightness, block.data.brightness, block.data.brightness, block.data.alpha);
 
         Facing facing = Facing.get(block.getBlockState().getValue(FrameBlock.FACING));
-        AlignedBox alignedBox = block.getBox();
+        AlignedBox alignedBox = block.getRenderBox();
         BoxFace boxFace = BoxFace.get(facing);
         alignedBox.grow(facing.axis, 0.01f);
 
