@@ -38,7 +38,7 @@ public class FrameEvents {
         private static void client() {
             BlockEntityRenderers.register(FrameRegistry.TILE_FRAME.get(), (x) -> new FrameRender());
             BlockEntityRenderers.register(FrameRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRender());
-            BlockEntityRenderers.register(FrameRegistry.TILE_TV.get(), (x) -> new TvRender());
+//            BlockEntityRenderers.register(FrameRegistry.TILE_TV.get(), (x) -> new TvRender());
         }
 
         @SubscribeEvent

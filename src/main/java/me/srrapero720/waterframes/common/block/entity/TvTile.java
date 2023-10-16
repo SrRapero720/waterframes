@@ -11,7 +11,8 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 public class TvTile extends DisplayTile<TvData> {
     public TvTile(BlockPos pPos, BlockState pBlockState) {
-        super(new TvData(), FrameRegistry.TILE_TV.get(), pPos, pBlockState);
+//        super(new TvData(), FrameRegistry.TILE_TV.get(), pPos, pBlockState);
+        super(new TvData(), null, pPos, pBlockState);
     }
 
     @Override

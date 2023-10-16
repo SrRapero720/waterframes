@@ -164,6 +164,8 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
     public void stop() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick = 0); }
     public void fastbackwards() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = true, data.tick + MathAPI.msToTick(5000)); }
     public void fastforward() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick + MathAPI.msToTick(5000)); }
+    public void fastBackwards() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = true, data.tick + MathAPI.msToTick(5000)); }
+    public void fastForward() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick + MathAPI.msToTick(5000)); }
 
     public void setDirty() {
         if (this.level != null) {
