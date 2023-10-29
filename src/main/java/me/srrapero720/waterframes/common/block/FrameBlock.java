@@ -53,7 +53,7 @@ public class FrameBlock extends DisplayBlock implements SimpleWaterloggedBlock {
 
     @Override
     public @NotNull FluidState getFluidState(BlockState pState) {
-        return pState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(pState);
+        return pState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(true) : super.getFluidState(pState);
     }
 
     @Override
@@ -85,6 +85,6 @@ public class FrameBlock extends DisplayBlock implements SimpleWaterloggedBlock {
 
     @Override
     public DirectionProperty getFacing() {
-        return FrameTile.getDefaultDirectionalProperty();
+        return FACING;
     }
 }
