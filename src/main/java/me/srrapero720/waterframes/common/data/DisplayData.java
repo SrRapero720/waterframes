@@ -54,8 +54,10 @@ public abstract class DisplayData {
     public int tick = 0;
     public int tickMax = -1;
 
-    public int getPosX() { return min.x == 0 ? 0 : max.x == 1 ? 2 : 1; }
-    public int getPosY() { return min.y == 0 ? 0 : max.y == 1 ? 2 : 1; }
+    public int getPosX() { return this.min.x == 0 ? 0 : this.max.x == 1 ? 2 : 1; }
+    public int getPosY() { return this.min.y == 0 ? 0 : this.max.y == 1 ? 2 : 1; }
+    public float getSizeX() { return this.max.x - this.min.x; }
+    public float getSizeY() { return this.max.y - this.min.y; }
 
     public void save(CompoundTag nbt) {
         nbt.putString(URL, url);

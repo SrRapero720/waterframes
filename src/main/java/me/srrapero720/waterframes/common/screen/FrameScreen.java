@@ -57,7 +57,7 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
 
         // IMAGE SIZE
         this.sizeParent = new WidgetParent(GuiFlow.STACK_X).setSpacing(4).setAlign(Align.STRETCH);
-        this.sizeParent.add(this.widthTextField = new WidgetCounterDecimal("width", tileBlock.getSizeX(), 0, FrameConfig.maxWidth(), scale)
+        this.sizeParent.add(this.widthTextField = new WidgetCounterDecimal("width", tileBlock.data.getSizeX(), 0, FrameConfig.maxWidth(), scale)
                 .expandX()
                 .setSpacing(0)
                 .setAlign(Align.CENTER)
@@ -67,7 +67,7 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
                 }))
         );
 
-        this.sizeParent.add(this.heightTextField = new WidgetCounterDecimal("height", tileBlock.getSizeY(), 0, FrameConfig.maxHeight(), scale)
+        this.sizeParent.add(this.heightTextField = new WidgetCounterDecimal("height", tileBlock.data.getSizeY(), 0, FrameConfig.maxHeight(), scale)
                 .expandX()
                 .setSpacing(0)
                 .setAlign(Align.CENTER)

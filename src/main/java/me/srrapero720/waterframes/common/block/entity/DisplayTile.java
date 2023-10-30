@@ -40,31 +40,6 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
     @OnlyIn(Dist.CLIENT) public volatile String parsedUrl;
     @OnlyIn(Dist.CLIENT) private final AtomicBoolean released = new AtomicBoolean(false);
 
-
-    public AlignedBox getRenderBox(DirectionProperty directionProperty, float thickness) {
-        Direction direction = getBlockState().getValue(directionProperty);
-        Facing facing = Facing.get(direction);
-        AlignedBox box = DisplayBlock.getBlockBox(direction, thickness);
-
-        Axis one = facing.one();
-        Axis two = facing.two();
-
-        if (facing.axis != Axis.Z) {
-            one = facing.two();
-            two = facing.one();
-        }
-
-        box.setMin(one, this.data.min.x);
-        box.setMax(one, this.data.max.x);
-
-        box.setMin(two, this.data.min.y);
-        box.setMax(two, this.data.max.y);
-
-        return box;
-    }
-    public abstract AlignedBox getRenderBox();
-    public abstract AlignedBox getRenderGifBox();
-
     public DisplayTile(DATA data, BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
         this.data = data;
@@ -120,9 +95,6 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
             }
         }
     }
-
-    public float getSizeX() { return this.data.max.x - this.data.min.x; }
-    public float getSizeY() { return this.data.max.y - this.data.min.y; }
 
     @Override
     public void saveAdditional(CompoundTag nbt) {

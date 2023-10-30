@@ -27,14 +27,15 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 @SuppressWarnings("deprecation")
 public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCreator {
+
     protected DisplayBlock(Properties pProperties) { super(pProperties); }
 
-    public static @NotNull AlignedBox getBlockBox(Direction direction, Float projectionDistance) {
+    public static @NotNull AlignedBox getBlockBox(Direction direction, Float thickness) {
         var facing = Facing.get(direction);
         var box = new AlignedBox();
 
-        if (facing.positive) box.setMax(facing.axis, projectionDistance);
-        else box.setMin(facing.axis, 1 - projectionDistance);
+        if (facing.positive) box.setMax(facing.axis, thickness);
+        else box.setMin(facing.axis, 1 - thickness);
         return box;
     }
 

@@ -137,15 +137,15 @@ jar {
             "MixinConfigs": "waterframes.mixin.json"
         ])
     }
-    from {
-        configurations.library.collect {
-            it.isDirectory() ? it.matching {
-                exclude '*', 'META-INF/**'
-            } : zipTree(it).matching {
-                exclude '*', 'META-INF/**'
-            }
-        }
-    }
+//    from {
+//        configurations.library.collect {
+//            it.isDirectory() ? it.matching {
+//                exclude '*', 'META-INF/**'
+//            } : zipTree(it).matching {
+//                exclude '*', 'META-INF/**'
+//            }
+//        }
+//    }
 }
 
 jar.finalizedBy('reobfJar')

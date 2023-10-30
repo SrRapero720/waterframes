@@ -60,17 +60,17 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
 
         // IMAGE SIZE
         this.sizeParent = new WidgetParent(GuiFlow.STACK_X).setSpacing(4).setAlign(Align.STRETCH);
-        this.sizeParent.add(this.widthTextField = new WidgetCounterDecimal("width", tileBlock.getSizeX(), 0, FrameConfig.maxWidth(), scale)
+        this.sizeParent.add(this.widthTextField = new WidgetCounterDecimal("width", tileBlock.data.getSizeX(), 0, FrameConfig.maxWidth(), scale)
                 .expandX()
                 .setSpacing(0)
                 .setAlign(Align.CENTER)
                 .add2(new GuiIconButton("reX", 16, 16, WidgetIcons.EXPAND_X, but -> {
                     if (tileBlock.display != null)
-                        widthTextField.setValue(tileBlock.display.height() / (tileBlock.display.width() / widthTextField.getValue()));
+                        heightTextField.setValue(tileBlock.display.height() / (tileBlock.display.width() / widthTextField.getValue()));
                 }))
         );
 
-        this.sizeParent.add(this.heightTextField = new WidgetCounterDecimal("height", tileBlock.getSizeY(), 0, FrameConfig.maxHeight(), scale)
+        this.sizeParent.add(this.heightTextField = new WidgetCounterDecimal("height", tileBlock.data.getSizeY(), 0, FrameConfig.maxHeight(), scale)
                 .expandX()
                 .setSpacing(0)
                 .setAlign(Align.CENTER)

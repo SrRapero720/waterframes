@@ -4,9 +4,11 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -23,7 +25,7 @@ import team.creative.creativecore.common.util.math.box.BoxFace;
 public class TvRender implements BlockEntityRenderer<TvTile> {
     @Override
     public boolean shouldRenderOffScreen(TvTile frame) {
-        return frame.getSizeX() > 8 || frame.getSizeY() > 8;
+        return frame.data.getSizeX() > 8 || frame.data.getSizeY() > 8;
     }
     
     @Override
@@ -40,10 +42,11 @@ public class TvRender implements BlockEntityRenderer<TvTile> {
         RenderSystem.enableDepthTest();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShaderColor(block.data.brightness, block.data.brightness, block.data.brightness, block.data.alpha);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
 
         Facing facing = Facing.get(block.getBlockState().getValue(ProjectorBlock.FACING).getOpposite());
-        AlignedBox alignedBox = block.getRenderBox();
-        alignedBox.grow(facing.axis, 0.01f);
+//        AlignedBox alignedBox = block.getRenderBox();
+//        alignedBox.grow(facing.axis, 0.01f);
         BoxFace boxFace = BoxFace.get(facing);
 
         if (display.isLoading()) {
@@ -53,7 +56,6 @@ public class TvRender implements BlockEntityRenderer<TvTile> {
                 int texture = display.texture();
                 RenderSystem.bindTexture(texture);
                 RenderSystem.setShaderTexture(0, texture);
-                RenderSystem.setShader(GameRenderer::getPositionTexShader);
                 if (texture != -1) {
                     pose.pushPose();
 
@@ -61,7 +63,7 @@ public class TvRender implements BlockEntityRenderer<TvTile> {
                     pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-block.data.rotation)));
                     pose.translate(-0.5, -0.5, -0.5);
 
-                    RenderEngine.vertexFrontSide(alignedBox, boxFace, pose, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL, block.data);
+//                    RenderEngine.vertexFrontSide(alignedBox, boxFace, pose, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL, block.data);
 
                     pose.popPose();
                 }
@@ -72,6 +74,7 @@ public class TvRender implements BlockEntityRenderer<TvTile> {
             }
         }
 
+        Tesselator.getInstance().end();
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         RenderSystem.disableDepthTest();

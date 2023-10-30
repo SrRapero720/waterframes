@@ -7,5 +7,7 @@
   "client": [
     "MinecraftMixin"
   ],
-  "mixins": []
+  "mixins": [
+    "creativecore.IBoxFaceAccessor"
+  ]
 }

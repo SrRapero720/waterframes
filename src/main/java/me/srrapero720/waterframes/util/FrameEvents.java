@@ -4,7 +4,6 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.DisplayControl;
 import me.srrapero720.waterframes.client.rendering.FrameRender;
 import me.srrapero720.waterframes.client.rendering.ProjectorRender;
-import me.srrapero720.waterframes.client.rendering.TvRender;
 import me.srrapero720.waterframes.util.events.PauseUpdateEvent;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
