@@ -2,7 +2,8 @@
 	"credit": "Made with Blockbench by FabiAcr",
 	"texture_size": [32, 32],
 	"textures": {
-		"1": "waterframes:block/projector/projector"
+		"1": "waterframes:block/projector/projector",
+		"particle": "waterframes:block/projector/projector"
 	},
 	"elements": [
 		{
