@@ -29,7 +29,7 @@ public class WidgetIcons {
     // STATUS ICONS (chunk 2)
     public static final GuiIcon STATUS_OK = create(2, 0);
     public static final GuiIcon STATUS_ALERT = create(2, 1);
-    public static final GuiIcon STATUS_CHILL = create(2, 2);
+    public static final GuiIcon STATUS_IDLE = create(2, 2);
     public static final GuiIcon STATUS_ERROR = create(2, 3);
     public static final GuiIcon STATUS_HACKED = create(2, 4);
     public static final GuiIcon STATUS_PEM = create(2, 5);

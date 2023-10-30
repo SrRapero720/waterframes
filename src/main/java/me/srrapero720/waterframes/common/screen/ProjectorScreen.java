@@ -10,7 +10,7 @@ import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetIcons;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.controls.simple.*;
@@ -53,7 +53,7 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
     public void onCreate() {
         this.urlTextField = new WidgetTextFieldTrigger(() -> this.saveBtn, DisplayData.URL, tileBlock.getUrl()).setSuggest("https://i.imgur.com/1yCDs5C.mp4").expandX();
         this.urlValueTable = new WidgetDoubleTable(GuiFlow.STACK_Y)
-                .addOnFirst(new WidgetLabel("media_label", 0.75f).setTitle(new TextComponent("URL")))
+                .addOnFirst(new WidgetLabel("media_label", 0.75f).setTitle(new TranslatableComponent("gui.waterframes.url")))
                 .addOnFirst(urlTextField)
                 .addOnSecondIf(isClient(), new WidgetStatusIcon("", 25, 25, WidgetIcons.STATUS_OK, () -> tileBlock.imageCache))
                 .setSpacing(4);
@@ -80,8 +80,8 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
                 })));
 
         this.sizeParent.add(new WidgetParent(GuiFlow.STACK_Y)
-                .add2(new GuiCheckBox(DisplayData.FLIP_X, tileBlock.data.flipX).setTranslate("gui.waterframes.flipx"))
-                .add2(new GuiCheckBox(DisplayData.FLIP_Y, tileBlock.data.flipY).setTranslate("gui.waterframes.flipy")));
+                .add2(new GuiCheckBox(DisplayData.FLIP_X, tileBlock.data.flipX).setTranslate("gui.waterframes.flip_x"))
+                .add2(new GuiCheckBox(DisplayData.FLIP_Y, tileBlock.data.flipY).setTranslate("gui.waterframes.flip_y")));
 
 
         this.textureSettingsTable = new WidgetDoubleTable(() -> new WidgetColum(GuiFlow.STACK_Y)).setSpacing(2).expandY()
@@ -116,7 +116,7 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
                 .addOnFirst(new GuiCheckBox("loop", tileBlock.data.loop).setTranslate("gui.waterframes.loop"))
                 .addOnSecond(new WidgetParent()
                         .add2(new GuiStateButton(ProjectorData.AUDIO_OFFSET, tileBlock.data.getOffsetMode(), new TextListBuilder()
-                                .addTranslated("gui.waterframes.audiocenter.", "block", "between", "projection")))
+                                .addTranslated("gui.waterframes.audio_offset.", "block", "between", "projection")))
                         .setAlign(Align.RIGHT))
                 .addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
                         .add2(this.volumeIcon = new WidgetIcon("v_icon", 12, 12, WidgetIcons.getVolumeIcon(tileBlock.data.volume)))
@@ -134,7 +134,7 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
 
         this.saveBtn = (GuiButton) new GuiButton("save", x -> syncAction.send(ProjectorData.build(this))).setTranslate("gui.waterframes.save");
         this.actionsTable = new WidgetDoubleTable().setSpacing(2)
-                .addOnFirst(new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTitle(new TextComponent("Reload All")))
+                .addOnFirst(new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTitle(new TranslatableComponent("gui.waterframes.reload.all")))
                 .addOnSecond(saveBtn.setEnabled(FrameConfig.canUse(getPlayer(), urlTextField.getText())))
                 .addOnSecond(new GuiButton("reload", x -> tileBlock.imageCache.reload()).setTranslate("gui.waterframes.reload"))
                 .setSpacing(2);
@@ -143,9 +143,9 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
 
         this.add(urlValueTable);
         this.add(sizeParent);
-        this.add(new WidgetLabel("tex_label", 0.8f).setTitle(new TextComponent("Texture settings")));
+        this.add(new WidgetLabel("tex_label", 0.8f).setTitle(new TranslatableComponent("label.waterframes.texture_settings")));
         this.add(textureSettingsTable);
-        this.add(new WidgetLabel("media_label", 0.8f).setTitle(new TextComponent("Media settings")));
+        this.add(new WidgetLabel("media_label", 0.8f).setTitle(new TranslatableComponent("label.waterframes.media_settings")));
         this.add(mediaSettingsTable);
         this.add(new WidgetSeekBar("seek", 150, 12, tileBlock.data.tick, 0, tileBlock.display != null ? tileBlock.display.durationInTicks() : 1, () -> tileBlock.data.tick)
                 .addOnMouseGrab(seekBar -> tileBlock.data.tick = (int) seekBar.value)

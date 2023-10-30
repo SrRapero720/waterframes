@@ -9,7 +9,7 @@ import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetIcons;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.controls.simple.*;
@@ -50,7 +50,7 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
     protected void onCreate() {
         this.urlTextField = new WidgetTextFieldTrigger(() -> this.saveBtn, DisplayData.URL, tileBlock.getUrl()).setSuggest("https://i.imgur.com/1yCDs5C.mp4").expandX();
         this.urlValueTable = new WidgetDoubleTable(GuiFlow.STACK_Y)
-                .addOnFirst(new WidgetLabel("media_label", 0.75f).setTitle(new TextComponent("URL")))
+                .addOnFirst(new WidgetLabel("media_label", 0.75f).setTitle(new TranslatableComponent("gui.waterframes.url")))
                 .addOnFirst(urlTextField)
                 .addOnSecondIf(isClient(), new WidgetStatusIcon("", 25, 25, WidgetIcons.STATUS_OK, () -> tileBlock.imageCache))
                 .setSpacing(4);
@@ -77,8 +77,8 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
                 })));
 
         this.sizeParent.add(new WidgetParent(GuiFlow.STACK_Y)
-                .add2(new GuiCheckBox(DisplayData.FLIP_X, tileBlock.data.flipX).setTranslate("gui.waterframes.flipx"))
-                .add2(new GuiCheckBox(DisplayData.FLIP_Y, tileBlock.data.flipY).setTranslate("gui.waterframes.flipy")));
+                .add2(new GuiCheckBox(DisplayData.FLIP_X, tileBlock.data.flipX).setTranslate("gui.waterframes.flip_x"))
+                .add2(new GuiCheckBox(DisplayData.FLIP_Y, tileBlock.data.flipY).setTranslate("gui.waterframes.flip_y")));
 
         this.textureSettingsTable = new WidgetDoubleTable(() -> new WidgetColum(GuiFlow.STACK_Y)).setSpacing(2).expandY()
                 .addOnFirst(new WidgetParent(GuiFlow.STACK_X)
@@ -94,8 +94,8 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
                         .add2(this.distanceIcon = new WidgetIcon("d_icon", 12, 12, WidgetIcons.DISTANCE))
                         .add2(new GuiSteppedSlider(DisplayData.RENDER_DISTANCE, 130, 10, tileBlock.data.renderDistance, 5, 1024)))
                 .addOnFirst(new WidgetParent(GuiFlow.STACK_X).setAlign(Align.STRETCH)
-                        .add2(new GuiCheckBox(FrameData.VISIBLE_FRAME, tileBlock.data.visibleFrame).setTranslate("gui.waterframes.visibleFrame"))
-                        .add2(new GuiCheckBox(FrameData.RENDER_BOTH_SIDES, tileBlock.data.bothSides).setTranslate("gui.waterframes.bothSides")))
+                        .add2(new GuiCheckBox(FrameData.VISIBLE_FRAME, tileBlock.data.visibleFrame).setTranslate("gui.waterframes.visible_frame"))
+                        .add2(new GuiCheckBox(FrameData.RENDER_BOTH_SIDES, tileBlock.data.bothSides).setTranslate("gui.waterframes.both_sides")))
                 // IMAGE POSITION
                 .addOnSecond(this.positionViewer = new WidgetIcon("posView", 40, 40, WidgetIcons.POS_CORD[tileBlock.data.getPosX()][tileBlock.data.getPosY()]))
                 .addOnSecond(new GuiStateButton("pos_x", tileBlock.data.getPosX(), new TextListBuilder()
@@ -127,7 +127,7 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
 
         this.saveBtn = (GuiButton) new GuiButton("save", x -> syncAction.send(FrameData.build(this))).setTranslate("gui.waterframes.save");
         this.actionsTable = new WidgetDoubleTable().setSpacing(2)
-                .addOnFirst(new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTitle(new TextComponent("Reload All")))
+                .addOnFirst(new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTitle(new TranslatableComponent("gui.waterframes.reload.all")))
                 .addOnSecond(saveBtn.setEnabled(FrameConfig.canUse(getPlayer(), urlTextField.getText())))
                 .addOnSecond(new GuiButton("reload", x -> tileBlock.imageCache.reload()).setTranslate("gui.waterframes.reload"))
                 .setSpacing(2);
@@ -135,9 +135,9 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
 
         this.add(urlValueTable);
         this.add(sizeParent);
-        this.add(new WidgetLabel("tex_label", 0.8f).setTitle(new TextComponent("Texture settings")));
+        this.add(new WidgetLabel("tex_label", 0.8f).setTitle(new TranslatableComponent("label.waterframes.texture_settings")));
         this.add(textureSettingsTable);
-        this.add(new WidgetLabel("media_label", 0.8f).setTitle(new TextComponent("Media settings")));
+        this.add(new WidgetLabel("media_label", 0.8f).setTitle(new TranslatableComponent("label.waterframes.media_settings")));
         this.add(mediaSettingsTable);
         this.add(actionsTable);
     }
