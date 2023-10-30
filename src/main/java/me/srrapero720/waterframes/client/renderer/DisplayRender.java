@@ -81,14 +81,19 @@ public class DisplayRender {
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 
         AlignedBox expanded = new AlignedBox(renderBox);
-        expanded.grow(facing.axis, facing.positive ? 0.01f : 1 - 0.01f);
         builder.begin(VertexFormat.Mode.QUADS, POSITION_TEX_COLOR_NORMAL);
         AlignedBox squared = RenderBox.squaredOf(block, facing, expanded);
-        if (renderFrontSide)
+        if (renderFrontSide) {
+            expanded.grow(facing.axis, 0.01f);
             RenderVertex.frontHalf(squared, boxFace, pose, builder, forceXFlip != block.data.flipX, forceYFlip != block.data.flipY);
+            expanded.grow(facing.axis, -0.01f);
+        }
 
-        if (renderBackside)
+        if (renderBackside) {
+            expanded.grow(facing.axis, -0.01f);
             RenderVertex.backHalf(squared, boxFace, pose, builder, forceXFlip != block.data.flipX, forceYFlip != block.data.flipY);
+            expanded.grow(facing.axis, 0.01f);
+        }
 
         Tesselator.getInstance().end();
     }
