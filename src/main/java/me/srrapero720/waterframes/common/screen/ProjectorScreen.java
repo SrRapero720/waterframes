@@ -147,7 +147,7 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
         this.add(textureSettingsTable);
         this.add(new WidgetLabel("media_label", 0.8f).setTitle(new TranslatableComponent("label.waterframes.media_settings")));
         this.add(mediaSettingsTable);
-        this.add(new WidgetSeekBar("seek", 150, 12, tileBlock.data.tick, 0, tileBlock.display != null ? tileBlock.display.durationInTicks() : 1, () -> tileBlock.data.tick)
+        if (isClient()) this.add(new WidgetSeekBar("seek", 150, 12, tileBlock.data.tick, 0, tileBlock.display != null ? tileBlock.display.durationInTicks() : 1, () -> tileBlock.data.tick)
                 .addOnMouseGrab(seekBar -> tileBlock.data.tick = (int) seekBar.value)
                 .addOnMouseRelease(seekBar -> FrameNet.syncPlaybackState(tileBlock.getBlockPos(), tileBlock.data.playing, tileBlock.data.tick = (int) seekBar.value))
                 .setExpandableX());

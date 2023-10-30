@@ -38,7 +38,7 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
     @OnlyIn(Dist.CLIENT) public volatile ImageCache imageCache;
     @OnlyIn(Dist.CLIENT) public volatile TextureDisplay display;
     @OnlyIn(Dist.CLIENT) public volatile String parsedUrl;
-    @OnlyIn(Dist.CLIENT) private final AtomicBoolean released = new AtomicBoolean(false);
+    private final AtomicBoolean released = new AtomicBoolean(false); // clientside
 
     public DisplayTile(DATA data, BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
@@ -47,7 +47,7 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
 
     public void setUrl(String url) {
         this.data.url = url;
-        this.parsedUrl = FrameTools.patchUrl(this.data.url);
+        if (isClient()) this.parsedUrl = FrameTools.patchUrl(this.data.url);
     }
 
     public String getUrl() { return this.data.url; }

@@ -46,6 +46,7 @@ minecraft {
 
             property 'forge.logging.console.level', 'debug'
             property 'log4j.appender.Console', "org.apache.log4j.ConsoleAppender"
+            property 'terminal.jline', 'true'
             arg '--mixin.config'
             arg 'waterframes.mixin.json'
 

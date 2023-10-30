@@ -15,10 +15,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.loading.FMLLoader;
 
 public class FrameEvents {
     public static void init(IEventBus bus) {
-        bus.addListener(Client::init);
+        if (FMLLoader.getDist().isClient()) bus.addListener(Client::init);
         bus.addListener(Common::init);
     }
 
