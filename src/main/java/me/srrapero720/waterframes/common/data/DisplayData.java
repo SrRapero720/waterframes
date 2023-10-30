@@ -56,8 +56,8 @@ public abstract class DisplayData {
 
     public int getPosX() { return this.min.x == 0 ? 0 : this.max.x == 1 ? 2 : 1; }
     public int getPosY() { return this.min.y == 0 ? 0 : this.max.y == 1 ? 2 : 1; }
-    public float getSizeX() { return this.max.x - this.min.x; }
-    public float getSizeY() { return this.max.y - this.min.y; }
+    public float getWidth() { return this.max.x - this.min.x; }
+    public float getHeight() { return this.max.y - this.min.y; }
 
     public void save(CompoundTag nbt) {
         nbt.putString(URL, url);
@@ -162,28 +162,37 @@ public abstract class DisplayData {
             float height = (float) FrameTools.minFloat(FrameConfig.maxHeight(), nbt.getFloat("height"));
             int posX = nbt.getByte("pos_x");
             int posY = nbt.getByte("pos_y");
-            if (posX == 0) {
-                block.data.min.x = 0;
-                block.data.max.x = width;
-            } else if (posX == 1) {
-                float middle = width / 2;
-                block.data.min.x = 0.5F - middle;
-                block.data.max.x = 0.5F + middle;
-            } else {
-                block.data.min.x = 1 - width;
-                block.data.max.x = 1;
+
+            switch (posX) {
+                case 0 -> {
+                    block.data.min.x = 0;
+                    block.data.max.x = width;
+                }
+                case 1 -> {
+                    float middle = width / 2;
+                    block.data.min.x = 0.5F - middle;
+                    block.data.max.x = 0.5F + middle;
+                }
+                default -> {
+                    block.data.min.x = 1 - width;
+                    block.data.max.x = 1;
+                }
             }
 
-            if (posY == 0) {
-                block.data.min.y = 0;
-                block.data.max.y = height;
-            } else if (posY == 1) {
-                float middle = height / 2;
-                block.data.min.y = 0.5F - middle;
-                block.data.max.y = 0.5F + middle;
-            } else {
-                block.data.min.y = 1 - height;
-                block.data.max.y = 1;
+            switch (posY) {
+                case 0 -> {
+                    block.data.min.y = 0;
+                    block.data.max.y = height;
+                }
+                case 1 -> {
+                    float middle = height / 2;
+                    block.data.min.y = 0.5F - middle;
+                    block.data.max.y = 0.5F + middle;
+                }
+                default -> {
+                    block.data.min.y = 1 - height;
+                    block.data.max.y = 1;
+                }
             }
 
             block.data.flipX = nbt.getBoolean(FLIP_X);

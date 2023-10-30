@@ -194,7 +194,13 @@ public class TextureDisplay {
         };
     }
 
-    
+    public boolean isBroken() {
+        return switch (displayMode) {
+            case PICTURE -> false;
+            case VIDEO, AUDIO -> this.mediaPlayer.isBroken();
+        };
+    }
+
     public boolean isLoading() {
         return imageCache.getStatus() == ImageCache.Status.LOADING;
     }

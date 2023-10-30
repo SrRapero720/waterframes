@@ -30,8 +30,8 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     protected DisplayBlock(Properties pProperties) { super(pProperties); }
 
-    public static @NotNull AlignedBox getBlockBox(Direction direction, Float thickness) {
-        var facing = Facing.get(direction);
+    public static AlignedBox getBlockBox(Direction direction, float thickness) { return getBlockBox(Facing.get(direction), thickness); }
+    public static AlignedBox getBlockBox(Facing facing, float thickness) {
         var box = new AlignedBox();
 
         if (facing.positive) box.setMax(facing.axis, thickness);

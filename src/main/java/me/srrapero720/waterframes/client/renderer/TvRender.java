@@ -1,14 +1,12 @@
-package me.srrapero720.waterframes.client.rendering;
+package me.srrapero720.waterframes.client.renderer;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -18,14 +16,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.base.Facing;
-import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.box.BoxFace;
 
 @OnlyIn(Dist.CLIENT)
 public class TvRender implements BlockEntityRenderer<TvTile> {
     @Override
     public boolean shouldRenderOffScreen(TvTile frame) {
-        return frame.data.getSizeX() > 8 || frame.data.getSizeY() > 8;
+        return frame.data.getWidth() > 8 || frame.data.getHeight() > 8;
     }
     
     @Override
