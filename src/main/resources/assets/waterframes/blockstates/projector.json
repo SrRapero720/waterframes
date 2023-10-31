@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": {"model": "waterframes:block/projector", "y": 0},
+        "facing=south": { "model": "waterframes:block/projector", "y": 180},
+        "facing=west": {"model": "waterframes:block/projector", "y": -90},
+        "facing=east": {"model": "waterframes:block/projector", "y": -270}
+    }
+}

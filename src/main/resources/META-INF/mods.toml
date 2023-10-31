@@ -32,7 +32,7 @@ license="${mod_license}"
 [[dependencies.waterframes]]
 	modId="watermedia"
 	mandatory=true
-	ordering="NONE"
+	ordering="AFTER"
 	side="CLIENT"
 	versionRange="${watermedia_version_range}"
 
