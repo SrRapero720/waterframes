@@ -55,8 +55,11 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
         this.urlValueTable = new WidgetDoubleTable(GuiFlow.STACK_Y)
                 .addOnFirst(new WidgetLabel("media_label", 0.75f).setTitle(new TranslatableComponent("gui.waterframes.url")))
                 .addOnFirst(urlTextField)
-                .addOnSecondIf(isClient(), new WidgetStatusIcon("", 25, 25, WidgetIcons.STATUS_OK, () -> tileBlock.imageCache))
                 .setSpacing(4);
+
+        if (isClient()) {
+            this.urlValueTable.addOnSecond(new WidgetStatusIcon("", 25, 25, WidgetIcons.STATUS_OK, () -> tileBlock.imageCache));
+        }
 
         // IMAGE SIZE
         this.sizeParent = new WidgetParent(GuiFlow.STACK_X).setSpacing(4).setAlign(Align.STRETCH);
@@ -147,10 +150,12 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
         this.add(textureSettingsTable);
         this.add(new WidgetLabel("media_label", 0.8f).setTitle(new TranslatableComponent("label.waterframes.media_settings")));
         this.add(mediaSettingsTable);
-        if (isClient()) this.add(new WidgetSeekBar("seek", 150, 12, tileBlock.data.tick, 0, tileBlock.display != null ? tileBlock.display.durationInTicks() : 1, () -> tileBlock.data.tick)
-                .addOnMouseGrab(seekBar -> tileBlock.data.tick = (int) seekBar.value)
-                .addOnMouseRelease(seekBar -> FrameNet.syncPlaybackState(tileBlock.getBlockPos(), tileBlock.data.playing, tileBlock.data.tick = (int) seekBar.value))
-                .setExpandableX());
+        if (isClient()) {
+            this.add(new WidgetSeekBar("seek", 150, 12, tileBlock.data.tick, 0, tileBlock.display != null ? tileBlock.display.durationInTicks() : 1, () -> tileBlock.data.tick)
+                    .addOnMouseGrab(seekBar -> tileBlock.data.tick = (int) seekBar.value)
+                    .addOnMouseRelease(seekBar -> FrameNet.syncPlaybackState(tileBlock.getBlockPos(), tileBlock.data.playing, tileBlock.data.tick = (int) seekBar.value))
+                    .setExpandableX());
+        }
         this.add(actionsTable);
     }
 

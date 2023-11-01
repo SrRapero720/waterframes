@@ -52,8 +52,11 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
         this.urlValueTable = new WidgetDoubleTable(GuiFlow.STACK_Y)
                 .addOnFirst(new WidgetLabel("media_label", 0.75f).setTitle(new TranslatableComponent("gui.waterframes.url")))
                 .addOnFirst(urlTextField)
-                .addOnSecondIf(isClient(), new WidgetStatusIcon("", 25, 25, WidgetIcons.STATUS_OK, () -> tileBlock.imageCache))
                 .setSpacing(4);
+
+        if (isClient()) {
+            this.urlValueTable.addOnSecond(new WidgetStatusIcon("", 25, 25, WidgetIcons.STATUS_OK, () -> tileBlock.imageCache));
+        }
 
         // IMAGE SIZE
         this.sizeParent = new WidgetParent(GuiFlow.STACK_X).setSpacing(4).setAlign(Align.STRETCH);
