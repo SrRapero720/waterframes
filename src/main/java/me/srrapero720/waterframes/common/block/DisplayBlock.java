@@ -28,7 +28,9 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 @SuppressWarnings("deprecation")
 public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCreator {
 
-    protected DisplayBlock(Properties pProperties) { super(pProperties); }
+    protected DisplayBlock(Properties pProperties) {
+        super(pProperties);
+    }
 
     public static AlignedBox getBlockBox(Direction direction, float thickness) { return getBlockBox(Facing.get(direction), thickness); }
     public static AlignedBox getBlockBox(Facing facing, float thickness) {

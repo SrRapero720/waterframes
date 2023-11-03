@@ -35,6 +35,7 @@ public class FrameBlock extends DisplayBlock implements SimpleWaterloggedBlock {
 
     public FrameBlock() {
         super(Properties.of(Material.WOOD).strength(0.25f, 2.5f).sound(SoundType.WOOD).noOcclusion());
+        registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED, false));
     }
 
     @Override
@@ -59,7 +60,7 @@ public class FrameBlock extends DisplayBlock implements SimpleWaterloggedBlock {
     @Override
     @NotNull
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
-        return super.getStateForPlacement(context).setValue(getFacing(), context.getClickedFace()).setValue(VISIBLE, true).setValue(WATERLOGGED, false);
+        return this.defaultBlockState().setValue(getFacing(), context.getClickedFace()).setValue(VISIBLE, true).setValue(WATERLOGGED, false);
     }
 
     @Override
