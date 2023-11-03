@@ -59,7 +59,7 @@ public class FrameTools {
         return is;
     }
 
-    public static double minFloat(float a, float b) {
+    public static float minFloat(float a, float b) {
         if (a != a)
             return a;   // a is NaN
         if ((a == 0.0f) &&

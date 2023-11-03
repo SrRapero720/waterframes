@@ -116,13 +116,13 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
                 .addOnFirst(new GuiCheckBox(DisplayData.LOOP, tileBlock.data.loop).setTranslate("gui.waterframes.loop"))
                 .addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
                         .add2(this.volumeIcon = new WidgetIcon("v_icon", 12, 12, WidgetIcons.getVolumeIcon(tileBlock.data.volume)))
-                        .add2(this.volumeSlider = (WidgetSlider) new WidgetSlider(DisplayData.VOLUME, 100, 10, tileBlock.data.volume, 0, DisplayConfig.maxAudioVolume(), WidgetSlider.PERCENT).setExpandableX())
+                        .add2(this.volumeSlider = (WidgetSlider) new WidgetSlider(DisplayData.VOLUME, 100, 10, tileBlock.data.volume, 0, DisplayConfig.maxVolume(), WidgetSlider.PERCENT).setExpandableX())
                         .setAlign(Align.RIGHT))
                 .addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
                         .add2(new WidgetIcon("v_min_icon", 12, 12, WidgetIcons.VOLUME_RANGE_MIN))
-                        .add2(this.volumeMinSlider = (GuiSteppedSlider) new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, 63, 10, tileBlock.data.minVolumeDistance, 0, Math.min(DisplayConfig.maxAudioDistance(), tileBlock.data.maxVolumeDistance)).setExpandableX())
+                        .add2(this.volumeMinSlider = (GuiSteppedSlider) new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, 63, 10, tileBlock.data.minVolumeDistance, 0, Math.min(DisplayConfig.maxVolumeDistance(), tileBlock.data.maxVolumeDistance)).setExpandableX())
                         .add2(new WidgetIcon("v_max_icon", 12, 12, WidgetIcons.VOLUME_RANGE_MAX))
-                        .add2(this.volumeMaxSlider = (WidgetSteppedSlider) new WidgetSteppedSlider(DisplayData.VOL_RANGE_MAX, volumeMinSlider, 63, 10, tileBlock.data.maxVolumeDistance, 0, DisplayConfig.maxAudioDistance()).setExpandableX())
+                        .add2(this.volumeMaxSlider = (WidgetSteppedSlider) new WidgetSteppedSlider(DisplayData.VOL_RANGE_MAX, volumeMinSlider, 63, 10, tileBlock.data.maxVolumeDistance, 0, DisplayConfig.maxVolumeDistance()).setExpandableX())
                         .setAlign(Align.RIGHT));
 
         this.mediaSettingsTable.getFirstRow().setExpandableX();

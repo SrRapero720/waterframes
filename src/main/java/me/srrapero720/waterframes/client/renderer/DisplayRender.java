@@ -3,6 +3,7 @@ package me.srrapero720.waterframes.client.renderer;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.DisplayControl;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
@@ -26,6 +27,7 @@ public class DisplayRender {
 
     public static void render(PoseStack pose, DisplayTile<?> block, Facing facing, AlignedBox renderBox,
                               boolean renderFrontSide, boolean renderBackside, boolean forceXFlip, boolean forceYFlip) {
+        if (!DisplayConfig.keepsRendering()) return;
 
         TextureDisplay display = block.requestDisplay();
         if (display == null || display.isBroken()) return;

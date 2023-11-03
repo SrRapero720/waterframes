@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.client.display;
 
 import me.lib720.caprica.vlcj.player.base.State;
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
@@ -15,10 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 public class TextureDisplay {
     // MEDIA AND DATA
@@ -42,6 +40,14 @@ public class TextureDisplay {
     }
 
     private void switchVideoMode() {
+        // DO NOT USE VIDEOLAN IF I DONT WANT
+        if (!DisplayConfig.useVideoLan()) {
+            imageCache.deuse();
+            imageCache = new ImageCache(ImageAPI.failedVLC());
+            this.displayMode = Mode.PICTURE;
+            return;
+        }
+
         // START
         this.displayMode = Mode.VIDEO;
         this.mediaPlayer = new SyncVideoPlayer(Minecraft.getInstance());

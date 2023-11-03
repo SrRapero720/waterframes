@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.common.data;
 
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
@@ -11,7 +12,7 @@ public class ProjectorData extends DisplayData {
     public static final String PROJECTION_DISTANCE = "projection_distance";
     public static final String AUDIO_OFFSET = "audio_offset";
 
-    public int projectionDistance = 8;
+    public int projectionDistance = Math.min(8, DisplayConfig.maxProjectionDistance());
     public float audioOffset = 0;
 
     @Override
@@ -24,7 +25,7 @@ public class ProjectorData extends DisplayData {
     @Override
     public void load(CompoundTag nbt) {
         super.load(nbt);
-        projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? nbt.getInt(PROJECTION_DISTANCE) : projectionDistance;
+        projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? Math.min(nbt.getInt(PROJECTION_DISTANCE), DisplayConfig.maxProjectionDistance()) : projectionDistance;
         audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : audioOffset;
     }
 
@@ -44,7 +45,7 @@ public class ProjectorData extends DisplayData {
 
     public static void sync(ProjectorTile block, Player player, CompoundTag nbt) {
         DisplayData.sync(block, player, nbt, data -> {
-            block.data.projectionDistance = nbt.getInt(PROJECTION_DISTANCE);
+            block.data.projectionDistance = Math.min(nbt.getInt(PROJECTION_DISTANCE), DisplayConfig.maxProjectionDistance());
 
             int mode = nbt.getInt("audio_offset_mode");
             block.data.audioOffset = mode == 2 ? block.data.projectionDistance : mode == 1 ? block.data.projectionDistance / 2f : 0;

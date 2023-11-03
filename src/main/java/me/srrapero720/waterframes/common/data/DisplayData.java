@@ -34,8 +34,8 @@ public abstract class DisplayData {
     public static final String TICK_MAX = "tick_max";
 
     public String url = "";
-    public Vec2f min = new Vec2f(0, 0);
-    public Vec2f max = new Vec2f(1, 1);
+    public final Vec2f min = new Vec2f(0, 0);
+    public final Vec2f max = new Vec2f(1, 1);
 
     public boolean flipX = false;
     public boolean flipY = false;
@@ -43,11 +43,11 @@ public abstract class DisplayData {
     public float rotation = 0;
     public float alpha = 1;
     public float brightness = 1;
-    public int renderDistance = 32;
+    public int renderDistance = Math.min(32, DisplayConfig.maxRenderDistance());
 
-    public int volume = 100;
-    public int minVolumeDistance = 5;
-    public int maxVolumeDistance = 20;
+    public int volume = DisplayConfig.maxVolume();
+    public int maxVolumeDistance = Math.min(20, DisplayConfig.maxVolumeDistance());
+    public int minVolumeDistance = Math.min(5, maxVolumeDistance);
 
     public boolean loop = true;
     public boolean playing = true;
@@ -86,15 +86,53 @@ public abstract class DisplayData {
         min.y = nbt.getFloat(MIN_Y);
         max.x = nbt.getFloat(MAX_X);
         max.y = nbt.getFloat(MAX_Y);
+        float width;
+        if (getWidth() > (width = DisplayConfig.maxWidth())) {
+            switch (getPosX()) {
+                case 0 -> {
+                    min.x = 0;
+                    max.x = width;
+                }
+                case 1 -> {
+                    float middle = width / 2;
+                    min.x = 0.5F - middle;
+                    max.x = 0.5F + middle;
+                }
+                default -> {
+                    min.x = 1 - width;
+                    max.x = 1;
+                }
+            }
+        }
+
+        float height;
+        if (getHeight() > (height = DisplayConfig.maxHeight())) {
+            switch (getPosY()) {
+                case 0 -> {
+                    min.y = 0;
+                    max.y = height;
+                }
+                case 1 -> {
+                    float middle = height / 2;
+                    min.y = 0.5F - middle;
+                    max.y = 0.5F + middle;
+                }
+                default -> {
+                    min.y = 1 - height;
+                    max.y = 1;
+                }
+            }
+        }
+
         rotation = nbt.getFloat(ROTATION);
         renderDistance = Math.min(DisplayConfig.maxRenderDistance(), nbt.getInt(RENDER_DISTANCE));
         flipX = nbt.getBoolean(FLIP_X);
         flipY = nbt.getBoolean(FLIP_Y);
-        alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : 1;
-        brightness = nbt.contains(BRIGHTNESS) ? nbt.getFloat(BRIGHTNESS) : 1;
-        volume = nbt.getInt(VOLUME);
-        minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? nbt.getInt(VOL_RANGE_MIN) : 5;
-        maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? nbt.getInt(VOL_RANGE_MAX) : 25;
+        alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : alpha;
+        brightness = nbt.contains(BRIGHTNESS) ? nbt.getFloat(BRIGHTNESS) : alpha;
+        volume = nbt.contains(VOLUME) ? Math.min(nbt.getInt(VOLUME), DisplayConfig.maxVolume()) : volume;
+        maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? Math.min(nbt.getInt(VOL_RANGE_MAX), DisplayConfig.maxVolumeDistance()) : maxVolumeDistance;
+        minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), maxVolumeDistance) : minVolumeDistance;
         playing = nbt.getBoolean(PLAYING);
         tick = nbt.getInt(TICK);
         tickMax = nbt.getInt(TICK_MAX);
@@ -158,8 +196,8 @@ public abstract class DisplayData {
             }
             block.setUrl(url);
 
-            float width = (float) FrameTools.minFloat(DisplayConfig.maxWidth(), nbt.getFloat("width"));
-            float height = (float) FrameTools.minFloat(DisplayConfig.maxHeight(), nbt.getFloat("height"));
+            float width = FrameTools.minFloat(nbt.getFloat("width"), DisplayConfig.maxWidth());
+            float height = FrameTools.minFloat(nbt.getFloat("height"), DisplayConfig.maxHeight());
             int posX = nbt.getByte("pos_x");
             int posY = nbt.getByte("pos_y");
 
@@ -200,11 +238,11 @@ public abstract class DisplayData {
             block.data.rotation = nbt.getFloat(ROTATION);
             block.data.alpha = nbt.getFloat(ALPHA);
             block.data.brightness = nbt.getFloat(BRIGHTNESS);
-            block.data.renderDistance = Math.min(DisplayConfig.maxRenderDistance(), nbt.getInt(RENDER_DISTANCE));
+            block.data.renderDistance = Math.min(nbt.getInt(RENDER_DISTANCE), DisplayConfig.maxRenderDistance());
             block.data.loop = nbt.getBoolean(LOOP);
-            block.data.volume = Math.min(DisplayConfig.maxAudioVolume(), nbt.getInt(VOLUME));
-            block.data.minVolumeDistance = nbt.getInt(VOL_RANGE_MIN);
-            block.data.maxVolumeDistance = Math.min(DisplayConfig.maxAudioDistance(), nbt.getInt(VOL_RANGE_MAX));
+            block.data.volume = Math.min(nbt.getInt(VOLUME), DisplayConfig.maxVolume());
+            block.data.maxVolumeDistance = Math.min(nbt.getInt(VOL_RANGE_MAX), DisplayConfig.maxVolumeDistance());
+            block.data.minVolumeDistance = Math.min(nbt.getInt(VOL_RANGE_MIN), block.data.maxVolumeDistance);
             if (block.data.minVolumeDistance > block.data.maxVolumeDistance) block.data.maxVolumeDistance = block.data.minVolumeDistance;
             if (extra != null) extra.set(block.data);
         }

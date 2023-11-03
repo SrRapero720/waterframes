@@ -27,8 +27,8 @@ public class DisplayConfig {
     private static ForgeConfigSpec.IntValue maxRenderDistance;
     private static ForgeConfigSpec.IntValue maxProjectionDistance;
     // MULTIMEDIA
-    private static ForgeConfigSpec.IntValue maxAudioDistance;
-    private static ForgeConfigSpec.IntValue maxAudioVolume;
+    private static ForgeConfigSpec.IntValue maxVolumeDistance;
+    private static ForgeConfigSpec.IntValue maxVolume;
     private static ForgeConfigSpec.BooleanValue useVideoLan;
     private static ForgeConfigSpec.BooleanValue keepsRendering;
     // BEHAVIOR
@@ -63,8 +63,8 @@ public class DisplayConfig {
         }, "Configures all rendering limits, size, distance");
 
         serverBuilder.group("multimedia", b -> {
-            maxAudioDistance = b.defineInRange("maxAudioDistance", 64, 8, 512);
-            maxAudioVolume =
+            maxVolumeDistance = b.defineInRange("maxAudioDistance", 64, 8, 512);
+            maxVolume =
                     b.comment("Values over 100 uses ÜberVolume of VLC")
                             .defineInRange("maxAudioVolume", 100, 10, 200);
             useVideoLan = serverBuilder.booleanGroup("videoLan", true, b2 -> {
@@ -118,10 +118,10 @@ public class DisplayConfig {
     public static int maxRenderDistance() { return maxRenderDistance.get(); }
     public static int maxProjectionDistance() { return maxProjectionDistance.get(); }
     // MULTIMEDIA
-    public static int maxAudioDistance() { return maxAudioDistance.get(); }
-    public static int maxAudioVolume() { return maxAudioVolume.get(); }
-    public static boolean useVideoLan() { return useVideoLan.get(); }
-    public static boolean keepsRendering() { return keepsRendering.get(); }
+    public static int maxVolumeDistance() { return maxVolumeDistance.get(); }
+    public static int maxVolume() { return maxVolume.get(); }
+    public static boolean useVideoLan() { return overridesServerConfig() ? useVideoLan.get() : overridesUseVideoLan(); }
+    public static boolean keepsRendering() { return overridesServerConfig() ? keepsRendering.get() : overridesKeepsRendering(); }
     // BEHAVIOR
     public static boolean useRedstone() { return useRedstone.get(); }
     public static RedstoneMode redstoneMode() { return redstoneMode.get(); }
@@ -133,9 +133,9 @@ public class DisplayConfig {
     public static boolean useWhitelist() { return useWhitelist.get(); }
     public static String[] whitelist() { return whitelist.get().toArray(new String[0]); }
     // OVERRIDES (client)
-    public boolean overrideServerConfig() { return overrideServerConfig.get(); }
-    public boolean overrideUseVideolan() { return overrideUseVideolan.get(); }
-    public boolean overrideKeepsRendering() { return overrideKeepsRendering.get(); }
+    private static boolean overridesServerConfig() { return overrideServerConfig.get(); }
+    private static boolean overridesUseVideoLan() { return overrideUseVideolan.get(); }
+    private static boolean overridesKeepsRendering() { return overrideKeepsRendering.get(); }
 
     public static boolean isWhiteListed(@NotNull String domain) {
         if (useWhitelist()) return true;
