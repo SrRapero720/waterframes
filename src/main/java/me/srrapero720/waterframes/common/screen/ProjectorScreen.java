@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.common.screen;
 
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.data.DisplayData;
-import me.srrapero720.waterframes.util.FrameConfig;
 import me.srrapero720.waterframes.util.FrameNet;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import me.srrapero720.waterframes.common.data.ProjectorData;
@@ -63,7 +63,7 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
 
         // IMAGE SIZE
         this.sizeParent = new WidgetParent(GuiFlow.STACK_X).setSpacing(4).setAlign(Align.STRETCH);
-        this.sizeParent.add(this.widthTextField = new WidgetCounterDecimal("width", tileBlock.data.getWidth(), 0, FrameConfig.maxWidth(), scale)
+        this.sizeParent.add(this.widthTextField = new WidgetCounterDecimal("width", tileBlock.data.getWidth(), 0, DisplayConfig.maxWidth(), scale)
                 .expandX()
                 .setSpacing(0)
                 .setAlign(Align.CENTER)
@@ -73,7 +73,7 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
                 }))
         );
 
-        this.sizeParent.add(this.heightTextField = new WidgetCounterDecimal("height", tileBlock.data.getHeight(), 0, FrameConfig.maxHeight(), scale)
+        this.sizeParent.add(this.heightTextField = new WidgetCounterDecimal("height", tileBlock.data.getHeight(), 0, DisplayConfig.maxHeight(), scale)
                 .expandX()
                 .setSpacing(0)
                 .setAlign(Align.CENTER)
@@ -123,13 +123,13 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
                         .setAlign(Align.RIGHT))
                 .addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
                         .add2(this.volumeIcon = new WidgetIcon("v_icon", 12, 12, WidgetIcons.getVolumeIcon(tileBlock.data.volume)))
-                        .add2(this.volumeSlider = (WidgetSlider) new WidgetSlider(DisplayData.VOLUME, 100, 10, tileBlock.data.volume, 0, FrameConfig.maxAudioVolume(), WidgetSlider.PERCENT).setExpandableX())
+                        .add2(this.volumeSlider = (WidgetSlider) new WidgetSlider(DisplayData.VOLUME, 100, 10, tileBlock.data.volume, 0, DisplayConfig.maxAudioVolume(), WidgetSlider.PERCENT).setExpandableX())
                         .setAlign(Align.RIGHT))
                 .addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
                         .add2(new WidgetIcon("v_min_icon", 12, 12, WidgetIcons.VOLUME_RANGE_MIN))
-                        .add2(this.volumeMinSlider = (GuiSteppedSlider) new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, 63, 10, tileBlock.data.minVolumeDistance, 0, Math.min(FrameConfig.maxAudioDistance(), tileBlock.data.maxVolumeDistance)).setExpandableX())
+                        .add2(this.volumeMinSlider = (GuiSteppedSlider) new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, 63, 10, tileBlock.data.minVolumeDistance, 0, Math.min(DisplayConfig.maxAudioDistance(), tileBlock.data.maxVolumeDistance)).setExpandableX())
                         .add2(new WidgetIcon("v_max_icon", 12, 12, WidgetIcons.VOLUME_RANGE_MAX))
-                        .add2(this.volumeMaxSlider = (WidgetSteppedSlider) new WidgetSteppedSlider(DisplayData.VOL_RANGE_MAX, volumeMinSlider, 63, 10, tileBlock.data.maxVolumeDistance, 0, FrameConfig.maxAudioDistance()).setExpandableX())
+                        .add2(this.volumeMaxSlider = (WidgetSteppedSlider) new WidgetSteppedSlider(DisplayData.VOL_RANGE_MAX, volumeMinSlider, 63, 10, tileBlock.data.maxVolumeDistance, 0, DisplayConfig.maxAudioDistance()).setExpandableX())
                 .setAlign(Align.RIGHT));
 
         this.mediaSettingsTable.getFirstRow().setExpandableX();
@@ -138,7 +138,7 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
         this.saveBtn = (GuiButton) new GuiButton("save", x -> syncAction.send(ProjectorData.build(this))).setTranslate("gui.waterframes.save");
         this.actionsTable = new WidgetDoubleTable().setSpacing(2)
                 .addOnFirst(new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTitle(new TranslatableComponent("gui.waterframes.reload.all")))
-                .addOnSecond(saveBtn.setEnabled(FrameConfig.canUse(getPlayer(), urlTextField.getText())))
+                .addOnSecond(saveBtn.setEnabled(DisplayConfig.canSave(getPlayer(), urlTextField.getText())))
                 .addOnSecond(new GuiButton("reload", x -> tileBlock.imageCache.reload()).setTranslate("gui.waterframes.reload"))
                 .setSpacing(2);
         this.actionsTable.getSecondRow().setAlign(Align.RIGHT);

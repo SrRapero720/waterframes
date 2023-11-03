@@ -1,9 +1,9 @@
 package me.srrapero720.waterframes.common.data;
 
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screen.widgets.WidgetCounterDecimal;
 import me.srrapero720.waterframes.util.FrameTools;
-import me.srrapero720.waterframes.util.FrameConfig;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import team.creative.creativecore.common.gui.GuiLayer;
@@ -87,7 +87,7 @@ public abstract class DisplayData {
         max.x = nbt.getFloat(MAX_X);
         max.y = nbt.getFloat(MAX_Y);
         rotation = nbt.getFloat(ROTATION);
-        renderDistance = Math.min(FrameConfig.maxRenderDistance(), nbt.getInt(RENDER_DISTANCE));
+        renderDistance = Math.min(DisplayConfig.maxRenderDistance(), nbt.getInt(RENDER_DISTANCE));
         flipX = nbt.getBoolean(FLIP_X);
         flipY = nbt.getBoolean(FLIP_Y);
         alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : 1;
@@ -151,15 +151,15 @@ public abstract class DisplayData {
 
     public static <D extends DisplayData, T extends DisplayTile<D>> void sync(T block, Player player, CompoundTag nbt, ExtraData<D> extra) {
         String url = nbt.getString("url");
-        if (FrameConfig.canUse(player, url)) {
+        if (DisplayConfig.canSave(player, url)) {
             if (!block.getUrl().equals(url)) {
                 block.data.tick = 0;
                 block.data.tickMax = -1;
             }
             block.setUrl(url);
 
-            float width = (float) FrameTools.minFloat(FrameConfig.maxWidth(), nbt.getFloat("width"));
-            float height = (float) FrameTools.minFloat(FrameConfig.maxHeight(), nbt.getFloat("height"));
+            float width = (float) FrameTools.minFloat(DisplayConfig.maxWidth(), nbt.getFloat("width"));
+            float height = (float) FrameTools.minFloat(DisplayConfig.maxHeight(), nbt.getFloat("height"));
             int posX = nbt.getByte("pos_x");
             int posY = nbt.getByte("pos_y");
 
@@ -200,11 +200,11 @@ public abstract class DisplayData {
             block.data.rotation = nbt.getFloat(ROTATION);
             block.data.alpha = nbt.getFloat(ALPHA);
             block.data.brightness = nbt.getFloat(BRIGHTNESS);
-            block.data.renderDistance = Math.min(FrameConfig.maxRenderDistance(), nbt.getInt(RENDER_DISTANCE));
+            block.data.renderDistance = Math.min(DisplayConfig.maxRenderDistance(), nbt.getInt(RENDER_DISTANCE));
             block.data.loop = nbt.getBoolean(LOOP);
-            block.data.volume = Math.min(FrameConfig.maxAudioVolume(), nbt.getInt(VOLUME));
+            block.data.volume = Math.min(DisplayConfig.maxAudioVolume(), nbt.getInt(VOLUME));
             block.data.minVolumeDistance = nbt.getInt(VOL_RANGE_MIN);
-            block.data.maxVolumeDistance = Math.min(FrameConfig.maxAudioDistance(), nbt.getInt(VOL_RANGE_MAX));
+            block.data.maxVolumeDistance = Math.min(DisplayConfig.maxAudioDistance(), nbt.getInt(VOL_RANGE_MAX));
             if (block.data.minVolumeDistance > block.data.maxVolumeDistance) block.data.maxVolumeDistance = block.data.minVolumeDistance;
             if (extra != null) extra.set(block.data);
         }

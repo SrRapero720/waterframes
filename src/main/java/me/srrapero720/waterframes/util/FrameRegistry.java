@@ -31,7 +31,7 @@ public class FrameRegistry {
     public static final CreativeModeTab TAB = tab(new ResourceLocation(WaterFrames.ID, "frame"));
 
     /* BLOCKS */
-    public static final RegistryObject<FrameBlock> FRAME = BLOCKS.register("frame", () -> new FrameBlock());
+    public static final RegistryObject<FrameBlock> FRAME = BLOCKS.register("frame", FrameBlock::new);
     public static final RegistryObject<ProjectorBlock> PROJECTOR = BLOCKS.register("projector", ProjectorBlock::new);
 //    public static final RegistryObject<ProjectorBlock> DARK_PROJECTOR = BLOCKS.register("dark_projector", ProjectorBlock::new);
 //    public static final RegistryObject<TvBlock> TV = BLOCKS.register("tv", TvBlock::new);

@@ -1,20 +1,18 @@
 package me.srrapero720.waterframes.common.screen.widgets;
 
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetStyles;
-import me.srrapero720.waterframes.util.FrameConfig;
 import me.srrapero720.waterframes.util.FrameTools;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.Nullable;
-import team.creative.creativecore.common.gui.controls.simple.GuiButton;
 import team.creative.creativecore.common.gui.controls.simple.GuiTextfield;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class WidgetTextField extends GuiTextfield {
     private String suggestion_c = "";
@@ -78,7 +76,7 @@ public class WidgetTextField extends GuiTextfield {
     public List<Component> getTooltip() {
         var tooltips = new ArrayList<Component>();
 
-        if (!FrameConfig.domainAllowed(getText()))
+        if (!DisplayConfig.isWhiteListed(getText()))
             tooltips.add(new TranslatableComponent("label.waterframes.not_whitelisted").withStyle(ChatFormatting.RED));
         if (!FrameTools.isUrlValid(getText()))
             tooltips.add(new TranslatableComponent("label.waterframes.invalid_url").withStyle(ChatFormatting.RED));

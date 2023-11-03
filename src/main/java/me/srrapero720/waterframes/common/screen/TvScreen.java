@@ -1,13 +1,12 @@
 package me.srrapero720.waterframes.common.screen;
 
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
 import me.srrapero720.waterframes.common.data.DisplayData;
 import me.srrapero720.waterframes.common.data.TvData;
 import me.srrapero720.waterframes.common.screen.widgets.*;
 import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetIcons;
-import me.srrapero720.waterframes.util.FrameConfig;
 import me.srrapero720.waterframes.util.FrameNet;
-import me.srrapero720.watermedia.api.image.ImageAPI;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
 import net.minecraft.network.chat.TextComponent;
@@ -75,11 +74,11 @@ public class TvScreen extends DisplayScreen<TvTile> {
         this.mediaControlsParent
                 .add2(new WidgetParent("", GuiFlow.STACK_X)
                         .add2(this.volumeIcon = new WidgetIcon("v_icon", 12, 12, WidgetIcons.getVolumeIcon(tileBlock.data.volume)))
-                        .add2(this.volumeSlider = new WidgetSlider(DisplayData.VOLUME, 50, 10, tileBlock.data.volume, 0, FrameConfig.maxAudioVolume(), WidgetSlider.PERCENT))
+                        .add2(this.volumeSlider = new WidgetSlider(DisplayData.VOLUME, 50, 10, tileBlock.data.volume, 0, DisplayConfig.maxAudioVolume(), WidgetSlider.PERCENT))
                         .add2(new WidgetIcon("v_min_icon", 12, 12, WidgetIcons.VOLUME_RANGE_MIN))
-                        .add2(this.volumeMinSlider = new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, 50, 10, tileBlock.data.minVolumeDistance, 0, Math.min(FrameConfig.maxAudioDistance(), tileBlock.data.maxVolumeDistance)))
+                        .add2(this.volumeMinSlider = new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, 50, 10, tileBlock.data.minVolumeDistance, 0, Math.min(DisplayConfig.maxAudioDistance(), tileBlock.data.maxVolumeDistance)))
                         .add2(new WidgetIcon("v_max_icon", 12, 12, WidgetIcons.VOLUME_RANGE_MAX))
-                        .add2(this.volumeMaxSlider = new WidgetSteppedSlider(DisplayData.VOL_RANGE_MAX, volumeMinSlider, 50, 10, tileBlock.data.maxVolumeDistance, 0, FrameConfig.maxAudioDistance()))
+                        .add2(this.volumeMaxSlider = new WidgetSteppedSlider(DisplayData.VOL_RANGE_MAX, volumeMinSlider, 50, 10, tileBlock.data.maxVolumeDistance, 0, DisplayConfig.maxAudioDistance()))
                         .setAlign(Align.STRETCH))
                 .add2(new WidgetSeekBar("seek", 200, 12, tileBlock.data.tick, 0, tileBlock.display != null ? tileBlock.display.durationInTicks() : 1, () -> tileBlock.data.tick)
                         .addOnMouseGrab(seekBar -> tileBlock.data.tick = (int) seekBar.value)

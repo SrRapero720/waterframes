@@ -1,6 +1,5 @@
 package me.srrapero720.waterframes;
 
-import me.srrapero720.waterframes.util.FrameConfig;
 import me.srrapero720.waterframes.util.FrameEvents;
 import me.srrapero720.waterframes.util.FrameRegistry;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,12 +17,12 @@ public class WaterFrames {
     public static final String ID = "waterframes";
     public static final String VERSION = ModList.get().getModFileById(ID).versionString();
     public static final Logger LOGGER = LogManager.getLogger(ID);
-    private static final Marker IT = MarkerFactory.getMarker("Bootstrap");
+    public static final Marker IT = MarkerFactory.getMarker("Bootstrap");
 
     // BOOTSTRAP
     public WaterFrames() {
         FrameEvents.init(bus());
-        FrameConfig.init(bus());
+        DisplayConfig.init();
         FrameRegistry.init(bus());
     }
 

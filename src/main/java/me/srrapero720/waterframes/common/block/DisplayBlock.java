@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.common.block;
 
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
-import me.srrapero720.waterframes.util.FrameConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -68,7 +68,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override
     public @NotNull InteractionResult use(BlockState state, @NotNull Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide && FrameConfig.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        if (!level.isClientSide && DisplayConfig.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
     }
 
@@ -98,7 +98,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     @Override
     public void neighborChanged(@NotNull BlockState state, @NotNull Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
         super.neighborChanged(state, level, pos, block, neighborPos, isMoving);
-        if (!FrameConfig.isDisabledRedstone() && level.getBlockEntity(pos) instanceof ProjectorTile tile) {
+        if (!DisplayConfig.useRedstone() && level.getBlockEntity(pos) instanceof ProjectorTile tile) {
             boolean signal = false;
             for (Direction direction: Direction.values()) {
                 BlockPos neighborPose = pos.relative(direction);
