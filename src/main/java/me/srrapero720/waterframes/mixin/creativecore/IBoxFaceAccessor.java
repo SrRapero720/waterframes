@@ -7,7 +7,7 @@ import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.BoxCorner;
 import team.creative.creativecore.common.util.math.box.BoxFace;
 
-@Mixin(BoxFace.class)
+@Mixin(value = BoxFace.class, remap = false)
 public interface IBoxFaceAccessor {
     @Accessor
     Axis getOne();
