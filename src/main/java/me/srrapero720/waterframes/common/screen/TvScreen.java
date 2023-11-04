@@ -142,6 +142,8 @@ public class TvScreen extends DisplayScreen<TvTile> {
     @Override
     public void tick() {
         super.tick();
-        volumeIcon.setIcon(WidgetIcons.getVolumeIcon((int) volumeSlider.value));
+        if (isClient()) {
+            volumeIcon.setIcon(WidgetIcons.getVolumeIcon((int) volumeSlider.value));
+        }
     }
 }

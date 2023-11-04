@@ -28,6 +28,8 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
     private GuiTextfield urlTextField;
     private WidgetCounterDecimal widthTextField;
     private WidgetCounterDecimal heightTextField;
+    protected GuiStateButton posXButton;
+    protected GuiStateButton posYButton;
     private WidgetSlider volumeSlider;
     private GuiSteppedSlider volumeMinSlider;
     private WidgetSteppedSlider volumeMaxSlider;
@@ -101,9 +103,9 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
                         .add2(new GuiCheckBox(FrameData.RENDER_BOTH_SIDES, tileBlock.data.bothSides).setTranslate("gui.waterframes.both_sides")))
                 // IMAGE POSITION
                 .addOnSecond(this.positionViewer = new WidgetIcon("posView", 40, 40, WidgetIcons.POS_CORD[tileBlock.data.getPosX()][tileBlock.data.getPosY()]))
-                .addOnSecond(new GuiStateButton("pos_x", tileBlock.data.getPosX(), new TextListBuilder()
+                .addOnSecond(this.posXButton = new GuiStateButton("pos_x", tileBlock.data.getPosX(), new TextListBuilder()
                         .addTranslated("gui.waterframes.posx.", "left", "center", "right")))
-                .addOnSecond(new GuiStateButton("pos_y", tileBlock.data.getPosY(), new TextListBuilder()
+                .addOnSecond(this.posYButton = new GuiStateButton("pos_y", tileBlock.data.getPosY(), new TextListBuilder()
                         .addTranslated("gui.waterframes.posy.", "top", "center", "bottom")));
 
         this.textureSettingsTable.getSecondRow().setAlign(Align.CENTER);
@@ -153,7 +155,9 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
     @Override
     public void tick() {
         super.tick();
-        positionViewer.setIcon(WidgetIcons.POS_CORD[((GuiStateButton) get("pos_x")).getState()][((GuiStateButton) get("pos_y")).getState()]);
-        volumeIcon.setIcon(WidgetIcons.getVolumeIcon((int) volumeSlider.value));
+        if (isClient()) {
+            positionViewer.setIcon(WidgetIcons.POS_CORD[posXButton.getState()][posYButton.getState()]);
+            volumeIcon.setIcon(WidgetIcons.getVolumeIcon((int) volumeSlider.value));
+        }
     }
 }

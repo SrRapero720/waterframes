@@ -31,6 +31,8 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
     protected WidgetCounterDecimal heightTextField;
     protected WidgetSlider volumeSlider;
     protected GuiSteppedSlider volumeMinSlider;
+    protected GuiStateButton posXButton;
+    protected GuiStateButton posYButton;
     protected WidgetSteppedSlider volumeMaxSlider;
     protected GuiButton saveBtn;
 
@@ -105,9 +107,9 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
                         .add2(new GuiSteppedSlider(ProjectorData.PROJECTION_DISTANCE, 130, 10, tileBlock.data.projectionDistance, 4, 128)))
                 // IMAGE POSITION
                 .addOnSecond(positionViewer = new WidgetIcon("posView", 40, 40, WidgetIcons.POS_CORD[tileBlock.data.getPosX()][tileBlock.data.getPosY()]))
-                .addOnSecond(new GuiStateButton("pos_x", tileBlock.data.getPosX(), new TextListBuilder()
+                .addOnSecond(posXButton = new GuiStateButton("pos_x", tileBlock.data.getPosX(), new TextListBuilder()
                         .addTranslated("gui.waterframes.posx.", "left", "center", "right")))
-                .addOnSecond(new GuiStateButton("pos_y", tileBlock.data.getPosY(), new TextListBuilder()
+                .addOnSecond(posYButton = new GuiStateButton("pos_y", tileBlock.data.getPosY(), new TextListBuilder()
                         .addTranslated("gui.waterframes.posy.", "top", "center", "bottom")));
         this.textureSettingsTable.getSecondRow().setAlign(Align.CENTER);
 
@@ -167,7 +169,9 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
     @Override
     public void tick() {
         super.tick();
-        positionViewer.setIcon(WidgetIcons.POS_CORD[((GuiStateButton) get("pos_x")).getState()][((GuiStateButton) get("pos_y")).getState()]);
-        volumeIcon.setIcon(WidgetIcons.getVolumeIcon((int) volumeSlider.value));
+        if (isClient()) {
+            positionViewer.setIcon(WidgetIcons.POS_CORD[posXButton.getState()][posYButton.getState()]);
+            volumeIcon.setIcon(WidgetIcons.getVolumeIcon((int) volumeSlider.value));
+        }
     }
 }
