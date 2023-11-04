@@ -149,7 +149,9 @@ public class DisplayConfig {
     }
 
     public static boolean canSave(Player player, String url) {
-        MinecraftServer server = player.getServer();
+        Level level = player.getLevel();
+        MinecraftServer server = level.getServer();
+        if (level.isClientSide()) return true; // FIXME: on client breaks screens
         assert server != null;
         if (server.isSingleplayer() || player.hasPermissions(server.getOperatorUserPermissionLevel())) return true;
 
