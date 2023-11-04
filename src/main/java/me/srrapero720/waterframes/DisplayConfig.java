@@ -56,7 +56,7 @@ public class DisplayConfig {
     static {
         LazyBuilder serverBuilder = new LazyBuilder("waterframes");
         serverBuilder.group("rendering", b -> {
-            maxWidth = b.defineInRange("maxWidth", 40f, 1f, 128f);
+            maxWidth = b.defineInRange("maxWidth", 40d, 1d, 128d);
             maxHeight = b.defineInRange("maxHeight", 40d, 1d, 128d);
             maxRenderDistance = b.defineInRange("maxRenderDistance", 128, 8, 512);
             maxProjectionDistance = b.defineInRange("maxProjectionDistance", 32, 8, 128);
