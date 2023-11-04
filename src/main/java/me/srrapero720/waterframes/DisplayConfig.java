@@ -63,15 +63,16 @@ public class DisplayConfig {
         }, "Configures all rendering limits, size, distance");
 
         serverBuilder.group("multimedia", b -> {
-            maxVolumeDistance = b.defineInRange("maxAudioDistance", 64, 8, 512);
+            maxVolumeDistance = b.defineInRange("maxVolumeDistance", 64, 8, 512);
             maxVolume =
                     b.comment("Values over 100 uses ÜberVolume of VLC")
-                            .defineInRange("maxAudioVolume", 100, 10, 200);
+                            .defineInRange("maxVolume", 100, 10, 200);
+
             useVideoLan = serverBuilder.booleanGroup("videoLan", true, b2 -> {
                 keepsRendering = b2
-                        .comment("Enables VLC media processing and game rendering for videos, when is disabled only plays audio")
+                        .comment("Enables VLC media processing and game rendering for videos, disabling only plays audio")
                         .define("keepsRendering", true);
-            });
+            }, "Enables VideoLAN usage for multimedia processing (support added by WATERMeDIA)");
         }, "Configures all settings related with multimedia player");
 
         serverBuilder.group("blockBehavior", b -> {
@@ -88,7 +89,7 @@ public class DisplayConfig {
                                 "Only works when redstone behavior is on 'IN' mode"
                         )
                         .define("overridingPlayback", true);
-            });
+            }, "Enables redstone playback for all DisplayBlocks");
         }, "Configures block behavior");
 
         serverBuilder.group("permissions", b -> {
@@ -196,6 +197,7 @@ public class DisplayConfig {
             BUILDER.push(name);
             ForgeConfigSpec.BooleanValue result = BUILDER.comment("Toggle the option").define("enable", def);
             groupCreator.create(BUILDER);
+            BUILDER.pop();
             return result;
         }
 
