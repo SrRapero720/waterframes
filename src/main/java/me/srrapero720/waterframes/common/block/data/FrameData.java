@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.common.data;
+package me.srrapero720.waterframes.common.block.data;
 
 import me.srrapero720.waterframes.common.block.entity.FrameTile;
 import net.minecraft.nbt.CompoundTag;
@@ -38,7 +38,7 @@ public class FrameData extends DisplayData {
     }
 
     public static void sync(FrameTile block, Player player, CompoundTag nbt) {
-        DisplayData.sync(block, player, nbt, data -> {
+        sync(block, player, nbt, data -> {
             block.data.visibleFrame = nbt.getBoolean(VISIBLE_FRAME);
             block.data.bothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
         });

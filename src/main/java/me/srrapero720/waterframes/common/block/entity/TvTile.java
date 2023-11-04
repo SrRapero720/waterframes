@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.block.entity;
 
-import me.srrapero720.waterframes.common.data.TvData;
+import me.srrapero720.waterframes.common.block.data.TvData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 

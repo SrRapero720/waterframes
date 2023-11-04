@@ -2,8 +2,8 @@ package me.srrapero720.waterframes.common.screen;
 
 import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
-import me.srrapero720.waterframes.common.data.DisplayData;
-import me.srrapero720.waterframes.common.data.TvData;
+import me.srrapero720.waterframes.common.block.data.DisplayData;
+import me.srrapero720.waterframes.common.block.data.TvData;
 import me.srrapero720.waterframes.common.screen.widgets.*;
 import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetIcons;
 import me.srrapero720.waterframes.util.FrameNet;

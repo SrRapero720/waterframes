@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.common.data;
+package me.srrapero720.waterframes.common.block.data;
 
 import net.minecraft.nbt.CompoundTag;
 

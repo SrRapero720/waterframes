@@ -1,6 +1,5 @@
-package me.srrapero720.waterframes.common.data;
+package me.srrapero720.waterframes.common.block.data;
 
-import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -32,7 +31,7 @@ public class TvData extends DisplayData {
     }
 
     public static void sync(TvTile block, Player player, CompoundTag nbt) {
-        DisplayData.sync(block, player, nbt, data -> {
+        sync(block, player, nbt, data -> {
             block.data.url_index = nbt.getInt("url_index");
         });
     }

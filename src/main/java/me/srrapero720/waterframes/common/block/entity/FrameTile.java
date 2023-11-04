@@ -2,10 +2,9 @@ package me.srrapero720.waterframes.common.block.entity;
 
 import me.srrapero720.waterframes.client.renderer.engine.RenderBox;
 import me.srrapero720.waterframes.common.block.FrameBlock;
-import me.srrapero720.waterframes.common.data.FrameData;
+import me.srrapero720.waterframes.common.block.data.FrameData;
 import me.srrapero720.waterframes.util.FrameRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;

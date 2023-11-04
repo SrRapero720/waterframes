@@ -1,9 +1,8 @@
 package me.srrapero720.waterframes.common.block.entity;
 
 import me.srrapero720.waterframes.client.display.TextureDisplay;
-import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.FrameBlock;
-import me.srrapero720.waterframes.common.data.DisplayData;
+import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.util.FrameTools;
 import me.srrapero720.waterframes.util.FrameNet;
 import me.srrapero720.watermedia.api.image.ImageAPI;
@@ -11,7 +10,6 @@ import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -20,13 +18,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
-import team.creative.creativecore.common.util.math.base.Axis;
-import team.creative.creativecore.common.util.math.base.Facing;
-import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 import java.util.concurrent.atomic.AtomicBoolean;

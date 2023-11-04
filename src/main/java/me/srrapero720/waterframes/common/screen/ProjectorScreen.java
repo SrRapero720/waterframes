@@ -1,10 +1,10 @@
 package me.srrapero720.waterframes.common.screen;
 
 import me.srrapero720.waterframes.DisplayConfig;
-import me.srrapero720.waterframes.common.data.DisplayData;
+import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.util.FrameNet;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
-import me.srrapero720.waterframes.common.data.ProjectorData;
+import me.srrapero720.waterframes.common.block.data.ProjectorData;
 import me.srrapero720.waterframes.common.screen.widgets.*;
 import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetIcons;
 import me.srrapero720.watermedia.api.image.ImageAPI;

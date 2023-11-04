@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.common.data;
+package me.srrapero720.waterframes.common.block.data;
 
 import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
