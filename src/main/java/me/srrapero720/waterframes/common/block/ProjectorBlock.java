@@ -26,7 +26,7 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 public class ProjectorBlock extends DisplayBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public ProjectorBlock() {
-        super(Properties.of(Material.METAL).strength(2.5f, 10.0f).sound(SoundType.METAL).noOcclusion());
+        super(Properties.of(Material.METAL).strength(2f).sound(SoundType.METAL).noOcclusion());
     }
 
     public static @NotNull AlignedBox getBlockBox(Direction direction) {

@@ -31,7 +31,7 @@ public class TvBlock extends DisplayBlock {
 
 
     public TvBlock() {
-        super(Properties.of(Material.METAL).strength(2.5f, 10.0f).sound(SoundType.METAL).noOcclusion());
+        super(Properties.of(Material.METAL).strength(1f).sound(SoundType.METAL).noOcclusion());
     }
 
     public static @NotNull AlignedBox box(Direction direction, Direction attachedBlockFace, boolean renderMode) {

@@ -11,7 +11,10 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -34,7 +37,7 @@ public class FrameBlock extends DisplayBlock implements SimpleWaterloggedBlock {
     public static final float THICKNESS = 0.0625F / 2F;
 
     public FrameBlock() {
-        super(Properties.of(Material.WOOD).strength(0.25f, 2.5f).sound(SoundType.WOOD).noOcclusion());
+        super(Properties.of(Material.WOOD).strength(1.0f).sound(SoundType.WOOD).noOcclusion());
         registerDefaultState(getStateDefinition().any().setValue(WATERLOGGED, false));
     }
 
