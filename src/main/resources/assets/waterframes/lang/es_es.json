@@ -1,7 +1,7 @@
 {
     "block.waterframes.frame": "Marco de imagenes",
     "block.waterframes.projector": "Proyector",
-    "itemGroup.waterframes": "WATERFrAMES",
+    "itemGroup.waterframes": "WaterFrames",
     "download.exception.forbidden": "No permitido",
     "download.exception.notfound": "No encontrado",
     "download.exception.invalid": "No se puede cargar la imagen",

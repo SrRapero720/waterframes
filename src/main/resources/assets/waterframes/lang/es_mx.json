@@ -1,7 +1,7 @@
 {
     "block.waterframes.frame": "Cuadro de imagenes",
     "block.waterframes.projector": "Proyector",
-    "itemGroup.waterframes": "WATERFrAMES",
+    "itemGroup.waterframes": "WaterFrames",
     "download.exception.forbidden": "No autorizado",
     "download.exception.notfound": "No encontrado",
     "download.exception.invalid": "Error al cargar la imagen",
