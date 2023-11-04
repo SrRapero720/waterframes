@@ -1,6 +1,15 @@
 package me.srrapero720.waterframes.client.display;
 
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+import org.slf4j.MarkerFactory;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+
 public class DisplayControl {
+    private static final Marker IT = MarkerManager.getMarker("DisplayControl");
     public static final Registry REGISTRY = new Registry();
 
     public static final int SYNC_TIME = 1500;
@@ -88,6 +97,30 @@ public class DisplayControl {
             }
 
             this.data = new TextureDisplay[DEFAULT_SIZE];
+        }
+
+        static TextureDisplay[] criticalReduceOf(int currentSize, AtomicInteger newSize, TextureDisplay[] originData) {
+            LOGGER.warn(IT, "Size is {} but current data size is {}... preventing a crash!", currentSize, originData.length);
+
+            int size = 0;
+            TextureDisplay[] targetData = new TextureDisplay[originData.length];
+            for (int i = 0; i < originData.length; i++) {
+                if (originData[i] != null) {
+                    targetData[size] = originData[i];
+                    originData[i] = null;
+                    size++;
+                }
+            }
+
+            if (((float) size / targetData.length) < 0.50f) {
+                TextureDisplay[] data = targetData;
+                targetData = new TextureDisplay[targetData.length / 2];
+
+                System.arraycopy(data, 0, targetData, 0, data.length);
+            }
+
+            newSize.set(size);
+            return targetData;
         }
 
         static int reduceOf(TextureDisplay[] data, TextureDisplay[] target) {
