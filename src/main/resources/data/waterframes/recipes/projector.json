@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "##R",
+    "12G",
+    "##B"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:iron_block"
+    },
+    "1": {
+      "item": "minecraft:redstone"
+    },
+    "2": {
+      "item": "minecraft:glowstone"
+    },
+    "R": {
+      "item": "minecraft:red_stained_glass"
+    },
+    "G": {
+      "item": "minecraft:green_stained_glass"
+    },
+    "B": {
+      "item": "minecraft:blue_stained_glass"
+    }
+  },
+  "result": {
+    "item": "waterframes:projector",
+    "count": 1
+  },
+  "group": "stuff"
+}
