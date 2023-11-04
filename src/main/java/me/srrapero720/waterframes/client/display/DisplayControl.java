@@ -54,12 +54,23 @@ public class DisplayControl {
 
         public int size() { return size; }
 
-        public void pauseAll() { for (int i = 0; i < size; i++) if (data[i] != null) data[i].pause(); }
-        public void resumeAll() { for (int i = 0; i < size; i++) if (data[i] != null) data[i].resume(); }
+        public void pauseAll() {
+            for (int i = 0; i < size; i++) {
+                if (size >= data.length) break; //FIXME: That wasn't should happen
+                if (data[i] != null) data[i].pause();
+            }
+        }
+        public void resumeAll() {
+            for (int i = 0; i < size; i++) {
+                if (size >= data.length) break; //FIXME: That wasn't should happen
+                if (data[i] != null) data[i].resume();
+            }
+        }
         public void remove(int i) { data[i] = null; }
         public void remove(TextureDisplay obj) {
             if (obj == null) return; // null cannot be removed, duh
             for (int i = 0; i < size; i++) {
+                if (i >= data.length) break; //FIXME: That wasn't should happen
                 if (obj == data[i]) {
                     data[i] = null;
                     break;
@@ -69,6 +80,7 @@ public class DisplayControl {
 
         public void release() {
             for (int i = 0; i < size; i++) {
+                if (i >= data.length) break;  //FIXME: That wasn't should happen
                 if (data[i] != null) {
                     data[i].release(false);
                     data[i] = null;
