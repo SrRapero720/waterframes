@@ -31,6 +31,7 @@ public class FrameTools {
     private static final Gson GSON = new Gson();
     private static final Marker IT = MarkerManager.getMarker("Tools");
     private static final long negativeZeroDoubleBits = Float.floatToRawIntBits(-0.0f);
+    public static int tickTime = 0;
 
     public static boolean isUrlValid(String url) {
         try { new URL(url); return true; } catch (Exception ignored) { return false; }
@@ -135,4 +136,11 @@ public class FrameTools {
             return sdf.format(time);
         }
     }
+
+    public static void tick() {
+        tickTime++;
+        if (tickTime == Integer.MAX_VALUE) tickTime = 0;
+    }
+
+    public static int getTickTime() { return tickTime; }
 }

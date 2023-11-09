@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.client.display.DisplayControl;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.client.renderer.engine.RenderBox;
 import me.srrapero720.waterframes.client.renderer.engine.RenderVertex;
@@ -76,7 +75,7 @@ public class DisplayRender {
                                       AlignedBox renderBox, BoxFace boxFace, BufferBuilder builder,
                                       boolean renderFrontSide, boolean renderBackside, boolean forceXFlip, boolean forceYFlip) {
 
-        int loadingTexture = LOADING_TEX.texture(DisplayControl.getTickTime(), MathAPI.tickToMs(FrameTools.deltaFrames()), true);
+        int loadingTexture = LOADING_TEX.texture(FrameTools.getTickTime(), MathAPI.tickToMs(FrameTools.deltaFrames()), true);
         RenderSystem.bindTexture(loadingTexture);
         RenderSystem.setShaderTexture(0, loadingTexture);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);

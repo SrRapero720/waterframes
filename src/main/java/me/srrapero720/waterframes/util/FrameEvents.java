@@ -50,7 +50,7 @@ public class FrameEvents {
         @SubscribeEvent
         @OnlyIn(Dist.CLIENT)
         public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
-            if (event.phase == TickEvent.Phase.END) DisplayControl.tick();
+            if (event.phase == TickEvent.Phase.END) FrameTools.tick();
         }
 
         @SubscribeEvent
