@@ -1,44 +1,39 @@
 modLoader="javafml"
-loaderVersion="${loader_version_range}"
+loaderVersion="${fgloaderrange}"
 issueTrackerURL="https://github.com/SrRapero720/waterframes/issues"
 logoFile="pack.png"
-license="${mod_license}"
+license="${modlicense}"
 
 [[mods]]
-	modId="${mod_id}"
-	version="${mod_version}"
-	displayName="${mod_name}"
+	modId="${modid}"
+	version="${modversion}"
+	displayName="${modname}"
+	displayTest="MATCH_VERSION"
 	displayURL="https://www.curseforge.com/minecraft/mc-mods/waterframes"
-	credits="Start contributor CoolDCB, models by FabiAcr"
-	authors="SrRapero720"
+	credits="${modcredits}"
+	authors="${modauthor}"
 	logoFile="pack.png"
+	side="BOTH"
 	description='''${mod_description}'''
 
 
 [[dependencies.${mod_id}]]
-	modId = "forge"
-	mandatory = true
-	versionRange = "${loader_version_range}"
-	ordering = "NONE"
-	side = "BOTH"
+	modId="forge"
+	mandatory=true
+	versionRange="${fgrange}"
+	ordering="NONE"
+	side="BOTH"
 
 [[dependencies.${mod_id}]]
 	modId="creativecore"
 	mandatory=true
-	ordering="NONE"
+	ordering="AFTER"
 	side="BOTH"
-	versionRange="${creativecore_version_range}"
+	versionRange="${creativecorerange}"
 
 [[dependencies.waterframes]]
 	modId="watermedia"
 	mandatory=true
 	ordering="AFTER"
 	side="CLIENT"
-	versionRange="${watermedia_version_range}"
-
-#[[dependencies.waterframes]]
-#    modId="watercore"
-#    mandatory=false
-#    ordering="NONE"
-#    side="BOTH"
-#    versionRange="[1.3,)"
+	versionRange="${watermediarange}"

@@ -101,21 +101,9 @@ dependencies {
     implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateversion}")
 }
 
-def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
-def replaceProperties = [
-        minecraft_version: mcversion, minecraft_version_range: mcrange,
-        forge_version: fgversion, forge_version_range: fgrange,
-        loader_version_range: fgrange,
-        mod_id: modid, mod_name: modname, mod_license: modlicense, mod_version: modversion,
-        mod_authors: modauthor, mod_description: mod_description,
-        watermedia_version_range: watermediarange, creativecore_version_range: creativecorerange
-]
 processResources {
-    inputs.properties replaceProperties
-    replaceProperties.put 'project', project
-
-    filesMatching(resourceTargets) {
-        expand replaceProperties
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+        expand project.properties
     }
 }
 
@@ -153,3 +141,4 @@ jar.finalizedBy('reobfJar')
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = 'UTF-8'
 }
+tasks.processResources.outputs.upToDateWhen { false }
