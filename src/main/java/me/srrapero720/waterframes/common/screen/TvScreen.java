@@ -74,7 +74,7 @@ public class TvScreen extends DisplayScreen<TvTile> {
         this.mediaControlsParent
                 .add2(new WidgetParent("", GuiFlow.STACK_X)
                         .add2(this.volumeIcon = new WidgetIcon("v_icon", 12, 12, WidgetIcons.getVolumeIcon(tileBlock.data.volume)))
-                        .add2(this.volumeSlider = new WidgetSlider(DisplayData.VOLUME, 50, 10, tileBlock.data.volume, 0, DisplayConfig.maxVolume(), WidgetSlider.PERCENT))
+                        .add2(this.volumeSlider = new WidgetSlider(DisplayData.VOLUME, 50, 10, tileBlock.data.volume, 0, DisplayConfig.maxVolume(), WidgetSlider.PERCENT_100))
                         .add2(new WidgetIcon("v_min_icon", 12, 12, WidgetIcons.VOLUME_RANGE_MIN))
                         .add2(this.volumeMinSlider = new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, 50, 10, tileBlock.data.minVolumeDistance, 0, Math.min(DisplayConfig.maxVolumeDistance(), tileBlock.data.maxVolumeDistance)))
                         .add2(new WidgetIcon("v_max_icon", 12, 12, WidgetIcons.VOLUME_RANGE_MAX))

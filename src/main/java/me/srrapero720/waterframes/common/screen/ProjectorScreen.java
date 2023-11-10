@@ -125,7 +125,7 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
                         .setAlign(Align.RIGHT))
                 .addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
                         .add2(this.volumeIcon = new WidgetIcon("v_icon", 12, 12, WidgetIcons.getVolumeIcon(tileBlock.data.volume)))
-                        .add2(this.volumeSlider = (WidgetSlider) new WidgetSlider(DisplayData.VOLUME, 100, 10, tileBlock.data.volume, 0, DisplayConfig.maxVolume(), WidgetSlider.PERCENT).setExpandableX())
+                        .add2(this.volumeSlider = (WidgetSlider) new WidgetSlider(DisplayData.VOLUME, 100, 10, tileBlock.data.volume, 0, DisplayConfig.maxVolume(), WidgetSlider.PERCENT_100).setExpandableX())
                         .setAlign(Align.RIGHT))
                 .addOnSecond(new WidgetParent("", GuiFlow.STACK_X)
                         .add2(new WidgetIcon("v_min_icon", 12, 12, WidgetIcons.VOLUME_RANGE_MIN))

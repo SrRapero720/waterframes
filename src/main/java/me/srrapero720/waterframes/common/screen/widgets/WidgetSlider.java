@@ -5,6 +5,7 @@ import team.creative.creativecore.common.gui.controls.simple.GuiSlider;
 public class WidgetSlider extends GuiSlider {
     public static final ValueParser NONE = (v, max) -> (float) Math.round(v * 100.0) / 100 + "";
     public static final ValueParser PERCENT = (v, max) -> (int) ((v / max) * 100.0d) + "%";
+    public static final ValueParser PERCENT_100 = (v, max) -> (int) ((v / 100d) * 100.0d) + "%";
     public static final ValueParser ANGLE = (v, max) -> Math.round(v) + "°";
 
     public final ValueParser parser;
@@ -22,6 +23,12 @@ public class WidgetSlider extends GuiSlider {
     @Override
     public String getTextByValue() {
         return parser.get(value, maxValue);
+    }
+
+    @Override
+    public String getTextfieldValue() {
+        float var10000 = (float)Math.round(this.value * 100.0);
+        return "" + var10000 / 100.0F;
     }
 
     public interface ValueParser {

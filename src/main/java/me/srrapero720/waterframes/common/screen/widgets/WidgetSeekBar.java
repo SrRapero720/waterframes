@@ -2,7 +2,7 @@ package me.srrapero720.waterframes.common.screen.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.util.FrameTools;
-import me.srrapero720.watermedia.api.WaterMediaAPI;
+import me.srrapero720.watermedia.api.math.MathAPI;
 import team.creative.creativecore.client.render.GuiRenderHelper;
 import team.creative.creativecore.common.gui.GuiChildControl;
 import team.creative.creativecore.common.gui.controls.simple.GuiSlider;
@@ -58,7 +58,7 @@ public class WidgetSeekBar extends GuiSlider {
         else {
             int ticks = (int) value;
             if (ticks > maxValue) ticks %= (int) maxValue;
-            GuiRenderHelper.drawStringCentered(pose, FrameTools.timestamp(WaterMediaAPI.math_ticksToMillis(ticks)) + "/" + FrameTools.timestamp(WaterMediaAPI.math_ticksToMillis((int) maxValue)), (float)rect.getWidth(), (float)rect.getHeight(), -1, true);
+            GuiRenderHelper.drawStringCentered(pose, FrameTools.timestamp(MathAPI.tickToMs(ticks)) + "/" + FrameTools.timestamp(MathAPI.tickToMs((int) maxValue)), (float)rect.getWidth(), (float)rect.getHeight(), -1, true);
         }
     }
 
