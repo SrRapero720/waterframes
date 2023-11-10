@@ -50,7 +50,7 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
     @OnlyIn(Dist.CLIENT)
     public synchronized TextureDisplay requestDisplay() {
         if (getUrl().isEmpty() && display != null) {
-            cleanDisplay(false);
+            cleanDisplay();
             return null;
         }
 
@@ -62,7 +62,7 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
 
         if (imageCache == null || !imageCache.url.equals(url)) {
             imageCache = ImageAPI.getCache(url, Minecraft.getInstance());
-            cleanDisplay(false);
+            cleanDisplay();
         }
 
         switch (imageCache.getStatus()) {
@@ -72,7 +72,7 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
             }
 
             case WAITING -> {
-                cleanDisplay(false);
+                cleanDisplay();
                 imageCache.load();
                 return display;
             }
@@ -104,16 +104,16 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
 
 
     @OnlyIn(Dist.CLIENT)
-    private void cleanDisplay(boolean quiet) {
+    private void cleanDisplay() {
         if (display != null) {
-            display.release(quiet);
+            display.release();
             display = null;
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     private void release() {
-        cleanDisplay(false);
+        cleanDisplay();
         released.set(true);
     }
 

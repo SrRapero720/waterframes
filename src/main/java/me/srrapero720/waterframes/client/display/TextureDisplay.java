@@ -245,12 +245,15 @@ public class TextureDisplay {
     }
 
     
-    public void release(boolean quiet) {
+    public void release() {
         switch (displayMode) {
             case PICTURE -> {
-                if (imageCache != null && !quiet) imageCache.deuse();
+                if (imageCache != null) imageCache.deuse();
             }
-            case VIDEO, AUDIO -> mediaPlayer.release();
+            case VIDEO, AUDIO -> {
+                mediaPlayer.release();
+                DisplayControl.remove(this);
+            }
         }
     }
 

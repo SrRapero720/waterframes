@@ -75,7 +75,7 @@ public class DisplayControl {
         synchronized (LOCK) {
             for (int i = 0; i < position; i++) {
                 if (displays[i] != null) {
-                    displays[i].release(false);
+                    displays[i].release();
                     displays[i] = null;
                 }
             }
