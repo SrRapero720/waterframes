@@ -17,21 +17,21 @@ license="${modlicense}"
 	description='''${mod_description}'''
 
 
-[[dependencies.${mod_id}]]
+[[dependencies.${modid}]]
 	modId="forge"
 	mandatory=true
 	versionRange="${fgrange}"
 	ordering="NONE"
 	side="BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies.${modid}]]
 	modId="creativecore"
 	mandatory=true
 	ordering="AFTER"
 	side="BOTH"
 	versionRange="${creativecorerange}"
 
-[[dependencies.waterframes]]
+[[dependencies.${modid}]]
 	modId="watermedia"
 	mandatory=true
 	ordering="AFTER"
