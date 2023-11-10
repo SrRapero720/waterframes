@@ -87,7 +87,7 @@ public class FrameTools {
 
     public static int floorVolume(Vec3d pos, int volume, int min, int max) {
         assert Minecraft.getInstance().player != null;
-        double distance = (int) pos.distance(Minecraft.getInstance().player.getPosition(deltaFrames()));
+        double distance = pos.distance(Minecraft.getInstance().player.getPosition(deltaFrames()));
         if (min > max) {
             int temp = max;
             max = min;
