@@ -53,7 +53,7 @@ public class DisplayControl {
     }
 
     public static void remove(int i) {
-        if (i > displays.length) return; // i cannot be over position
+        if (i > displays.length) return; // 'i' cannot be over position
         synchronized (LOCK) {
             displays[i] = null;
         }
@@ -79,9 +79,10 @@ public class DisplayControl {
                     displays[i] = null;
                 }
             }
-        }
 
-        displays = new TextureDisplay[DEFAULT_SIZE];
+            displays = new TextureDisplay[DEFAULT_SIZE];
+            position = 0;
+        }
     }
 
     private static int copyData$resetPosition(TextureDisplay[] current, TextureDisplay[] target) {
