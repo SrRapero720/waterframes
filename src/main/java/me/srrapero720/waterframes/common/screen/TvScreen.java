@@ -1,27 +1,28 @@
 package me.srrapero720.waterframes.common.screen;
 
 import me.srrapero720.waterframes.DisplayConfig;
-import me.srrapero720.waterframes.common.block.entity.TvTile;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.data.TvData;
+import me.srrapero720.waterframes.common.block.entity.TvTile;
 import me.srrapero720.waterframes.common.screen.widgets.*;
 import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetIcons;
+import me.srrapero720.waterframes.cossporting.Crossponent;
 import me.srrapero720.waterframes.util.FrameNet;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.player.Player;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.VAlign;
 import team.creative.creativecore.common.gui.controls.parent.GuiScrollY;
-import team.creative.creativecore.common.gui.controls.simple.*;
+import team.creative.creativecore.common.gui.controls.simple.GuiButton;
+import team.creative.creativecore.common.gui.controls.simple.GuiCheckBox;
+import team.creative.creativecore.common.gui.controls.simple.GuiIconButton;
+import team.creative.creativecore.common.gui.controls.simple.GuiSteppedSlider;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 
 import java.util.List;
 
 public class TvScreen extends DisplayScreen<TvTile> {
-    int customWidth = 230;
-    int customHeight = 210;
 
     // PARENTS
     private WidgetDoubleTable textureSettingsTable;
@@ -130,7 +131,7 @@ public class TvScreen extends DisplayScreen<TvTile> {
                     tileBlock.data.url_index = tileBlock.data.url_list.size() - 1;
                 }
                 FrameNet.syncUrlList(tileBlock.getBlockPos(), tileBlock.data.url_list, tileBlock.data.url_index);
-            }).setTitle(new TextComponent(url)).setExpandableX());
+            }).setTitle(Crossponent.text(url)).setExpandableX());
         }
     }
 

@@ -1,33 +1,44 @@
 package me.srrapero720.waterframes.util;
 
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.client.display.DisplayControl;
+import me.srrapero720.waterframes.client.renderer.FrameRender;
+import me.srrapero720.waterframes.client.renderer.ProjectorRender;
 import me.srrapero720.waterframes.common.block.FrameBlock;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
-import me.srrapero720.waterframes.common.block.TvBlock;
 import me.srrapero720.waterframes.common.block.entity.FrameTile;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
-import me.srrapero720.waterframes.common.block.entity.TvTile;
+import me.srrapero720.waterframes.util.events.PauseUpdateEvent;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
 public class FrameRegistry {
-    public static final DeferredRegister<Item> ITEMS = reg(ForgeRegistries.ITEMS);
-    public static final DeferredRegister<Block> BLOCKS =  reg(ForgeRegistries.BLOCKS);
-    public static final DeferredRegister<BlockEntityType<?>> TILES = reg(ForgeRegistries.BLOCK_ENTITIES);
-
-    /* TABS */
+    public static final DeferredRegister<Item> ITEMS = create(ForgeRegistries.ITEMS);
+    public static final DeferredRegister<Block> BLOCKS =  create(ForgeRegistries.BLOCKS);
+    public static final DeferredRegister<BlockEntityType<?>> TILES = create(ForgeRegistries.BLOCK_ENTITIES);
     public static final CreativeModeTab TAB = tab(new ResourceLocation(WaterFrames.ID, "frame"));
 
     /* BLOCKS */
@@ -47,12 +58,15 @@ public class FrameRegistry {
 //    public static final RegistryObject<BlockEntityType<TvTile>> TILE_TV = tile("tv", TvTile::new, TV);
 
     public static void init(IEventBus bus) {
+        if (FMLLoader.getDist().isClient()) bus.addListener(Client::init);
+        bus.addListener(Common::init);
+
         BLOCKS.register(bus);
         ITEMS.register(bus);
         TILES.register(bus);
     }
 
-    private static <B extends IForgeRegistryEntry<B>> DeferredRegister<B> reg(IForgeRegistry<B> registry) {
+    private static <B extends IForgeRegistryEntry<B>> DeferredRegister<B> create(IForgeRegistry<B> registry) {
         return DeferredRegister.create(registry, WaterFrames.ID);
     }
 
@@ -63,9 +77,44 @@ public class FrameRegistry {
     private static CreativeModeTab tab(ResourceLocation location) {
         return new CreativeModeTab(WaterFrames.ID) {
             @Override
-            public @NotNull ItemStack makeIcon() {
-                return new ItemStack(ForgeRegistries.ITEMS.getValue(location));
-            }
+            public @NotNull ItemStack makeIcon() { return new ItemStack(ForgeRegistries.ITEMS.getValue(location)); }
         };
+    }
+
+    @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    private static class Common {
+        private static void init(FMLCommonSetupEvent event) { common(); }
+        private static void common() { FrameNet.register(); }
+    }
+
+    @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    private static class Client {
+        private static void init(FMLClientSetupEvent event) { client(); }
+
+        @OnlyIn(Dist.CLIENT)
+        private static void client() {
+            BlockEntityRenderers.register(FrameRegistry.TILE_FRAME.get(), (x) -> new FrameRender());
+            BlockEntityRenderers.register(FrameRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRender());
+//            BlockEntityRenderers.register(FrameRegistry.TILE_TV.get(), (x) -> new TvRender());
+        }
+
+        @SubscribeEvent
+        @OnlyIn(Dist.CLIENT)
+        public static void onUnloadingLevel(WorldEvent.Unload event) {
+            LevelAccessor level = event.getWorld();
+            if (level != null && level.isClientSide()) DisplayControl.release();
+        }
+
+        @SubscribeEvent
+        @OnlyIn(Dist.CLIENT)
+        public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
+            if (event.phase == TickEvent.Phase.END) FrameTools.tick();
+        }
+
+        @SubscribeEvent
+        @OnlyIn(Dist.CLIENT)
+        public static void onPause(PauseUpdateEvent event) {
+            if (event.isPaused()) DisplayControl.pause();
+        }
     }
 }

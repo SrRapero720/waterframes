@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.util;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Direction;
 import net.minecraftforge.api.distmarker.Dist;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -24,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
@@ -39,7 +43,9 @@ public class FrameTools {
 
     @OnlyIn(Dist.CLIENT)
     public static @NotNull String patchUrl(@NotNull String url) {
-        return url.replace("minecraft://", ("file:///" + FMLPaths.GAMEDIR.get().toAbsolutePath()).replace("\\", "/") + "/");
+        return url.replace(
+                "minecraft://",
+                "file:///" + FMLPaths.GAMEDIR.get().toAbsolutePath() + File.separator);
     }
 
     public static List<String> readStringList(String path) {

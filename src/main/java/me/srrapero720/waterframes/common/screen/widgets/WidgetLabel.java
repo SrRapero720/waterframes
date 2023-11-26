@@ -2,8 +2,8 @@ package me.srrapero720.waterframes.common.screen.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.common.screen.text.ScalableCompiledText;
+import me.srrapero720.waterframes.cossporting.Crossponent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.gui.Align;
@@ -39,7 +39,7 @@ public class WidgetLabel extends GuiControl {
     }
 
     public WidgetLabel setTranslate(String translate) {
-        return this.setTitle((Component)(new TranslatableComponent(translate)));
+        return this.setTitle(Crossponent.translatable(translate));
     }
 
     public WidgetLabel setTitle(Component component) {

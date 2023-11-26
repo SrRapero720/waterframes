@@ -96,7 +96,10 @@ public class TextureDisplay {
     public int texture() {
         return switch (displayMode) {
             case PICTURE -> this.imageCache.getRenderer().texture(block.data.tick, (block.data.playing ? MathAPI.tickToMs(FrameTools.deltaFrames()) : 0), block.data.loop);
-            case VIDEO -> this.mediaPlayer.getGlTexture();
+            case VIDEO -> {
+                this.mediaPlayer.preRender();
+                yield this.mediaPlayer.getTexture();
+            }
             case AUDIO -> -1;
         };
     }

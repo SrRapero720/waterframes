@@ -2,9 +2,8 @@ package me.srrapero720.waterframes.common.screen.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetIcons;
+import me.srrapero720.waterframes.cossporting.Crossponent;
 import me.srrapero720.watermedia.api.image.ImageCache;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.gui.GuiChildControl;
@@ -27,19 +26,19 @@ public class WidgetStatusIcon extends WidgetIcon {
         ImageCache cache = cacheSupplier.get();
         icon = switch (cache != null ? cache.getStatus() : ImageCache.Status.FAILED) {
             case READY -> {
-                setTooltip(new TextBuilder().add(new TranslatableComponent("label.waterframes.operative")).build());
+                setTooltip(new TextBuilder().add(Crossponent.translatable("label.waterframes.operative")).build());
                 yield  WidgetIcons.STATUS_OK;
             }
             case LOADING -> {
-                setTooltip(new TextBuilder().add(new TranslatableComponent("label.waterframes.loading")).build());
+                setTooltip(new TextBuilder().add(Crossponent.translatable("label.waterframes.loading")).build());
                 yield WidgetIcons.STATUS_ALERT;
             }
             case WAITING, FORGOTTEN -> {
                 if (cacheSupplier.get().url.isEmpty()) {
-                    setTooltip(new TextBuilder().add(new TranslatableComponent("label.waterframes.idle")).build());
+                    setTooltip(new TextBuilder().add(Crossponent.translatable("label.waterframes.idle")).build());
                     yield WidgetIcons.STATUS_IDLE;
                 } else {
-                    setTooltip(new TextBuilder().add(new TranslatableComponent("label.waterframes.wrong")).build());
+                    setTooltip(new TextBuilder().add(Crossponent.translatable("label.waterframes.wrong")).build());
                     yield WidgetIcons.STATUS_PEM;
                 }
             }
@@ -47,7 +46,7 @@ public class WidgetStatusIcon extends WidgetIcon {
                 if (cache != null) {
                     setTooltip(new TextBuilder(cacheSupplier.get().getException().getMessage()).build());
                 } else {
-                    setTooltip(new TextBuilder().add(new TranslatableComponent("download.exception.invalid")).build());
+                    setTooltip(new TextBuilder().add(Crossponent.translatable("download.exception.invalid")).build());
                 }
                 yield WidgetIcons.STATUS_ERROR;
             }

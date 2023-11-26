@@ -9,7 +9,6 @@ import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetIcons;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.controls.simple.*;
@@ -52,7 +51,7 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
     protected void onCreate() {
         this.urlTextField = new WidgetTextFieldTrigger(() -> this.saveBtn, DisplayData.URL, tileBlock.getUrl()).setSuggest("https://i.imgur.com/1yCDs5C.mp4").expandX();
         this.urlValueTable = new WidgetDoubleTable(GuiFlow.STACK_Y)
-                .addOnFirst(new WidgetLabel("media_label", 0.75f).setTitle(new TranslatableComponent("gui.waterframes.url")))
+                .addOnFirst(new WidgetLabel("media_label", 0.75f).setTranslate("gui.waterframes.url"))
                 .addOnFirst(urlTextField)
                 .setSpacing(4);
 
@@ -132,7 +131,7 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
 
         this.saveBtn = (GuiButton) new GuiButton("save", x -> syncAction.send(FrameData.build(this))).setTranslate("gui.waterframes.save");
         this.actionsTable = new WidgetDoubleTable().setSpacing(2)
-                .addOnFirst(new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTitle(new TranslatableComponent("gui.waterframes.reload.all")))
+                .addOnFirst(new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTranslate("gui.waterframes.reload.all"))
                 .addOnSecond(saveBtn.setEnabled(DisplayConfig.canSave(getPlayer(), urlTextField.getText())))
                 .addOnSecond(new GuiButton("reload", x -> tileBlock.imageCache.reload()).setTranslate("gui.waterframes.reload"))
                 .setSpacing(2);
@@ -140,9 +139,9 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
 
         this.add(urlValueTable);
         this.add(sizeParent);
-        this.add(new WidgetLabel("tex_label", 0.8f).setTitle(new TranslatableComponent("label.waterframes.texture_settings")));
+        this.add(new WidgetLabel("tex_label", 0.8f).setTranslate("label.waterframes.texture_settings"));
         this.add(textureSettingsTable);
-        this.add(new WidgetLabel("media_label", 0.8f).setTitle(new TranslatableComponent("label.waterframes.media_settings")));
+        this.add(new WidgetLabel("media_label", 0.8f).setTranslate("label.waterframes.media_settings"));
         this.add(mediaSettingsTable);
         this.add(actionsTable);
     }

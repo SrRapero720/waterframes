@@ -43,7 +43,7 @@ public class DisplayConfig {
     private static ForgeConfigSpec.ConfigValue<List<String>> whitelist;
 
     // OVERRIDES (client)
-    private static ForgeConfigSpec.BooleanValue overrideServerConfig;
+    private final static ForgeConfigSpec.BooleanValue overrideServerConfig;
     private static ForgeConfigSpec.BooleanValue overrideUseVideolan;
     private static ForgeConfigSpec.BooleanValue overrideKeepsRendering;
 
