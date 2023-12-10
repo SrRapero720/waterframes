@@ -8,7 +8,8 @@ import me.srrapero720.waterframes.common.block.FrameBlock;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
 import me.srrapero720.waterframes.common.block.entity.FrameTile;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
-import me.srrapero720.waterframes.util.events.PauseUpdateEvent;
+import me.srrapero720.waterframes.common.item.RemoteControl;
+import me.srrapero720.waterframes.util.events.ClientPauseUpdateEvent;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -35,6 +36,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+
 public class FrameRegistry {
     public static final DeferredRegister<Item> ITEMS = create(ForgeRegistries.ITEMS);
     public static final DeferredRegister<Block> BLOCKS =  create(ForgeRegistries.BLOCKS);
@@ -48,6 +51,7 @@ public class FrameRegistry {
 //    public static final RegistryObject<TvBlock> TV = BLOCKS.register("tv", TvBlock::new);
 
     /* ITEMS */
+    public static final RegistryObject<Item> REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties().tab(TAB)));
     public static final RegistryObject<Item> FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB)));
     public static final RegistryObject<Item> PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB)));
 //    public static final RegistryObject<Item> TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties().tab(TAB)));
@@ -84,7 +88,13 @@ public class FrameRegistry {
     @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
     private static class Common {
         private static void init(FMLCommonSetupEvent event) { common(); }
-        private static void common() { FrameNet.register(); }
+        private static void common() {
+            FrameNet.register();
+            if (FrameTools.isLoadingMod("stellarity")) {
+                LOGGER.warn("");
+                throw new IllegalStateException("Mod 'Stellatity' is NOT compatible with WaterFrames, report it to Stellarity");
+            }
+        }
     }
 
     @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -113,7 +123,7 @@ public class FrameRegistry {
 
         @SubscribeEvent
         @OnlyIn(Dist.CLIENT)
-        public static void onPause(PauseUpdateEvent event) {
+        public static void onPause(ClientPauseUpdateEvent event) {
             if (event.isPaused()) DisplayControl.pause();
         }
     }
