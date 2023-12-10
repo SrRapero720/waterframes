@@ -2,8 +2,8 @@ package me.srrapero720.waterframes.util;
 
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.packets.ActionPacket;
-import me.srrapero720.waterframes.common.packets.SyncTickPacket;
-import me.srrapero720.waterframes.common.packets.SyncUrlListPacket;
+import me.srrapero720.waterframes.common.packets.TickPacket;
+import me.srrapero720.waterframes.common.packets.SourceCollectionPacket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -25,15 +25,15 @@ public class FrameNet {
     }
 
     public static void syncMaxTickTime(BlockPos pos, int maxTick) {
-        NETWORK.sendToServer(new SyncTickPacket(pos, maxTick));
+        NETWORK.sendToServer(new TickPacket(pos, maxTick));
     }
 
     public static void syncUrlList(BlockPos pos, List<String> urlList, int index) {
-        NETWORK.sendToServer(new SyncUrlListPacket(pos, urlList, index));
+        NETWORK.sendToServer(new SourceCollectionPacket(pos, urlList, index));
     }
 
     static void register() {
         NETWORK.registerType(ActionPacket.class, ActionPacket::new);
-        NETWORK.registerType(SyncTickPacket.class, SyncTickPacket::new);
+        NETWORK.registerType(TickPacket.class, TickPacket::new);
     }
 }

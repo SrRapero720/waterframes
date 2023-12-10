@@ -67,11 +67,8 @@ public class FrameTools {
     }
 
     public static float minFloat(float a, float b) {
-        if (a != a)
-            return a;   // a is NaN
-        if ((a == 0.0f) &&
-                (b == 0.0f) &&
-                (Float.floatToRawIntBits(b) == negativeZeroDoubleBits)) {
+        if (a != a) return a;   // a is NaN
+        if ((a == 0.0f) && (b == 0.0f) && (Float.floatToRawIntBits(b) == negativeZeroDoubleBits)) {
             // Raw conversion ok since NaN can't map to -0.0.
             return b;
         }
@@ -82,9 +79,7 @@ public class FrameTools {
         try {
             final long r = x % y;
             // if the signs are different and modulo not zero, adjust result
-            if ((x ^ y) < 0 && r != 0) {
-                return r + y;
-            }
+            if ((x ^ y) < 0 && r != 0) return r + y;
             return r;
         } catch (ArithmeticException e) {
             return 0;

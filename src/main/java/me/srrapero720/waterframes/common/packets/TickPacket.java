@@ -9,12 +9,12 @@ import team.creative.creativecore.common.network.CreativePacket;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
-public class SyncTickPacket extends CreativePacket {
+public class TickPacket extends CreativePacket {
 
     public BlockPos pos;
     public int tickMax;
-    public SyncTickPacket() {}
-    public SyncTickPacket(BlockPos pos, int tickMax) {
+    public TickPacket() {}
+    public TickPacket(BlockPos pos, int tickMax) {
         this.pos = pos;
         this.tickMax = tickMax;
     }

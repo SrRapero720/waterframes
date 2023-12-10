@@ -8,17 +8,17 @@ import team.creative.creativecore.common.network.CreativePacket;
 
 import java.util.List;
 
-public class SyncUrlListPacket extends CreativePacket {
+public class SourceCollectionPacket extends CreativePacket {
 
     BlockPos pos;
     List<String> url_list;
     int index;
 
-    public SyncUrlListPacket() {
+    public SourceCollectionPacket() {
 
     }
 
-    public SyncUrlListPacket(BlockPos pos, List<String> list, int index) {
+    public SourceCollectionPacket(BlockPos pos, List<String> list, int index) {
         this.pos = pos;
         this.url_list = list;
         this.index = index;

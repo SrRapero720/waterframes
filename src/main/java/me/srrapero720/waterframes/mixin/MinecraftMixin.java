@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.mixin;
 
-import me.srrapero720.waterframes.util.events.PauseUpdateEvent;
+import me.srrapero720.waterframes.util.events.ClientPauseUpdateEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -18,6 +18,6 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "runTick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;pause:Z", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
     public void injectRunTick(boolean pRenderLevel, CallbackInfo ci) {
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new PauseUpdateEvent(pause));
+        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(new ClientPauseUpdateEvent(pause));
     }
 }
