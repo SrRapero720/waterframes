@@ -32,6 +32,7 @@ public class FrameData extends DisplayData {
             }
 
             default -> { // NO EXISTS
+                if (!nbt.contains("visibleFrame")) return;
                 frameVisibility = nbt.getBoolean("visibleFrame");
                 renderBothSides = nbt.getBoolean("bothSides");
             }

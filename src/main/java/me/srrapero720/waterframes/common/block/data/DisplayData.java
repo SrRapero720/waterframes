@@ -110,6 +110,7 @@ public abstract class DisplayData {
             }
 
             default -> { // NO EXISTS
+                if (!nbt.contains("maxx")) return; // no exists then ignore, prevents broke new data on 2.0
                 this.min.x = nbt.getFloat("minx");
                 this.min.y = nbt.getFloat("miny");
                 this.max.x = nbt.getFloat("maxx");
@@ -118,8 +119,8 @@ public abstract class DisplayData {
                 this.flipX = nbt.getBoolean("flipX");
                 this.flipY = nbt.getBoolean("flipY");
 
-                this.minVolumeDistance = nbt.contains("min") ? (int) nbt.getFloat("min") : 5;
-                this.maxVolumeDistance = nbt.contains("max") ? (int) nbt.getFloat("max") : 20;
+                this.maxVolumeDistance = DisplayConfig.maxVolumeDistance((int) nbt.getFloat("max"));
+                this.minVolumeDistance = Math.min((int) nbt.getFloat("min"), maxVolumeDistance);
 
                 this.renderDistance = nbt.getInt("render");
             }
