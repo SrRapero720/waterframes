@@ -32,10 +32,13 @@ public abstract class DisplayData {
     public static final String PLAYING = "playing";
     public static final String TICK = "tick";
     public static final String TICK_MAX = "tick_max";
+    public static final String DATA_V = "data_v";
+
+    public static final int V = 1;
 
     public String url = "";
-    public final Vec2f min = new Vec2f(0, 0);
-    public final Vec2f max = new Vec2f(1, 1);
+    public final Vec2f min = new Vec2f(0f, 0f);
+    public final Vec2f max = new Vec2f(1f, 1f);
 
     public boolean flipX = false;
     public boolean flipY = false;
@@ -78,67 +81,95 @@ public abstract class DisplayData {
         nbt.putInt(TICK, tick);
         nbt.putInt(TICK_MAX, tickMax);
         nbt.putBoolean(LOOP, loop);
+        nbt.putInt(DATA_V, V);
     }
 
     public void load(CompoundTag nbt) {
-        url = nbt.getString(URL);
-        min.x = nbt.getFloat(MIN_X);
-        min.y = nbt.getFloat(MIN_Y);
-        max.x = nbt.getFloat(MAX_X);
-        max.y = nbt.getFloat(MAX_Y);
-        float width;
-        if (getWidth() > (width = DisplayConfig.maxWidth())) {
-            switch (getPosX()) {
-                case 0 -> {
-                    min.x = 0;
-                    max.x = width;
-                }
-                case 1 -> {
-                    float middle = width / 2;
-                    min.x = 0.5F - middle;
-                    max.x = 0.5F + middle;
-                }
-                default -> {
-                    min.x = 1 - width;
-                    max.x = 1;
-                }
+        this.url = nbt.getString(URL);
+        this.min.x = nbt.getFloat(MIN_X);
+        this.min.y = nbt.getFloat(MIN_Y);
+        this.max.x = nbt.getFloat(MAX_X);
+        this.max.y = nbt.getFloat(MAX_Y);
+        this.rotation = nbt.getFloat(ROTATION);
+        this.renderDistance = DisplayConfig.maxRenderDistance(nbt.getInt(RENDER_DISTANCE));
+        this.flipX = nbt.getBoolean(FLIP_X);
+        this.flipY = nbt.getBoolean(FLIP_Y);
+        this.alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : alpha;
+        this.brightness = nbt.contains(BRIGHTNESS) ? nbt.getFloat(BRIGHTNESS) : alpha;
+        this.volume = nbt.contains(VOLUME) ? DisplayConfig.maxVolume(nbt.getInt(VOLUME)) : volume;
+        this.maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? DisplayConfig.maxVolumeDistance(nbt.getInt(VOL_RANGE_MAX)) : maxVolumeDistance;
+        this.minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), maxVolumeDistance) : minVolumeDistance;
+        this.playing = nbt.getBoolean(PLAYING);
+        this.tick = nbt.getInt(TICK);
+        this.tickMax = nbt.getInt(TICK_MAX);
+        this.loop = nbt.getBoolean(LOOP);
+
+        switch (nbt.getInt(DATA_V)) {
+            case 1 -> {
+
+            }
+
+            default -> { // NO EXISTS
+                this.min.x = nbt.getFloat("minx");
+                this.min.y = nbt.getFloat("miny");
+                this.max.x = nbt.getFloat("maxx");
+                this.max.y = nbt.getFloat("maxy");
+
+                this.flipX = nbt.getBoolean("flipX");
+                this.flipY = nbt.getBoolean("flipY");
+
+                this.minVolumeDistance = nbt.contains("min") ? (int) nbt.getFloat("min") : 5;
+                this.maxVolumeDistance = nbt.contains("max") ? (int) nbt.getFloat("max") : 20;
+
+                this.renderDistance = nbt.getInt("render");
             }
         }
 
-        float height;
-        if (getHeight() > (height = DisplayConfig.maxHeight())) {
+        this.restrictWidth();
+        this.restrictHeight();
+    }
+
+    private void restrictWidth() {
+        float maxWidth = DisplayConfig.maxWidth();
+        if (getWidth() > maxWidth) {
+            switch (getPosX()) {
+                case 2 -> {
+                    this.min.x = 1 - maxWidth;
+                    this.max.x = 1;
+                }
+                case 1 -> {
+                    float middle = maxWidth / 2f;
+                    this.min.x = 0.5F - middle;
+                    this.max.x = 0.5F + middle;
+                }
+                default -> {
+                    this.min.x = 0;
+                    this.max.x = maxWidth;
+                }
+            }
+        }
+    }
+
+    private void restrictHeight() {
+        float height = DisplayConfig.maxHeight();
+        if (getHeight() > height) {
             switch (getPosY()) {
-                case 0 -> {
-                    min.y = 0;
-                    max.y = height;
+                case 2 -> {
+                    this.min.y = 1 - height;
+                    this.max.y = 1;
                 }
                 case 1 -> {
                     float middle = height / 2;
-                    min.y = 0.5F - middle;
-                    max.y = 0.5F + middle;
+                    this.min.y = 0.5F - middle;
+                    this.max.y = 0.5F + middle;
                 }
                 default -> {
-                    min.y = 1 - height;
-                    max.y = 1;
+                    this.min.y = 0;
+                    this.max.y = height;
                 }
             }
         }
-
-        rotation = nbt.getFloat(ROTATION);
-        renderDistance = Math.min(DisplayConfig.maxRenderDistance(), nbt.getInt(RENDER_DISTANCE));
-        flipX = nbt.getBoolean(FLIP_X);
-        flipY = nbt.getBoolean(FLIP_Y);
-        alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : alpha;
-        brightness = nbt.contains(BRIGHTNESS) ? nbt.getFloat(BRIGHTNESS) : alpha;
-        volume = nbt.contains(VOLUME) ? Math.min(nbt.getInt(VOLUME), DisplayConfig.maxVolume()) : volume;
-        maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? Math.min(nbt.getInt(VOL_RANGE_MAX), DisplayConfig.maxVolumeDistance()) : maxVolumeDistance;
-        minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), maxVolumeDistance) : minVolumeDistance;
-        playing = nbt.getBoolean(PLAYING);
-        tick = nbt.getInt(TICK);
-        tickMax = nbt.getInt(TICK_MAX);
-        loop = nbt.getBoolean(LOOP);
     }
-
 
     public static CompoundTag build(GuiLayer gui) {
         CompoundTag nbt = new CompoundTag();
@@ -188,7 +219,7 @@ public abstract class DisplayData {
     }
 
     public static <D extends DisplayData, T extends DisplayTile<D>> void sync(T block, Player player, CompoundTag nbt, ExtraData<D> extra) {
-        String url = nbt.getString("url");
+        String url = nbt.getString(URL);
         if (DisplayConfig.canSave(player, url)) {
             if (!block.getUrl().equals(url)) {
                 block.data.tick = 0;

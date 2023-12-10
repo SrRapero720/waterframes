@@ -35,7 +35,7 @@ public class FrameRender implements BlockEntityRenderer<FrameTile> {
         AlignedBox alignedBox = RenderBox.getBasic(block, facing, FrameBlock.THICKNESS);
         alignedBox.grow(facing.axis, 0.01f);
 
-        DisplayRender.render(pose, block, facing, alignedBox, true, block.data.bothSides, false, false);
+        DisplayRender.render(pose, block, facing, alignedBox, true, block.data.renderBothSides, false, false);
 
         RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();

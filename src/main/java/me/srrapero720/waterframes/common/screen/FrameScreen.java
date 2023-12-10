@@ -98,8 +98,8 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
                         .add2(this.distanceIcon = new WidgetIcon("d_icon", 12, 12, WidgetIcons.DISTANCE))
                         .add2(new GuiSteppedSlider(DisplayData.RENDER_DISTANCE, 130, 10, tileBlock.data.renderDistance, 5, 1024)))
                 .addOnFirst(new WidgetParent(GuiFlow.STACK_X).setAlign(Align.STRETCH)
-                        .add2(new GuiCheckBox(FrameData.VISIBLE_FRAME, tileBlock.data.visibleFrame).setTranslate("gui.waterframes.visible_frame"))
-                        .add2(new GuiCheckBox(FrameData.RENDER_BOTH_SIDES, tileBlock.data.bothSides).setTranslate("gui.waterframes.both_sides")))
+                        .add2(new GuiCheckBox(FrameData.VISIBLE_FRAME, tileBlock.data.frameVisibility).setTranslate("gui.waterframes.visible_frame"))
+                        .add2(new GuiCheckBox(FrameData.RENDER_BOTH_SIDES, tileBlock.data.renderBothSides).setTranslate("gui.waterframes.both_sides")))
                 // IMAGE POSITION
                 .addOnSecond(this.positionViewer = new WidgetIcon("posView", 40, 40, WidgetIcons.POS_CORD[tileBlock.data.getPosX()][tileBlock.data.getPosY()]))
                 .addOnSecond(this.posXButton = new GuiStateButton("pos_x", tileBlock.data.getPosX(), new TextListBuilder()

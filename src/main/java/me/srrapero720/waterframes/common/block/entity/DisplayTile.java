@@ -168,8 +168,8 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
 
             // EXTRA IMPORTANT TICKERS FOR OTHER TILES
             if (blockEntity instanceof FrameTile frame) {
-                if (state.getValue(FrameBlock.VISIBLE) != frame.data.visibleFrame) {
-                    var brandNewState = state.setValue(FrameBlock.VISIBLE, frame.data.visibleFrame);
+                if (state.getValue(FrameBlock.VISIBLE) != frame.data.frameVisibility) {
+                    var brandNewState = state.setValue(FrameBlock.VISIBLE, frame.data.frameVisibility);
                     level.setBlock(pos, brandNewState, 0);
                 }
             }

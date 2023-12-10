@@ -11,20 +11,31 @@ public class FrameData extends DisplayData {
     public static final String VISIBLE_FRAME = "frame_visibility";
     public static final String RENDER_BOTH_SIDES = "render_both";
 
-    public boolean visibleFrame = true;
-    public boolean bothSides = false;
+    public boolean frameVisibility = true;
+    public boolean renderBothSides = false;
 
     @Override
     public void save(CompoundTag nbt) {
         super.save(nbt);
-        nbt.putBoolean(VISIBLE_FRAME, visibleFrame);
-        nbt.putBoolean(RENDER_BOTH_SIDES, bothSides);
+        nbt.putBoolean(VISIBLE_FRAME, frameVisibility);
+        nbt.putBoolean(RENDER_BOTH_SIDES, renderBothSides);
     }
 
     public void load(CompoundTag nbt) {
         super.load(nbt);
-        visibleFrame = nbt.getBoolean(VISIBLE_FRAME);
-        bothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
+        frameVisibility = nbt.getBoolean(VISIBLE_FRAME);
+        renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
+
+        switch (nbt.getInt(DATA_V)) {
+            case 1 -> {
+
+            }
+
+            default -> { // NO EXISTS
+                frameVisibility = nbt.getBoolean("visibleFrame");
+                renderBothSides = nbt.getBoolean("bothSides");
+            }
+        }
     }
 
     public static CompoundTag build(GuiLayer gui) {
@@ -39,8 +50,8 @@ public class FrameData extends DisplayData {
 
     public static void sync(FrameTile block, Player player, CompoundTag nbt) {
         sync(block, player, nbt, data -> {
-            block.data.visibleFrame = nbt.getBoolean(VISIBLE_FRAME);
-            block.data.bothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
+            block.data.frameVisibility = nbt.getBoolean(VISIBLE_FRAME);
+            block.data.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
         });
     }
 }

@@ -116,13 +116,23 @@ public class DisplayConfig {
     // RENDERING
     public static float maxWidth() { return (float) (double) maxWidth.get(); }
     public static float maxHeight() { return (float) (double) maxHeight.get(); }
+
     public static int maxRenderDistance() { return maxRenderDistance.get(); }
+    public static int maxRenderDistance(int value) { return Math.min(value, maxRenderDistance()); }
+
     public static int maxProjectionDistance() { return maxProjectionDistance.get(); }
+    public static int maxProjectionDistance(int value) { return Math.min(value, maxProjectionDistance()); }
+
     // MULTIMEDIA
     public static int maxVolumeDistance() { return maxVolumeDistance.get(); }
+    public static int maxVolumeDistance(int value) { return Math.min(value, maxVolumeDistance()); }
+
     public static int maxVolume() { return maxVolume.get(); }
+    public static int maxVolume(int value) { return Math.min(value, maxVolume()); }
+
     public static boolean useVideoLan() { return overridesServerConfig() ? useVideoLan.get() : overridesUseVideoLan(); }
     public static boolean keepsRendering() { return overridesServerConfig() ? keepsRendering.get() : overridesKeepsRendering(); }
+
     // BEHAVIOR
     public static boolean useRedstone() { return useRedstone.get(); }
     public static RedstoneMode redstoneMode() { return redstoneMode.get(); }
