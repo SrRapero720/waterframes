@@ -41,13 +41,6 @@ public class FrameTools {
         try { new URL(url); return true; } catch (Exception ignored) { return false; }
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public static @NotNull String patchUrl(@NotNull String url) {
-        return url.replace(
-                "minecraft://",
-                "file:///" + FMLPaths.GAMEDIR.get().toAbsolutePath() + File.separator);
-    }
-
     public static List<String> readStringList(String path) {
         List<String> result = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(readResource(Thread.currentThread().getContextClassLoader(), path)))) {

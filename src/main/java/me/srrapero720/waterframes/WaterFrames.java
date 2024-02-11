@@ -1,6 +1,12 @@
 package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.util.FrameRegistry;
+import net.coderbot.iris.Iris;
+import net.coderbot.iris.apiimpl.IrisApiV0ConfigImpl;
+import net.coderbot.iris.apiimpl.IrisApiV0Impl;
+import net.coderbot.iris.parsing.IrisFunctions;
+import net.coderbot.iris.pipeline.ShadowRenderer;
+import net.irisshaders.iris.api.v0.IrisApi;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
@@ -21,8 +27,10 @@ public class WaterFrames {
     // BOOTSTRAP
     public WaterFrames() {
         DisplayConfig.init();
-        FrameRegistry.init(bus());
+        FrameRegistry.init(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
-    public static IEventBus bus() { return FMLJavaModLoadingContext.get().getModEventBus(); }
+    public void irisCheckforward() {
+//        IrisApi.getInstance().isRenderingShadowPass(
+    }
 }

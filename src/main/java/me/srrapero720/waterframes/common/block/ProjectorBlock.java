@@ -20,33 +20,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import team.creative.creativecore.common.gui.GuiLayer;
-import team.creative.creativecore.common.util.math.base.Facing;
-import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 public class ProjectorBlock extends DisplayBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public ProjectorBlock() {
         super(Properties.of(Material.METAL).strength(2f).sound(SoundType.METAL).noOcclusion());
-    }
-
-    public static @NotNull AlignedBox getBlockBox(Direction direction) {
-        Facing facing = Facing.get(direction);
-        var box = new AlignedBox();
-
-        // fit projector model height
-        box.maxY = 8f / 16f;
-
-        // fit projector thick
-        float blockThickness = 4f / 16f;
-        box.setMin(facing.axis, blockThickness);
-        box.setMax(facing.axis, 1 - blockThickness);
-
-        // fit anchor of it
-        Facing clockWise = Facing.get(direction.getClockWise());
-        box.setMin(clockWise.axis, 1f / 16f);
-        box.setMax(clockWise.axis, 15f / 16f);
-
-        return box;
     }
 
     @Override

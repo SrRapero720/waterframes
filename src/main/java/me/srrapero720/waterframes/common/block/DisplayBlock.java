@@ -32,12 +32,38 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         super(pProperties);
     }
 
-    public static AlignedBox getBlockBox(Direction direction, float thickness) { return getBlockBox(Facing.get(direction), thickness); }
+    // FRAMES AND TVs
+    public static AlignedBox getBlockBox(Direction direction, float thickness) {
+        return getBlockBox(Facing.get(direction), thickness);
+    }
+
+    // FRAMES AND TVs
     public static AlignedBox getBlockBox(Facing facing, float thickness) {
         var box = new AlignedBox();
 
         if (facing.positive) box.setMax(facing.axis, thickness);
         else box.setMin(facing.axis, 1 - thickness);
+        return box;
+    }
+
+    // FOR PROJECTORS
+    public static @NotNull AlignedBox getBlockBox(Direction direction) {
+        Facing facing = Facing.get(direction);
+        var box = new AlignedBox();
+
+        // fit projector model height
+        box.maxY = 8f / 16f;
+
+        // fit projector thickness
+        float blockThickness = 4f / 16f;
+        box.setMin(facing.axis, blockThickness);
+        box.setMax(facing.axis, 1 - blockThickness);
+
+        // fit anchor of it
+        Facing clockWise = Facing.get(direction.getClockWise());
+        box.setMin(clockWise.axis, 1f / 16f);
+        box.setMax(clockWise.axis, 15f / 16f);
+
         return box;
     }
 

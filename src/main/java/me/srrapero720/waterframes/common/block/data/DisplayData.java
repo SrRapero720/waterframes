@@ -57,8 +57,8 @@ public abstract class DisplayData {
     public int tick = 0;
     public int tickMax = -1;
 
-    public int getPosX() { return this.min.x == 0 ? 0 : this.max.x == 1 ? 2 : 1; }
-    public int getPosY() { return this.min.y == 0 ? 0 : this.max.y == 1 ? 2 : 1; }
+    public HorizontalPosition getPosX() { return this.min.x == 0 ? HorizontalPosition.LEFT : this.max.x == 1 ? HorizontalPosition.RIGHT : HorizontalPosition.CENTER; }
+    public VerticalPosition getPosY() { return this.min.y == 0 ? VerticalPosition.TOP : this.max.y == 1 ? VerticalPosition.BOTTOM : VerticalPosition.CENTER; }
     public float getWidth() { return this.max.x - this.min.x; }
     public float getHeight() { return this.max.y - this.min.y; }
 
@@ -130,22 +130,58 @@ public abstract class DisplayData {
         this.restrictHeight();
     }
 
+    public static void setWidth(final DisplayTile<?> block, final HorizontalPosition position, final float width) {
+        switch (position) {
+            case LEFT -> {
+                block.data.min.x = 0;
+                block.data.max.x = width;
+            }
+            case RIGHT -> {
+                block.data.min.x = 1 - width;
+                block.data.max.x = 1;
+            }
+            default -> {
+                float middle = width / 2;
+                block.data.min.x = 0.5F - middle;
+                block.data.max.x = 0.5F + middle;
+            }
+        }
+    }
+
+    public static void setHeight(final DisplayTile<?> block, final VerticalPosition position, final float height) {
+        switch (position) {
+            case TOP -> {
+                block.data.min.y = 0;
+                block.data.max.y = height;
+            }
+            case BOTTOM -> {
+                block.data.min.y = 1 - height;
+                block.data.max.y = 1;
+            }
+            default -> {
+                float middle = height / 2;
+                block.data.min.y = 0.5F - middle;
+                block.data.max.y = 0.5F + middle;
+            }
+        }
+    }
+
     private void restrictWidth() {
         float maxWidth = DisplayConfig.maxWidth();
         if (getWidth() > maxWidth) {
             switch (getPosX()) {
-                case 2 -> {
+                case LEFT -> {
+                    this.min.x = 0;
+                    this.max.x = maxWidth;
+                }
+                case RIGHT -> {
                     this.min.x = 1 - maxWidth;
                     this.max.x = 1;
                 }
-                case 1 -> {
+                default -> {
                     float middle = maxWidth / 2f;
                     this.min.x = 0.5F - middle;
                     this.max.x = 0.5F + middle;
-                }
-                default -> {
-                    this.min.x = 0;
-                    this.max.x = maxWidth;
                 }
             }
         }
@@ -155,18 +191,18 @@ public abstract class DisplayData {
         float height = DisplayConfig.maxHeight();
         if (getHeight() > height) {
             switch (getPosY()) {
-                case 2 -> {
+                case TOP  -> {
+                    this.min.y = 0;
+                    this.max.y = height;
+                }
+                case BOTTOM -> {
                     this.min.y = 1 - height;
                     this.max.y = 1;
                 }
-                case 1 -> {
+                default -> {
                     float middle = height / 2;
                     this.min.y = 0.5F - middle;
                     this.max.y = 0.5F + middle;
-                }
-                default -> {
-                    this.min.y = 0;
-                    this.max.y = height;
                 }
             }
         }
@@ -184,8 +220,8 @@ public abstract class DisplayData {
         GuiStateButton buttonPosY = gui.get("pos_y");
         nbt.putFloat("width", Math.max(0.1F, width.getValue()));
         nbt.putFloat("height", Math.max(0.1F, height.getValue()));
-        nbt.putByte("pos_x",  (byte) buttonPosX.getState());
-        nbt.putByte("pos_y", (byte) buttonPosY.getState());
+        nbt.putInt("pos_x",  buttonPosX.getState());
+        nbt.putInt("pos_y", buttonPosY.getState());
 
 
         GuiCheckBox flipX = gui.get(FLIP_X);
@@ -230,40 +266,11 @@ public abstract class DisplayData {
 
             float width = FrameTools.minFloat(nbt.getFloat("width"), DisplayConfig.maxWidth());
             float height = FrameTools.minFloat(nbt.getFloat("height"), DisplayConfig.maxHeight());
-            int posX = nbt.getByte("pos_x");
-            int posY = nbt.getByte("pos_y");
+            int posX = nbt.getInt("pos_x");
+            int posY = nbt.getInt("pos_y");
 
-            switch (posX) {
-                case 0 -> {
-                    block.data.min.x = 0;
-                    block.data.max.x = width;
-                }
-                case 1 -> {
-                    float middle = width / 2;
-                    block.data.min.x = 0.5F - middle;
-                    block.data.max.x = 0.5F + middle;
-                }
-                default -> {
-                    block.data.min.x = 1 - width;
-                    block.data.max.x = 1;
-                }
-            }
-
-            switch (posY) {
-                case 0 -> {
-                    block.data.min.y = 0;
-                    block.data.max.y = height;
-                }
-                case 1 -> {
-                    float middle = height / 2;
-                    block.data.min.y = 0.5F - middle;
-                    block.data.max.y = 0.5F + middle;
-                }
-                default -> {
-                    block.data.min.y = 1 - height;
-                    block.data.max.y = 1;
-                }
-            }
+            DisplayData.setWidth(block, HorizontalPosition.values()[posX], width);
+            DisplayData.setHeight(block, VerticalPosition.values()[posY], height);
 
             block.data.flipX = nbt.getBoolean(FLIP_X);
             block.data.flipY = nbt.getBoolean(FLIP_Y);
@@ -280,6 +287,14 @@ public abstract class DisplayData {
         }
 
         block.setDirty();
+    }
+
+    public enum VerticalPosition {
+        TOP, BOTTOM, CENTER
+    }
+
+    public enum HorizontalPosition {
+        LEFT, RIGHT, CENTER;
     }
 
     public interface ExtraData<T extends DisplayData> {

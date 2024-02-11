@@ -87,7 +87,8 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
                 .add2(new GuiCheckBox(DisplayData.FLIP_X, tileBlock.data.flipX).setTranslate("gui.waterframes.flip_x"))
                 .add2(new GuiCheckBox(DisplayData.FLIP_Y, tileBlock.data.flipY).setTranslate("gui.waterframes.flip_y")));
 
-
+        int posXOrdinal = tileBlock.data.getPosX().ordinal();
+        int posYOrdinal = tileBlock.data.getPosY().ordinal();
         this.textureSettingsTable = new WidgetDoubleTable(() -> new WidgetColum(GuiFlow.STACK_Y)).setSpacing(2).expandY()
                 .addOnFirst(new WidgetParent(GuiFlow.STACK_X)
                         .add2(this.rotationIcon = new WidgetIcon("r_icon", 12, 12, WidgetIcons.ROTATION))
@@ -105,11 +106,11 @@ public class ProjectorScreen extends DisplayScreen<ProjectorTile> {
                         .add2(new WidgetIcon("pd_icon", 12, 12, WidgetIcons.PROJECTION_DISTANCE))
                         .add2(new GuiSteppedSlider(ProjectorData.PROJECTION_DISTANCE, 130, 10, tileBlock.data.projectionDistance, 4, 128)))
                 // IMAGE POSITION
-                .addOnSecond(positionViewer = new WidgetIcon("posView", 40, 40, WidgetIcons.POS_CORD[tileBlock.data.getPosX()][tileBlock.data.getPosY()]))
-                .addOnSecond(posXButton = new GuiStateButton("pos_x", tileBlock.data.getPosX(), new TextListBuilder()
-                        .addTranslated("gui.waterframes.posx.", "left", "center", "right")))
-                .addOnSecond(posYButton = new GuiStateButton("pos_y", tileBlock.data.getPosY(), new TextListBuilder()
-                        .addTranslated("gui.waterframes.posy.", "top", "center", "bottom")));
+                .addOnSecond(positionViewer = new WidgetIcon("posView", 40, 40, WidgetIcons.POS_CORD[posXOrdinal][posYOrdinal]))
+                .addOnSecond(posXButton = new GuiStateButton("pos_x", posXOrdinal, new TextListBuilder()
+                        .addTranslated("gui.waterframes.posx.", "right", "left", "center")))
+                .addOnSecond(posYButton = new GuiStateButton("pos_y", posYOrdinal, new TextListBuilder()
+                        .addTranslated("gui.waterframes.posy.", "top", "bottom", "center")));
         this.textureSettingsTable.getSecondRow().setAlign(Align.CENTER);
 
         this.mediaSettingsTable = new WidgetDoubleTable(() -> new WidgetColum(GuiFlow.STACK_Y)).setSpacing(4);

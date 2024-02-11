@@ -32,7 +32,7 @@ public class TickPacket extends CreativePacket {
             }
             if (block.data.tickMax < tickMax) {
                 block.data.tickMax = tickMax;
-                LOGGER.warn("Received a new maxTick value with different duration.");
+                LOGGER.warn("Received maxTick value major than current one, media differs?.");
             }
         }
     }

@@ -5,9 +5,9 @@ import org.apache.logging.log4j.MarkerManager;
 
 public class DisplayControl {
     private static final Marker IT = MarkerManager.getMarker("DisplayControl");
-    private static final Integer DEFAULT_SIZE = Integer.valueOf(32);
+    private static final Integer DEFAULT_SIZE = 32;
     private static final Object LOCK = new Object();
-    static final int SYNC_TIME = Integer.valueOf(1500);
+    static final int SYNC_TIME = 1500;
 
     private static TextureDisplay[] displays = new TextureDisplay[DEFAULT_SIZE];
     private static int position = 0;

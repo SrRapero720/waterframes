@@ -1,6 +1,6 @@
 modLoader="javafml"
 loaderVersion="${fgloaderrange}"
-issueTrackerURL="https://github.com/SrRapero720/waterframes/issues"
+issueTrackerURL="https://github.com/${github_project}/issues"
 logoFile="pack.png"
 license="${modlicense}"
 

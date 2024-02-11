@@ -8,6 +8,7 @@ import me.srrapero720.waterframes.util.FrameNet;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
+import me.srrapero720.watermedia.api.player.PlayerAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -41,27 +42,25 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
 
     public void setUrl(String url) {
         this.data.url = url;
-        if (isClient()) this.parsedUrl = FrameTools.patchUrl(this.data.url);
+        if (isClient()) this.parsedUrl = this.data.url;
     }
 
     public String getUrl() { return this.data.url; }
-    public String getParsedUrl() { return FrameTools.patchUrl(this.data.url); }
 
     @OnlyIn(Dist.CLIENT)
     public synchronized TextureDisplay requestDisplay() {
-        if (getUrl().isEmpty() && display != null) {
+        if (this.data.url.isEmpty() && display != null) {
             cleanDisplay();
             return null;
         }
 
-        String url = getParsedUrl();
         if (released.get()) {
             imageCache = null;
             return null;
         }
 
-        if (imageCache == null || !imageCache.url.equals(url)) {
-            imageCache = ImageAPI.getCache(url, Minecraft.getInstance());
+        if (imageCache == null || !imageCache.url.equals(this.data.url)) {
+            imageCache = ImageAPI.getCache(this.data.url, Minecraft.getInstance());
             cleanDisplay();
         }
 

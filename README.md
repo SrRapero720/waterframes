@@ -11,20 +11,20 @@ comes [WATERFrAMES](https://www.curseforge.com/minecraft/mc-mods/waterframes)
 The ultimate display mod with an expansion, contains more features and enhanced 
 styling, and works on survival!
 
-## DEPENDENCIES
-- [CreativeCore](https://beta.curseforge.com/minecraft/mc-mods/creativecore/files/4394989)
-- [WATERMeDIA](https://beta.curseforge.com/minecraft/mc-mods/watermedia)
-
 ## FEATURES
 - Display pictures and videos using URL or local files
 - Compatibility with a lot of platforms (powered by WATERMeDIA)
 - Easy customization and configuration for modpacks and server owners
 
-## TOP DONATOR
-- wayerspork
+## WANT A SERVER?
+![KineticHosting sponsor](https://media.discordapp.net/attachments/1076151535291088916/1107066110492278856/watermods.png "KineticHosting sponsor code WATERCoRE")
 
-## AUTHORS
-- [SrRapero720](https://github.com/SrRapero720) | Owner
+## DEPENDENCIES
+- [CreativeCore](https://beta.curseforge.com/minecraft/mc-mods/creativecore/files/4394989)
+- [WATERMeDIA](https://beta.curseforge.com/minecraft/mc-mods/watermedia)
+
+## TOP DONATOR
+- Wayerspork
 
 ## CREDITS
 - [CoolDCB](https://github.com/CoolDCB) - Backporting code

@@ -8,10 +8,9 @@ plugins {
 }
 
 version = modversion
-group = modgroup
-archivesBaseName = modid
 
 java {
+    archivesBaseName = modid
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
@@ -19,36 +18,18 @@ java {
 println "Gradle Java: ${JavaVersion.current()}"
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: "${mappingsch}", version: "${mappings_version}-${mcversion}"
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    mappings channel: mappingsch, version: "${mappings_version}-${mcversion}"
+    accessTransformer file('src/main/resources/META-INF/accesstransformer.cfg')
     copyIdeResources = true
+
     runs {
-        client {
-            taskName "Client_${mcversion}"
+        configureEach {
             workingDirectory project.file('run')
-			
-			property 'forge.logging.console.level', 'debug'
-            property 'log4j.appender.Console', "org.apache.log4j.ConsoleAppender"
-            property 'terminal.jline', 'true'
-			arg '--mixin.config'
-			arg 'waterframes.mixin.json'
-
-            mods {
-                "${modid}" {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            taskName "WFServer_${mcversion}"
-            workingDirectory project.file('run')
-
             property 'forge.logging.console.level', 'debug'
             property 'log4j.appender.Console', "org.apache.log4j.ConsoleAppender"
             property 'terminal.jline', 'true'
             arg '--mixin.config'
-            arg 'waterframes.mixin.json'
+            arg "${modid}.${mixin_file_suffix}"
 
             mods {
                 "${modid}" {
@@ -56,10 +37,18 @@ minecraft {
                 }
             }
         }
+
+        client {}
+        server {}
     }
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+mixin {
+    add sourceSets.main, "${modid}.${mixin_refmap_suffix}"
+    config "${modid}.${mixin_file_suffix}"
+}
 
 repositories {
     mavenCentral()
@@ -93,7 +82,7 @@ dependencies {
     implementation fg.deobf("curse.maven:spark-361579:${sparkversion}")
     implementation fg.deobf("curse.maven:embeddium-908741:${embeddiumversion}")
     implementation fg.deobf("curse.maven:worldedit-225608:3697298")
-//    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
+    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
 
     // MOD SUPPORT
     implementation fg.deobf("com.simibubi.create:create-${mcversion}:${createversion}:slim") { transitive = false }
@@ -102,39 +91,24 @@ dependencies {
 }
 
 processResources {
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta', "${modid}.${mixin_file_suffix}".toString()]) {
         expand project.properties
     }
 }
 
-
-mixin { add sourceSets.main, "waterframes.mixin-refmap.json" }
-
-jar.archiveFileName = "${modid}-${mcversion}-${modversion}.jar"
 jar {
     manifest {
         attributes([
-            "Specification-Title": project.modname,
-            "Specification-Vendor": project.modauthor,
-            "Specification-Version": project.modversion,
-            "Implementation-Title": project.modname,
-            "Implementation-Version"  : project.modversion,
-            "Implementation-Vendor": project.modauthor,
+            "Specification-Title": modname,
+            "Specification-Vendor": modauthor,
+            "Specification-Version": modversion,
+            "Implementation-Title": modname,
+            "Implementation-Version"  : modversion,
+            "Implementation-Vendor": modauthor,
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "TweakClass": "org.spongepowered.asm.launch.MixinTweaker",
-            "TweakOrder": 0,
-            "MixinConfigs": "waterframes.mixin.json"
+            "MixinConfigs": "${modid}.${mixin_file_suffix}"
         ])
     }
-//    from {
-//        configurations.library.collect {
-//            it.isDirectory() ? it.matching {
-//                exclude '*', 'META-INF/**'
-//            } : zipTree(it).matching {
-//                exclude '*', 'META-INF/**'
-//            }
-//        }
-//    }
 }
 
 jar.finalizedBy('reobfJar')

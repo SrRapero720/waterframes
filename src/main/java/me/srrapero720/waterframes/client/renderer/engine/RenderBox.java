@@ -42,36 +42,36 @@ public class RenderBox {
 
         if (width > height) {
             switch (block.data.getPosX()) {
-                case 0 -> {
+                case LEFT -> {
                     box.setMin(axisX, 0f);
                     box.setMax(axisX, height);
                 }
-                case 1 -> {
+                case RIGHT -> {
+                    box.setMin(axisX, 1 - height);
+                    box.setMax(axisX, 1);
+                }
+                default -> {
                     float middle = height / 2;
                     box.setMin(axisX, 0.5f - middle);
                     box.setMax(axisX, 0.5f + middle);
-                }
-                default -> {
-                    box.setMin(axisX, 1 - height);
-                    box.setMax(axisX, 1);
                 }
             }
         }
 
         if (height > width) {
             switch (block.data.getPosY()) {
-                case 0 -> {
+                case TOP -> {
                     box.setMin(axisY, 0f);
                     box.setMax(axisY, width);
                 }
-                case 1 -> {
+                case BOTTOM -> {
+                    box.setMin(axisY, 1 - width);
+                    box.setMax(axisY, 1);
+                }
+                default -> {
                     float middle = width / 2;
                     box.setMin(axisY, 0.5f - middle);
                     box.setMax(axisY, 0.5f + middle);
-                }
-                default -> {
-                    box.setMin(axisY, 1 - width);
-                    box.setMax(axisY, 1);
                 }
             }
         }
