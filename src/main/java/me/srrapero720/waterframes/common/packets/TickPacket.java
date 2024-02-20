@@ -27,12 +27,13 @@ public class TickPacket extends CreativePacket {
         LOGGER.debug("Received maxTick packet for {} with value {}", pos, tickMax);
         BlockEntity be = serverPlayer.getLevel().getBlockEntity(pos);
         if (be instanceof DisplayTile<?> block) {
-            if (block.data.tickMax == -1) {
+            boolean tickMaxNegative = block.data.tickMax == -1;
+            if (tickMaxNegative) {
                 block.data.tick = 0;
             }
             if (block.data.tickMax < tickMax) {
                 block.data.tickMax = tickMax;
-                LOGGER.warn("Received maxTick value major than current one, media differs?.");
+                if (!tickMaxNegative) LOGGER.warn("Received maxTick value major than current one, media differs?.");
             }
         }
     }

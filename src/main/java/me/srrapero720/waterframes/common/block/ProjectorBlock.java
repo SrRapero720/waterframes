@@ -40,12 +40,15 @@ public class ProjectorBlock extends DisplayBlock {
     @Override
     public @NotNull BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
         Direction current = context.getHorizontalDirection();
-        return this.defaultBlockState().setValue(getFacing(), context.getPlayer().isCrouching() ? current.getOpposite() : current);
+        return super.getStateForPlacement(context)
+                .setValue(getFacing(), context.getPlayer().isCrouching() ? current.getOpposite() : current);
     }
 
     @Nullable
     @Override
-    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) { return new ProjectorTile(pPos, pState); }
+    public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+        return new ProjectorTile(pPos, pState);
+    }
 
     @Override
     public GuiLayer create(CompoundTag compoundTag, Level level, BlockPos blockPos, BlockState blockState, Player player) {

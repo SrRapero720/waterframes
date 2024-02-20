@@ -269,8 +269,8 @@ public abstract class DisplayData {
             int posX = nbt.getInt("pos_x");
             int posY = nbt.getInt("pos_y");
 
-            DisplayData.setWidth(block, HorizontalPosition.values()[posX], width);
-            DisplayData.setHeight(block, VerticalPosition.values()[posY], height);
+            DisplayData.setWidth(block, HorizontalPosition.VALUES[posX], width);
+            DisplayData.setHeight(block, VerticalPosition.VALUES[posY], height);
 
             block.data.flipX = nbt.getBoolean(FLIP_X);
             block.data.flipY = nbt.getBoolean(FLIP_Y);
@@ -290,11 +290,13 @@ public abstract class DisplayData {
     }
 
     public enum VerticalPosition {
-        TOP, BOTTOM, CENTER
+        TOP, BOTTOM, CENTER;
+        public static final VerticalPosition[] VALUES = values();
     }
 
     public enum HorizontalPosition {
         LEFT, RIGHT, CENTER;
+        public static final HorizontalPosition[] VALUES = values();
     }
 
     public interface ExtraData<T extends DisplayData> {

@@ -29,7 +29,6 @@ public class TvBlock extends DisplayBlock {
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-
     public TvBlock() {
         super(Properties.of(Material.METAL).strength(1f).sound(SoundType.METAL).noOcclusion());
     }
@@ -104,9 +103,9 @@ public class TvBlock extends DisplayBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        super.createBlockStateDefinition(pBuilder);
-        pBuilder.add(ATTACHED_FACE);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(ATTACHED_FACE);
     }
 
     @Override

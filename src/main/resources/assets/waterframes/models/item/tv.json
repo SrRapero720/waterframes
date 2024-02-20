@@ -3,7 +3,7 @@
 	"texture_size": [64, 64],
 	"textures": {
 		"0": "waterframes:block/tv/tv",
-		"particle": "waterframes:block/tv/tv"
+		"particle": "waterframes:particles/displays"
 	},
 	"elements": [
 		{

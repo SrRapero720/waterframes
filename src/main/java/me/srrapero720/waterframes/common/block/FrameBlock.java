@@ -27,44 +27,30 @@ import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.gui.GuiLayer;
 
 @SuppressWarnings("deprecation")
-public class FrameBlock extends DisplayBlock implements SimpleWaterloggedBlock {
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
-    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+public class FrameBlock extends DisplayBlock {
     public static final VisibleProperty VISIBLE = VisibleProperty.VISIBLE_PROPERTY;
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final float THICKNESS = 0.0625F / 2F;
 
     public FrameBlock() {
-        super(Properties.of(Material.WOOD).strength(1.0f).sound(SoundType.WOOD).noOcclusion().isSuffocating(Blocks::never).isViewBlocking(Blocks::never));
-        registerDefaultState(getStateDefinition().any().setValue(WATERLOGGED, false));
+        super(Properties.of(Material.METAL).strength(1f).sound(SoundType.METAL).noOcclusion());
+        registerDefaultState(defaultBlockState().setValue(VISIBLE, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(VISIBLE, WATERLOGGED);
+        super.createBlockStateDefinition(builder.add(VISIBLE));
     }
 
     @Override
-    public @NotNull BlockState updateShape(BlockState pState, Direction pDirection, BlockState pNeighborState, LevelAccessor pLevel, BlockPos pCurrentPos, BlockPos pNeighborPos) {
-        if (pState.getValue(WATERLOGGED)) {
-            pLevel.scheduleTick(pCurrentPos, Fluids.WATER, Fluids.WATER.getTickDelay(pLevel));
-        }
-        return super.updateShape(pState, pDirection, pNeighborState, pLevel, pCurrentPos, pNeighborPos);
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(getFacing(), context.getClickedFace()).setValue(VISIBLE, true);
     }
 
     @Override
-    public @NotNull FluidState getFluidState(BlockState pState) {
-        return pState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(true) : super.getFluidState(pState);
+    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
+        return state.getValue(VISIBLE) ? RenderShape.MODEL : RenderShape.INVISIBLE;
     }
-
-    @Override
-    @NotNull
-    public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(getFacing(), context.getClickedFace()).setValue(VISIBLE, true).setValue(WATERLOGGED, false);
-    }
-
-    @Override
-    public @NotNull RenderShape getRenderShape(@NotNull BlockState state) { return state.getValue(VISIBLE) ? RenderShape.MODEL : RenderShape.INVISIBLE; }
 
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
@@ -86,6 +72,6 @@ public class FrameBlock extends DisplayBlock implements SimpleWaterloggedBlock {
 
     @Override
     public DirectionProperty getFacing() {
-        return FACING;
+        return BlockStateProperties.FACING;
     }
 }

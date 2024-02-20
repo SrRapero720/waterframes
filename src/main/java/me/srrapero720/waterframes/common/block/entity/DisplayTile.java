@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.common.block.entity;
 
 import me.srrapero720.waterframes.client.display.TextureDisplay;
+import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.FrameBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.util.FrameTools;
@@ -61,7 +62,7 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
 
         if (imageCache == null || !imageCache.url.equals(this.data.url)) {
             imageCache = ImageAPI.getCache(this.data.url, Minecraft.getInstance());
-            cleanDisplay();
+            this.cleanDisplay();
         }
 
         switch (imageCache.getStatus()) {
