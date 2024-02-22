@@ -8,6 +8,7 @@
     "MinecraftMixin"
   ],
   "mixins": [
+    "creativecore.GuiCreatorMixin",
     "creativecore.IBoxFaceAccessor"
   ]
 }

@@ -89,11 +89,11 @@ public class TvScreen extends DisplayScreen<TvTile> {
                         .add2(new GuiCheckBox(DisplayData.FLIP_X, tileBlock.data.flipX).setTranslate("gui.waterframes.flipx"))
                         .add2(new GuiCheckBox(DisplayData.FLIP_Y, tileBlock.data.flipY).setTranslate("gui.waterframes.flipy")))
                 .add2(new WidgetParent("media_controls_btn", GuiFlow.STACK_X, Align.CENTER, VAlign.CENTER)
-                        .add2(new GuiIconButton("back_media", WidgetIcons.BACK_MEDIA, button -> fastBackwards.send(EndTag.INSTANCE)))
-                        .add2(new GuiIconButton("fast_backward", WidgetIcons.BACK_10, button -> fastBackwards.send(EndTag.INSTANCE)))
+                        .add2(new GuiIconButton("back_media", WidgetIcons.BACK_MEDIA, button -> fastBackward.send(EndTag.INSTANCE)))
+                        .add2(new GuiIconButton("fast_backward", WidgetIcons.FAST_BACKWARD, button -> fastBackward.send(EndTag.INSTANCE)))
                         .add2(new GuiIconButton("pause", WidgetIcons.PAUSE, button -> pauseAction.send(EndTag.INSTANCE)))
                         .add2(new GuiIconButton("play", WidgetIcons.PLAY, button -> playAction.send(EndTag.INSTANCE)))
-                        .add2(new GuiIconButton("fast_forward", WidgetIcons.SKIP_10, button -> fastForward.send(EndTag.INSTANCE)))
+                        .add2(new GuiIconButton("fast_forward", WidgetIcons.FAST_FOWARD, button -> fastForward.send(EndTag.INSTANCE)))
                         .add2(new GuiIconButton("next_media", WidgetIcons.NEXT_MEDIA, button -> fastForward.send(EndTag.INSTANCE)))
         );
 

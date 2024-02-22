@@ -1,15 +1,13 @@
 package me.srrapero720.waterframes.common.block.entity;
 
+import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
-import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.FrameBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
-import me.srrapero720.waterframes.util.FrameTools;
 import me.srrapero720.waterframes.util.FrameNet;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
-import me.srrapero720.watermedia.api.player.PlayerAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -120,8 +118,11 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
     public void play() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = true, data.tick); }
     public void pause() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick); }
     public void stop() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick = 0); }
-    public void fastBackwards() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = true, data.tick + MathAPI.msToTick(5000)); }
-    public void fastForward() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick + MathAPI.msToTick(5000)); }
+    public void volumeUp() { FrameNet.sendVolumeUpdate(worldPosition, level, data.minVolumeDistance, data.maxVolumeDistance, data.volume = DisplayConfig.maxVolume(data.volume + 5)); }
+    public void volumeDown() { FrameNet.sendVolumeUpdate(worldPosition, level, data.minVolumeDistance, data.maxVolumeDistance, data.volume = DisplayConfig.maxVolume(data.volume - 5)); }
+    public void fastForward() { FrameNet.sendPlaybackState(worldPosition, level, data.playing, data.tick += MathAPI.msToTick(5000)); }
+    public void fastBackwards() { FrameNet.sendPlaybackState(worldPosition, level, data.playing, data.tick -= MathAPI.msToTick(5000)); }
+    public void toggleActive() { FrameNet.sendActiveToggle(worldPosition, level, data.active = !data.active); }
 
     public void setDirty() {
         if (this.level != null) {

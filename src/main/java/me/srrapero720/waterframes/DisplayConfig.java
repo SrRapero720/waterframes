@@ -128,7 +128,7 @@ public class DisplayConfig {
     public static int maxVolumeDistance(int value) { return Math.min(value, maxVolumeDistance()); }
 
     public static int maxVolume() { return maxVolume.get(); }
-    public static int maxVolume(int value) { return Math.min(value, maxVolume()); }
+    public static int maxVolume(int value) { return Math.max(Math.min(value, maxVolume()), 0); }
 
     public static boolean useVideoLan() { return overridesServerConfig() ? useVideoLan.get() : overridesUseVideoLan(); }
     public static boolean keepsRendering() { return overridesServerConfig() ? keepsRendering.get() : overridesKeepsRendering(); }
@@ -180,7 +180,7 @@ public class DisplayConfig {
 
     public static boolean canInteract(Player player, Level level) {
         var server = player.getServer();
-        boolean isOperator = level.isClientSide() || (server != null && player.hasPermissions( server.getOperatorUserPermissionLevel()));
+        boolean isOperator = level.isClientSide() || (server != null && player.hasPermissions(server.getOperatorUserPermissionLevel()));
 
         if (!usableOnSurvival() && getGameType(player).equals(GameType.SURVIVAL) && !isOperator) return false;
         if (!usableOnAdventure() && getGameType(player).equals(GameType.ADVENTURE) && !isOperator) return false;

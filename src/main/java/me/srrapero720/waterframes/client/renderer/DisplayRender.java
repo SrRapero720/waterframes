@@ -49,24 +49,26 @@ public class DisplayRender {
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-block.data.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
-        if (!display.isLoading() && display.canRender()) {
-            int texture = display.texture();
-            if (texture != -1) {
-                RenderSystem.bindTexture(texture);
-                RenderSystem.setShaderTexture(0, texture);
-                RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-                RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        if (!display.isLoading()) {
+            if (display.canRender()) {
+                int texture = display.texture();
+                if (texture != -1) {
+                    RenderSystem.bindTexture(texture);
+                    RenderSystem.setShaderTexture(0, texture);
+                    RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
+                    RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 
-                builder.begin(VertexFormat.Mode.QUADS, POSITION_TEX_COLOR_NORMAL);
-                if (renderFrontSide)
-                    RenderVertex.front(renderBox, boxFace, pose, builder, forceXFlip != block.data.flipX, forceYFlip != block.data.flipY);
+                    builder.begin(VertexFormat.Mode.QUADS, POSITION_TEX_COLOR_NORMAL);
+                    if (renderFrontSide)
+                        RenderVertex.front(renderBox, boxFace, pose, builder, forceXFlip != block.data.flipX, forceYFlip != block.data.flipY);
 
-                if (renderBackside)
-                    RenderVertex.back(renderBox, boxFace, pose, builder, forceXFlip != block.data.flipX, forceYFlip != block.data.flipY);
-                t.end();
-            }
-            if (display.isBuffering()) {
-                renderLoading(pose, block, facing, renderBox, boxFace, builder, renderFrontSide, renderBackside, forceXFlip, forceYFlip);
+                    if (renderBackside)
+                        RenderVertex.back(renderBox, boxFace, pose, builder, forceXFlip != block.data.flipX, forceYFlip != block.data.flipY);
+                    t.end();
+                }
+                if (display.isBuffering()) {
+                    renderLoading(pose, block, facing, renderBox, boxFace, builder, renderFrontSide, renderBackside, forceXFlip, forceYFlip);
+                }
             }
         } else {
             renderLoading(pose, block, facing, renderBox, boxFace, builder, renderFrontSide, renderBackside, forceXFlip, forceYFlip);

@@ -30,12 +30,12 @@ public class WidgetTextFieldTrigger extends GuiTextfield {
 
     @Override
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
-        return WidgetStyles.NORMAL_BORDER;
+        return WidgetStyles.WIDGET_BORDER;
     }
 
     @Override
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
-        return WidgetStyles.NORMAL_BACKGROUND;
+        return WidgetStyles.WIDGET_BACKGROUND;
     }
 
     @Override

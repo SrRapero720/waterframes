@@ -12,6 +12,7 @@ import team.creative.creativecore.common.util.math.vec.Vec2f;
 
 public abstract class DisplayData {
     public static final String URL = "url";
+    public static final String ACTIVE = "active";
     public static final String MIN_X = "min_x";
     public static final String MIN_Y = "min_y";
     public static final String MAX_X = "max_x";
@@ -37,6 +38,7 @@ public abstract class DisplayData {
     public static final int V = 1;
 
     public String url = "";
+    public boolean active = true;
     public final Vec2f min = new Vec2f(0f, 0f);
     public final Vec2f max = new Vec2f(1f, 1f);
 
@@ -64,6 +66,7 @@ public abstract class DisplayData {
 
     public void save(CompoundTag nbt) {
         nbt.putString(URL, url);
+        nbt.putBoolean(ACTIVE, active);
         nbt.putFloat(MIN_X, min.x);
         nbt.putFloat(MIN_Y, min.y);
         nbt.putFloat(MAX_X, max.x);
@@ -86,6 +89,7 @@ public abstract class DisplayData {
 
     public void load(CompoundTag nbt) {
         this.url = nbt.getString(URL);
+        this.active = nbt.contains(ACTIVE) ? nbt.getBoolean(ACTIVE) : this.active;
         this.min.x = nbt.getFloat(MIN_X);
         this.min.y = nbt.getFloat(MIN_Y);
         this.max.x = nbt.getFloat(MAX_X);
@@ -213,6 +217,7 @@ public abstract class DisplayData {
 
         GuiTextfield url = gui.get(URL);
         nbt.putString(URL, url.getText());
+        nbt.putBoolean(ACTIVE, true);
 
         WidgetCounterDecimal width = gui.get("width");
         WidgetCounterDecimal height = gui.get("height");
@@ -222,7 +227,6 @@ public abstract class DisplayData {
         nbt.putFloat("height", Math.max(0.1F, height.getValue()));
         nbt.putInt("pos_x",  buttonPosX.getState());
         nbt.putInt("pos_y", buttonPosY.getState());
-
 
         GuiCheckBox flipX = gui.get(FLIP_X);
         GuiCheckBox flipY = gui.get(FLIP_Y);
@@ -263,6 +267,7 @@ public abstract class DisplayData {
                 block.data.tickMax = -1;
             }
             block.setUrl(url);
+            block.data.active = nbt.getBoolean(ACTIVE);
 
             float width = FrameTools.minFloat(nbt.getFloat("width"), DisplayConfig.maxWidth());
             float height = FrameTools.minFloat(nbt.getFloat("height"), DisplayConfig.maxHeight());

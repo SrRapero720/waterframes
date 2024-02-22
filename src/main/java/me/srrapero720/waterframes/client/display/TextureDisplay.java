@@ -112,7 +112,7 @@ public class TextureDisplay {
     
     public long duration() {
         return switch (displayMode) {
-            case PICTURE -> this.imageCache.getRenderer().duration;
+            case PICTURE -> this.imageCache.getRenderer() != null ? this.imageCache.getRenderer().duration : 0;
             case VIDEO -> this.mediaPlayer.getDuration();
             case AUDIO -> 0;
         };
@@ -130,8 +130,8 @@ public class TextureDisplay {
     
     public boolean canRender() {
         return switch (displayMode) {
-            case PICTURE -> this.imageCache.getRenderer() != null;
-            case VIDEO -> this.mediaPlayer.isValid();
+            case PICTURE -> this.imageCache.getRenderer() != null && block.data.active;
+            case VIDEO -> this.mediaPlayer.isValid() && block.data.active;
             case AUDIO -> false;
         };
     }
@@ -168,7 +168,7 @@ public class TextureDisplay {
                     if (mediaPlayer.getRepeatMode() != block.data.loop) mediaPlayer.setRepeatMode(block.data.loop);
                     if (!stream && mediaPlayer.isLive()) stream = true;
 
-                    boolean canPlay = block.data.playing && !Minecraft.getInstance().isPaused();
+                    boolean canPlay = block.data.playing && block.data.active && !Minecraft.getInstance().isPaused();
 
                     mediaPlayer.setPauseMode(!canPlay);
                     if (!stream && mediaPlayer.isSeekAble()) {

@@ -6,6 +6,7 @@ import me.srrapero720.waterframes.common.block.data.FrameData;
 import me.srrapero720.waterframes.common.block.entity.FrameTile;
 import me.srrapero720.waterframes.common.screen.widgets.*;
 import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetIcons;
+import me.srrapero720.waterframes.util.FrameNet;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
@@ -44,7 +45,7 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
     private WidgetIcon volumeIcon;
 
     public FrameScreen(FrameTile tileBlock) {
-        super("frame_screen", tileBlock, 230, 210);
+        super("frame_screen", tileBlock, 245, 230);
     }
 
     @Override
@@ -145,6 +146,12 @@ public class FrameScreen extends DisplayScreen<FrameTile> {
         this.add(textureSettingsTable);
         this.add(new WidgetLabel("media_label", 0.8f).setTranslate("label.waterframes.media_settings"));
         this.add(mediaSettingsTable);
+        if (isClient()) {
+            this.add(new WidgetSeekBar("seek", 150, 12, tileBlock.data.tick, 0, tileBlock.display != null ? tileBlock.display.durationInTicks() : 1, () -> tileBlock.data.tick)
+                    .addOnMouseGrab(seekBar -> tileBlock.data.tick = (int) seekBar.value)
+                    .addOnMouseRelease(seekBar -> FrameNet.syncPlaybackState(tileBlock.getBlockPos(), tileBlock.data.playing, tileBlock.data.tick = (int) seekBar.value))
+                    .setExpandableX());
+        }
         this.add(actionsTable);
     }
 

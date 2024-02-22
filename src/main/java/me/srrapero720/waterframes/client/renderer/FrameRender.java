@@ -19,7 +19,7 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 public class FrameRender implements BlockEntityRenderer<FrameTile> {
     @Override
     public boolean shouldRenderOffScreen(FrameTile frame) {
-        return frame.data.getWidth() > 12 || frame.data.getHeight() > 12;
+        return frame.data.getWidth() > 8 || frame.data.getHeight() > 8;
     }
     @Override
     public boolean shouldRender(FrameTile frame, @NotNull Vec3 vec) {

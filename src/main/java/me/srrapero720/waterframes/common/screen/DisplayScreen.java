@@ -18,8 +18,11 @@ public abstract class DisplayScreen<T extends DisplayTile<?>> extends GuiLayer {
     protected final GuiSyncLocal<EndTag> playAction;
     protected final GuiSyncLocal<EndTag> pauseAction;
     protected final GuiSyncLocal<EndTag> stopAction;
+    protected final GuiSyncLocal<EndTag> volumeUpAction;
+    protected final GuiSyncLocal<EndTag> volumeDownAction;
     protected final GuiSyncLocal<EndTag> fastForward;
-    protected final GuiSyncLocal<EndTag> fastBackwards;
+    protected final GuiSyncLocal<EndTag> fastBackward;
+    protected final GuiSyncLocal<EndTag> activeToggle;
     protected final GuiSyncLocal<CompoundTag> syncAction;
 
     protected final T tileBlock;
@@ -33,8 +36,11 @@ public abstract class DisplayScreen<T extends DisplayTile<?>> extends GuiLayer {
         this.playAction = getSyncHolder().register("play", x -> tileBlock.play());
         this.pauseAction = getSyncHolder().register("pause", x -> tileBlock.pause());
         this.stopAction = getSyncHolder().register("stop", x -> tileBlock.stop());
+        this.volumeUpAction = getSyncHolder().register("volume_up", x -> tileBlock.volumeUp());
+        this.volumeDownAction = getSyncHolder().register("volume_down", x -> tileBlock.volumeDown());
         this.fastForward = getSyncHolder().register("forward", x -> tileBlock.fastForward());
-        this.fastBackwards = getSyncHolder().register("backwards", x -> tileBlock.fastBackwards());
+        this.fastBackward = getSyncHolder().register("backward", x -> tileBlock.fastBackwards());
+        this.activeToggle = getSyncHolder().register("activeToggle", x -> tileBlock.toggleActive());
         this.syncAction = getSyncHolder().register("sync", nbt -> syncData(tileBlock, getPlayer(), nbt));
     }
 
@@ -48,9 +54,9 @@ public abstract class DisplayScreen<T extends DisplayTile<?>> extends GuiLayer {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) { return WidgetStyles.BACKGROUND_COLOR; }
+    public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) { return WidgetStyles.SCREEN_BACKGROUND; }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) { return WidgetStyles.BACKGROUND_BORDER; }
+    public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) { return WidgetStyles.SCREEN_BORDER; }
 }

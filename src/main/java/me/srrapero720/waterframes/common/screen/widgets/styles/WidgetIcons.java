@@ -47,20 +47,21 @@ public class WidgetIcons {
     public static final GuiIcon POS_8 = create(3, 7);
     public static final GuiIcon POS_9 = create(3, 8);
     public static final GuiIcon[][] POS_CORD = new GuiIcon[][] {
-            new GuiIcon[] { POS_1, POS_4, POS_7 },
-            new GuiIcon[] { POS_2, POS_5, POS_8 },
-            new GuiIcon[] { POS_3, POS_6, POS_9 }
+            new GuiIcon[] { POS_1, POS_7, POS_4, },
+            new GuiIcon[] { POS_3, POS_9, POS_6, },
+            new GuiIcon[] { POS_2, POS_8, POS_5, }
     };
 
     // ACTION COLUM (chunk 15)
     public static final GuiIcon PLAY = create(15, 0);
     public static final GuiIcon PAUSE = create(15, 1);
     public static final GuiIcon STOP = create(15, 2);
-    public static final GuiIcon SKIP_10 = create(15, 3);
-    public static final GuiIcon BACK_10 = create(15, 4);
+    public static final GuiIcon FAST_FOWARD = create(15, 3);
+    public static final GuiIcon FAST_BACKWARD = create(15, 4);
     public static final GuiIcon NEXT_MEDIA = create(15, 5);
     public static final GuiIcon BACK_MEDIA = create(15, 6);
     public static final GuiIcon ADD = create(15, 7);
+    public static final GuiIcon OFF_ON = create(15, 8);
 
     private static GuiIcon create(int chunkX, int chunkY) {
         return new GuiIcon(location, 16 * chunkX, 16 * chunkY, 16, 16);
