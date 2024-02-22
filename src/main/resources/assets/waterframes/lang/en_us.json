@@ -1,11 +1,14 @@
 {
+    "itemGroup.waterframes": "WaterFrames",
     "block.waterframes.frame": "Picture Frame",
     "block.waterframes.projector": "Projector",
-    "itemGroup.waterframes": "WaterFrames",
+    "item.waterframes.remote": "Remote",
+
     "download.exception.forbidden": "Forbidden",
     "download.exception.notfound": "Not found",
     "download.exception.invalid": "Could not download image",
     "download.exception.gif": "Failed to parse GIF",
+
     "label.waterframes.not_whitelisted": "URL not whitelisted, cannot save",
     "label.waterframes.whitelist_warning": "Warning: URL Whitelist not enabled",
     "label.waterframes.invalid_url": "Warning: Invalid URL",
@@ -15,6 +18,7 @@
     "label.waterframes.loading": "Loading...",
     "label.waterframes.idle": "Idle",
     "label.waterframes.wrong": "Something is wrong",
+    
     "gui.waterframes.url": "URL",
     "gui.waterframes.flip_x": "flip X",
     "gui.waterframes.flip_y": "flip Y",
