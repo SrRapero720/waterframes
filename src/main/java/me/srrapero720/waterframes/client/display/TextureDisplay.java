@@ -74,7 +74,6 @@ public class TextureDisplay {
         DisplayControl.add(this);
     }
 
-    
     public int width() {
         return switch (displayMode) {
             case PICTURE -> this.imageCache.getRenderer().width;
@@ -83,7 +82,6 @@ public class TextureDisplay {
         };
     }
 
-    
     public int height() {
         return switch (displayMode) {
             case PICTURE -> this.imageCache.getRenderer().height;
@@ -92,7 +90,6 @@ public class TextureDisplay {
         };
     }
 
-    
     public int texture() {
         return switch (displayMode) {
             case PICTURE -> this.imageCache.getRenderer().texture(block.data.tick, (block.data.playing ? MathAPI.tickToMs(FrameTools.deltaFrames()) : 0), block.data.loop);
@@ -104,12 +101,10 @@ public class TextureDisplay {
         };
     }
 
-    
     public int durationInTicks() {
         return MathAPI.msToTick(duration());
     }
 
-    
     public long duration() {
         return switch (displayMode) {
             case PICTURE -> this.imageCache.getRenderer() != null ? this.imageCache.getRenderer().duration : 0;
@@ -118,7 +113,6 @@ public class TextureDisplay {
         };
     }
 
-    
     public boolean canTick() {
         return switch (displayMode) {
             case PICTURE -> this.imageCache.getStatus().equals(ImageCache.Status.READY);
@@ -127,7 +121,6 @@ public class TextureDisplay {
         };
     }
 
-    
     public boolean canRender() {
         return switch (displayMode) {
             case PICTURE -> this.imageCache.getRenderer() != null && block.data.active;
@@ -136,13 +129,11 @@ public class TextureDisplay {
         };
     }
 
-    
     public void syncDuration(BlockPos pos) {
         if (block.data.tickMax == -1) block.data.tick = 0;
         FrameNet.syncMaxTickTime(pos, durationInTicks());
     }
 
-    
     public void tick(BlockPos pos) {
         if (!synced && canRender()) {
             syncDuration(pos);
@@ -195,7 +186,6 @@ public class TextureDisplay {
         };
     }
 
-    
     public boolean isBuffering() {
         return switch (displayMode) {
             case PICTURE -> false;
@@ -214,7 +204,6 @@ public class TextureDisplay {
         return imageCache.getStatus() == ImageCache.Status.LOADING;
     }
 
-    
     public void pause() {
         switch (displayMode) {
             case PICTURE -> {}
@@ -225,7 +214,6 @@ public class TextureDisplay {
         }
     }
 
-    
     public void resume() {
         switch (displayMode) {
             case PICTURE -> {}
@@ -236,7 +224,6 @@ public class TextureDisplay {
         }
     }
 
-    
     public void stop() {
         switch (displayMode) {
             case PICTURE -> {}
@@ -247,7 +234,6 @@ public class TextureDisplay {
         }
     }
 
-    
     public void release() {
         switch (displayMode) {
             case PICTURE -> {
@@ -260,10 +246,7 @@ public class TextureDisplay {
         }
     }
 
-
     public enum Mode {
-        VIDEO,
-        PICTURE,
-        AUDIO;
+        VIDEO, PICTURE, AUDIO;
     }
 }
