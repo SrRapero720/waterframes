@@ -33,7 +33,7 @@ public class VolumePacket extends CreativePacket {
     @Override
     public void execute(Player player) {
         BlockEntity be = player.level.getBlockEntity(pos);
-        if (be instanceof DisplayTile<?> tile) {
+        if (be instanceof DisplayTile tile) {
             tile.data.volume = DisplayConfig.maxVolume(this.volume);
             tile.data.maxVolumeDistance = DisplayConfig.maxVolumeDistance(this.max);
             tile.data.minVolumeDistance = Math.min(this.max, this.min);

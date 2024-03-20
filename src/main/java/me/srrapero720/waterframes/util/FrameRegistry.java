@@ -4,10 +4,13 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.DisplayControl;
 import me.srrapero720.waterframes.client.renderer.FrameRender;
 import me.srrapero720.waterframes.client.renderer.ProjectorRender;
+import me.srrapero720.waterframes.client.renderer.TvRender;
 import me.srrapero720.waterframes.common.block.FrameBlock;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
+import me.srrapero720.waterframes.common.block.TvBlock;
 import me.srrapero720.waterframes.common.block.entity.FrameTile;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
+import me.srrapero720.waterframes.common.block.entity.TvTile;
 import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.util.events.ClientPauseUpdateEvent;
@@ -50,19 +53,18 @@ public class FrameRegistry {
     /* BLOCKS */
     public static final RegistryObject<FrameBlock> FRAME = BLOCKS.register("frame", FrameBlock::new);
     public static final RegistryObject<ProjectorBlock> PROJECTOR = BLOCKS.register("projector", ProjectorBlock::new);
-//    public static final RegistryObject<ProjectorBlock> DARK_PROJECTOR = BLOCKS.register("dark_projector", ProjectorBlock::new);
-//    public static final RegistryObject<TvBlock> TV = BLOCKS.register("tv", TvBlock::new);
+    public static final RegistryObject<TvBlock> TV = BLOCKS.register("tv", TvBlock::new);
 
     /* ITEMS */
     public static final RegistryObject<Item> REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties().tab(TAB)));
     public static final RegistryObject<Item> FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB)));
     public static final RegistryObject<Item> PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB)));
-//    public static final RegistryObject<Item> TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties().tab(TAB)));
+    public static final RegistryObject<Item> TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties().tab(TAB)));
 
     /* TILES */
     public static final RegistryObject<BlockEntityType<FrameTile>> TILE_FRAME = tile("frame", FrameTile::new, FRAME);
     public static final RegistryObject<BlockEntityType<ProjectorTile>> TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR);
-//    public static final RegistryObject<BlockEntityType<TvTile>> TILE_TV = tile("tv", TvTile::new, TV);
+    public static final RegistryObject<BlockEntityType<TvTile>> TILE_TV = tile("tv", TvTile::new, TV);
 
     public static void init(IEventBus bus) {
         if (FMLLoader.getDist().isClient()) bus.addListener(Client::init);
@@ -113,7 +115,7 @@ public class FrameRegistry {
         private static void client() {
             BlockEntityRenderers.register(FrameRegistry.TILE_FRAME.get(), (x) -> new FrameRender());
             BlockEntityRenderers.register(FrameRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRender());
-//            BlockEntityRenderers.register(FrameRegistry.TILE_TV.get(), (x) -> new TvRender());
+            BlockEntityRenderers.register(FrameRegistry.TILE_TV.get(), (x) -> new TvRender());
         }
 
         @SubscribeEvent

@@ -18,11 +18,11 @@ import java.util.List;
 @Mixin(MountedStorageManager.class)
 public class MountedStorageManagerMixin {
     @Unique
-    private final List<DisplayTile<?>> waterframes$displays = new ArrayList<>();
+    private final List<DisplayTile> waterframes$displays = new ArrayList<>();
 
     @Inject(method = "addBlock", remap = false, at = @At(value = "HEAD"), cancellable = true)
     public void addBlock$inject(BlockPos localPos, BlockEntity be, CallbackInfo ci) {
-        if (be instanceof DisplayTile<?> displayTile) {
+        if (be instanceof DisplayTile displayTile) {
             waterframes$displays.add(displayTile);
             ci.cancel(); // if was a frame, the rest of logic isn't required
         }
@@ -33,7 +33,7 @@ public class MountedStorageManagerMixin {
         for (int i = 0; i < waterframes$displays.size(); i++) {
             BlockPos entityPos = entity.blockPosition();
             WaterFrames.LOGGER.debug("TICKING [{}, {}, {}]", entityPos.getX(), entityPos.getY(), entityPos.getZ());
-            DisplayTile<?> tile = waterframes$displays.get(i);
+            DisplayTile tile = waterframes$displays.get(i);
             DisplayTile.tick(entity.level, entity.blockPosition(), tile.getBlockState(), tile);
         }
     }

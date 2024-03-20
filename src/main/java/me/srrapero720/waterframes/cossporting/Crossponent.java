@@ -52,6 +52,9 @@ public class Crossponent {
         return translatable(key).withStyle(formatting);
     }
 
+    public static MutableComponent translatableParse(String key, Component argument) {
+        return new TranslatableComponent(key, argument);
+    }
 
     public static MutableComponent translatable(String key, Component ...components) {
         MutableComponent c = translatable(key);

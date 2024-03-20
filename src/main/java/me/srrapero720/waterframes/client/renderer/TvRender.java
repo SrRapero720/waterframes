@@ -1,22 +1,21 @@
 package me.srrapero720.waterframes.client.renderer;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
-import me.srrapero720.waterframes.common.block.ProjectorBlock;
+import me.srrapero720.waterframes.client.renderer.engine.RenderBox;
+import me.srrapero720.waterframes.common.block.FrameBlock;
+import me.srrapero720.waterframes.common.block.TvBlock;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.base.Facing;
-import team.creative.creativecore.common.util.math.box.BoxFace;
+import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 @OnlyIn(Dist.CLIENT)
 public class TvRender implements BlockEntityRenderer<TvTile> {
@@ -35,45 +34,14 @@ public class TvRender implements BlockEntityRenderer<TvTile> {
         TextureDisplay display = block.requestDisplay();
         if (display == null) return;
 
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
-        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(block.data.brightness, block.data.brightness, block.data.brightness, block.data.alpha);
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        Direction direction = block.getBlockState().getValue(TvBlock.FACING);
+        Facing facing = Facing.get(direction.getOpposite());
+        AlignedBox alignedBox = TvBlock.box(direction, block.getBlockState().getValue(TvBlock.ATTACHED_FACE), true);
+        alignedBox.grow(facing.axis, 0.01f);
 
-        Facing facing = Facing.get(block.getBlockState().getValue(ProjectorBlock.FACING).getOpposite());
-//        AlignedBox alignedBox = block.getRenderBox();
-//        alignedBox.grow(facing.axis, 0.01f);
-        BoxFace boxFace = BoxFace.get(facing);
 
-        if (display.isLoading()) {
-//            RenderEngine.renderVertexGif(block, pose, boxFace, true);
-        } else {
-            if (display.canRender()) {
-                int texture = display.texture();
-                RenderSystem.bindTexture(texture);
-                RenderSystem.setShaderTexture(0, texture);
-                if (texture != -1) {
-                    pose.pushPose();
+        DisplayRender.render(pose, block, facing, alignedBox, true, false, false, false);
 
-                    pose.translate(0.5, 0.5, 0.5);
-                    pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-block.data.rotation)));
-                    pose.translate(-0.5, -0.5, -0.5);
-
-//                    RenderEngine.vertexFrontSide(alignedBox, boxFace, pose, DefaultVertexFormat.POSITION_TEX_COLOR_NORMAL, block.data);
-
-                    pose.popPose();
-                }
-
-                if (display.isBuffering()) {
-//                    RenderEngine.renderVertexGif(block, pose, boxFace, true);
-                }
-            }
-        }
-
-        Tesselator.getInstance().end();
-        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
         RenderSystem.disableDepthTest();
         RenderSystem.disableBlend();
     }

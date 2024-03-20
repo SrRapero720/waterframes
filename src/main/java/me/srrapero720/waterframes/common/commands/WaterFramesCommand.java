@@ -58,7 +58,7 @@ public class WaterFramesCommand {
         final var url = StringArgumentType.getString(context, "url");
 
         final var displayTile = level.getBlockEntity(blockpos);
-        if (displayTile instanceof DisplayTile<?> displayBE) {
+        if (displayTile instanceof DisplayTile displayBE) {
             if (!displayBE.getUrl().equals(url)) {
                 displayBE.data.tick = 0;
                 displayBE.data.tickMax = -1;
@@ -78,7 +78,7 @@ public class WaterFramesCommand {
         final var blockpos = BlockPosArgument.getLoadedBlockPos(context, "pos");
 
         final var displayTile = level.getBlockEntity(blockpos);
-        if (displayTile instanceof DisplayTile<?> displayBE) {
+        if (displayTile instanceof DisplayTile displayBE) {
             if (width > 0.1f) DisplayData.setWidth(displayBE, displayBE.data.getPosX(), width);
             if (height > 0.1f) DisplayData.setHeight(displayBE, displayBE.data.getPosY(), height);
 
@@ -96,7 +96,7 @@ public class WaterFramesCommand {
         final var blockpos = BlockPosArgument.getLoadedBlockPos(context, "pos");
 
         final var displayTile = level.getBlockEntity(blockpos);
-        if (displayTile instanceof DisplayTile<?> displayBE) {
+        if (displayTile instanceof DisplayTile displayBE) {
             if (horizontal != null) DisplayData.setWidth(displayBE, horizontal, displayBE.data.getWidth());
             DisplayData.setHeight(displayBE, vertical, displayBE.data.getHeight());
             displayBE.setDirty();

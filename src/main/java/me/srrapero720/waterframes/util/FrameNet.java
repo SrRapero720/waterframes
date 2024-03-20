@@ -1,9 +1,12 @@
 package me.srrapero720.waterframes.util;
 
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.common.network.packets.C2SSyncDataPacket;
 import me.srrapero720.waterframes.common.packets.*;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import team.creative.creativecore.common.network.CreativeNetwork;
 
@@ -12,7 +15,15 @@ import java.util.List;
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 public class FrameNet {
-    private static final CreativeNetwork NETWORK = new CreativeNetwork("2.0", LOGGER, new ResourceLocation(WaterFrames.ID, "network"));
+    private static final CreativeNetwork NETWORK = new CreativeNetwork(2, LOGGER, new ResourceLocation(WaterFrames.ID, "network"));
+
+    public static void syncDisplayToServer(BlockPos blockPos, Player player, Level level, CompoundTag tag) {
+        NETWORK.sendToServer(new C2SSyncDataPacket());
+    }
+
+    public static void syncDisplayToClients(BlockPos blockPos, Player player, Level level, CompoundTag tag) {
+        NETWORK.sendToClientAll(level.getServer(), new C2SSyncDataPacket());
+    }
 
     public static void sendVolumeUpdate(BlockPos pos, Level level, int min, int max, int volume) {
         NETWORK.sendToClient(new VolumePacket(pos, (short) min, (short) max, (short) volume), level, pos);

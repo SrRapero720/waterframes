@@ -1,11 +1,9 @@
-package me.srrapero720.waterframes.common.screen.widgets;
+package me.srrapero720.waterframes.common.screens.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.srrapero720.waterframes.common.screen.text.ScalableCompiledText;
+import me.srrapero720.waterframes.common.screens.ScalableCompiledText;
 import me.srrapero720.waterframes.cossporting.Crossponent;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.GuiChildControl;
 import team.creative.creativecore.common.gui.GuiControl;
@@ -24,7 +22,8 @@ public class WidgetLabel extends GuiControl {
     }
 
     public WidgetLabel(String name, int width, int height, float scale) {
-        super(name, (int) (width * scale), (int) (height * scale));
+        super(name);
+        this.setDim((int) (width * scale), (int) (height * scale));
         this.scale = scale;
     }
 
@@ -83,33 +82,33 @@ public class WidgetLabel extends GuiControl {
         return ControlFormatting.TRANSPARENT;
     }
 
-    @OnlyIn(Dist.CLIENT)
-    protected void renderContent(PoseStack matrix, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
-        this.text.setScale(scale);
-        this.text.render(matrix);
+    @Override
+    public void render(PoseStack pose, GuiChildControl control, Rect controlRect, Rect realRect, double scale, int mouseX, int mouseY) {
+        this.text.setScale(this.scale);
+        this.text.render(pose);
+    }
+
+    @Override
+    protected void renderContent(PoseStack poseStack, GuiChildControl guiChildControl, Rect rect, int i, int i1) {
+
     }
 
     public void flowX(int width, int preferred) {
         this.text.setDimension(width, Integer.MAX_VALUE);
     }
 
-    public void flowY(int height, int preferred) {
+    @Override
+    public void flowY(int height, int prefferred, int width) {
         this.text.setMaxHeight(height);
     }
 
-    public int getMinWidth() {
-        return (int) (10 * scale);
+    @Override
+    protected int preferredWidth(int i) {
+        return this.text.getTotalWidth();
     }
 
-    public int preferredWidth() {
-        return (int) (this.text.getTotalWidth() * scale) + 8;
-    }
-
-    public int getMinHeight() {
-        return (int) (9 * scale);
-    }
-
-    public int preferredHeight() {
-        return (int) (this.text.getTotalHeight() * scale) + 2;
+    @Override
+    protected int preferredHeight(int i, int i1) {
+        return this.text.getTotalHeight();
     }
 }

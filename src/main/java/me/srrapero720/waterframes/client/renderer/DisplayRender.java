@@ -27,7 +27,7 @@ import static com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX_COLOR_N
 public class DisplayRender {
     static final ImageRenderer LOADING_TEX = ImageAPI.loadingGif(WaterFrames.ID);
 
-    public static void render(PoseStack pose, DisplayTile<?> block, Facing facing, AlignedBox renderBox,
+    public static void render(PoseStack pose, DisplayTile block, Facing facing, AlignedBox renderBox,
                               boolean renderFrontSide, boolean renderBackside, boolean forceXFlip, boolean forceYFlip) {
         if (!DisplayConfig.keepsRendering()) return;
 
@@ -76,7 +76,7 @@ public class DisplayRender {
         pose.popPose();
     }
 
-    private static void renderLoading(PoseStack pose, DisplayTile<?> block, Facing facing,
+    private static void renderLoading(PoseStack pose, DisplayTile block, Facing facing,
                                       AlignedBox renderBox, BoxFace boxFace, BufferBuilder builder,
                                       boolean renderFrontSide, boolean renderBackside, boolean forceXFlip, boolean forceYFlip) {
 

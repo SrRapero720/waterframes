@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.util.FrameRegistry;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
@@ -16,9 +17,5 @@ public class WaterFrames {
     public WaterFrames() {
         DisplayConfig.init();
         FrameRegistry.init(FMLJavaModLoadingContext.get().getModEventBus());
-    }
-
-    public void irisCheckforward() {
-//        IrisApi.getInstance().isRenderingShadowPass(
     }
 }

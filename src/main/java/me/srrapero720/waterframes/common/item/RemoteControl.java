@@ -1,15 +1,12 @@
 package me.srrapero720.waterframes.common.item;
 
 import me.srrapero720.waterframes.DisplayConfig;
-import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screen.RemoteControlScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -22,10 +19,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import team.creative.creativecore.common.gui.GuiLayer;
-import team.creative.creativecore.common.gui.handler.GuiCreator;
-import team.creative.creativecore.common.gui.handler.ItemGuiCreator;
-
-import java.util.UUID;
+import team.creative.creativecore.common.gui.creator.GuiCreator;
+import team.creative.creativecore.common.gui.creator.ItemGuiCreator;
 
 public class RemoteControl extends Item implements ItemGuiCreator {
     public RemoteControl(Properties pProperties) {
@@ -40,15 +35,15 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         if (!level.isClientSide && DisplayConfig.canInteract(player, level)) {
             var tag = player.getItemInHand(pUsedHand).getOrCreateTag();
             if (tag.isEmpty()) {
-                player.displayClientMessage(new TextComponent("No display Binded"), false);
-                return new InteractionResultHolder<>(InteractionResult.FAIL, player.getItemInHand(pUsedHand));
+                player.displayClientMessage(new TextComponent("No display Binded"), true);
+                return new InteractionResultHolder<>(InteractionResult.PASS, player.getItemInHand(pUsedHand));
             } else {
                 long[] pos = tag.getLongArray("pos");
                 var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
                 var dimension = new ResourceLocation(tag.getString("dimension"));
 
 
-                if (!(level.getBlockEntity(blockPos) instanceof DisplayTile<?>)) {
+                if (!(level.getBlockEntity(blockPos) instanceof DisplayTile)) {
                     player.getItemInHand(pUsedHand).setTag(new CompoundTag());
                     player.displayClientMessage(new TextComponent("Display is removed"), false);
                     return new InteractionResultHolder<>(InteractionResult.FAIL, player.getItemInHand(pUsedHand));
@@ -72,7 +67,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     public GuiLayer create(CompoundTag tag, Player player) {
         long[] pos = tag.getLongArray("pos");
         var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
-        return new RemoteControlScreen(player, (DisplayTile<?>) player.level.getBlockEntity(blockPos), tag, this);
+        return new RemoteControlScreen(player, (DisplayTile) player.level.getBlockEntity(blockPos), tag, this);
     }
 
     @Override
@@ -81,11 +76,11 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         var level = context.getLevel();
         var player = context.getPlayer();
 
-        if (!context.getItemInHand().isEmpty()) {
+        if (context.getHand() == InteractionHand.OFF_HAND || !context.getItemInHand().getOrCreateTag().isEmpty() || context.getLevel().isClientSide) {
             return InteractionResult.PASS;
         }
 
-        if (level.getBlockEntity(pos) instanceof DisplayTile<?>) {
+        if (level.getBlockEntity(pos) instanceof DisplayTile) {
             var item = context.getItemInHand();
             var tag = item.getOrCreateTag();
 

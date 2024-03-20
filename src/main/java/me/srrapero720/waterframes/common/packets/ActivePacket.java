@@ -1,6 +1,5 @@
 package me.srrapero720.waterframes.common.packets;
 
-import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -31,7 +30,7 @@ public class ActivePacket extends CreativePacket {
     @Override
     public void execute(Player player) {
         BlockEntity be = player.level.getBlockEntity(pos);
-        if (be instanceof DisplayTile<?> tile) {
+        if (be instanceof DisplayTile tile) {
             tile.data.active = active;
         }
         super.execute(player);

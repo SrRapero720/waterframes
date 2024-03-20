@@ -7,7 +7,7 @@ import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 public class RenderBox {
-    public static AlignedBox getBasic(DisplayTile<?> block, Facing facing, float thickness) {
+    public static AlignedBox getBasic(DisplayTile block, Facing facing, float thickness) {
         AlignedBox box = DisplayBlock.getBlockBox(facing, thickness); // LESS CODE
 
         Axis one = facing.one();
@@ -27,7 +27,7 @@ public class RenderBox {
         return box;
     }
 
-    public static AlignedBox squaredOf(DisplayTile<?> block, Facing blockFacing, AlignedBox renderBox) {
+    public static AlignedBox squaredOf(DisplayTile block, Facing blockFacing, AlignedBox renderBox) {
         AlignedBox box = new AlignedBox(renderBox);
         Axis axisX = blockFacing.one();
         Axis axisY = blockFacing.two();

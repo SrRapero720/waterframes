@@ -1,7 +1,5 @@
 package me.srrapero720.waterframes.mixin.create;
 
-
-import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import com.simibubi.create.content.contraptions.Contraption;
 import com.simibubi.create.content.contraptions.bearing.BearingContraption;
 import com.simibubi.create.content.contraptions.bearing.ClockworkContraption;
@@ -12,19 +10,7 @@ import com.simibubi.create.content.contraptions.mounted.MountedContraption;
 import com.simibubi.create.content.contraptions.piston.PistonContraption;
 import com.simibubi.create.content.contraptions.pulley.PulleyContraption;
 import com.simibubi.create.content.trains.entity.CarriageContraption;
-import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Mixin(value = {
         BearingContraption.class,

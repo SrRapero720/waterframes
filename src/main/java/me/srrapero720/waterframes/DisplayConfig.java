@@ -117,11 +117,11 @@ public class DisplayConfig {
     public static float maxWidth() { return (float) (double) maxWidth.get(); }
     public static float maxHeight() { return (float) (double) maxHeight.get(); }
 
-    public static int maxRenderDistance() { return maxRenderDistance.get(); }
-    public static int maxRenderDistance(int value) { return Math.min(value, maxRenderDistance()); }
+    public static short maxRenderDistance() { return (short) (int) maxRenderDistance.get(); }
+    public static short maxRenderDistance(short value) { return FrameTools.minShort(value, maxRenderDistance()); }
 
-    public static int maxProjectionDistance() { return maxProjectionDistance.get(); }
-    public static int maxProjectionDistance(int value) { return Math.min(value, maxProjectionDistance()); }
+    public static short maxProjectionDistance() { return (short) (int) maxProjectionDistance.get(); }
+    public static short maxProjectionDistance(short value) { return FrameTools.minShort(value, maxProjectionDistance()); }
 
     // MULTIMEDIA
     public static int maxVolumeDistance() { return maxVolumeDistance.get(); }

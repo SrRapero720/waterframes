@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.common.screen.widgets.styles;
+package me.srrapero720.waterframes.common.screens.styles;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -7,7 +7,7 @@ import team.creative.creativecore.common.gui.style.display.DisplayColor;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 
 @OnlyIn(Dist.CLIENT)
-public class WidgetStyles {
+public class ScreenStyles {
     public static final StyleDisplay NO_BACKGROUND = new DisplayColor(0,0,0,0);
     public static final StyleDisplay WIDGET_BORDER = new DisplayColor(color(72), color(220), color(219), 1.0F);
     public static final StyleDisplay WIDGET_BACKGROUND = new DisplayColor(color(27), color(36), color(52), 1);

@@ -26,7 +26,7 @@ public class TickPacket extends CreativePacket {
     public void executeServer(ServerPlayer serverPlayer) {
         LOGGER.debug("Received maxTick packet for {} with value {}", pos, tickMax);
         BlockEntity be = serverPlayer.getLevel().getBlockEntity(pos);
-        if (be instanceof DisplayTile<?> block) {
+        if (be instanceof DisplayTile block) {
             boolean tickMaxNegative = block.data.tickMax == -1;
             if (tickMaxNegative) {
                 block.data.tick = 0;

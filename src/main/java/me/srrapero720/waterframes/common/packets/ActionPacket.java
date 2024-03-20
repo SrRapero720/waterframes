@@ -24,7 +24,7 @@ public class ActionPacket extends CreativePacket {
     @Override
     public void executeClient(Player player) {
         BlockEntity be = player.level.getBlockEntity(pos);
-        if (be instanceof DisplayTile<?> tile) {
+        if (be instanceof DisplayTile tile) {
             tile.data.playing = playing;
             tile.data.tick = tick;
             if (tile.display != null) {
@@ -39,7 +39,7 @@ public class ActionPacket extends CreativePacket {
     @Override
     public void executeServer(ServerPlayer player) {
         BlockEntity be = player.level.getBlockEntity(pos);
-        if (be instanceof DisplayTile<?> tile) {
+        if (be instanceof DisplayTile tile) {
             tile.data.tick = tick;
             tile.data.playing = playing;
         }

@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.common.screen;
 
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.screen.widgets.styles.WidgetStyles;
+import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.EndTag;
 import net.minecraft.world.entity.player.Player;
@@ -14,7 +14,7 @@ import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 import team.creative.creativecore.common.gui.sync.GuiSyncLocal;
 
-public abstract class DisplayScreen<T extends DisplayTile<?>> extends GuiLayer {
+public abstract class DisplayScreen<T extends DisplayTile> extends GuiLayer {
     protected final GuiSyncLocal<EndTag> playAction;
     protected final GuiSyncLocal<EndTag> pauseAction;
     protected final GuiSyncLocal<EndTag> stopAction;
@@ -54,9 +54,9 @@ public abstract class DisplayScreen<T extends DisplayTile<?>> extends GuiLayer {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) { return WidgetStyles.SCREEN_BACKGROUND; }
+    public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) { return ScreenStyles.SCREEN_BACKGROUND; }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) { return WidgetStyles.SCREEN_BORDER; }
+    public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) { return ScreenStyles.SCREEN_BORDER; }
 }

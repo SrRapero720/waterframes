@@ -1,7 +1,8 @@
 package me.srrapero720.waterframes.common.block;
 
 import me.srrapero720.waterframes.common.block.entity.TvTile;
-import me.srrapero720.waterframes.common.screen.TvScreen;
+import me.srrapero720.waterframes.common.screens.DisplayScreen;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -19,12 +20,15 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@SuppressWarnings({"deprecated", "null", "unused"})
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class TvBlock extends DisplayBlock {
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
@@ -33,7 +37,12 @@ public class TvBlock extends DisplayBlock {
         super(Properties.of(Material.METAL).strength(1f).sound(SoundType.METAL).noOcclusion());
     }
 
-    public static @NotNull AlignedBox box(Direction direction, Direction attachedBlockFace, boolean renderMode) {
+    @Override
+    public DirectionProperty getFacing() {
+        return FACING;
+    }
+
+    public static AlignedBox box(Direction direction, Direction attachedBlockFace, boolean renderMode) {
         Facing facing = Facing.get(direction);
         Facing facingClockWise = Facing.get(direction.getClockWise());
         Facing wide = Facing.get(attachedBlockFace);
@@ -59,7 +68,7 @@ public class TvBlock extends DisplayBlock {
         }
 
         // SETUP HEIGHT
-        float renderMargin = renderMode ? 0.5f : 0;
+        float renderMargin = renderMode ? 1f : 0;
         if (attachedBlockFace == Direction.DOWN) {
             box.setMax(Facing.UP.axis, ((10f - renderMargin) / 16f)); // render: 9.5
             box.setMin(Facing.UP.axis, -((10f - renderMargin) / 16f)); // render: 9.5
@@ -95,7 +104,7 @@ public class TvBlock extends DisplayBlock {
     }
 
     @Override
-    public @NotNull BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
+    public BlockState getStateForPlacement( BlockPlaceContext context) {
         Direction current = context.getHorizontalDirection();
         return this.defaultBlockState()
                 .setValue(getFacing(), context.getPlayer().isCrouching() ? current.getOpposite() : current)
@@ -104,12 +113,11 @@ public class TvBlock extends DisplayBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
-        builder.add(ATTACHED_FACE);
+        super.createBlockStateDefinition(builder.add(ATTACHED_FACE));
     }
 
     @Override
-    public @NotNull VoxelShape getShape(@NotNull BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return TvBlock.box(state.getValue(getFacing()), state.getValue(ATTACHED_FACE), false).voxelShape();
     }
 
@@ -119,11 +127,10 @@ public class TvBlock extends DisplayBlock {
     }
 
     @Override
-    public VoxelShape getInteractionShape(@NotNull BlockState state, BlockGetter level, BlockPos pos) {
+    public VoxelShape getInteractionShape(BlockState state, BlockGetter level, BlockPos pos) {
         return TvBlock.box(state.getValue(getFacing()), state.getValue(ATTACHED_FACE), false).voxelShape();
     }
 
-    @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
         return new TvTile(pPos, pState);
@@ -131,11 +138,6 @@ public class TvBlock extends DisplayBlock {
 
     @Override
     public GuiLayer create(CompoundTag compoundTag, Level level, BlockPos blockPos, BlockState blockState, Player player) {
-        return (level.getBlockEntity(blockPos) instanceof TvTile projector) ? new TvScreen(projector) : null;
-    }
-
-    @Override
-    public DirectionProperty getFacing() {
-        return FACING;
+        return (level.getBlockEntity(blockPos) instanceof TvTile projector) ? new DisplayScreen<>(projector) : null;
     }
 }

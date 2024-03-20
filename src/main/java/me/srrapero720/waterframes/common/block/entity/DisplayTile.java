@@ -2,7 +2,7 @@ package me.srrapero720.waterframes.common.block.entity;
 
 import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
-import me.srrapero720.waterframes.common.block.FrameBlock;
+import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.util.FrameNet;
 import me.srrapero720.watermedia.api.image.ImageAPI;
@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,28 +24,26 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
-public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity {
-    public final DATA data;
-    @OnlyIn(Dist.CLIENT) public volatile ImageCache imageCache;
-    @OnlyIn(Dist.CLIENT) public volatile TextureDisplay display;
-    @OnlyIn(Dist.CLIENT) public volatile String parsedUrl;
-    private final AtomicBoolean released = new AtomicBoolean(false); // clientside
+public abstract class DisplayTile extends BlockEntity {
+    public final DisplayData data;
+    @OnlyIn(Dist.CLIENT) public ImageCache imageCache;
+    @OnlyIn(Dist.CLIENT) public TextureDisplay display;
+    @OnlyIn(Dist.CLIENT) private boolean released = false;
 
-    public DisplayTile(DATA data, BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
+    public DisplayTile(DisplayData data, BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
         this.data = data;
     }
 
     public void setUrl(String url) {
         this.data.url = url;
-        if (isClient()) this.parsedUrl = this.data.url;
     }
 
-    public String getUrl() { return this.data.url; }
+    public String getUrl() {
+        return this.data.url;
+    }
 
     @OnlyIn(Dist.CLIENT)
     public synchronized TextureDisplay requestDisplay() {
@@ -53,7 +52,7 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
             return null;
         }
 
-        if (released.get()) {
+        if (released) {
             imageCache = null;
             return null;
         }
@@ -90,16 +89,15 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
 
     @Override
     public void saveAdditional(CompoundTag nbt) {
+        data.save(nbt, this);
         super.saveAdditional(nbt);
-        data.save(nbt);
     }
 
     @Override
     public void load(CompoundTag nbt) {
+        data.load(nbt, this);
         super.load(nbt);
-        data.load(nbt);
     }
-
 
     @OnlyIn(Dist.CLIENT)
     private void cleanDisplay() {
@@ -112,8 +110,14 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
     @OnlyIn(Dist.CLIENT)
     private void release() {
         cleanDisplay();
-        released.set(true);
+        released = true;
     }
+
+    public abstract void sync(Player player, CompoundTag tag);
+    public abstract boolean canHideModel();
+    public abstract boolean canRenderBackside();
+    public abstract boolean canProject();
+    public abstract boolean canResize();
 
     public void play() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = true, data.tick); }
     public void pause() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick); }
@@ -123,10 +127,36 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
     public void fastForward() { FrameNet.sendPlaybackState(worldPosition, level, data.playing, data.tick += MathAPI.msToTick(5000)); }
     public void fastBackwards() { FrameNet.sendPlaybackState(worldPosition, level, data.playing, data.tick -= MathAPI.msToTick(5000)); }
     public void toggleActive() { FrameNet.sendActiveToggle(worldPosition, level, data.active = !data.active); }
+    public boolean isClient() { return (this.level != null && this.level.isClientSide); }
+
+    /* SPECIAL TICKS */
+    public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
+        if (blockEntity instanceof DisplayTile be) {
+            if (be.isClient()) {
+                TextureDisplay display = be.requestDisplay();
+                if (display != null && display.canTick()) display.tick(pos);
+            }
+            if (be.data.playing) {
+                if ((be.data.tick <= be.data.tickMax) || be.data.tickMax == -1) {
+                    be.data.tick++;
+                } else {
+                    if (be.data.loop) be.data.tick = 0;
+                }
+            }
+
+            // EXTRA IMPORTANT TICKERS FOR OTHER TILES
+            if (blockEntity instanceof FrameTile frame) {
+                if (state.getValue(DisplayBlock.VISIBLE) != frame.data.frameVisibility) {
+                    var brandNewState = state.setValue(DisplayBlock.VISIBLE, frame.data.frameVisibility);
+                    level.setBlock(pos, brandNewState, 0);
+                }
+            }
+        }
+    }
 
     public void setDirty() {
         if (this.level != null) {
-            this.level.blockEntityChangedWithoutNeighborUpdates(this.worldPosition);
+            this.level.blockEntityChanged(this.worldPosition);
             this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
         } else LOGGER.warn("Cannot be stored block data, level is NULL");
     }
@@ -145,38 +175,10 @@ public abstract class DisplayTile<DATA extends DisplayData> extends BlockEntity 
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
-        data.load(tag);
+        data.load(tag, this);
         setDirty();
     }
 
     @Override public @NotNull CompoundTag getUpdateTag() { return this.saveWithFullMetadata(); }
     @Override public Packet<ClientGamePacketListener> getUpdatePacket() { return ClientboundBlockEntityDataPacket.create(this); }
-
-    /* SPECIAL TICKS */
-    public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
-        if (blockEntity instanceof DisplayTile<?> be) {
-            if (be.isClient()) {
-                TextureDisplay display = be.requestDisplay();
-                if (display != null && display.canTick()) display.tick(pos);
-            }
-            if (be.data.playing) {
-                if ((be.data.tick <= be.data.tickMax) || be.data.tickMax == -1) {
-                    be.data.tick++;
-                } else {
-                    if (be.data.loop) be.data.tick = 0;
-                }
-            }
-
-            // EXTRA IMPORTANT TICKERS FOR OTHER TILES
-            if (blockEntity instanceof FrameTile frame) {
-                if (state.getValue(FrameBlock.VISIBLE) != frame.data.frameVisibility) {
-                    var brandNewState = state.setValue(FrameBlock.VISIBLE, frame.data.frameVisibility);
-                    level.setBlock(pos, brandNewState, 0);
-                }
-            }
-        }
-    }
-
-    /* TOOLS */
-    public boolean isClient() { return (this.level != null && this.level.isClientSide); }
 }

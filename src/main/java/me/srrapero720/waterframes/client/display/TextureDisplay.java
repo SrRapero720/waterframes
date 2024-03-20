@@ -22,7 +22,7 @@ public class TextureDisplay {
     // MEDIA AND DATA
     private SyncVideoPlayer mediaPlayer;
     private ImageCache imageCache;
-    private final DisplayTile<?> block;
+    private final DisplayTile block;
 
     // CONFIG
     private Vec3d blockPos;
@@ -32,7 +32,7 @@ public class TextureDisplay {
     private boolean stream = false;
     private boolean synced = false;
 
-    public TextureDisplay(ImageCache cache, Vec3d blockPos, DisplayTile<?> block) {
+    public TextureDisplay(ImageCache cache, Vec3d blockPos, DisplayTile block) {
         this.imageCache = cache;
         this.blockPos = blockPos;
         this.block = block;
@@ -110,6 +110,20 @@ public class TextureDisplay {
             case PICTURE -> this.imageCache.getRenderer() != null ? this.imageCache.getRenderer().duration : 0;
             case VIDEO -> this.mediaPlayer.getDuration();
             case AUDIO -> 0;
+        };
+    }
+
+    public long time() {
+        return switch (displayMode) {
+            case PICTURE -> MathAPI.tickToMs(this.block.data.tick);
+            case VIDEO, AUDIO -> this.mediaPlayer.getTime();
+        };
+    }
+
+    public int  timeInTicks() {
+        return switch (displayMode) {
+            case PICTURE -> this.block.data.tick;
+            default -> MathAPI.msToTick(time());
         };
     }
 

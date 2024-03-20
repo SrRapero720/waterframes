@@ -2,7 +2,7 @@ package me.srrapero720.waterframes.common.block.data;
 
 import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.screen.widgets.WidgetCounterDecimal;
+import me.srrapero720.waterframes.common.screens.widgets.WidgetCheckButton;
 import me.srrapero720.waterframes.util.FrameTools;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
@@ -10,7 +10,7 @@ import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
 
-public abstract class DisplayData {
+public class DisplayData {
     public static final String URL = "url";
     public static final String ACTIVE = "active";
     public static final String MIN_X = "min_x";
@@ -35,7 +35,15 @@ public abstract class DisplayData {
     public static final String TICK_MAX = "tick_max";
     public static final String DATA_V = "data_v";
 
-    public static final int V = 1;
+    // FRAME KEYS
+    public static final String VISIBLE_FRAME = "frame_visibility";
+    public static final String RENDER_BOTH_SIDES = "render_both";
+
+    // PROJECTOR
+    public static final String PROJECTION_DISTANCE = "projection_distance";
+    public static final String AUDIO_OFFSET = "audio_offset";
+
+    public static final short V = 1;
 
     public String url = "";
     public boolean active = true;
@@ -48,7 +56,7 @@ public abstract class DisplayData {
     public float rotation = 0;
     public float alpha = 1;
     public float brightness = 1;
-    public int renderDistance = Math.min(32, DisplayConfig.maxRenderDistance());
+    public short renderDistance = DisplayConfig.maxRenderDistance((short) 32);
 
     public int volume = DisplayConfig.maxVolume();
     public int maxVolumeDistance = Math.min(20, DisplayConfig.maxVolumeDistance());
@@ -59,20 +67,30 @@ public abstract class DisplayData {
     public int tick = 0;
     public int tickMax = -1;
 
+    // FRAME VALUES
+    public boolean frameVisibility = true;
+    public boolean renderBothSides = false;
+
+    // PROJECTOR VALUES
+    public short projectionDistance = DisplayConfig.maxProjectionDistance((short) 8);
+    public float audioOffset = 0;
+
     public HorizontalPosition getPosX() { return this.min.x == 0 ? HorizontalPosition.LEFT : this.max.x == 1 ? HorizontalPosition.RIGHT : HorizontalPosition.CENTER; }
     public VerticalPosition getPosY() { return this.min.y == 0 ? VerticalPosition.TOP : this.max.y == 1 ? VerticalPosition.BOTTOM : VerticalPosition.CENTER; }
     public float getWidth() { return this.max.x - this.min.x; }
     public float getHeight() { return this.max.y - this.min.y; }
 
-    public void save(CompoundTag nbt) {
+    public void save(CompoundTag nbt, DisplayTile displayTile) {
         nbt.putString(URL, url);
         nbt.putBoolean(ACTIVE, active);
-        nbt.putFloat(MIN_X, min.x);
-        nbt.putFloat(MIN_Y, min.y);
-        nbt.putFloat(MAX_X, max.x);
-        nbt.putFloat(MAX_Y, max.y);
+        if (displayTile.canResize()) {
+            nbt.putFloat(MIN_X, min.x);
+            nbt.putFloat(MIN_Y, min.y);
+            nbt.putFloat(MAX_X, max.x);
+            nbt.putFloat(MAX_Y, max.y);
+        }
         nbt.putFloat(ROTATION, rotation);
-        nbt.putInt(RENDER_DISTANCE, renderDistance);
+        nbt.putShort(RENDER_DISTANCE, renderDistance);
         nbt.putBoolean(FLIP_X, flipX);
         nbt.putBoolean(FLIP_Y, flipY);
         nbt.putFloat(ALPHA, alpha);
@@ -84,18 +102,34 @@ public abstract class DisplayData {
         nbt.putInt(TICK, tick);
         nbt.putInt(TICK_MAX, tickMax);
         nbt.putBoolean(LOOP, loop);
+
+        if (displayTile.canRenderBackside()) {
+            nbt.putBoolean(RENDER_BOTH_SIDES, renderBothSides);
+        }
+
+        if (displayTile.canHideModel()) {
+            nbt.putBoolean(VISIBLE_FRAME, frameVisibility);
+        }
+
+        if (displayTile.canProject()) {
+            nbt.putInt(PROJECTION_DISTANCE, projectionDistance);
+            nbt.putFloat(AUDIO_OFFSET, audioOffset);
+        }
+
         nbt.putInt(DATA_V, V);
     }
 
-    public void load(CompoundTag nbt) {
+    public void load(CompoundTag nbt, DisplayTile displayTile) {
         this.url = nbt.getString(URL);
         this.active = nbt.contains(ACTIVE) ? nbt.getBoolean(ACTIVE) : this.active;
-        this.min.x = nbt.getFloat(MIN_X);
-        this.min.y = nbt.getFloat(MIN_Y);
-        this.max.x = nbt.getFloat(MAX_X);
-        this.max.y = nbt.getFloat(MAX_Y);
+        if (displayTile.canResize()) {
+            this.min.x = nbt.getFloat(MIN_X);
+            this.min.y = nbt.getFloat(MIN_Y);
+            this.max.x = nbt.getFloat(MAX_X);
+            this.max.y = nbt.getFloat(MAX_Y);
+        }
         this.rotation = nbt.getFloat(ROTATION);
-        this.renderDistance = DisplayConfig.maxRenderDistance(nbt.getInt(RENDER_DISTANCE));
+        this.renderDistance = DisplayConfig.maxRenderDistance(nbt.getShort(RENDER_DISTANCE));
         this.flipX = nbt.getBoolean(FLIP_X);
         this.flipY = nbt.getBoolean(FLIP_Y);
         this.alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : alpha;
@@ -108,7 +142,20 @@ public abstract class DisplayData {
         this.tickMax = nbt.getInt(TICK_MAX);
         this.loop = nbt.getBoolean(LOOP);
 
-        switch (nbt.getInt(DATA_V)) {
+        if (displayTile.canHideModel()) {
+            this.frameVisibility = nbt.getBoolean(VISIBLE_FRAME);
+        }
+
+        if (displayTile.canRenderBackside()) {
+            this.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
+        }
+
+        if (displayTile.canProject()) {
+            projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? DisplayConfig.maxProjectionDistance(nbt.getShort(PROJECTION_DISTANCE)) : projectionDistance;
+            audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : audioOffset;
+        }
+
+        switch (nbt.getShort(DATA_V)) {
             case 1 -> {
 
             }
@@ -126,7 +173,15 @@ public abstract class DisplayData {
                 this.maxVolumeDistance = DisplayConfig.maxVolumeDistance((int) nbt.getFloat("max"));
                 this.minVolumeDistance = Math.min((int) nbt.getFloat("min"), maxVolumeDistance);
 
-                this.renderDistance = nbt.getInt("render");
+                this.renderDistance = nbt.getShort("render");
+
+                if (displayTile.canHideModel()) {
+                    this.frameVisibility = nbt.getBoolean("visibleFrame");
+                }
+
+                if (displayTile.canRenderBackside()) {
+                    this.renderBothSides = nbt.getBoolean("bothSides");
+                }
             }
         }
 
@@ -134,7 +189,7 @@ public abstract class DisplayData {
         this.restrictHeight();
     }
 
-    public static void setWidth(final DisplayTile<?> block, final HorizontalPosition position, final float width) {
+    public static void setWidth(final DisplayTile block, final HorizontalPosition position, final float width) {
         switch (position) {
             case LEFT -> {
                 block.data.min.x = 0;
@@ -152,7 +207,7 @@ public abstract class DisplayData {
         }
     }
 
-    public static void setHeight(final DisplayTile<?> block, final VerticalPosition position, final float height) {
+    public static void setHeight(final DisplayTile block, final VerticalPosition position, final float height) {
         switch (position) {
             case TOP -> {
                 block.data.min.y = 0;
@@ -212,21 +267,27 @@ public abstract class DisplayData {
         }
     }
 
-    public static CompoundTag build(GuiLayer gui) {
+    public int getOffsetMode() {
+        return (audioOffset == projectionDistance) ? 2 : (audioOffset == projectionDistance / 2f) ? 1 : 0;
+    }
+
+    public static <BL extends DisplayTile> CompoundTag build(GuiLayer gui, BL displayTile) {
         CompoundTag nbt = new CompoundTag();
 
         GuiTextfield url = gui.get(URL);
         nbt.putString(URL, url.getText());
         nbt.putBoolean(ACTIVE, true);
 
-        WidgetCounterDecimal width = gui.get("width");
-        WidgetCounterDecimal height = gui.get("height");
-        GuiStateButton buttonPosX = gui.get("pos_x");
-        GuiStateButton buttonPosY = gui.get("pos_y");
-        nbt.putFloat("width", Math.max(0.1F, width.getValue()));
-        nbt.putFloat("height", Math.max(0.1F, height.getValue()));
-        nbt.putInt("pos_x",  buttonPosX.getState());
-        nbt.putInt("pos_y", buttonPosY.getState());
+        if (displayTile.canResize()) {
+            GuiCounterDecimal width = gui.get("width");
+            GuiCounterDecimal height = gui.get("height");
+            GuiStateButton buttonPosX = gui.get("pos_x");
+            GuiStateButton buttonPosY = gui.get("pos_y");
+            nbt.putFloat("width", Math.max(0.1F, (float) width.getValue()));
+            nbt.putFloat("height", Math.max(0.1F, (float) height.getValue()));
+            nbt.putInt("pos_x",  buttonPosX.getState());
+            nbt.putInt("pos_y", buttonPosY.getState());
+        }
 
         GuiCheckBox flipX = gui.get(FLIP_X);
         GuiCheckBox flipY = gui.get(FLIP_Y);
@@ -243,23 +304,41 @@ public abstract class DisplayData {
         nbt.putFloat(BRIGHTNESS, (float) brightness.value);
 
         GuiSteppedSlider renderDistance = gui.get(RENDER_DISTANCE);
-        nbt.putInt(RENDER_DISTANCE, (int) renderDistance.value);
+        nbt.putShort(RENDER_DISTANCE, (short) renderDistance.value);
 
-        GuiCheckBox loop = gui.get(LOOP);
+        WidgetCheckButton loop = gui.get(LOOP);
         nbt.putBoolean(LOOP, loop.value);
 
         GuiSlider volume = gui.get(VOLUME);
-        nbt.putInt(VOLUME, (int) volume.value);
+        nbt.putByte(VOLUME, (byte) volume.value);
 
         GuiSteppedSlider min = gui.get(VOL_RANGE_MIN);
         GuiSteppedSlider max = gui.get(VOL_RANGE_MAX);
-        nbt.putInt(VOL_RANGE_MIN, min.getValue());
-        nbt.putInt(VOL_RANGE_MAX, max.getValue());
+        nbt.putShort(VOL_RANGE_MIN, (short) min.getValue());
+        nbt.putShort(VOL_RANGE_MAX, (short) max.getValue());
+
+        if (displayTile.canHideModel()) {
+            GuiCheckBox frameVisibility = gui.get(VISIBLE_FRAME);
+            nbt.putBoolean(VISIBLE_FRAME, frameVisibility.value);
+        }
+
+        if (displayTile.canRenderBackside()) {
+            GuiCheckBox renderBoth = gui.get(RENDER_BOTH_SIDES);
+            nbt.putBoolean(RENDER_BOTH_SIDES, renderBoth.value);
+        }
+
+        if (displayTile.canProject()) {
+            GuiSteppedSlider projection_distance = gui.get(PROJECTION_DISTANCE);
+            nbt.putShort(PROJECTION_DISTANCE, (short) projection_distance.value);
+
+            GuiStateButton audioCenter = gui.get(AUDIO_OFFSET);
+            nbt.putInt("audio_offset_mode", audioCenter.getState());
+        }
 
         return nbt;
     }
 
-    public static <D extends DisplayData, T extends DisplayTile<D>> void sync(T block, Player player, CompoundTag nbt, ExtraData<D> extra) {
+    public static <T extends DisplayTile> void sync(T block, Player player, CompoundTag nbt, ExtraData extra) {
         String url = nbt.getString(URL);
         if (DisplayConfig.canSave(player, url)) {
             if (!block.getUrl().equals(url)) {
@@ -269,25 +348,43 @@ public abstract class DisplayData {
             block.setUrl(url);
             block.data.active = nbt.getBoolean(ACTIVE);
 
-            float width = FrameTools.minFloat(nbt.getFloat("width"), DisplayConfig.maxWidth());
-            float height = FrameTools.minFloat(nbt.getFloat("height"), DisplayConfig.maxHeight());
-            int posX = nbt.getInt("pos_x");
-            int posY = nbt.getInt("pos_y");
+            if (block.canResize()) {
+                float width = FrameTools.minFloat(nbt.getFloat("width"), DisplayConfig.maxWidth());
+                float height = FrameTools.minFloat(nbt.getFloat("height"), DisplayConfig.maxHeight());
+                int posX = nbt.getInt("pos_x");
+                int posY = nbt.getInt("pos_y");
 
-            DisplayData.setWidth(block, HorizontalPosition.VALUES[posX], width);
-            DisplayData.setHeight(block, VerticalPosition.VALUES[posY], height);
+                DisplayData.setWidth(block, HorizontalPosition.VALUES[posX], width);
+                DisplayData.setHeight(block, VerticalPosition.VALUES[posY], height);
+            }
 
             block.data.flipX = nbt.getBoolean(FLIP_X);
             block.data.flipY = nbt.getBoolean(FLIP_Y);
             block.data.rotation = nbt.getFloat(ROTATION);
             block.data.alpha = nbt.getFloat(ALPHA);
             block.data.brightness = nbt.getFloat(BRIGHTNESS);
-            block.data.renderDistance = Math.min(nbt.getInt(RENDER_DISTANCE), DisplayConfig.maxRenderDistance());
+            block.data.renderDistance = DisplayConfig.maxRenderDistance(nbt.getShort(RENDER_DISTANCE));
             block.data.loop = nbt.getBoolean(LOOP);
-            block.data.volume = Math.min(nbt.getInt(VOLUME), DisplayConfig.maxVolume());
-            block.data.maxVolumeDistance = Math.min(nbt.getInt(VOL_RANGE_MAX), DisplayConfig.maxVolumeDistance());
-            block.data.minVolumeDistance = Math.min(nbt.getInt(VOL_RANGE_MIN), block.data.maxVolumeDistance);
+            block.data.volume = DisplayConfig.maxVolume(nbt.getInt(VOLUME));
+            block.data.maxVolumeDistance = DisplayConfig.maxVolumeDistance(nbt.getShort(VOL_RANGE_MAX));
+            block.data.minVolumeDistance = Math.min(nbt.getShort(VOL_RANGE_MIN), block.data.maxVolumeDistance);
             if (block.data.minVolumeDistance > block.data.maxVolumeDistance) block.data.maxVolumeDistance = block.data.minVolumeDistance;
+
+            if (block.canHideModel()) {
+                block.data.frameVisibility = nbt.getBoolean(VISIBLE_FRAME);
+            }
+
+            if (block.canRenderBackside()) {
+                block.data.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
+            }
+
+            if (block.canProject()) {
+                block.data.projectionDistance = DisplayConfig.maxProjectionDistance(nbt.getShort(PROJECTION_DISTANCE));
+
+                int mode = nbt.getInt("audio_offset_mode");
+                block.data.audioOffset = mode == 2 ? block.data.projectionDistance : mode == 1 ? block.data.projectionDistance / 2f : 0;
+            }
+
             if (extra != null) extra.set(block.data);
         }
 
@@ -304,7 +401,12 @@ public abstract class DisplayData {
         public static final HorizontalPosition[] VALUES = values();
     }
 
-    public interface ExtraData<T extends DisplayData> {
-        void set(T data);
+    public enum AudioSource {
+        BLOCK, BETWEEN, PROJECTION;
+        public static final AudioSource[] VALUES = values();
+    }
+
+    public interface ExtraData {
+        void set(DisplayData data);
     }
 }

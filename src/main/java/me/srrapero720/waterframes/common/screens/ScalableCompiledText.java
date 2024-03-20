@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.common.screen.text;
+package me.srrapero720.waterframes.common.screens;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -160,24 +160,26 @@ public class ScalableCompiledText {
 
             for (CompiledLine line : this.lines) {
                 switch (this.alignment) {
-                    case LEFT:
+                    case LEFT -> {
                         line.render(stack);
                         this.usedWidth = Math.max(this.usedWidth, line.width);
-                        break;
-                    case CENTER:
+                    }
+                    case CENTER -> {
                         stack.pushPose();
-                        stack.translate((double) (this.maxWidth / 2 - line.width / 2), 0.0, 0.0);
+                        stack.translate(this.maxWidth / 2d - line.width / 2d, 0.0, 0.0);
                         line.render(stack);
                         this.usedWidth = Math.max(this.usedWidth, this.maxWidth);
                         stack.popPose();
-                        break;
-                    case RIGHT:
+                    }
+                    case RIGHT -> {
                         stack.pushPose();
-                        stack.translate((double) (this.maxWidth - line.width), 0.0, 0.0);
+                        stack.translate(this.maxWidth - line.width, 0.0, 0.0);
                         line.render(stack);
                         this.usedWidth = Math.max(this.usedWidth, this.maxWidth);
                         stack.popPose();
-                    case STRETCH:
+                    }
+                    case STRETCH -> {
+                    }
                 }
 
                 int height = line.height + this.lineSpacing;
@@ -309,7 +311,7 @@ public class ScalableCompiledText {
 
             int width;
             for(Iterator<FormattedText> var5 = this.components.iterator(); var5.hasNext(); xOffset += width) {
-                FormattedText text = (FormattedText)var5.next();
+                FormattedText text = var5.next();
                 int height;
                 if (text instanceof AdvancedComponent) {
                     width = ((AdvancedComponent)text).getWidth(font);
@@ -326,7 +328,7 @@ public class ScalableCompiledText {
                 }
 
                 stack.pushPose();
-                stack.translate((double)xOffset, (double)yOffset, 0.0);
+                stack.translate(xOffset, yOffset, 0.0);
                 if (text instanceof AdvancedComponent) {
                     ((AdvancedComponent)text).render(stack, font, ScalableCompiledText.this.defaultColor);
                 } else {

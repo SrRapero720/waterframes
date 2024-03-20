@@ -6,9 +6,5 @@
   "minVersion": "0.8.5",
   "client": [
     "MinecraftMixin"
-  ],
-  "mixins": [
-    "creativecore.GuiCreatorMixin",
-    "creativecore.IBoxFaceAccessor"
   ]
 }
