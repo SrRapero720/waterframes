@@ -29,7 +29,7 @@ public abstract class DisplayTile extends BlockEntity {
     public final DisplayData data;
     @OnlyIn(Dist.CLIENT) public ImageCache imageCache;
     @OnlyIn(Dist.CLIENT) public TextureDisplay display;
-    @OnlyIn(Dist.CLIENT) private boolean released = false;
+    @OnlyIn(Dist.CLIENT) private boolean isReleased;
 
     public abstract boolean canHideModel();
     public abstract boolean canRenderBackside();
@@ -48,7 +48,7 @@ public abstract class DisplayTile extends BlockEntity {
             return null;
         }
 
-        if (released) {
+        if (isReleased) {
             imageCache = null;
             return null;
         }
@@ -106,7 +106,7 @@ public abstract class DisplayTile extends BlockEntity {
     @OnlyIn(Dist.CLIENT)
     private void release() {
         cleanDisplay();
-        released = true;
+        isReleased = true;
     }
 
     @Override

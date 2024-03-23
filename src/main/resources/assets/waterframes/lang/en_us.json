@@ -2,6 +2,7 @@
     "itemGroup.waterframes": "WaterFrames",
     "block.waterframes.frame": "Picture Frame",
     "block.waterframes.projector": "Picture Projector",
+    "block.waterframes.tv": "Television",
     "item.waterframes.remote": "Remote Control",
 
     "waterframes.common.enabled": "enabled",

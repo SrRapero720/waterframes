@@ -71,7 +71,7 @@ public class DisplayScreen extends GuiLayer {
 
     public final GuiButton reloadAll;
     public final GuiButton reloadBtn;
-    public final GuiControl seekBar;
+    public GuiControl seekBar;
 
     // WIDGETS
     public final GuiCheckBox flipXWidget;
@@ -174,14 +174,15 @@ public class DisplayScreen extends GuiLayer {
         this.volumeMinSlider = new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, tile.data.minVolumeDistance, 0, Math.min(tile.data.maxVolumeDistance, DisplayConfig.maxVolumeDistance()));
         this.volumeMaxSlider = new WidgetSteppedSlider(DisplayData.VOL_RANGE_MAX, volumeMinSlider, tile.data.maxVolumeDistance, 0, DisplayConfig.maxVolumeDistance());
 
+        this.reloadAll = (GuiButton) new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTranslate("waterframes.gui.reload.all").setTooltip("waterframes.gui.reload.all.warning");
+        this.reloadBtn = (GuiButton) new GuiButton("reload", x -> tile.imageCache.reload()).setTranslate("waterframes.gui.reload");
+
+        if (!this.tile.isClient()) return;
         this.seekBar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.display != null ? tile.display.durationInTicks() : 1, ValueParsers.TIME_DURATION_TICK)
                 .setPosConsumer(v -> tile.data.tick = (int) v)
                 .setLastPosConsumer(v -> DisplaysNet.sendPlaytimeServer(tile, tile.data.tick = (int) v, tile.data.tickMax))
                 .setDim(150, 18)
                 .setExpandableX();
-
-        this.reloadAll = (GuiButton) new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTranslate("waterframes.gui.reload.all").setTooltip("waterframes.gui.reload.all.warning");
-        this.reloadBtn = (GuiButton) new GuiButton("reload", x -> tile.imageCache.reload()).setTranslate("waterframes.gui.reload");
     }
 
     @Override
