@@ -4,7 +4,7 @@ import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
-import me.srrapero720.waterframes.util.FrameNet;
+import me.srrapero720.waterframes.common.network.DisplaysNet;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
@@ -14,7 +14,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -32,17 +31,14 @@ public abstract class DisplayTile extends BlockEntity {
     @OnlyIn(Dist.CLIENT) public TextureDisplay display;
     @OnlyIn(Dist.CLIENT) private boolean released = false;
 
+    public abstract boolean canHideModel();
+    public abstract boolean canRenderBackside();
+    public abstract boolean canProject();
+    public abstract boolean canResize();
+
     public DisplayTile(DisplayData data, BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
         this.data = data;
-    }
-
-    public void setUrl(String url) {
-        this.data.url = url;
-    }
-
-    public String getUrl() {
-        return this.data.url;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -113,39 +109,72 @@ public abstract class DisplayTile extends BlockEntity {
         released = true;
     }
 
-    public abstract void sync(Player player, CompoundTag tag);
-    public abstract boolean canHideModel();
-    public abstract boolean canRenderBackside();
-    public abstract boolean canProject();
-    public abstract boolean canResize();
+    @Override
+    public void setRemoved() {
+        if (isClient()) release();
+        super.setRemoved();
+    }
 
-    public void play() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = true, data.tick); }
-    public void pause() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick); }
-    public void stop() { FrameNet.sendPlaybackState(worldPosition, level, data.playing = false, data.tick = 0); }
-    public void volumeUp() { FrameNet.sendVolumeUpdate(worldPosition, level, data.minVolumeDistance, data.maxVolumeDistance, data.volume = DisplayConfig.maxVolume(data.volume + 5)); }
-    public void volumeDown() { FrameNet.sendVolumeUpdate(worldPosition, level, data.minVolumeDistance, data.maxVolumeDistance, data.volume = DisplayConfig.maxVolume(data.volume - 5)); }
-    public void fastForward() { FrameNet.sendPlaybackState(worldPosition, level, data.playing, data.tick += MathAPI.msToTick(5000)); }
-    public void fastBackwards() { FrameNet.sendPlaybackState(worldPosition, level, data.playing, data.tick -= MathAPI.msToTick(5000)); }
-    public void toggleActive() { FrameNet.sendActiveToggle(worldPosition, level, data.active = !data.active); }
-    public boolean isClient() { return (this.level != null && this.level.isClientSide); }
+    @Override
+    public void onChunkUnloaded() {
+        if (isClient()) release();
+        super.onChunkUnloaded();
+    }
+
+
+    public void setActiveMode(boolean mode) {
+        assert isClient();
+        DisplaysNet.sendActiveServer(this, mode);
+    }
+    public void setMutedMode(boolean mode) {
+        assert isClient();
+        DisplaysNet.sendMutedServer(this, mode);
+    }
+    public void setPauseMode(boolean pause) {
+        assert isClient();
+        DisplaysNet.sendPlaybackServer(this, pause, this.data.tick);
+    }
+    public void stop() {
+        assert isClient();
+        DisplaysNet.sendPlaybackServer(this, true, 0);
+    }
+    public void volumeUp() {
+        assert isClient();
+        DisplaysNet.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance,  DisplayConfig.maxVolume(this.data.volume + 5));
+    }
+    public void volumeDown() {
+        assert isClient();
+        DisplaysNet.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance, DisplayConfig.maxVolume(this.data.volume - 5));
+    }
+    public void fastForward() {
+        assert isClient();
+        DisplaysNet.sendPlaytimeServer(this, Math.min(data.tick + MathAPI.msToTick(5000), data.tickMax), data.tickMax);
+    }
+    public void fastBackwards() {
+        DisplaysNet.sendPlaytimeServer(this, Math.max(data.tick - MathAPI.msToTick(5000), 0), data.tickMax);
+    }
+
+    public boolean isClient() {
+        return this.level != null && this.level.isClientSide;
+    }
 
     /* SPECIAL TICKS */
-    public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity blockEntity) {
-        if (blockEntity instanceof DisplayTile be) {
-            if (be.isClient()) {
-                TextureDisplay display = be.requestDisplay();
+    public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity be) {
+        if (be instanceof DisplayTile tile) {
+            if (tile.isClient()) {
+                TextureDisplay display = tile.requestDisplay();
                 if (display != null && display.canTick()) display.tick(pos);
             }
-            if (be.data.playing) {
-                if ((be.data.tick <= be.data.tickMax) || be.data.tickMax == -1) {
-                    be.data.tick++;
+            if (!tile.data.paused && tile.data.active) {
+                if ((tile.data.tick <= tile.data.tickMax) || tile.data.tickMax == -1) {
+                    tile.data.tick++;
                 } else {
-                    if (be.data.loop) be.data.tick = 0;
+                    if (tile.data.loop) tile.data.tick = 0;
                 }
             }
 
             // EXTRA IMPORTANT TICKERS FOR OTHER TILES
-            if (blockEntity instanceof FrameTile frame) {
+            if (tile instanceof FrameTile frame) {
                 if (state.getValue(DisplayBlock.VISIBLE) != frame.data.frameVisibility) {
                     var brandNewState = state.setValue(DisplayBlock.VISIBLE, frame.data.frameVisibility);
                     level.setBlock(pos, brandNewState, 0);
@@ -158,19 +187,9 @@ public abstract class DisplayTile extends BlockEntity {
         if (this.level != null) {
             this.level.blockEntityChanged(this.worldPosition);
             this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
-        } else LOGGER.warn("Cannot be stored block data, level is NULL");
-    }
-
-    @Override
-    public void setRemoved() {
-        if (isClient()) release();
-        super.setRemoved();
-    }
-
-    @Override
-    public void onChunkUnloaded() {
-        if (isClient()) release();
-        super.onChunkUnloaded();
+        } else {
+            LOGGER.warn("Cannot be stored block data, level is NULL");
+        }
     }
 
     @Override

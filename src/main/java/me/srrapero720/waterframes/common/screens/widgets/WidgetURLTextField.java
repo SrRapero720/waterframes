@@ -33,18 +33,18 @@ public class WidgetURLTextField extends GuiTextfield {
         super(DisplayData.URL);
         this.setMaxStringLength(2048);
         this.setSuggest("https://i.imgur.com/1yCDs5C.mp4");
-        this.setText(tile.getUrl());
+        this.setText(tile.data.url);
         this.saveButton = saveButton;
     }
 
     @Override
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
-        return ScreenStyles.WIDGET_BORDER;
+        return ScreenStyles.BLUE_BORDER;
     }
 
     @Override
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
-        return ScreenStyles.WIDGET_BACKGROUND;
+        return ScreenStyles.DARK_BLUE_BACKGROUND;
     }
 
     @Override

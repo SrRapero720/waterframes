@@ -59,6 +59,6 @@ public class ProjectorBlock extends DisplayBlock {
 
     @Override
     public GuiLayer create(CompoundTag compoundTag, Level level, BlockPos blockPos, BlockState blockState, Player player) {
-        return (level.getBlockEntity(blockPos) instanceof ProjectorTile projector) ? new DisplayScreen<>(projector) : null;
+        return (level.getBlockEntity(blockPos) instanceof ProjectorTile projector) ? new DisplayScreen(projector) : null;
     }
 }

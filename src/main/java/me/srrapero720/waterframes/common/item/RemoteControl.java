@@ -2,7 +2,7 @@ package me.srrapero720.waterframes.common.item;
 
 import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.screen.RemoteControlScreen;
+import me.srrapero720.waterframes.common.screens.RemoteControlScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TextComponent;

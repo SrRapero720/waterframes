@@ -68,6 +68,10 @@ public class IconStyles {
     public static final Icon BACK_MEDIA = create(15, 6);
     public static final Icon ADD = create(15, 7);
     public static final Icon OFF_ON = create(15, 8);
+    public static final Icon MUTE = create(15, 9);
+    public static final Icon RELOAD = create(15, 10);
+    public static final Icon VOLUME_DOWN = create(15, 11);
+    public static final Icon VOLUME_UP = create(15, 12);
 
     private static Icon create(int chunkX, int chunkY) {
         return new Icon(location, 16 * chunkX, 16 * chunkY, 16, 16);

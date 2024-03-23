@@ -16,8 +16,8 @@ import java.util.function.Supplier;
 
 public class WidgetStatusIcon extends GuiIcon {
     private final Supplier<ImageCache> cacheSupplier;
-    public WidgetStatusIcon(String name, int width, int height, Icon icon, Supplier<ImageCache> cacheSupplier) {
-        super(name, width, height, icon);
+    public WidgetStatusIcon(String name, Icon icon, boolean squared, Supplier<ImageCache> cacheSupplier) {
+        super(name, icon, squared);
         this.cacheSupplier = cacheSupplier;
     }
 

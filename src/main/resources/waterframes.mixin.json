@@ -6,5 +6,8 @@
   "minVersion": "0.8.5",
   "client": [
     "MinecraftMixin"
+  ],
+  "mixins": [
+    "LevelMixin"
   ]
 }

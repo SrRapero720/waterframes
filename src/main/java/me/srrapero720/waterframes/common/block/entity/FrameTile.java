@@ -5,8 +5,6 @@ import me.srrapero720.waterframes.common.block.FrameBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.util.FrameRegistry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,11 +20,6 @@ public class FrameTile extends DisplayTile {
     @OnlyIn(Dist.CLIENT)
     public AABB getRenderBoundingBox() {
         return RenderBox.getBasic(this, Facing.get(this.getBlockState().getValue(FrameBlock.FACING)), FrameBlock.THICKNESS).getBB(getBlockPos());
-    }
-
-    @Override
-    public void sync(Player player, CompoundTag tag) {
-        DisplayData.sync(this, player, tag, null);
     }
 
     @Override

@@ -13,6 +13,7 @@ import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
 import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
+import me.srrapero720.waterframes.common.network.DisplaysNet;
 import me.srrapero720.waterframes.util.events.ClientPauseUpdateEvent;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.resources.ResourceLocation;
@@ -94,9 +95,8 @@ public class FrameRegistry {
     private static class Common {
         private static void init(FMLCommonSetupEvent event) { common(); }
         private static void common() {
-            FrameNet.register();
+            DisplaysNet.register();
             if (FrameTools.isLoadingMod("stellarity")) {
-                LOGGER.warn("");
                 throw new IllegalStateException("Mod 'Stellatity' is NOT compatible with WaterFrames, report it to Stellarity");
             }
         }

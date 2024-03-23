@@ -5,7 +5,7 @@ import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
-import me.srrapero720.waterframes.util.FrameNet;
+import me.srrapero720.waterframes.common.network.DisplaysNet;
 import me.srrapero720.waterframes.util.FrameTools;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
@@ -22,7 +22,7 @@ public class TextureDisplay {
     // MEDIA AND DATA
     private SyncVideoPlayer mediaPlayer;
     private ImageCache imageCache;
-    private final DisplayTile block;
+    private final DisplayTile tile;
 
     // CONFIG
     private Vec3d blockPos;
@@ -32,10 +32,10 @@ public class TextureDisplay {
     private boolean stream = false;
     private boolean synced = false;
 
-    public TextureDisplay(ImageCache cache, Vec3d blockPos, DisplayTile block) {
+    public TextureDisplay(ImageCache cache, Vec3d blockPos, DisplayTile tile) {
         this.imageCache = cache;
         this.blockPos = blockPos;
-        this.block = block;
+        this.tile = tile;
         if (cache.isVideo()) this.switchVideoMode();
     }
 
@@ -59,18 +59,19 @@ public class TextureDisplay {
             this.displayMode = Mode.PICTURE;
         }
 
-        if (block instanceof ProjectorTile projector) {
+        if (tile instanceof ProjectorTile projector) {
             Direction direction = projector.getBlockState().getValue(ProjectorBlock.FACING);
-            this.currentVolume = FrameTools.floorVolume(this.blockPos, direction, projector.data.audioOffset, this.block.data.volume, this.block.data.minVolumeDistance, this.block.data.maxVolumeDistance);
+            this.currentVolume = FrameTools.floorVolume(this.blockPos, direction, projector.data.audioOffset, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
         } else {
-            this.currentVolume = FrameTools.floorVolume(this.blockPos, this.block.data.volume, this.block.data.minVolumeDistance, this.block.data.maxVolumeDistance);
+            this.currentVolume = FrameTools.floorVolume(this.blockPos, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
         }
 
         // PLAYER CONFIG
         this.mediaPlayer.setVolume(this.currentVolume);
-        this.mediaPlayer.setRepeatMode(block.data.loop);
-        this.mediaPlayer.setPauseMode(!block.data.playing);
-        this.mediaPlayer.start(block.data.url);
+        this.mediaPlayer.setRepeatMode(tile.data.loop);
+        this.mediaPlayer.setPauseMode(tile.data.paused);
+        this.mediaPlayer.setMuteMode(tile.data.muted);
+        this.mediaPlayer.start(tile.data.url);
         DisplayControl.add(this);
     }
 
@@ -92,11 +93,8 @@ public class TextureDisplay {
 
     public int texture() {
         return switch (displayMode) {
-            case PICTURE -> this.imageCache.getRenderer().texture(block.data.tick, (block.data.playing ? MathAPI.tickToMs(FrameTools.deltaFrames()) : 0), block.data.loop);
-            case VIDEO -> {
-                this.mediaPlayer.preRender();
-                yield this.mediaPlayer.getTexture();
-            }
+            case PICTURE -> this.imageCache.getRenderer().texture(tile.data.tick, (!tile.data.paused ? MathAPI.tickToMs(FrameTools.deltaFrames()) : 0), tile.data.loop);
+            case VIDEO -> this.mediaPlayer.getGlTexture();
             case AUDIO -> -1;
         };
     }
@@ -115,14 +113,14 @@ public class TextureDisplay {
 
     public long time() {
         return switch (displayMode) {
-            case PICTURE -> MathAPI.tickToMs(this.block.data.tick);
+            case PICTURE -> MathAPI.tickToMs(this.tile.data.tick);
             case VIDEO, AUDIO -> this.mediaPlayer.getTime();
         };
     }
 
     public int  timeInTicks() {
         return switch (displayMode) {
-            case PICTURE -> this.block.data.tick;
+            case PICTURE -> this.tile.data.tick;
             default -> MathAPI.msToTick(time());
         };
     }
@@ -137,20 +135,20 @@ public class TextureDisplay {
 
     public boolean canRender() {
         return switch (displayMode) {
-            case PICTURE -> this.imageCache.getRenderer() != null && block.data.active;
-            case VIDEO -> this.mediaPlayer.isValid() && block.data.active;
+            case PICTURE -> this.imageCache.getRenderer() != null && tile.data.active;
+            case VIDEO -> this.mediaPlayer.isValid() && tile.data.active;
             case AUDIO -> false;
         };
     }
 
-    public void syncDuration(BlockPos pos) {
-        if (block.data.tickMax == -1) block.data.tick = 0;
-        FrameNet.syncMaxTickTime(pos, durationInTicks());
+    public void syncDuration() {
+        if (tile.data.tickMax == -1) tile.data.tick = 0;
+        DisplaysNet.sendPlaytimeServer(tile, tile.data.tick, durationInTicks());
     }
 
     public void tick(BlockPos pos) {
         if (!synced && canRender()) {
-            syncDuration(pos);
+            syncDuration();
             synced = true;
         }
         switch (displayMode) {
@@ -161,24 +159,24 @@ public class TextureDisplay {
                 this.blockPos = new Vec3d(pos);
 
                 int volume;
-                if (block instanceof ProjectorTile projectorTile) {
+                if (tile instanceof ProjectorTile projectorTile) { // TODO: OPTIMIZE DATA
                     Direction direction = projectorTile.getBlockState().getValue(ProjectorBlock.FACING);
-                    volume = FrameTools.floorVolume(this.blockPos, direction, projectorTile.data.audioOffset, this.block.data.volume, this.block.data.minVolumeDistance, this.block.data.maxVolumeDistance);
+                    volume = FrameTools.floorVolume(this.blockPos, direction, projectorTile.data.audioOffset, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
                 } else {
-                    volume = FrameTools.floorVolume(this.blockPos, this.block.data.volume, this.block.data.minVolumeDistance, this.block.data.maxVolumeDistance);
+                    volume = FrameTools.floorVolume(this.blockPos, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
                 }
 
                 if (currentVolume != volume) mediaPlayer.setVolume(currentVolume = volume);
                 if (mediaPlayer.isSafeUse() && mediaPlayer.isValid()) {
-                    if (mediaPlayer.getRepeatMode() != block.data.loop) mediaPlayer.setRepeatMode(block.data.loop);
+                    if (mediaPlayer.getRepeatMode() != tile.data.loop) mediaPlayer.setRepeatMode(tile.data.loop);
                     if (!stream && mediaPlayer.isLive()) stream = true;
 
-                    boolean canPlay = block.data.playing && block.data.active && !Minecraft.getInstance().isPaused();
+                    boolean canPlay = !tile.data.paused && tile.data.active && !Minecraft.getInstance().isPaused();
 
                     mediaPlayer.setPauseMode(!canPlay);
                     if (!stream && mediaPlayer.isSeekAble()) {
-                        long time = MathAPI.tickToMs(block.data.tick) + (canPlay ? MathAPI.tickToMs(FrameTools.deltaFrames()) : 0);
-                        if (time > mediaPlayer.getTime() && block.data.loop) time = FrameTools.floorMod(time, mediaPlayer.getMediaInfoDuration());
+                        long time = MathAPI.tickToMs(tile.data.tick) + (canPlay ? MathAPI.tickToMs(FrameTools.deltaFrames()) : 0);
+                        if (time > mediaPlayer.getTime() && tile.data.loop) time = FrameTools.floorMod(time, mediaPlayer.getMediaInfoDuration());
 
                         if (Math.abs(time - mediaPlayer.getTime()) > DisplayControl.SYNC_TIME && Math.abs(time - currentLastTime.get()) > DisplayControl.SYNC_TIME) {
                             currentLastTime.set(time);
@@ -218,21 +216,42 @@ public class TextureDisplay {
         return imageCache.getStatus() == ImageCache.Status.LOADING;
     }
 
+    public void setPauseMode(boolean pause) {
+        switch (displayMode) {
+            case PICTURE -> {}
+            case VIDEO, AUDIO -> {
+                mediaPlayer.seekTo(MathAPI.tickToMs(this.tile.data.tick));
+                mediaPlayer.setPauseMode(pause);
+            }
+        }
+    }
+
+    public void setMuteMode(boolean mute) {
+        switch (displayMode) {
+            case PICTURE -> {}
+            case VIDEO, AUDIO -> {
+                mediaPlayer.setMuteMode(mute);
+            }
+        }
+    }
+
+    @Deprecated
     public void pause() {
         switch (displayMode) {
             case PICTURE -> {}
             case VIDEO, AUDIO -> {
-                mediaPlayer.seekTo(MathAPI.tickToMs(this.block.data.tick));
+                mediaPlayer.seekTo(MathAPI.tickToMs(this.tile.data.tick));
                 mediaPlayer.setPauseMode(true);
             }
         }
     }
 
+    @Deprecated
     public void resume() {
         switch (displayMode) {
             case PICTURE -> {}
             case VIDEO, AUDIO -> {
-                mediaPlayer.seekTo(MathAPI.tickToMs(this.block.data.tick));
+                mediaPlayer.seekTo(MathAPI.tickToMs(this.tile.data.tick));
                 mediaPlayer.setPauseMode(false);
             }
         }

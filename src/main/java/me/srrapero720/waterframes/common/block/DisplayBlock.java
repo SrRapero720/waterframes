@@ -103,8 +103,8 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
             }
         }
 
-        if (state.getValue(POWERED) && tile.data.playing) tile.pause();
-        if (!state.getValue(POWERED) && !tile.data.playing) tile.play();
+//        if (state.getValue(POWERED) && tile.data.playing) tile.pause();
+//        if (!state.getValue(POWERED) && !tile.data.playing) tile.play();
     }
 
     @Override

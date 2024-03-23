@@ -58,13 +58,13 @@ public class WaterFramesCommand {
         final var url = StringArgumentType.getString(context, "url");
 
         final var displayTile = level.getBlockEntity(blockpos);
-        if (displayTile instanceof DisplayTile displayBE) {
-            if (!displayBE.getUrl().equals(url)) {
-                displayBE.data.tick = 0;
-                displayBE.data.tickMax = -1;
+        if (displayTile instanceof DisplayTile tile) {
+            if (!tile.data.url.equals(url)) {
+                tile.data.tick = 0;
+                tile.data.tickMax = -1;
             }
-            displayBE.setUrl(url);
-            displayBE.setDirty();
+            tile.data.url = url;
+            tile.setDirty();
             context.getSource().sendSuccess(new TextComponent("Url updated successfully"), true);
             return 0;
         } else {
@@ -79,8 +79,8 @@ public class WaterFramesCommand {
 
         final var displayTile = level.getBlockEntity(blockpos);
         if (displayTile instanceof DisplayTile displayBE) {
-            if (width > 0.1f) DisplayData.setWidth(displayBE, displayBE.data.getPosX(), width);
-            if (height > 0.1f) DisplayData.setHeight(displayBE, displayBE.data.getPosY(), height);
+            if (width > 0.1f) displayBE.data.setWidth(displayBE.data.getPosX(), width);
+            if (height > 0.1f) displayBE.data.setHeight(displayBE.data.getPosY(), height);
 
             displayBE.setDirty();
             context.getSource().sendSuccess(new TextComponent("Size updated successfully"), true);
@@ -97,8 +97,8 @@ public class WaterFramesCommand {
 
         final var displayTile = level.getBlockEntity(blockpos);
         if (displayTile instanceof DisplayTile displayBE) {
-            if (horizontal != null) DisplayData.setWidth(displayBE, horizontal, displayBE.data.getWidth());
-            DisplayData.setHeight(displayBE, vertical, displayBE.data.getHeight());
+            if (horizontal != null) displayBE.data.setWidth(horizontal, displayBE.data.getWidth());
+            displayBE.data.setHeight(vertical, displayBE.data.getHeight());
             displayBE.setDirty();
             context.getSource().sendSuccess(new TextComponent("Position updated successfully"), true);
             return 0;
