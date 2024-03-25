@@ -18,23 +18,12 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public class WidgetURLTextField extends GuiTextfield {
-    private final GuiButton saveButton;
 
-    @Deprecated
-    public WidgetURLTextField(Supplier<GuiButton> saveButton, String text) {
+    public WidgetURLTextField(DisplayTile tile) {
         super(DisplayData.URL);
         this.setMaxStringLength(2048);
-        this.setSuggest("https://i.imgur.com/1yCDs5C.mp4");
-        this.setText(text);
-        this.saveButton = saveButton.get();
-    }
-
-    public WidgetURLTextField(DisplayTile tile, GuiButton saveButton) {
-        super(DisplayData.URL);
-        this.setMaxStringLength(2048);
-        this.setSuggest("https://i.imgur.com/1yCDs5C.mp4");
+        this.setSuggestion("https://i.imgur.com/1yCDs5C.mp4");
         this.setText(tile.data.url);
-        this.saveButton = saveButton;
     }
 
     @Override
@@ -45,23 +34,6 @@ public class WidgetURLTextField extends GuiTextfield {
     @Override
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
         return ScreenStyles.DARK_BLUE_BACKGROUND;
-    }
-
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        boolean pressed = super.keyPressed(keyCode, scanCode, modifiers);
-        saveButton.setEnabled(DisplayConfig.canSave(getPlayer(), getText()));
-        return pressed;
-    }
-
-    public WidgetURLTextField setSuggest(String suggest) {
-        setSuggestion(suggest);
-        return this;
-    }
-
-    public WidgetURLTextField expandX() {
-        this.setExpandableX();
-        return this;
     }
 
     @Override

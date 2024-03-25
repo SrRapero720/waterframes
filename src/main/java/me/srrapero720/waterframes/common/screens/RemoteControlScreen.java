@@ -4,7 +4,6 @@ import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.WidgetDoubleTable;
-import me.srrapero720.waterframes.common.screens.widgets.WidgetParent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -45,7 +44,7 @@ public class RemoteControlScreen extends GuiLayer {
         this.flow = GuiFlow.STACK_Y;
         this.tile = tile;
 
-        this.active = new GuiButtonIcon("active_toggle", IconStyles.OFF_ON, false, button -> tile.setActiveMode(!tile.data.active)) {
+        this.active = new GuiButtonIcon("active_toggle", IconStyles.OFF_ON, button -> tile.setActiveMode(!tile.data.active)) {
             @Override
             @OnlyIn(Dist.CLIENT)
             public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
@@ -59,7 +58,7 @@ public class RemoteControlScreen extends GuiLayer {
             }
         };
 
-        this.muted = new GuiButtonIcon("muted_toggle", IconStyles.MUTE, false, button -> tile.setMutedMode(!tile.data.muted)) {
+        this.muted = new GuiButtonIcon("muted_toggle", IconStyles.MUTE, button -> tile.setMutedMode(!tile.data.muted)) {
             @Override
             @OnlyIn(Dist.CLIENT)
             public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
@@ -73,15 +72,15 @@ public class RemoteControlScreen extends GuiLayer {
             }
         };
 
-        this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, true, button -> { if (tile.imageCache != null) tile.imageCache.reload(); });
+        this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, button -> { if (tile.imageCache != null) tile.imageCache.reload(); });
 
 
-        this.play = new GuiButtonIcon("pause", IconStyles.PAUSE, true, button -> tile.setPauseMode(true));
-        this.pause = new GuiButtonIcon("play", IconStyles.PLAY, true, button -> tile.setPauseMode(false));
-        this.stop = new GuiButtonIcon("stop", IconStyles.STOP, true, button -> tile.stop());
+        this.play = new GuiButtonIcon("pause", IconStyles.PAUSE, button -> tile.setPauseMode(true));
+        this.pause = new GuiButtonIcon("play", IconStyles.PLAY, button -> tile.setPauseMode(false));
+        this.stop = new GuiButtonIcon("stop", IconStyles.STOP, button -> tile.stop());
 
-        this.volumeUp = new GuiButtonIcon("volume_up", IconStyles.VOLUME_UP, true, button -> tile.volumeUp());
-        this.volumeDown = new GuiButtonIcon("volume_down", IconStyles.VOLUME_DOWN, true, button -> tile.volumeDown());
+        this.volumeUp = new GuiButtonIcon("volume_up", IconStyles.VOLUME_UP, button -> tile.volumeUp());
+        this.volumeDown = new GuiButtonIcon("volume_down", IconStyles.VOLUME_DOWN, button -> tile.volumeDown());
     }
 
 
@@ -95,14 +94,14 @@ public class RemoteControlScreen extends GuiLayer {
 
         this.add(new GuiParent().setDim(0, 20));
 
-        this.add(new WidgetParent(GuiFlow.STACK_X, Align.STRETCH)
-                .addWidget(new WidgetParent(GuiFlow.STACK_Y, Align.LEFT)
+        this.add(new GuiParent("", GuiFlow.STACK_X, Align.STRETCH)
+                .addWidget(new GuiParent("", GuiFlow.STACK_Y, Align.LEFT)
                         .addWidget(this.volumeUp.setDim(12, 25).setExpandableX())
                         .addWidget(this.volumeDown.setDim(12, 25).setExpandableX())
                         .setSpacing(0)
                 )
                 .addWidget(reload)
-                .addWidget(new WidgetParent(GuiFlow.STACK_Y, Align.LEFT)
+                .addWidget(new GuiParent("", GuiFlow.STACK_Y, Align.LEFT)
                         .addWidget(this.volumeUp.setDim(12, 25).setExpandableX())
                         .addWidget(this.volumeDown.setDim(12, 25).setExpandableX())
                         .setSpacing(0)
@@ -112,15 +111,15 @@ public class RemoteControlScreen extends GuiLayer {
 
         this.add(new GuiParent().setDim(0, 20));
 
-        this.add(new WidgetParent(GuiFlow.STACK_X, Align.CENTER)
+        this.add(new GuiParent("", GuiFlow.STACK_X, Align.CENTER)
                 .addWidget(this.pause.setExpandableX())
                 .addWidget(this.play.setExpandableX())
                 .addWidget(this.stop.setExpandableX())
         );
 
         this.add(new WidgetDoubleTable(GuiFlow.STACK_X)
-                .addLeft(new GuiButtonIcon("fast_backward", IconStyles.FAST_BACKWARD, false, button -> tile.fastBackwards()))
-                .addRight(new GuiButtonIcon("fast_foward", IconStyles.FAST_FOWARD, false, button -> tile.fastForward()))
+                .addLeft(new GuiButtonIcon("fast_backward", IconStyles.FAST_BACKWARD, button -> tile.fastBackwards()))
+                .addRight(new GuiButtonIcon("fast_foward", IconStyles.FAST_FOWARD, button -> tile.fastForward()))
                 .setAlignRight(Align.RIGHT)
         );
     }

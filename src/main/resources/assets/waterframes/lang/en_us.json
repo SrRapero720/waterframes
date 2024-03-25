@@ -5,18 +5,20 @@
     "block.waterframes.tv": "Television",
     "item.waterframes.remote": "Remote Control",
 
-    "waterframes.common.enabled": "enabled",
-    "waterframes.common.disabled": "disabled",
+    "waterframes.common.true": "enabled",
+    "waterframes.common.false": "disabled",
 
+    "waterframes.status.off.1": "Off",
+    "waterframes.status.off.2": "Click save to turn on",
     "waterframes.status.operative": "Working fine",
     "waterframes.status.loading": "Loading...",
     "waterframes.status.idle": "Idle",
     "waterframes.status.wrong": "Something is wrong",
 
-    "download.exception.forbidden": "Forbidden",
-    "download.exception.notfound": "Not found",
-    "download.exception.invalid": "Could not download image",
-    "download.exception.gif": "Failed to parse GIF",
+    "waterframes.download.exception.forbidden": "Forbidden",
+    "waterframes.download.exception.notfound": "Not found",
+    "waterframes.download.exception.invalid": "Could not download image",
+    "waterframes.download.exception.gif": "Failed to parse GIF",
 
     "waterframes.gui.url": "URL",
     "waterframes.gui.url.tooltip.empty": "Type any media url",
@@ -52,16 +54,17 @@
     "waterframes.gui.pos_y.center": "center (y)",
     "waterframes.gui.pos_y.bottom": "bottom (y)",
 
-    "waterframes.gui.audio_pos": "Audio origin position\r\nMode: %s as source",
-    "waterframes.gui.audio_pos.block": "Block",
-    "waterframes.gui.audio_pos.projection": "Projection",
-    "waterframes.gui.audio_pos.center": "Center",
+    "waterframes.gui.audio_pos.1": "Audio origin position",
+    "waterframes.gui.audio_pos.2": "Mode: %s as source",
+    "waterframes.gui.audio_pos.states.0": "Block",
+    "waterframes.gui.audio_pos.states.1": "Projection",
+    "waterframes.gui.audio_pos.states.2": "Center",
 
     "waterframes.gui.show_model": "model",
     "waterframes.gui.render_behind": "render behind",
 
     "waterframes.gui.reload": "reload",
     "waterframes.gui.reload.all": "reload all",
-    "waterframes.gui.reload.all.warning": "§6WARNING: §8All WATERMeDIA images will be reloaded, causing a lot of lag (for you)",
+    "waterframes.gui.reload.all.warning": "§6WARNING: §rReloads all pictures, causing lag (to you)",
     "waterframes.gui.save": "save"
 }

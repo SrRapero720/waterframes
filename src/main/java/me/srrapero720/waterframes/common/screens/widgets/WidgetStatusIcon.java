@@ -1,57 +1,68 @@
 package me.srrapero720.waterframes.common.screens.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
-import me.srrapero720.waterframes.cossporting.Crossponent;
-import me.srrapero720.watermedia.api.image.ImageCache;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import team.creative.creativecore.common.gui.GuiChildControl;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
 import team.creative.creativecore.common.gui.style.Icon;
-import team.creative.creativecore.common.util.math.geo.Rect;
 import team.creative.creativecore.common.util.text.TextBuilder;
 
-import java.util.function.Supplier;
+import java.util.List;
 
 public class WidgetStatusIcon extends GuiIcon {
-    private final Supplier<ImageCache> cacheSupplier;
-    public WidgetStatusIcon(String name, Icon icon, boolean squared, Supplier<ImageCache> cacheSupplier) {
-        super(name, icon, squared);
-        this.cacheSupplier = cacheSupplier;
+
+    private final DisplayTile tile;
+    public WidgetStatusIcon(String name, Icon icon, DisplayTile tile) {
+        super(name, icon);
+        this.tile = tile;
     }
 
     @Override
+    public void tick() {
+        if (!isClient()) return;
+        this.setTooltip(getStatusTooltip());
+        this.setIcon(getStatusIcon());
+        super.tick();
+    }
+
     @OnlyIn(Dist.CLIENT)
-    protected void renderContent(PoseStack pose, GuiChildControl guiChildControl, Rect rect, int i, int i1) {
-        ImageCache cache = cacheSupplier.get();
-        icon = switch (cache != null ? cache.getStatus() : ImageCache.Status.FAILED) {
-            case READY -> {
-                setTooltip(new TextBuilder().add(Crossponent.translatable("waterframes.status.operative")).build());
-                yield  IconStyles.STATUS_OK;
-            }
-            case LOADING -> {
-                setTooltip(new TextBuilder().add(Crossponent.translatable("waterframes.status.loading")).build());
-                yield IconStyles.STATUS_ALERT;
-            }
+    public List<Component> getStatusTooltip() {
+        TextBuilder builder = new TextBuilder();
+        if (!tile.data.active) {
+            builder.translate("waterframes.status.off.1");
+            builder.translate("waterframes.status.off.2");
+            return builder.build();
+        }
+        if (tile.imageCache == null) {
+            builder.translate("waterframes.download.exception.invalid");
+            return builder.build();
+        }
+        switch (tile.imageCache.getStatus()) {
+            case READY -> builder.translate("waterframes.status.operative");
+            case LOADING -> builder.translate("waterframes.status.loading");
+            case FAILED -> builder.translate("download.exception.invalid");
             case WAITING, FORGOTTEN -> {
-                if (cacheSupplier.get().url.isEmpty()) {
-                    setTooltip(new TextBuilder().add(Crossponent.translatable("waterframes.status.idle")).build());
-                    yield IconStyles.STATUS_IDLE;
-                } else {
-                    setTooltip(new TextBuilder().add(Crossponent.translatable("waterframes.status.wrong")).build());
-                    yield IconStyles.STATUS_PEM;
-                }
-            }
-            case FAILED -> {
-                if (cache != null) {
-                    setTooltip(new TextBuilder(cacheSupplier.get().getException().getMessage()).build());
-                } else {
-                    setTooltip(new TextBuilder().add(Crossponent.translatable("download.exception.invalid")).build());
-                }
-                yield IconStyles.STATUS_ERROR;
+                if (tile.imageCache.url.isEmpty())
+                    builder.translate("waterframes.status.idle");
+                else
+                    builder.translate(tile.imageCache.getException().getLocalizedMessage()).build();
             }
         };
-        super.renderContent(pose, guiChildControl, rect, i, i1);
+
+        return builder.build();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public Icon getStatusIcon() {
+        if (!tile.data.active) return IconStyles.STATUS_OFF;
+        if (tile.imageCache == null) return IconStyles.STATUS_ERROR;
+        return switch (tile.imageCache.getStatus()) {
+            case READY -> IconStyles.STATUS_OK;
+            case LOADING -> IconStyles.STATUS_WARN;
+            case FAILED -> IconStyles.STATUS_ERROR;
+            case WAITING, FORGOTTEN -> tile.imageCache.url.isEmpty() ? IconStyles.STATUS_IDLE : IconStyles.STATUS_ERROR;
+        };
     }
 }

@@ -276,38 +276,38 @@ public class DisplayData {
     public static CompoundTag build(DisplayScreen screen, DisplayTile tile) {
         CompoundTag nbt = new CompoundTag();
 
-        nbt.putString(URL, screen.urlTextField.getText());
+        nbt.putString(URL, screen.urlField.getText());
         nbt.putBoolean(ACTIVE, true); // reset
 
         if (tile.canResize()) {
-            nbt.putFloat("width", Math.max(0.1F, (float) screen.widthTextField.getValue()));
-            nbt.putFloat("height", Math.max(0.1F, (float) screen.heightTextField.getValue()));
-            nbt.putInt("pos_x",  screen.posXButton.getState());
-            nbt.putInt("pos_y", screen.posYButton.getState());
+            nbt.putFloat("width", Math.max(0.1F, (float) screen.widthField.getValue()));
+            nbt.putFloat("height", Math.max(0.1F, (float) screen.heightField.getValue()));
+            nbt.putInt("pos_x",  screen.pos_x.getState());
+            nbt.putInt("pos_y", screen.pos_y.getState());
         }
 
-        nbt.putBoolean(FLIP_X, screen.flipXWidget.value);
-        nbt.putBoolean(FLIP_Y, screen.flipYWidget.value);
+        nbt.putBoolean(FLIP_X, screen.flip_x.value);
+        nbt.putBoolean(FLIP_Y, screen.flip_y.value);
 
-        nbt.putFloat(ROTATION, (float) screen.rotation.value);
-        nbt.putFloat(ALPHA, (float) screen.alpha.value);
-        nbt.putFloat(BRIGHTNESS, (float) screen.brightness.value);
-        nbt.putShort(RENDER_DISTANCE, (short) screen.renderDistance.value);
+        nbt.putFloat(ROTATION, (float) screen.rotation.getValue());
+        nbt.putFloat(ALPHA, (float) screen.visibility.getValue());
+        nbt.putFloat(BRIGHTNESS, (float) screen.brightness.getValue());
+        nbt.putShort(RENDER_DISTANCE, (short) screen.render_distance.getValue());
 
-        nbt.putByte(VOLUME, (byte) screen.volume.value);
-        nbt.putShort(VOL_RANGE_MIN, (short) screen.volumeMinSlider.getValue());
-        nbt.putShort(VOL_RANGE_MAX, (short) screen.volumeMaxSlider.getValue());
+        nbt.putByte(VOLUME, (byte) screen.volume.getValue());
+        nbt.putShort(VOL_RANGE_MIN, (short) screen.volume_min.getValue());
+        nbt.putShort(VOL_RANGE_MAX, (short) screen.volume_max.getValue());
 
         if (tile.canHideModel()) {
-            nbt.putBoolean(VISIBLE_FRAME, screen.showModel.value);
+            nbt.putBoolean(VISIBLE_FRAME, screen.show_model.value);
         }
 
         if (tile.canRenderBackside()) {
-            nbt.putBoolean(RENDER_BOTH_SIDES, screen.renderBehind.value);
+            nbt.putBoolean(RENDER_BOTH_SIDES, screen.render_behind.value);
         }
 
         if (tile.canProject()) {
-            nbt.putShort(PROJECTION_DISTANCE, (short) screen.projectionDistance.value);
+            nbt.putShort(PROJECTION_DISTANCE, (short) screen.projection_distance.getValue());
             nbt.putInt("audio_offset_mode", screen.audioOffset.getState());
         }
 

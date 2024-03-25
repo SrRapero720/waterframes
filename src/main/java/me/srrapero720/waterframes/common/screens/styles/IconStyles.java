@@ -14,8 +14,8 @@ public class IconStyles {
     public static final Icon VOLUME_2 = create(0, 3);
     public static final Icon VOLUME_3 = create(0, 4);
     public static final Icon VOLUME_OVERFLOW = create(0, 5);
-    public static final Icon VOLUME_RANGE_MIN = create(0, 10);
-    public static final Icon VOLUME_RANGE_MAX = create(0, 11);
+    public static final Icon VOLUME_RANGE_MIN = create(0, 6);
+    public static final Icon VOLUME_RANGE_MAX = create(0, 7);
     public static final Icon AUDIO_POS_BLOCK = create(0, 13, 2);
     public static final Icon AUDIO_POS_PICTURE = create(0, 14, 2);
     public static final Icon AUDIO_POS_CENTER = create(0, 15, 2);
@@ -29,18 +29,19 @@ public class IconStyles {
     public static final Icon BRIGHTNESS = create(1, 4);
     public static final Icon REPEAT_ON = create(1, 5);
     public static final Icon REPEAT_OFF = create(1, 6);
-    public static final Icon DISTANCE = create(1, 10);
-    public static final Icon PROJECTION_DISTANCE = create(1, 11);
+    public static final Icon DISTANCE = create(1, 7);
+    public static final Icon PROJECTION_DISTANCE = create(1, 8);
 
     // STATUS ICONS (chunk 2)
     public static final Icon STATUS_OK = create(2, 0);
-    public static final Icon STATUS_ALERT = create(2, 1);
+    public static final Icon STATUS_WARN = create(2, 1);
     public static final Icon STATUS_IDLE = create(2, 2);
     public static final Icon STATUS_ERROR = create(2, 3);
     public static final Icon STATUS_HACKED = create(2, 4);
     public static final Icon STATUS_PEM = create(2, 5);
     public static final Icon STATUS_AFFECTED = create(2, 6);
     public static final Icon STATUS_CASSETE_MODE = create(2, 7);
+    public static final Icon STATUS_OFF = create(2, 8);
 
     // POSITION ICONS (chunk 3)
     public static final Icon POS_1 = create(3, 0);
@@ -72,6 +73,8 @@ public class IconStyles {
     public static final Icon RELOAD = create(15, 10);
     public static final Icon VOLUME_DOWN = create(15, 11);
     public static final Icon VOLUME_UP = create(15, 12);
+    public static final Icon CHANNEL_DOWN = create(15, 13);
+    public static final Icon CHANNEL_UP = create(15, 14);
 
     private static Icon create(int chunkX, int chunkY) {
         return new Icon(location, 16 * chunkX, 16 * chunkY, 16, 16);
