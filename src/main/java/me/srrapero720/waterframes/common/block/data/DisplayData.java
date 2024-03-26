@@ -141,7 +141,7 @@ public class DisplayData {
         this.paused = nbt.getBoolean(PAUSED);
         this.muted = nbt.getBoolean(MUTED);
         this.tick = nbt.getInt(TICK);
-        this.tickMax = nbt.getInt(TICK_MAX);
+        this.tickMax = nbt.contains(TICK_MAX) ? nbt.getInt(TICK_MAX) : this.tickMax;
         this.loop = nbt.getBoolean(LOOP);
 
         if (displayTile.canHideModel()) {

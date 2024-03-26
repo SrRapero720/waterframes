@@ -3,7 +3,7 @@ package me.srrapero720.waterframes.common.screens;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
-import me.srrapero720.waterframes.common.screens.widgets.WidgetDoubleTable;
+import me.srrapero720.waterframes.common.screens.widgets.WidgetPairTable;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -74,7 +74,6 @@ public class RemoteControlScreen extends GuiLayer {
 
         this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, button -> { if (tile.imageCache != null) tile.imageCache.reload(); });
 
-
         this.play = new GuiButtonIcon("pause", IconStyles.PAUSE, button -> tile.setPauseMode(true));
         this.pause = new GuiButtonIcon("play", IconStyles.PLAY, button -> tile.setPauseMode(false));
         this.stop = new GuiButtonIcon("stop", IconStyles.STOP, button -> tile.stop());
@@ -86,7 +85,7 @@ public class RemoteControlScreen extends GuiLayer {
 
     @Override
     public void create() {
-        this.add(new WidgetDoubleTable(GuiFlow.STACK_X)
+        this.add(new WidgetPairTable(GuiFlow.STACK_X)
                 .addLeft(this.active)
                 .addRight(this.muted)
                 .setAlignRight(Align.RIGHT)
@@ -117,7 +116,7 @@ public class RemoteControlScreen extends GuiLayer {
                 .addWidget(this.stop.setExpandableX())
         );
 
-        this.add(new WidgetDoubleTable(GuiFlow.STACK_X)
+        this.add(new WidgetPairTable(GuiFlow.STACK_X)
                 .addLeft(new GuiButtonIcon("fast_backward", IconStyles.FAST_BACKWARD, button -> tile.fastBackwards()))
                 .addRight(new GuiButtonIcon("fast_foward", IconStyles.FAST_FOWARD, button -> tile.fastForward()))
                 .setAlignRight(Align.RIGHT)

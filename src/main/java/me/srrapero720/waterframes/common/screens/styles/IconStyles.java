@@ -17,8 +17,8 @@ public class IconStyles {
     public static final Icon VOLUME_RANGE_MIN = create(0, 6);
     public static final Icon VOLUME_RANGE_MAX = create(0, 7);
     public static final Icon AUDIO_POS_BLOCK = create(0, 13, 2);
-    public static final Icon AUDIO_POS_PICTURE = create(0, 14, 2);
-    public static final Icon AUDIO_POS_CENTER = create(0, 15, 2);
+    public static final Icon AUDIO_POS_CENTER = create(0, 14, 2);
+    public static final Icon AUDIO_POS_PICTURE = create(0, 15, 2);
 
 
     // ICON COLUM (chunk 1)

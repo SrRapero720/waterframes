@@ -14,6 +14,8 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
+import team.creative.creativecore.common.util.text.ITextCollection;
+import team.creative.creativecore.common.util.text.TextListBuilder;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -51,6 +53,10 @@ public class FrameTools {
         }
 
         return result;
+    }
+
+    public static ITextCollection translatable(String prefix, String... args) {
+        return new TextListBuilder().addTranslated(prefix, args);
     }
 
     public static InputStream readResource(ClassLoader loader, String source) {

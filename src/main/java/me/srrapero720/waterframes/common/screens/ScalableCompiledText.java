@@ -100,7 +100,7 @@ public class ScalableCompiledText {
     private CompiledLine compileNext(CompiledLine currentLine, boolean newLine, List<? extends FormattedText> components) {
         FormattedText component;
         for(Iterator<? extends FormattedText> var4 = components.iterator(); var4.hasNext(); currentLine = this.compileNext(currentLine, component)) {
-            component = (FormattedText)var4.next();
+            component = var4.next();
             if (newLine) {
                 this.lines.add(currentLine = new CompiledLine());
             }
@@ -118,21 +118,21 @@ public class ScalableCompiledText {
         return this.compileNext(currentLine, component);
     }
 
-    private CompiledLine compileNext(CompiledLine currentLine, FormattedText component) {
+    private CompiledLine compileNext(CompiledLine currentLine, FormattedText c) {
         List<Component> siblings = null;
-        if (component instanceof Component && !((Component)component).getSiblings().isEmpty()) {
-            siblings = new ArrayList(((Component)component).getSiblings());
-            ((Component)component).getSiblings().clear();
+        if (c instanceof Component component && !component.getSiblings().isEmpty()) {
+            siblings = new ArrayList<>(component.getSiblings());
+            component.getSiblings().clear();
         }
 
-        FormattedText next = currentLine.add(component);
+        FormattedText next = currentLine.add(c);
         if (next != null) {
             this.lines.add(currentLine = new CompiledLine());
             currentLine = this.compileNext(currentLine, false, next);
         }
 
         if (siblings != null) {
-            currentLine = this.compileNext(currentLine, false, (List)siblings);
+            currentLine = this.compileNext(currentLine, false, siblings);
         }
 
         return currentLine;

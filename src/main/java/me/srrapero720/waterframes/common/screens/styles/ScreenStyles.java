@@ -17,7 +17,6 @@ public class ScreenStyles {
     public static final StyleDisplay DARK_BLUE_BACKGROUND_DISABLED = new DisplayColor(color(27), color(36), color(52), 0.5f);
     public static final StyleDisplay DARK_BLUE_HIGHLIGHT = new DisplayColor(color(27 * 2), color(36 * 2), color(52 * 2), 1);
 
-
     public static final StyleDisplay RED_BORDER = new DisplayColor(color(255), color(60), color(60), 1.0F);
     public static final StyleDisplay RED_BACKGROUND = new DisplayColor(color(140), color(56), color(52), 1);
 

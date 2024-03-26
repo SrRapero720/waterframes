@@ -7,7 +7,7 @@ import me.srrapero720.waterframes.common.network.DisplaysNet;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
-import me.srrapero720.waterframes.cossporting.Crossponent;
+import me.srrapero720.waterframes.util.FrameTools;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -23,10 +23,10 @@ import team.creative.creativecore.common.gui.parser.LongValueParser;
 import team.creative.creativecore.common.gui.style.ControlFormatting;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
+import team.creative.creativecore.common.util.text.TextBuilder;
 import team.creative.creativecore.common.util.text.TextListBuilder;
 import team.creative.creativecore.common.util.type.Color;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -66,9 +66,9 @@ public class DisplayScreen extends GuiLayer {
 
     public final GuiCheckBox show_model;
     public final GuiCheckBox render_behind;
-    public final WidgetCheckButton loop;
+    public final WidgetCheckButtonIcon loop;
 
-    public final WidgetCheckButton playback;
+    public final WidgetCheckButtonIcon playback;
     public final GuiControl stop;
 
     public final GuiStateButtonIcon audioOffset;
@@ -88,7 +88,7 @@ public class DisplayScreen extends GuiLayer {
     public final GuiSteppedSlider volume_max;
 
     // ICONS
-    private final GuiIcon positionViewer;
+    private final GuiIcon pos_view;
 
     public DisplayScreen(DisplayTile tile) {
         super("display_screen", 260, 245);
@@ -96,73 +96,82 @@ public class DisplayScreen extends GuiLayer {
         this.flow = GuiFlow.STACK_Y;
         this.tile = tile;
 
-        this.save = (GuiButton) new GuiButton("save", x -> DisplaysNet.updateDataServer(tile, this)).setTranslate("waterframes.gui.save");
+        this.save = new GuiButton("save", x -> DisplaysNet.updateDataServer(tile, this));
+        this.save.setTranslate("waterframes.gui.save");
+
         this.urlField = new WidgetURLTextField(this.tile);
-        this.widthField = (GuiCounterDecimal) new GuiCounterDecimal("width", tile.data.getWidth(), 0, DisplayConfig.maxWidth(), ControlFormatting.CLICKABLE_NO_PADDING)
-                .setSpacing(0)
-                .setStep(SCALE)
-                .setAlign(Align.STRETCH)
-                .setVAlign(VAlign.STRETCH);
+
+        this.widthField = new GuiCounterDecimal("width", tile.data.getWidth(), 0.1, DisplayConfig.maxWidth(), ControlFormatting.CLICKABLE_NO_PADDING);
+        this.widthField.setSpacing(0).setStep(SCALE).setAlign(Align.STRETCH).setVAlign(VAlign.STRETCH);
+
         this.widthField.buttons.setVAlign(VAlign.STRETCH);
+        this.widthField.get("value").setTooltip("waterframes.common.width");
 
-        this.heightField = (GuiCounterDecimal) new GuiCounterDecimal("height", tile.data.getHeight(), 0, DisplayConfig.maxHeight(), ControlFormatting.CLICKABLE_NO_PADDING)
-                .setSpacing(0)
-                .setStep(SCALE)
-                .setAlign(Align.STRETCH)
-                .setVAlign(VAlign.STRETCH);
+        this.heightField = new GuiCounterDecimal("height", tile.data.getHeight(), 0.1, DisplayConfig.maxHeight(), ControlFormatting.CLICKABLE_NO_PADDING);
+        this.heightField.setSpacing(0).setStep(SCALE).setAlign(Align.STRETCH).setVAlign(VAlign.STRETCH);
+
         this.heightField.buttons.setVAlign(VAlign.STRETCH);
+        this.heightField.get("value").setTooltip("waterframes.common.height");
 
-        this.widthField.addControl(new GuiButtonIcon("expandY", IconStyles.EXPAND_Y, integer -> {
+        var resize_y = new GuiButtonIcon("resize_y", IconStyles.EXPAND_Y, integer -> {
             if (tile.display != null) {
                 this.heightField.setValue((float) (tile.display.height() / (tile.display.width() / widthField.getValue())));
             }
-        }).setDim(16, 16).setTooltip("waterframes.gui.expand_x"));
+        }).setTooltip("waterframes.gui.resize_y");
 
-        this.heightField.addControl(new GuiButtonIcon("expandX", IconStyles.EXPAND_X, integer -> {
+        var resize_x = new GuiButtonIcon("resize_x", IconStyles.EXPAND_X, integer -> {
             if (tile.display != null) {
                 this.widthField.setValue((float) (tile.display.width() / (tile.display.height() / widthField.getValue())));
             }
-        }).setDim(16, 16).setTooltip("waterframes.gui.expand_y"));
+        }).setTooltip("waterframes.gui.resize_x");
 
-        this.flip_x = new GuiCheckBox(DisplayData.FLIP_X, tile.data.flipX).setTranslate("waterframes.gui.flip_x");
-        this.flip_y = new GuiCheckBox(DisplayData.FLIP_Y, tile.data.flipY).setTranslate("waterframes.gui.flip_y");
+        this.widthField.addControl(resize_y.setDim(16, 16));
+        this.heightField.addControl(resize_x.setDim(16, 16));
+
+        this.flip_x = new GuiCheckBox(DisplayData.FLIP_X, tile.data.flipX);
+        this.flip_y = new GuiCheckBox(DisplayData.FLIP_Y, tile.data.flipY);
+        this.flip_x.setTranslate("waterframes.gui.flip_x");
+        this.flip_y.setTranslate("waterframes.gui.flip_y");
 
         this.rotation = new GuiSlider(DisplayData.ROTATION, tile.data.rotation, 0, 360, DoubleValueParser.ANGLE);
         this.visibility = new GuiSlider(DisplayData.ALPHA, tile.data.alpha, 0, 1, DoubleValueParser.PERCENT);
         this.brightness = new GuiSlider(DisplayData.BRIGHTNESS, tile.data.brightness, 0, 1, DoubleValueParser.PERCENT);
-        this.render_distance = new GuiSteppedSlider(DisplayData.RENDER_DISTANCE, tile.data.renderDistance, 5, DisplayConfig.maxRenderDistance(), IntValueParser.BLOCKS.BLOCKS);
+        this.render_distance = new GuiSteppedSlider(DisplayData.RENDER_DISTANCE, tile.data.renderDistance, 4, DisplayConfig.maxRenderDistance(), IntValueParser.BLOCKS.BLOCKS);
         this.projection_distance = new GuiSteppedSlider(DisplayData.PROJECTION_DISTANCE, tile.data.projectionDistance, 4, DisplayConfig.maxProjectionDistance(), IntValueParser.BLOCKS);
         this.audioOffset = new GuiStateButtonIcon(DisplayData.AUDIO_OFFSET, IconStyles.AUDIO_POS_BLOCK, IconStyles.AUDIO_POS_PICTURE, IconStyles.AUDIO_POS_CENTER) {
             @Override
             public List<Component> getTooltip() {
-                List<Component> tooltips = new ArrayList<>();
-                tooltips.add(Crossponent.translatable("waterframes.gui.audio_pos.1"));
-                tooltips.add(Crossponent.translatableParse("waterframes.gui.audio_pos.2",
-                        Crossponent.translatable("waterframes.gui.audio_pos.states." + getState())));
-                return tooltips;
+                return new TextBuilder()
+                        .translate("waterframes.gui.audio_pos.1")
+                        .newLine()
+                        .translate("waterframes.gui.audio_pos.2",
+                                ChatFormatting.BLUE + translate("waterframes.gui.audio_pos.states." + getState()))
+                        .build();
             }
         }.setControlFormatting(ControlFormatting.CLICKABLE_NO_PADDING).setState(tile.data.getOffsetMode());
         this.audioOffset.setShadow(Color.NONE);
 
-        this.show_model = new GuiCheckBox(DisplayData.VISIBLE_FRAME, tile.data.frameVisibility).setTranslate("waterframes.gui.show_model");
-        this.render_behind = new GuiCheckBox(DisplayData.RENDER_BOTH_SIDES, tile.data.renderBothSides).setTranslate("waterframes.gui.render_behind");
+        this.show_model = new GuiCheckBox(DisplayData.VISIBLE_FRAME, tile.data.frameVisibility);
+        this.render_behind = new GuiCheckBox(DisplayData.RENDER_BOTH_SIDES, tile.data.renderBothSides);
+        this.show_model.setTranslate("waterframes.gui.show_model");
+        this.render_behind.setTranslate("waterframes.gui.render_behind");
 
-        this.pos_x = new GuiStateButton("pos_x", tile.data.getPosX().ordinal(), new TextListBuilder().addTranslated("waterframes.gui.pos_x.", "left", "right", "center"));
-        this.pos_y = new GuiStateButton("pos_y", tile.data.getPosY().ordinal(), new TextListBuilder().addTranslated("waterframes.gui.pos_y.", "top", "bottom", "center"));
-        this.positionViewer = new GuiIcon("posView", IconStyles.POS_CORD[pos_x.getState()][pos_y.getState()]);
+        this.pos_x = new GuiStateButton("pos_x", tile.data.getPosX().ordinal(), FrameTools.translatable("waterframes.gui.pos_x.", "left", "right", "center"));
+        this.pos_y = new GuiStateButton("pos_y", tile.data.getPosY().ordinal(), FrameTools.translatable("waterframes.gui.pos_y.", "top", "bottom", "center"));
+        this.pos_view = new GuiIcon("posView", IconStyles.POS_CORD[pos_x.getState()][pos_y.getState()]);
 
-        this.playback = new WidgetCheckButton("playback", IconStyles.PAUSE, IconStyles.PLAY, tile.data.paused, button ->
-                DisplaysNet.sendPlaybackServer(tile, tile.data.paused, tile.data.tick)
+        this.playback = new WidgetCheckButtonIcon("playback", IconStyles.PAUSE, IconStyles.PLAY, tile.data.paused, button ->
+                DisplaysNet.sendPlaybackServer(tile, !tile.data.paused, tile.data.tick)
         );
         this.stop = new GuiButtonIcon("stop", IconStyles.STOP, button -> DisplaysNet.sendPlaybackServer(tile, false, 0));
-        this.loop = new WidgetCheckButton(DisplayData.LOOP, IconStyles.REPEAT_ON, IconStyles.REPEAT_OFF, tile.data.loop, button ->
+        this.loop = new WidgetCheckButtonIcon(DisplayData.LOOP, IconStyles.REPEAT_ON, IconStyles.REPEAT_OFF, tile.data.loop, button ->
                 DisplaysNet.sendLoopServer(tile, !tile.data.loop)
         ) {
             @Override
             public List<Component> getTooltip() {
-                Component is = Crossponent.translatable("waterframes.common." + this.value, this.value ? ChatFormatting.GREEN : ChatFormatting.RED);
                 return Collections.singletonList(
-                        Crossponent.translatableParse("waterframes.gui.loop", is)
+                        translatable("waterframes.gui.loop",
+                                (this.value ? ChatFormatting.GREEN : ChatFormatting.RED) + translate("waterframes.common." + this.value))
                 );
             }
         };
@@ -172,8 +181,10 @@ public class DisplayScreen extends GuiLayer {
         this.volume_max = new GuiSteppedSlider(DisplayData.VOL_RANGE_MAX, tile.data.maxVolumeDistance, 0, DisplayConfig.maxVolumeDistance());
         this.volume_max.setMinSlider(this.volume_min);
 
-        this.reload_all = (GuiButton) new GuiButton("reload_all", x -> ImageAPI.reloadCache()).setTranslate("waterframes.gui.reload.all").setTooltip("waterframes.gui.reload.all.warning");
-        this.reload = (GuiButton) new GuiButton("reload", x -> tile.imageCache.reload()).setTranslate("waterframes.gui.reload");
+        this.reload_all = new GuiButton("reload_all", x -> ImageAPI.reloadCache());
+        this.reload = new GuiButton("reload", x -> tile.imageCache.reload());
+        this.reload_all.setTranslate("waterframes.gui.reload.all").setTooltip("waterframes.gui.reload.all.warning");
+        this.reload.setTranslate("waterframes.gui.reload");
 
         this.registerEvent(GuiTextUpdateEvent.class, guiTextUpdateEvent -> {
             if (guiTextUpdateEvent.control.name.equals(DisplayData.URL)) {
@@ -182,19 +193,16 @@ public class DisplayScreen extends GuiLayer {
             }
         });
 
-        if (!this.tile.isClient()) return;
-        this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.display != null ? tile.display.durationInTicks() : 1, LongValueParser.TIME_DURATION_TICK)
+        this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax != -1 ? tile.data.tickMax : 1, LongValueParser.TIME_DURATION_TICK)
                 .setPosConsumer(v -> tile.data.tick = (int) v)
-                .setLastPosConsumer(v -> DisplaysNet.sendPlaytimeServer(tile, tile.data.tick = (int) v, tile.data.tickMax))
-                .setDim(150, 18)
-                .setExpandableX();
+                .setLastPosConsumer(v -> DisplaysNet.sendPlaytimeServer(tile, tile.data.tick = (int) v, tile.data.tickMax));
     }
 
     @Override
     public void create() {
         if (!isClient()) return;
         // URL FIELD
-        final var table = new WidgetDoubleTable(GuiFlow.STACK_Y, 4)
+        final var table = new WidgetPairTable(GuiFlow.STACK_Y, 4)
                 .addLeft(url_l)
                 .addLeft(urlField.setExpandableX())
                 .addRight(new WidgetStatusIcon("", IconStyles.STATUS_OK, tile).setDim(30, 30));
@@ -221,21 +229,21 @@ public class DisplayScreen extends GuiLayer {
                 .addWidget(!tile.canResize(), () -> flip_y);
 
         this.add(tex_l);
-        this.add(new WidgetDoubleTable(GuiFlow.STACK_Y, 2)
+        this.add(new WidgetPairTable(GuiFlow.STACK_Y, 2)
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(rot_i).addWidget(rotation.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(vis_i).addWidget(visibility.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(bright_i).addWidget(brightness.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(render_i).addWidget(render_distance.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeftIf(tile.canProject(), new GuiParent(GuiFlow.STACK_X).addWidget(project_i).addWidget(projection_distance.setDim(100, 13)).addWidget(audioOffset.setDim(26, 13)).setVAlign(VAlign.CENTER))
                 .addLeftIf(!basicOptions.isEmpty(), basicOptions)
-                .addRightIf(tile.canResize(), positionViewer.setDim(40, 40), pos_x, pos_y)
+                .addRightIf(tile.canResize(), pos_view.setDim(40, 40), pos_x, pos_y)
                 .setAlignRight(Align.CENTER)
                 .setExpandableY()
         );
 
         // MEDIA SETTINGS
         this.add(media_l);
-        final var mediaSettingsTable = new WidgetDoubleTable(GuiFlow.STACK_X, 4)
+        final var mediaSettingsTable = new WidgetPairTable(GuiFlow.STACK_X, 4)
                 .addRight(this.vol_i, this.volume.setDim(100, 16).setExpandableX())
                 .setAlignRight(Align.RIGHT)
                 .setVAlignRight(VAlign.CENTER)
@@ -255,17 +263,15 @@ public class DisplayScreen extends GuiLayer {
         this.add(mediaSettingsTable);
 
         // SEEKBAR + buttons
-        this.add(new GuiParent(GuiFlow.STACK_X)
-                .addWidget(
-                        this.loop.setDim(14, 14),
-                        this.playback.setSquared(true).setDim(20, 14),
-                        this.stop.setDim(14, 14),
-                        this.seekbar
-                )
+        this.add(new GuiParent(GuiFlow.STACK_X).addWidget(
+                this.loop.setDim(14, 14),
+                this.playback.setSquared(true).setDim(20, 14),
+                this.stop.setDim(14, 14),
+                this.seekbar.setDim(150, 18).setExpandableX())
         );
 
         // SAVE BUTTONS
-        this.add(new WidgetDoubleTable(GuiFlow.STACK_X, Align.RIGHT, 2)
+        this.add(new WidgetPairTable(GuiFlow.STACK_X, Align.RIGHT, 2)
                 .addLeft(this.reload_all)
                 .addRight(this.save.setEnabled(DisplayConfig.canSave(getPlayer(), urlField.getText())))
                 .addRight(this.reload)
@@ -278,7 +284,7 @@ public class DisplayScreen extends GuiLayer {
         super.tick();
         if (!isClient()) return;
         this.vol_i.setIcon(IconStyles.getVolumeIcon((int) volume.getValue()));
-        this.positionViewer.setIcon(IconStyles.POS_CORD[pos_x.getState()][pos_y.getState()]);
+        this.pos_view.setIcon(IconStyles.POS_CORD[pos_x.getState()][pos_y.getState()]);
         this.playback.setState(tile.data.paused);
     }
 

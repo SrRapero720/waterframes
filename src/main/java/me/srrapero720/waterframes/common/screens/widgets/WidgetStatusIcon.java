@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.common.screens.widgets;
 
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -31,25 +32,28 @@ public class WidgetStatusIcon extends GuiIcon {
     public List<Component> getStatusTooltip() {
         TextBuilder builder = new TextBuilder();
         if (!tile.data.active) {
-            builder.translate("waterframes.status.off.1");
-            builder.translate("waterframes.status.off.2");
+            builder.translate("waterframes.status", ChatFormatting.RED + translate("waterframes.status.off"));
+            builder.newLine();
+            builder.translateIfCan("waterframes.status.off.desc");
             return builder.build();
         }
         if (tile.imageCache == null) {
-            builder.translate("waterframes.download.exception.invalid");
+            builder.translate("waterframes.status", ChatFormatting.RED + translate("waterframes.status.failed"));
+            builder.translateIfCan("waterframes.status.failed.desc");
             return builder.build();
         }
-        switch (tile.imageCache.getStatus()) {
-            case READY -> builder.translate("waterframes.status.operative");
-            case LOADING -> builder.translate("waterframes.status.loading");
-            case FAILED -> builder.translate("download.exception.invalid");
+        var status = switch (tile.imageCache.getStatus()) {
+            case READY -> ChatFormatting.GREEN + translate("waterframes.status.operative");
+            case LOADING -> ChatFormatting.BLUE + translate("waterframes.status.loading");
+            case FAILED -> ChatFormatting.RED + translate("waterframes.download.exception.invalid");
             case WAITING, FORGOTTEN -> {
                 if (tile.imageCache.url.isEmpty())
-                    builder.translate("waterframes.status.idle");
+                    yield ChatFormatting.BLUE + translate("waterframes.status.idle");
                 else
-                    builder.translate(tile.imageCache.getException().getLocalizedMessage()).build();
+                    yield ChatFormatting.DARK_RED + tile.imageCache.getException().getLocalizedMessage();
             }
         };
+        builder.translate("waterframes.status", status);
 
         return builder.build();
     }

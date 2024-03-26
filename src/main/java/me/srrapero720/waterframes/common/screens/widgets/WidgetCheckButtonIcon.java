@@ -8,27 +8,46 @@ import team.creative.creativecore.common.util.type.Color;
 
 import java.util.function.Consumer;
 
-public class WidgetCheckButton extends GuiButtonIcon {
-    protected Icon on;
-    protected Icon off;
+public class WidgetCheckButtonIcon extends GuiButtonIcon {
+    protected Icon on, off;
     public boolean value;
 
-    public WidgetCheckButton(String name, Icon on, Icon off, boolean state, Consumer<Integer> pressed) {
+    public WidgetCheckButtonIcon(String name, Icon on, Icon off, boolean state) {
+        this(name, on, off, state, null);
+    }
+
+    public WidgetCheckButtonIcon(String name, Icon on, Icon off, boolean state, Consumer<Integer> pressed) {
         super(name, state ? on : off, pressed);
-        this.color = Color.WHITE;
-        this.shadow = Color.BLACK;
         this.value = state;
         this.on = on;
         this.off = off;
     }
 
-    public WidgetCheckButton setColor(Color color) {
+    public WidgetCheckButtonIcon setOnIcon(Icon icon) {
+        this.on = icon;
+        return this;
+    }
+
+    public WidgetCheckButtonIcon setOffIcon(Icon icon) {
+        this.off = icon;
+        return this;
+    }
+
+    @Override
+    public WidgetCheckButtonIcon setColor(Color color) {
         this.color = color;
         return this;
     }
 
-    public WidgetCheckButton setShadow(Color shadow) {
+    @Override
+    public WidgetCheckButtonIcon setShadow(Color shadow) {
         this.shadow = shadow;
+        return this;
+    }
+
+    @Override
+    public WidgetCheckButtonIcon setSquared(boolean squared) {
+        this.squared = squared;
         return this;
     }
 
