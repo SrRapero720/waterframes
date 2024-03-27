@@ -44,6 +44,10 @@ public class IconStyles {
     public static final Icon STATUS_OFF = create(2, 8);
 
     // POSITION ICONS (chunk 3)
+    // POS ICON
+    public static final Icon POS_ICON = create(4, 12);
+    public static final Icon POS_BASE = create(4, 13, 3, 3);
+
     public static final Icon POS_1 = create(3, 0);
     public static final Icon POS_2 = create(3, 1);
     public static final Icon POS_3 = create(3, 2);

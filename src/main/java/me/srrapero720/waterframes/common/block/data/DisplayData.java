@@ -252,7 +252,7 @@ public class DisplayData {
         float height = DisplayConfig.maxHeight();
         if (getHeight() > height) {
             switch (getPosY()) {
-                case TOP  -> {
+                case TOP -> {
                     this.min.y = 0;
                     this.max.y = height;
                 }
@@ -282,8 +282,8 @@ public class DisplayData {
         if (tile.canResize()) {
             nbt.putFloat("width", Math.max(0.1F, (float) screen.widthField.getValue()));
             nbt.putFloat("height", Math.max(0.1F, (float) screen.heightField.getValue()));
-            nbt.putInt("pos_x",  screen.pos_x.getState());
-            nbt.putInt("pos_y", screen.pos_y.getState());
+            nbt.putInt("pos_x",  screen.pos_view.getX().ordinal());
+            nbt.putInt("pos_y", screen.pos_view.getY().ordinal());
         }
 
         nbt.putBoolean(FLIP_X, screen.flip_x.value);

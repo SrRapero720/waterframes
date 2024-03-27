@@ -10,6 +10,7 @@ import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
 import team.creative.creativecore.common.gui.style.Icon;
 import team.creative.creativecore.common.util.text.TextBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class WidgetStatusIcon extends GuiIcon {
@@ -30,32 +31,30 @@ public class WidgetStatusIcon extends GuiIcon {
 
     @OnlyIn(Dist.CLIENT)
     public List<Component> getStatusTooltip() {
-        TextBuilder builder = new TextBuilder();
+        List<Component> tooltip = new ArrayList<>();
         if (!tile.data.active) {
-            builder.translate("waterframes.status", ChatFormatting.RED + translate("waterframes.status.off"));
-            builder.newLine();
-            builder.translateIfCan("waterframes.status.off.desc");
-            return builder.build();
+            tooltip.add(translatable("waterframes.status", ChatFormatting.RED + translate("waterframes.status.off")));
+            tooltip.add(translatable("waterframes.status.off.desc"));
+            return tooltip;
         }
         if (tile.imageCache == null) {
-            builder.translate("waterframes.status", ChatFormatting.RED + translate("waterframes.status.failed"));
-            builder.translateIfCan("waterframes.status.failed.desc");
-            return builder.build();
+            tooltip.add(translatable("waterframes.status", ChatFormatting.RED + translate("waterframes.status.failed")));
+            return tooltip;
         }
         var status = switch (tile.imageCache.getStatus()) {
             case READY -> ChatFormatting.GREEN + translate("waterframes.status.operative");
-            case LOADING -> ChatFormatting.BLUE + translate("waterframes.status.loading");
+            case LOADING -> ChatFormatting.AQUA + translate("waterframes.status.loading");
             case FAILED -> ChatFormatting.RED + translate("waterframes.download.exception.invalid");
             case WAITING, FORGOTTEN -> {
                 if (tile.imageCache.url.isEmpty())
-                    yield ChatFormatting.BLUE + translate("waterframes.status.idle");
+                    yield ChatFormatting.AQUA + translate("waterframes.status.idle");
                 else
                     yield ChatFormatting.DARK_RED + tile.imageCache.getException().getLocalizedMessage();
             }
         };
-        builder.translate("waterframes.status", status);
+        tooltip.add(translatable("waterframes.status", status));
 
-        return builder.build();
+        return tooltip;
     }
 
     @OnlyIn(Dist.CLIENT)

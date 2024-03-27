@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.common.screens;
 
 import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.network.DisplaysNet;
@@ -23,10 +24,12 @@ import team.creative.creativecore.common.gui.parser.LongValueParser;
 import team.creative.creativecore.common.gui.style.ControlFormatting;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
+import team.creative.creativecore.common.util.math.geo.Rect;
 import team.creative.creativecore.common.util.text.TextBuilder;
 import team.creative.creativecore.common.util.text.TextListBuilder;
 import team.creative.creativecore.common.util.type.Color;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -80,15 +83,15 @@ public class DisplayScreen extends GuiLayer {
     // WIDGETS
     public final GuiCheckBox flip_x;
     public final GuiCheckBox flip_y;
-
-    public final GuiStateButton pos_x;
-    public final GuiStateButton pos_y;
+//
+//    public final GuiStateButton pos_x;
+//    public final GuiStateButton pos_y;
     public final GuiSlider volume;
     public final GuiSteppedSlider volume_min;
     public final GuiSteppedSlider volume_max;
 
     // ICONS
-    private final GuiIcon pos_view;
+    public final WidgetClickableArea pos_view;
 
     public DisplayScreen(DisplayTile tile) {
         super("display_screen", 260, 245);
@@ -141,12 +144,12 @@ public class DisplayScreen extends GuiLayer {
         this.audioOffset = new GuiStateButtonIcon(DisplayData.AUDIO_OFFSET, IconStyles.AUDIO_POS_BLOCK, IconStyles.AUDIO_POS_PICTURE, IconStyles.AUDIO_POS_CENTER) {
             @Override
             public List<Component> getTooltip() {
-                return new TextBuilder()
-                        .translate("waterframes.gui.audio_pos.1")
-                        .newLine()
-                        .translate("waterframes.gui.audio_pos.2",
-                                ChatFormatting.BLUE + translate("waterframes.gui.audio_pos.states." + getState()))
-                        .build();
+                List<Component> tooltip = new ArrayList<>();
+                tooltip.add(translatable("waterframes.gui.audio_pos.1"));
+                tooltip.add(translatable("waterframes.gui.audio_pos.2",
+                        ChatFormatting.AQUA + translate("waterframes.gui.audio_pos.states." + getState())
+                ));
+                return tooltip;
             }
         }.setControlFormatting(ControlFormatting.CLICKABLE_NO_PADDING).setState(tile.data.getOffsetMode());
         this.audioOffset.setShadow(Color.NONE);
@@ -156,9 +159,7 @@ public class DisplayScreen extends GuiLayer {
         this.show_model.setTranslate("waterframes.gui.show_model");
         this.render_behind.setTranslate("waterframes.gui.render_behind");
 
-        this.pos_x = new GuiStateButton("pos_x", tile.data.getPosX().ordinal(), FrameTools.translatable("waterframes.gui.pos_x.", "left", "right", "center"));
-        this.pos_y = new GuiStateButton("pos_y", tile.data.getPosY().ordinal(), FrameTools.translatable("waterframes.gui.pos_y.", "top", "bottom", "center"));
-        this.pos_view = new GuiIcon("posView", IconStyles.POS_CORD[pos_x.getState()][pos_y.getState()]);
+        this.pos_view = new WidgetClickableArea("pos_area", tile.data.getPosX(), tile.data.getPosY());
 
         this.playback = new GuiCheckButtonIcon("playback", IconStyles.PAUSE, IconStyles.PLAY, tile.data.paused, button ->
                 DisplaysNet.sendPlaybackServer(tile, !tile.data.paused, tile.data.tick)
@@ -193,7 +194,7 @@ public class DisplayScreen extends GuiLayer {
             }
         });
 
-        this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax != -1 ? tile.data.tickMax : 1, LongValueParser.TIME_DURATION_TICK)
+        this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax, LongValueParser.TIME_DURATION_TICK)
                 .setOnTimeUpdate(v -> tile.data.tick = (int) v)
                 .setOnLastTimeUpdate(v -> DisplaysNet.sendPlaytimeServer(tile, tile.data.tick = (int) v, tile.data.tickMax));
     }
@@ -236,7 +237,7 @@ public class DisplayScreen extends GuiLayer {
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(render_i).addWidget(render_distance.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeftIf(tile.canProject(), new GuiParent(GuiFlow.STACK_X).addWidget(project_i).addWidget(projection_distance.setDim(100, 13)).addWidget(audioOffset.setDim(26, 13)).setVAlign(VAlign.CENTER))
                 .addLeftIf(!basicOptions.isEmpty(), basicOptions)
-                .addRightIf(tile.canResize(), pos_view.setDim(40, 40), pos_x, pos_y)
+                .addRightIf(tile.canResize(), pos_view.setDim(80, 80))
                 .setAlignRight(Align.CENTER)
                 .setExpandableY()
         );
@@ -284,7 +285,6 @@ public class DisplayScreen extends GuiLayer {
         super.tick();
         if (!isClient()) return;
         this.vol_i.setIcon(IconStyles.getVolumeIcon((int) volume.getValue()));
-        this.pos_view.setIcon(IconStyles.POS_CORD[pos_x.getState()][pos_y.getState()]);
         this.playback.setState(tile.data.paused);
     }
 
