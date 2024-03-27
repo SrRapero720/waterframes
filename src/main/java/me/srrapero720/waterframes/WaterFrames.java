@@ -1,7 +1,6 @@
 package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.util.FrameRegistry;
-import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
