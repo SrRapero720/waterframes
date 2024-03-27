@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 public class WaterFrames {
     // TOOLS
     public static final String ID = "waterframes";
+    public static final String COMM_PREFIX = "§6§l[§r§bWATERF§3r§bAMES§6§l]: §r";
     public static final Logger LOGGER = LogManager.getLogger(ID);
 
     // BOOTSTRAP
