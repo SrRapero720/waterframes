@@ -8,7 +8,6 @@ import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 
 @OnlyIn(Dist.CLIENT)
 public class ScreenStyles {
-    public static final StyleDisplay NO_BACKGROUND = new DisplayColor(0,0,0,0);
 
     public static final StyleDisplay BLUE_BORDER = new DisplayColor(color(72), color(220), color(219), 1.0F);
     public static final StyleDisplay BLUE_BACKGROUND = new DisplayColor(color(47), color(137), color(137), 1.0F);

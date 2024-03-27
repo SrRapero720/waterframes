@@ -66,9 +66,9 @@ public class DisplayScreen extends GuiLayer {
 
     public final GuiCheckBox show_model;
     public final GuiCheckBox render_behind;
-    public final WidgetCheckButtonIcon loop;
+    public final GuiCheckButtonIcon loop;
 
-    public final WidgetCheckButtonIcon playback;
+    public final GuiCheckButtonIcon playback;
     public final GuiControl stop;
 
     public final GuiStateButtonIcon audioOffset;
@@ -160,11 +160,11 @@ public class DisplayScreen extends GuiLayer {
         this.pos_y = new GuiStateButton("pos_y", tile.data.getPosY().ordinal(), FrameTools.translatable("waterframes.gui.pos_y.", "top", "bottom", "center"));
         this.pos_view = new GuiIcon("posView", IconStyles.POS_CORD[pos_x.getState()][pos_y.getState()]);
 
-        this.playback = new WidgetCheckButtonIcon("playback", IconStyles.PAUSE, IconStyles.PLAY, tile.data.paused, button ->
+        this.playback = new GuiCheckButtonIcon("playback", IconStyles.PAUSE, IconStyles.PLAY, tile.data.paused, button ->
                 DisplaysNet.sendPlaybackServer(tile, !tile.data.paused, tile.data.tick)
         );
         this.stop = new GuiButtonIcon("stop", IconStyles.STOP, button -> DisplaysNet.sendPlaybackServer(tile, false, 0));
-        this.loop = new WidgetCheckButtonIcon(DisplayData.LOOP, IconStyles.REPEAT_ON, IconStyles.REPEAT_OFF, tile.data.loop, button ->
+        this.loop = new GuiCheckButtonIcon(DisplayData.LOOP, IconStyles.REPEAT_ON, IconStyles.REPEAT_OFF, tile.data.loop, button ->
                 DisplaysNet.sendLoopServer(tile, !tile.data.loop)
         ) {
             @Override
@@ -194,8 +194,8 @@ public class DisplayScreen extends GuiLayer {
         });
 
         this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax != -1 ? tile.data.tickMax : 1, LongValueParser.TIME_DURATION_TICK)
-                .setPosConsumer(v -> tile.data.tick = (int) v)
-                .setLastPosConsumer(v -> DisplaysNet.sendPlaytimeServer(tile, tile.data.tick = (int) v, tile.data.tickMax));
+                .setOnTimeUpdate(v -> tile.data.tick = (int) v)
+                .setOnLastTimeUpdate(v -> DisplaysNet.sendPlaytimeServer(tile, tile.data.tick = (int) v, tile.data.tickMax));
     }
 
     @Override
