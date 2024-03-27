@@ -59,12 +59,7 @@
     "waterframes.gui.position.top": "Top",
     "waterframes.gui.position.bottom": "Bottom",
 
-    "waterframes.gui.pos_x.left": "left (x)",
-    "waterframes.gui.pos_x.center": "center (x)",
-    "waterframes.gui.pos_x.right": "right (x)",
-    "waterframes.gui.pos_y.top": "top (y)",
-    "waterframes.gui.pos_y.center": "center (y)",
-    "waterframes.gui.pos_y.bottom": "bottom (y)",
+    "waterframes.gui.videoplayer": "Open in VideoPlayer",
 
     "waterframes.gui.audio_pos.1": "Audio origin position",
     "waterframes.gui.audio_pos.2": "Mode: %s as source",

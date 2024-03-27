@@ -4,6 +4,7 @@ import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.compat.videoplayer.VPCompat;
 import me.srrapero720.waterframes.common.network.DisplaysNet;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
@@ -80,12 +81,12 @@ public class DisplayScreen extends GuiLayer {
     public final GuiButton reload;
     public GuiControl seekbar;
 
+    public GuiButtonIcon videoplayer;
+
     // WIDGETS
     public final GuiCheckBox flip_x;
     public final GuiCheckBox flip_y;
-//
-//    public final GuiStateButton pos_x;
-//    public final GuiStateButton pos_y;
+
     public final GuiSlider volume;
     public final GuiSteppedSlider volume_min;
     public final GuiSteppedSlider volume_max;
@@ -161,7 +162,7 @@ public class DisplayScreen extends GuiLayer {
 
         this.pos_view = new WidgetClickableArea("pos_area", tile.data.getPosX(), tile.data.getPosY());
 
-        this.playback = new GuiCheckButtonIcon("playback", IconStyles.PAUSE, IconStyles.PLAY, tile.data.paused, button ->
+        this.playback = new GuiCheckButtonIcon("playback", IconStyles.PLAY, IconStyles.PAUSE, tile.data.paused, button ->
                 DisplaysNet.sendPlaybackServer(tile, !tile.data.paused, tile.data.tick)
         );
         this.stop = new GuiButtonIcon("stop", IconStyles.STOP, button -> DisplaysNet.sendPlaybackServer(tile, false, 0));
@@ -186,6 +187,14 @@ public class DisplayScreen extends GuiLayer {
         this.reload = new GuiButton("reload", x -> tile.imageCache.reload());
         this.reload_all.setTranslate("waterframes.gui.reload.all").setTooltip("waterframes.gui.reload.all.warning");
         this.reload.setTranslate("waterframes.gui.reload");
+
+        if (VPCompat.installed()) {
+            this.videoplayer = new GuiButtonIcon("", IconStyles.VIDEOPLAYER_PLAY, button -> {
+                VPCompat.playVideo(tile.data.url, tile.data.volume, true);
+                DisplaysNet.sendPlaybackServer(tile, true, tile.data.tick);
+            });
+            this.videoplayer.setTooltip("waterframes.gui.videoplayer");
+        }
 
         this.registerEvent(GuiTextUpdateEvent.class, guiTextUpdateEvent -> {
             if (guiTextUpdateEvent.control.name.equals(DisplayData.URL)) {
@@ -235,17 +244,18 @@ public class DisplayScreen extends GuiLayer {
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(vis_i).addWidget(visibility.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(bright_i).addWidget(brightness.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(render_i).addWidget(render_distance.setDim(130, 12)).setVAlign(VAlign.CENTER))
-                .addLeftIf(tile.canProject(), new GuiParent(GuiFlow.STACK_X).addWidget(project_i).addWidget(projection_distance.setDim(100, 13)).addWidget(audioOffset.setDim(26, 13)).setVAlign(VAlign.CENTER))
-                .addLeftIf(!basicOptions.isEmpty(), basicOptions)
-                .addRightIf(tile.canResize(), pos_view.setDim(80, 80))
+                .addLeftIf(tile.canProject(), () -> new GuiParent(GuiFlow.STACK_X).addWidget(project_i).addWidget(projection_distance.setDim(100, 13)).addWidget(audioOffset.setDim(26, 13)).setVAlign(VAlign.CENTER))
+                .addLeftIf(!basicOptions.isEmpty(), () -> basicOptions)
+                .addRightIf(tile.canResize(), () -> pos_view.setDim(80, 80))
                 .setAlignRight(Align.CENTER)
                 .setExpandableY()
         );
 
         // MEDIA SETTINGS
         this.add(media_l);
-        final var mediaSettingsTable = new WidgetPairTable(GuiFlow.STACK_X, 4)
-                .addRight(this.vol_i, this.volume.setDim(100, 16).setExpandableX())
+        final var mediaSettingsTable = new WidgetPairTable(GuiFlow.STACK_X, 2)
+                .addRight(this.vol_i.setIcon(IconStyles.getVolumeIcon(tile.data.volume)), this.volume.setDim(100, 15).setExpandableX())
+                .addLeftIf(VPCompat.installed(), () -> this.videoplayer.setDim(16, 12))
                 .setAlignRight(Align.RIGHT)
                 .setVAlignRight(VAlign.CENTER)
                 .setLeftExpandableX()
@@ -273,9 +283,9 @@ public class DisplayScreen extends GuiLayer {
 
         // SAVE BUTTONS
         this.add(new WidgetPairTable(GuiFlow.STACK_X, Align.RIGHT, 2)
-                .addLeft(this.reload_all)
-                .addRight(this.save.setEnabled(DisplayConfig.canSave(getPlayer(), urlField.getText())))
-                .addRight(this.reload)
+                .addLeft(this.reload_all.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(50, 10))
+                .addRight(this.save.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(60, 10).setEnabled(DisplayConfig.canSave(getPlayer(), urlField.getText())))
+                .addRight(this.reload.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(50, 10))
                 .setAlignRight(Align.RIGHT)
         );
     }

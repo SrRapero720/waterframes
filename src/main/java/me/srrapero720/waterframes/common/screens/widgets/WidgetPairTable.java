@@ -8,6 +8,8 @@ import team.creative.creativecore.common.gui.controls.parent.GuiRow;
 import team.creative.creativecore.common.gui.controls.parent.GuiTable;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 
+import java.util.function.Supplier;
+
 public class WidgetPairTable extends GuiTable {
     private GuiColumn left;
     private GuiColumn right;
@@ -54,13 +56,13 @@ public class WidgetPairTable extends GuiTable {
         return this;
     }
 
-    public WidgetPairTable addLeftIf(boolean condition, GuiControl... guiControls) {
-        if (condition) this.addLeft(guiControls);
+    public WidgetPairTable addLeftIf(boolean condition, Supplier<GuiControl> guiControls) {
+        if (condition) this.addLeft(guiControls.get());
         return this;
     }
 
-    public WidgetPairTable addRightIf(boolean conditional, GuiControl... guiControls) {
-        if (conditional) this.addRight(guiControls);
+    public WidgetPairTable addRightIf(boolean conditional, Supplier<GuiControl> guiControls) {
+        if (conditional) this.addRight(guiControls.get());
         return this;
     }
 
