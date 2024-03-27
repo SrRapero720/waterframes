@@ -22,12 +22,12 @@ public abstract class DisplayPacket extends CreativePacket {
 
     @Override
     public void execute(Player player) {
-        if (player.getLevel().getBlockEntity(pos) instanceof DisplayTile tile) {
-            this.execute(tile, player, player.level);
-            if (player.level.isClientSide) {
-                this.executeClient(tile, player, player.level);
+        if (player.level().getBlockEntity(pos) instanceof DisplayTile tile) {
+            this.execute(tile, player, player.level());
+            if (player.level().isClientSide) {
+                this.executeClient(tile, player, player.level());
             } else {
-                this.executeServer(tile, (ServerPlayer) player, (ServerLevel) player.level);
+                this.executeServer(tile, (ServerPlayer) player, (ServerLevel) player.level());
             }
         }
     }

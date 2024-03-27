@@ -160,7 +160,7 @@ public class DisplayConfig {
     }
 
     public static boolean canSave(Player player, String url) {
-        Level level = player.getLevel();
+        Level level = player.level();
         MinecraftServer server = level.getServer();
         if (level.isClientSide()) return true; // FIXME: on client breaks screens
         assert server != null;

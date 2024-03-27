@@ -21,7 +21,7 @@ public class PauseModePacket extends DisplayPacket {
 
     @Override
     public void executeServer(DisplayTile tile, ServerPlayer player, ServerLevel level) {
-        DisplaysNet.sendPlaybackClient(this, player.level);
+        DisplaysNet.sendPlaybackClient(this, player.level());
     }
 
     @Override

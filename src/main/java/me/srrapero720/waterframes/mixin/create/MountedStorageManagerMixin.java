@@ -34,7 +34,7 @@ public class MountedStorageManagerMixin {
             BlockPos entityPos = entity.blockPosition();
             WaterFrames.LOGGER.debug("TICKING [{}, {}, {}]", entityPos.getX(), entityPos.getY(), entityPos.getZ());
             DisplayTile tile = waterframes$displays.get(i);
-            DisplayTile.tick(entity.level, entity.blockPosition(), tile.getBlockState(), tile);
+            DisplayTile.tick(entity.level(), entity.blockPosition(), tile.getBlockState(), tile);
         }
     }
 }

@@ -24,7 +24,7 @@ public class PlaytimePacket extends DisplayPacket {
 
     @Override
     public void executeServer(DisplayTile tile, ServerPlayer player, ServerLevel level) {
-        DisplaysNet.sendPlaytimeClient(this, player.level);
+        DisplaysNet.sendPlaytimeClient(this, player.level());
     }
 
     @Override

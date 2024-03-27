@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.common.screens.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.common.screens.ScalableCompiledText;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.GuiChildControl;
@@ -72,13 +73,13 @@ public class WidgetLabel extends GuiControl {
     }
 
     @Override
-    public void render(PoseStack pose, GuiChildControl control, Rect controlRect, Rect realRect, double scale, int mouseX, int mouseY) {
+    public void render(GuiGraphics graphics, GuiChildControl control, Rect controlRect, Rect realRect, double scale, int mouseX, int mouseY) {
         this.text.setScale(this.scale);
-        this.text.render(pose);
+        this.text.render(graphics.pose());
     }
 
     @Override
-    protected void renderContent(PoseStack poseStack, GuiChildControl guiChildControl, Rect rect, int i, int i1) {
+    protected void renderContent(GuiGraphics poseStack, GuiChildControl guiChildControl, Rect rect, int i, int i1) {
 
     }
 

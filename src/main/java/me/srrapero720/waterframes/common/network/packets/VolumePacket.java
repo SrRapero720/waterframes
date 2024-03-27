@@ -26,7 +26,7 @@ public class VolumePacket extends DisplayPacket {
 
     @Override
     public void executeServer(DisplayTile tile, ServerPlayer player, ServerLevel level) {
-        DisplaysNet.sendVolumeClient(this, player.level);
+        DisplaysNet.sendVolumeClient(this, player.level());
     }
 
     @Override

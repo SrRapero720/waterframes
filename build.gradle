@@ -73,16 +73,16 @@ dependencies {
     //DEPENDENCIES
     implementation fileTree('libs') { include '*.jar' }
     implementation "com.github.SrRapero720.watermedia:build:${watermediaversion}"
-    implementation fg.deobf("curse.maven:video-player-645407:4782050")
-//    implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
+    compileOnly fg.deobf("curse.maven:video-player-645407:4782050")
+//    compileOnly fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
 
     // UTIL
     implementation fg.deobf("curse.maven:ferritecore-429235:${ferritecoreversion}")
     implementation fg.deobf("curse.maven:fastload-630620:${fastloadversion}")
-    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:${lazyversion}")
+//    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:${lazyversion}")
     implementation fg.deobf("curse.maven:spark-361579:${sparkversion}")
     implementation fg.deobf("curse.maven:embeddium-908741:${embeddiumversion}")
-    implementation fg.deobf("curse.maven:worldedit-225608:3697298")
+//    implementation fg.deobf("curse.maven:worldedit-225608:3697298")
 //    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
 
     // MOD SUPPORT

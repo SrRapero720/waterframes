@@ -16,8 +16,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.server.command.EnumArgument;
 import team.creative.creativecore.common.gui.GuiControl;
@@ -36,9 +34,9 @@ public class WaterFramesCommand {
                                 )
 
                                 .then(Commands.literal("size")
-                                        .then(Commands.argument("width", FloatArgumentType.floatArg(0.1f, DisplayConfig.maxWidth()))
+                                        .then(Commands.argument("width", FloatArgumentType.floatArg(0.1f, 200))
                                                 .executes(c -> setSize(c, c.getArgument("width", float.class), -1))
-                                                .then(Commands.argument("height", FloatArgumentType.floatArg(0.1f, DisplayConfig.maxHeight()))
+                                                .then(Commands.argument("height", FloatArgumentType.floatArg(0.1f, 200))
                                                         .executes(c -> setSize(c, c.getArgument("width", float.class), c.getArgument("height", float.class)))
                                                         .then(positionLiteral)
                                                 )
@@ -48,7 +46,7 @@ public class WaterFramesCommand {
                                 .then(positionLiteral)
 
                                 .then(Commands.literal("volume")
-                                        .then(Commands.argument("volume", IntegerArgumentType.integer(0, DisplayConfig.maxVolume()))
+                                        .then(Commands.argument("volume", IntegerArgumentType.integer(0, 200))
                                                 .executes(c -> setVolume(c, c.getArgument("volume", int.class)))
                                         )
                                 )
@@ -79,14 +77,14 @@ public class WaterFramesCommand {
             }
             tile.data.url = url;
             tile.setDirty();
-            source.sendSuccess(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.set.url.success"))
+            source.sendSuccess(() ->
+                    Component.literal(WaterFrames.COMM_PREFIX).append(Component.translatable("waterframes.commands.set.url.success"))
                             .withStyle(ChatFormatting.GREEN), true
             );
             return 0;
         } else {
             source.sendFailure(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
+                    Component.literal(WaterFrames.COMM_PREFIX).append(Component.translatable("waterframes.commands.invalid")
                             .withStyle(ChatFormatting.RED))
             );
             return 1;
@@ -104,14 +102,14 @@ public class WaterFramesCommand {
             if (height > 0.1f) tile.data.setHeight(tile.data.getPosY(), height);
 
             tile.setDirty();
-            source.sendSuccess(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.set.size.success"))
+            source.sendSuccess(() ->
+                    Component.literal(WaterFrames.COMM_PREFIX).append(Component.translatable("waterframes.commands.set.size.success"))
                             .withStyle(ChatFormatting.GREEN), true
             );
             return 0;
         } else {
             source.sendFailure(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
+                    Component.literal(WaterFrames.COMM_PREFIX).append(Component.translatable("waterframes.commands.invalid")
                             .withStyle(ChatFormatting.RED))
             );
             return 1;
@@ -128,14 +126,14 @@ public class WaterFramesCommand {
             if (horizontal != null) displayBE.data.setWidth(horizontal, displayBE.data.getWidth());
             displayBE.data.setHeight(vertical, displayBE.data.getHeight());
             displayBE.setDirty();
-            source.sendSuccess(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.set.position.success"))
+            source.sendSuccess(() ->
+                    Component.literal(WaterFrames.COMM_PREFIX).append(Component.translatable("waterframes.commands.set.position.success"))
                             .withStyle(ChatFormatting.GREEN), true
             );
             return 0;
         } else {
             source.sendFailure(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
+                    Component.literal(WaterFrames.COMM_PREFIX).append(Component.translatable("waterframes.commands.invalid")
                             .withStyle(ChatFormatting.RED))
             );
             return 1;
@@ -151,14 +149,14 @@ public class WaterFramesCommand {
         if (displayTile instanceof DisplayTile tile) {
             tile.data.volume = volume;
             tile.setDirty();
-            source.sendSuccess(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.set.volume.success"))
+            source.sendSuccess(() ->
+                    Component.literal(WaterFrames.COMM_PREFIX).append(Component.translatable("waterframes.commands.set.volume.success"))
                             .withStyle(ChatFormatting.GREEN), true
             );
             return 0;
         } else {
             source.sendFailure(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.invalid").withStyle(ChatFormatting.RED))
+                    Component.literal(WaterFrames.COMM_PREFIX).append(Component.translatable("waterframes.commands.invalid").withStyle(ChatFormatting.RED))
             );
             return 1;
         }

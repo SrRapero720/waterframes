@@ -18,7 +18,6 @@ import team.creative.creativecore.client.render.text.CompiledText;
 import team.creative.creativecore.client.render.text.Linebreaker;
 import team.creative.creativecore.client.render.text.WidthLimitedCharSink;
 import team.creative.creativecore.common.gui.Align;
-import team.creative.creativecore.common.util.text.AdvancedComponent;
 import team.creative.creativecore.common.util.type.list.SingletonList;
 
 import java.util.*;
@@ -259,13 +258,7 @@ public class ScalableCompiledText {
     private int calculateWidth(FormattedText component) {
         Font font = Minecraft.getInstance().font;
         int width = 0;
-        if (component instanceof AdvancedComponent advanced) {
-            if (!advanced.isEmpty()) {
-                width += advanced.getWidth(font);
-            }
-        } else {
-            width += font.width(component);
-        }
+        width += font.width(component);
 
         if (component instanceof Component && !((Component)component).getSiblings().isEmpty()) {
             width += this.calculateWidth(0, false, ((Component)component).getSiblings());
@@ -276,9 +269,7 @@ public class ScalableCompiledText {
 
     public CompiledText copy() {
         CompiledText copy = new CompiledText(this.maxWidth, this.maxHeight);
-        copy.alignment = this.alignment;
-        copy.lineSpacing = this.lineSpacing;
-        copy.shadow = this.shadow;
+        copy.setAlign(this.alignment);;
         List<Component> components = new ArrayList();
         Iterator<Component> var3 = this.original.iterator();
 
@@ -313,14 +304,9 @@ public class ScalableCompiledText {
             for(Iterator<FormattedText> var5 = this.components.iterator(); var5.hasNext(); xOffset += width) {
                 FormattedText text = var5.next();
                 int height;
-                if (text instanceof AdvancedComponent) {
-                    width = ((AdvancedComponent)text).getWidth(font);
-                    height = ((AdvancedComponent)text).getHeight(font);
-                } else {
-                    width = font.width(text);
-                    Objects.requireNonNull(font);
-                    height = 9;
-                }
+                width = font.width(text);
+                Objects.requireNonNull(font);
+                height = 9;
 
                 int yOffset = 0;
                 if (height < this.height) {
@@ -329,12 +315,8 @@ public class ScalableCompiledText {
 
                 stack.pushPose();
                 stack.translate(xOffset, yOffset, 0.0);
-                if (text instanceof AdvancedComponent) {
-                    ((AdvancedComponent)text).render(stack, font, ScalableCompiledText.this.defaultColor);
-                } else {
-                    font.drawInBatch(Language.getInstance().getVisualOrder(text), 0.0F, 0.0F, ScalableCompiledText.this.defaultColor, ScalableCompiledText.this.shadow, stack.last().pose(), renderType, false, 0, 15728880);
-                    renderType.endBatch();
-                }
+                font.drawInBatch(Language.getInstance().getVisualOrder(text), 0.0F, 0.0F, ScalableCompiledText.this.defaultColor, ScalableCompiledText.this.shadow, stack.last().pose(), renderType, Font.DisplayMode.NORMAL, 0, 15728880);
+                renderType.endBatch();
 
                 stack.popPose();
             }
@@ -350,57 +332,32 @@ public class ScalableCompiledText {
         public FormattedText add(FormattedText component) {
             Font font = Minecraft.getInstance().font;
             int remainingWidth = ScalableCompiledText.this.maxWidth - this.width;
-            if (component instanceof AdvancedComponent advanced) {
-                if (advanced.isEmpty()) {
-                    return null;
-                } else {
-                    int textWidth = advanced.getWidth(font);
-                    if (remainingWidth > textWidth) {
-                        this.components.add(advanced);
-                        this.updateDimension(this.width + textWidth, advanced.getHeight(font));
-                        return null;
-                    } else if (advanced.canSplit()) {
-                        List<AdvancedComponent> remaining = advanced.split(remainingWidth, this.width == 0);
-                        AdvancedComponent toAdd = (AdvancedComponent)remaining.remove(0);
-                        this.components.add(toAdd);
-                        this.updateDimension(this.width + toAdd.getWidth(font), toAdd.getHeight(font));
-                        return remaining.isEmpty() ? null : (FormattedText)remaining.get(0);
-                    } else if (this.width == 0) {
-                        this.components.add(advanced);
-                        this.updateDimension(this.width + textWidth, advanced.getHeight(font));
-                        return null;
-                    } else {
-                        return advanced;
-                    }
-                }
+            int textWidthx = font.width(component);
+            int var10001;
+            if (remainingWidth >= textWidthx) {
+                this.components.add(component);
+                var10001 = this.width + textWidthx;
+                Objects.requireNonNull(font);
+                this.updateDimension(var10001, 9);
+                return null;
             } else {
-                int textWidthx = font.width(component);
-                int var10001;
-                if (remainingWidth >= textWidthx) {
-                    this.components.add(component);
-                    var10001 = this.width + textWidthx;
-                    Objects.requireNonNull(font);
-                    this.updateDimension(var10001, 9);
-                    return null;
-                } else {
-                    FormattedTextSplit split = ScalableCompiledText.this.splitByWidth(component, remainingWidth, Style.EMPTY, this.width == 0);
-                    if (split != null && (split.head != null || this.width == 0)) {
-                        if (split.head != null) {
-                            var10001 = this.width + font.width(split.head);
-                            Objects.requireNonNull(font);
-                            this.updateDimension(var10001, 9);
-                            this.components.add(split.head);
-                            return split.tail;
-                        } else {
-                            var10001 = this.width + font.width(split.tail);
-                            Objects.requireNonNull(font);
-                            this.updateDimension(var10001, 9);
-                            this.components.add(split.tail);
-                            return null;
-                        }
+                FormattedTextSplit split = ScalableCompiledText.this.splitByWidth(component, remainingWidth, Style.EMPTY, this.width == 0);
+                if (split != null && (split.head != null || this.width == 0)) {
+                    if (split.head != null) {
+                        var10001 = this.width + font.width(split.head);
+                        Objects.requireNonNull(font);
+                        this.updateDimension(var10001, 9);
+                        this.components.add(split.head);
+                        return split.tail;
                     } else {
-                        return component;
+                        var10001 = this.width + font.width(split.tail);
+                        Objects.requireNonNull(font);
+                        this.updateDimension(var10001, 9);
+                        this.components.add(split.tail);
+                        return null;
                     }
+                } else {
+                    return component;
                 }
             }
         }

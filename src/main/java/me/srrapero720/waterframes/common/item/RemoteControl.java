@@ -5,7 +5,7 @@ import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.RemoteControlScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -35,21 +35,21 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         if (!level.isClientSide && DisplayConfig.canInteract(player, level)) {
             var tag = player.getItemInHand(pUsedHand).getOrCreateTag();
             if (tag.isEmpty()) {
-                player.displayClientMessage(new TextComponent("No display Binded"), true);
+                player.displayClientMessage(Component.literal("No display Binded"), true);
                 return new InteractionResultHolder<>(InteractionResult.PASS, player.getItemInHand(pUsedHand));
             } else {
                 long[] pos = tag.getLongArray("pos");
-                var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
+                var blockPos = new BlockPos((int) pos[0], (int) pos[1], (int) pos[2]);
                 var dimension = new ResourceLocation(tag.getString("dimension"));
 
 
                 if (!(level.getBlockEntity(blockPos) instanceof DisplayTile)) {
                     player.getItemInHand(pUsedHand).setTag(new CompoundTag());
-                    player.displayClientMessage(new TextComponent("Display is removed"), false);
+                    player.displayClientMessage(Component.literal("Display is removed"), false);
                     return new InteractionResultHolder<>(InteractionResult.FAIL, player.getItemInHand(pUsedHand));
                 } else {
                     if (!level.dimension().location().equals(dimension) || !Vec3.atCenterOf(blockPos).closerThan(player.position(), 32)) {
-                        player.displayClientMessage(new TextComponent("You're out of distance"), false);
+                        player.displayClientMessage(Component.literal("You're out of distance"), false);
                         return new InteractionResultHolder<>(InteractionResult.FAIL, player.getItemInHand(pUsedHand));
                     } else {
                         GuiCreator.ITEM_OPENER.open(player.getItemInHand(pUsedHand).getOrCreateTag(), player, pUsedHand);
@@ -66,8 +66,8 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     @Override
     public GuiLayer create(CompoundTag tag, Player player) {
         long[] pos = tag.getLongArray("pos");
-        var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
-        return new RemoteControlScreen(player, (DisplayTile) player.level.getBlockEntity(blockPos), tag, this);
+        var blockPos = new BlockPos((int) pos[0], (int) pos[1], (int) pos[2]);
+        return new RemoteControlScreen(player, (DisplayTile) player.level().getBlockEntity(blockPos), tag, this);
     }
 
     @Override
@@ -88,10 +88,10 @@ public class RemoteControl extends Item implements ItemGuiCreator {
             tag.putString("dimension", level.dimension().location().toString());
 
             item.save(tag);
-            player.displayClientMessage(new TextComponent("Binded"), false);
+            player.displayClientMessage(Component.literal("Binded"), false);
             return InteractionResult.SUCCESS;
         } else {
-            player.displayClientMessage(new TextComponent("Invalid display tile"), false);
+            player.displayClientMessage(Component.literal("Invalid display tile"), false);
             return InteractionResult.FAIL;
         }
 

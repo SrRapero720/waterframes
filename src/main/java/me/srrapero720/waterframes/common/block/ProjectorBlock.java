@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import team.creative.creativecore.common.gui.GuiLayer;
@@ -28,7 +27,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class ProjectorBlock extends DisplayBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public ProjectorBlock() {
-        super(Properties.of(Material.METAL).strength(2f).sound(SoundType.METAL).noOcclusion());
+        super(Properties.of().strength(2f).sound(SoundType.METAL).noOcclusion());
     }
 
     @Override

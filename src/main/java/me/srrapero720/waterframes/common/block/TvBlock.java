@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import team.creative.creativecore.common.gui.GuiLayer;
@@ -34,7 +33,7 @@ public class TvBlock extends DisplayBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public TvBlock() {
-        super(Properties.of(Material.METAL).strength(1f).sound(SoundType.METAL).noOcclusion());
+        super(Properties.of().strength(1f).sound(SoundType.METAL).noOcclusion());
     }
 
     @Override

@@ -16,6 +16,10 @@ import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.network.DisplaysNet;
 import me.srrapero720.waterframes.util.events.ClientPauseUpdateEvent;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -28,10 +32,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -46,10 +51,10 @@ import java.util.function.Supplier;
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 public class FrameRegistry {
+    public static final DeferredRegister<CreativeModeTab> TABS = create(Registries.CREATIVE_MODE_TAB);
     public static final DeferredRegister<Item> ITEMS = create(ForgeRegistries.ITEMS);
     public static final DeferredRegister<Block> BLOCKS =  create(ForgeRegistries.BLOCKS);
-    public static final DeferredRegister<BlockEntityType<?>> TILES = create(ForgeRegistries.BLOCK_ENTITIES);
-    public static final CreativeModeTab TAB = tab(new ResourceLocation(WaterFrames.ID, "frame"));
+    public static final DeferredRegister<BlockEntityType<?>> TILES = create(ForgeRegistries.BLOCK_ENTITY_TYPES);
 
     /* BLOCKS */
     public static final RegistryObject<FrameBlock> FRAME = BLOCKS.register("frame", FrameBlock::new);
@@ -57,15 +62,22 @@ public class FrameRegistry {
     public static final RegistryObject<TvBlock> TV = BLOCKS.register("tv", TvBlock::new);
 
     /* ITEMS */
-    public static final RegistryObject<Item> REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties().tab(TAB)));
-    public static final RegistryObject<Item> FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB)));
-    public static final RegistryObject<Item> PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB)));
-    public static final RegistryObject<Item> TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties().tab(TAB)));
+    public static final RegistryObject<Item> REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties()));
+    public static final RegistryObject<Item> FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties()));
+    public static final RegistryObject<Item> PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties()));
+    public static final RegistryObject<Item> TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties()));
 
     /* TILES */
     public static final RegistryObject<BlockEntityType<FrameTile>> TILE_FRAME = tile("frame", FrameTile::new, FRAME);
     public static final RegistryObject<BlockEntityType<ProjectorTile>> TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR);
     public static final RegistryObject<BlockEntityType<TvTile>> TILE_TV = tile("tv", TvTile::new, TV);
+
+    /* TABS */
+    public static final RegistryObject<CreativeModeTab> WATERTAB = TABS.register("tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
+            .icon(() -> new ItemStack(FRAME.get()))
+            .title(Component.translatable("itemGroup.waterframes"))
+            .build()
+    );
 
     public static void init(IEventBus bus) {
         if (FMLLoader.getDist().isClient()) bus.addListener(Client::init);
@@ -76,19 +88,16 @@ public class FrameRegistry {
         TILES.register(bus);
     }
 
-    private static <B extends IForgeRegistryEntry<B>> DeferredRegister<B> create(IForgeRegistry<B> registry) {
+    private static <B> DeferredRegister<B> create(IForgeRegistry<B> registry) {
+        return DeferredRegister.create(registry, WaterFrames.ID);
+    }
+
+    private static <B> DeferredRegister<B> create(ResourceKey<Registry<B>> registry) {
         return DeferredRegister.create(registry, WaterFrames.ID);
     }
 
     private static <T extends BlockEntity, B extends BaseEntityBlock> RegistryObject<BlockEntityType<T>> tile(String name, BlockEntityType.BlockEntitySupplier<? extends T> creator, Supplier<B> block) {
         return TILES.register(name, () -> BlockEntityType.Builder.<T>of(creator, block.get()).build(null));
-    }
-
-    private static CreativeModeTab tab(ResourceLocation location) {
-        return new CreativeModeTab(WaterFrames.ID) {
-            @Override
-            public @NotNull ItemStack makeIcon() { return new ItemStack(ForgeRegistries.ITEMS.getValue(location)); }
-        };
     }
 
     @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -98,6 +107,14 @@ public class FrameRegistry {
             DisplaysNet.register();
             if (FrameTools.isLoadingMod("stellarity")) {
                 throw new IllegalStateException("Mod 'Stellatity' is NOT compatible with WaterFrames, report it to Stellarity");
+            }
+        }
+
+        @SubscribeEvent
+        public static void onCreativeTabsLoading(BuildCreativeModeTabContentsEvent event) {
+            if (event.getTabKey() == WATERTAB.getKey()) {
+                event.accept(FRAME, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+                event.accept(PROJECTOR, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
             }
         }
 
@@ -120,8 +137,8 @@ public class FrameRegistry {
 
         @SubscribeEvent
         @OnlyIn(Dist.CLIENT)
-        public static void onUnloadingLevel(WorldEvent.Unload event) {
-            LevelAccessor level = event.getWorld();
+        public static void onUnloadingLevel(LevelEvent.Unload event) {
+            LevelAccessor level = event.getLevel();
             if (level != null && level.isClientSide()) DisplayControl.release();
         }
 
