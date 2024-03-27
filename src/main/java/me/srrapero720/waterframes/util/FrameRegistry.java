@@ -86,6 +86,7 @@ public class FrameRegistry {
         BLOCKS.register(bus);
         ITEMS.register(bus);
         TILES.register(bus);
+        TABS.register(bus);
     }
 
     private static <B> DeferredRegister<B> create(IForgeRegistry<B> registry) {
