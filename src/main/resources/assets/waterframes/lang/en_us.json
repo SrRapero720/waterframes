@@ -17,7 +17,6 @@
     "waterframes.commands.set.position.success": "Position updated successfully",
     "waterframes.commands.set.volume.success": "Position updated successfully",
 
-
     "waterframes.status": "Status: %s",
     "waterframes.status.off": "Off",
     "waterframes.status.off.desc": "Click save to turn on",

@@ -5,9 +5,11 @@ import me.srrapero720.waterframes.client.display.DisplayControl;
 import me.srrapero720.waterframes.client.renderer.FrameRender;
 import me.srrapero720.waterframes.client.renderer.ProjectorRender;
 import me.srrapero720.waterframes.client.renderer.TvRender;
+import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.FrameBlock;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
 import me.srrapero720.waterframes.common.block.TvBlock;
+import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.block.entity.FrameTile;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
@@ -16,19 +18,15 @@ import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.network.DisplaysNet;
 import me.srrapero720.waterframes.util.events.ClientPauseUpdateEvent;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -39,36 +37,40 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.*;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
-import static me.srrapero720.waterframes.WaterFrames.LOGGER;
-
 public class FrameRegistry {
-    public static final DeferredRegister<Item> ITEMS = create(ForgeRegistries.ITEMS);
-    public static final DeferredRegister<Block> BLOCKS =  create(ForgeRegistries.BLOCKS);
-    public static final DeferredRegister<BlockEntityType<?>> TILES = create(ForgeRegistries.BLOCK_ENTITIES);
-    public static final CreativeModeTab TAB = tab(new ResourceLocation(WaterFrames.ID, "frame"));
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, WaterFrames.ID);
+    public static final DeferredRegister<Block> BLOCKS =  DeferredRegister.create(ForgeRegistries.BLOCKS, WaterFrames.ID);
+    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, WaterFrames.ID);
+    public static final CreativeModeTab TAB = new CreativeModeTab(WaterFrames.ID) {
+        @Override public ItemStack makeIcon() { return new ItemStack(FRAME_ITEM.get()); }
+    };
 
     /* BLOCKS */
-    public static final RegistryObject<FrameBlock> FRAME = BLOCKS.register("frame", FrameBlock::new);
-    public static final RegistryObject<ProjectorBlock> PROJECTOR = BLOCKS.register("projector", ProjectorBlock::new);
-    public static final RegistryObject<TvBlock> TV = BLOCKS.register("tv", TvBlock::new);
+    public static final RegistryObject<DisplayBlock>
+            FRAME = BLOCKS.register("frame", FrameBlock::new),
+            PROJECTOR = BLOCKS.register("projector", ProjectorBlock::new),
+            TV = BLOCKS.register("tv", TvBlock::new);
 
     /* ITEMS */
-    public static final RegistryObject<Item> REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties().tab(TAB)));
-    public static final RegistryObject<Item> FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB)));
-    public static final RegistryObject<Item> PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB)));
-    public static final RegistryObject<Item> TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties().tab(TAB)));
+    public static final RegistryObject<Item>
+            REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties().tab(TAB))),
+            FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB))),
+            PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB))),
+            TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties().tab(TAB)));
 
     /* TILES */
-    public static final RegistryObject<BlockEntityType<FrameTile>> TILE_FRAME = tile("frame", FrameTile::new, FRAME);
-    public static final RegistryObject<BlockEntityType<ProjectorTile>> TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR);
-    public static final RegistryObject<BlockEntityType<TvTile>> TILE_TV = tile("tv", TvTile::new, TV);
+    public static final RegistryObject<BlockEntityType<DisplayTile>>
+            TILE_FRAME = tile("frame", FrameTile::new, FRAME),
+            TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR),
+            TILE_TV = tile("tv", TvTile::new, TV);
 
     public static void init(IEventBus bus) {
-        if (FMLLoader.getDist().isClient()) bus.addListener(Client::init);
+        if (FMLLoader.getDist().isClient()) {
+            bus.addListener(Client::init);
+        }
         bus.addListener(Common::init);
 
         BLOCKS.register(bus);
@@ -76,19 +78,8 @@ public class FrameRegistry {
         TILES.register(bus);
     }
 
-    private static <B extends IForgeRegistryEntry<B>> DeferredRegister<B> create(IForgeRegistry<B> registry) {
-        return DeferredRegister.create(registry, WaterFrames.ID);
-    }
-
-    private static <T extends BlockEntity, B extends BaseEntityBlock> RegistryObject<BlockEntityType<T>> tile(String name, BlockEntityType.BlockEntitySupplier<? extends T> creator, Supplier<B> block) {
-        return TILES.register(name, () -> BlockEntityType.Builder.<T>of(creator, block.get()).build(null));
-    }
-
-    private static CreativeModeTab tab(ResourceLocation location) {
-        return new CreativeModeTab(WaterFrames.ID) {
-            @Override
-            public @NotNull ItemStack makeIcon() { return new ItemStack(ForgeRegistries.ITEMS.getValue(location)); }
-        };
+    private static RegistryObject<BlockEntityType<DisplayTile>> tile(String name, BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
+        return TILES.register(name, () -> BlockEntityType.Builder.of(creator, block.get()).build(null));
     }
 
     @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)

@@ -1,11 +1,11 @@
 package me.srrapero720.waterframes.client.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.client.renderer.engine.RenderBox;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
-import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
+import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.core.BlockPos;
@@ -18,14 +18,14 @@ import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 @OnlyIn(Dist.CLIENT)
-public class ProjectorRender implements BlockEntityRenderer<ProjectorTile> {
+public class ProjectorRender implements BlockEntityRenderer<DisplayTile> {
     @Override
-    public boolean shouldRenderOffScreen(ProjectorTile frame) {
+    public boolean shouldRenderOffScreen(DisplayTile frame) {
         return frame.data.getWidth() > 8 || frame.data.getHeight() > 8;
     }
     
     @Override
-    public boolean shouldRender(ProjectorTile block, @NotNull Vec3 playerPos) {
+    public boolean shouldRender(DisplayTile block, @NotNull Vec3 playerPos) {
         Direction direction = block.getBlockState().getValue(ProjectorBlock.FACING);
         BlockPos blockPos = block.getBlockPos();
         BlockPos projectionPos = blockPos.relative(direction, block.data.projectionDistance);
@@ -33,7 +33,7 @@ public class ProjectorRender implements BlockEntityRenderer<ProjectorTile> {
     }
 
     @Override
-    public void render(ProjectorTile block, float pPartialTick, PoseStack pose, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
+    public void render(DisplayTile block, float pPartialTick, PoseStack pose, MultiBufferSource pBufferSource, int pPackedLight, int pPackedOverlay) {
         TextureDisplay display = block.requestDisplay();
         if (display == null) return;
 

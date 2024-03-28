@@ -1,11 +1,11 @@
 package me.srrapero720.waterframes.client.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.client.renderer.engine.RenderBox;
 import me.srrapero720.waterframes.common.block.FrameBlock;
-import me.srrapero720.waterframes.common.block.entity.FrameTile;
+import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.world.phys.Vec3;
@@ -16,18 +16,18 @@ import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 @OnlyIn(Dist.CLIENT)
-public class FrameRender implements BlockEntityRenderer<FrameTile> {
+public class FrameRender implements BlockEntityRenderer<DisplayTile> {
     @Override
-    public boolean shouldRenderOffScreen(FrameTile frame) {
+    public boolean shouldRenderOffScreen(DisplayTile frame) {
         return frame.data.getWidth() > 8 || frame.data.getHeight() > 8;
     }
     @Override
-    public boolean shouldRender(FrameTile frame, @NotNull Vec3 vec) {
+    public boolean shouldRender(DisplayTile frame, @NotNull Vec3 vec) {
         return Vec3.atCenterOf(frame.getBlockPos()).closerThan(vec, frame.data.renderDistance);
     }
 
     @Override
-    public void render(FrameTile block, float pPartialTick, PoseStack pose, MultiBufferSource bufferSource, int pPackedLight, int pPackedOverlay) {
+    public void render(DisplayTile block, float pPartialTick, PoseStack pose, MultiBufferSource bufferSource, int pPackedLight, int pPackedOverlay) {
         TextureDisplay display = block.requestDisplay();
         if (display == null) return;
 

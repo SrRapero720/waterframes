@@ -55,10 +55,6 @@ public class FrameTools {
         return result;
     }
 
-    public static ITextCollection translatable(String prefix, String... args) {
-        return new TextListBuilder().addTranslated(prefix, args);
-    }
-
     public static InputStream readResource(ClassLoader loader, String source) {
         InputStream is = loader.getResourceAsStream(source);
         if (is == null && source.startsWith("/")) is = loader.getResourceAsStream(source.substring(1));
@@ -66,10 +62,6 @@ public class FrameTools {
     }
 
     public static short minShort(short a, short b) {
-        if ((a == 0.0f) && (b == 0.0f) && (Float.floatToRawIntBits(b) == negativeZeroDoubleBits)) {
-            // Raw conversion ok since NaN can't map to -0.0.
-            return b;
-        }
         return (a <= b) ? a : b;
     }
 
@@ -128,22 +120,9 @@ public class FrameTools {
         ModList list;
         return (list = ModList.get()) != null ? list.isLoaded(id) : FMLLoader.getLoadingModList().getModFileById(id) != null;
     }
-    public static boolean isPackageLoaded(String id) { return Thread.currentThread().getContextClassLoader().getDefinedPackage(id) != null; }
 
     @OnlyIn(Dist.CLIENT)
     public static float deltaFrames() { return Minecraft.getInstance().isPaused() ? 1.0F : Minecraft.getInstance().getFrameTime(); }
-
-    public static String timestamp(long time) {
-        if (time < 3600000) {
-            long minutos = TimeUnit.MILLISECONDS.toMinutes(time);
-            long segundos = TimeUnit.MILLISECONDS.toSeconds(time) -
-                    TimeUnit.MINUTES.toSeconds(minutos);
-            return String.format("%02d:%02d", minutos, segundos);
-        } else {
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-            return sdf.format(time);
-        }
-    }
 
     public static void tick() {
         tickTime++;
