@@ -1,12 +1,12 @@
 package me.srrapero720.waterframes.common.compat.videoplayer;
 
 import com.github.NGoedix.watchvideo.client.ClientHandler;
-import me.srrapero720.waterframes.util.FrameTools;
+import me.srrapero720.waterframes.WaterFrames;
 
 public class VPCompat {
 
     public static boolean installed() {
-        return FrameTools.isLoadingMod("videoplayer");
+        return WaterFrames.isInstalled("videoplayer");
     }
 
     public static void playVideo(String url, int volume, boolean controls) {

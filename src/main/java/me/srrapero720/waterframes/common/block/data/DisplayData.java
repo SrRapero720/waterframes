@@ -3,7 +3,7 @@ package me.srrapero720.waterframes.common.block.data;
 import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
-import me.srrapero720.waterframes.util.FrameTools;
+import me.srrapero720.waterframes.WFMath;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
@@ -325,8 +325,8 @@ public class DisplayData {
             block.data.active = nbt.getBoolean(ACTIVE);
 
             if (block.canResize()) {
-                float width = FrameTools.minFloat(nbt.getFloat("width"), DisplayConfig.maxWidth());
-                float height = FrameTools.minFloat(nbt.getFloat("height"), DisplayConfig.maxHeight());
+                float width = WFMath.minFloat(nbt.getFloat("width"), DisplayConfig.maxWidth());
+                float height = WFMath.minFloat(nbt.getFloat("height"), DisplayConfig.maxHeight());
                 int posX = nbt.getInt("pos_x");
                 int posY = nbt.getInt("pos_y");
 

@@ -12,7 +12,6 @@ import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.client.renderer.engine.RenderBox;
 import me.srrapero720.waterframes.client.renderer.engine.RenderVertex;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.util.FrameTools;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageRenderer;
 import me.srrapero720.watermedia.api.math.MathAPI;
@@ -80,7 +79,7 @@ public class DisplayRender {
                                       AlignedBox renderBox, BoxFace boxFace, BufferBuilder builder,
                                       boolean renderFrontSide, boolean renderBackside, boolean forceXFlip, boolean forceYFlip) {
 
-        int loadingTexture = LOADING_TEX.texture(FrameTools.getTickTime(), MathAPI.tickToMs(FrameTools.deltaFrames()), true);
+        int loadingTexture = LOADING_TEX.texture(WaterFrames.getTicks(), MathAPI.tickToMs(WaterFrames.deltaFrames()), true);
         RenderSystem.bindTexture(loadingTexture);
         RenderSystem.setShaderTexture(0, loadingTexture);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);

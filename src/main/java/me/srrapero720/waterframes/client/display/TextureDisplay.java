@@ -2,11 +2,12 @@ package me.srrapero720.waterframes.client.display;
 
 import me.lib720.caprica.vlcj.player.base.State;
 import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import me.srrapero720.waterframes.common.network.DisplaysNet;
-import me.srrapero720.waterframes.util.FrameTools;
+import me.srrapero720.waterframes.WFMath;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
@@ -61,9 +62,9 @@ public class TextureDisplay {
 
         if (tile instanceof ProjectorTile projector) {
             Direction direction = projector.getBlockState().getValue(ProjectorBlock.FACING);
-            this.currentVolume = FrameTools.floorVolume(this.blockPos, direction, projector.data.audioOffset, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+            this.currentVolume = WFMath.floorVolume(this.blockPos, direction, projector.data.audioOffset, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
         } else {
-            this.currentVolume = FrameTools.floorVolume(this.blockPos, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+            this.currentVolume = WFMath.floorVolume(this.blockPos, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
         }
 
         // PLAYER CONFIG
@@ -93,7 +94,7 @@ public class TextureDisplay {
 
     public int texture() {
         return switch (displayMode) {
-            case PICTURE -> this.imageCache.getRenderer().texture(tile.data.tick, (!tile.data.paused ? MathAPI.tickToMs(FrameTools.deltaFrames()) : 0), tile.data.loop);
+            case PICTURE -> this.imageCache.getRenderer().texture(tile.data.tick, (!tile.data.paused ? MathAPI.tickToMs(WaterFrames.deltaFrames()) : 0), tile.data.loop);
             case VIDEO -> this.mediaPlayer.getGlTexture();
             case AUDIO -> -1;
         };
@@ -161,9 +162,9 @@ public class TextureDisplay {
                 int volume;
                 if (tile instanceof ProjectorTile projectorTile) { // TODO: OPTIMIZE DATA
                     Direction direction = projectorTile.getBlockState().getValue(ProjectorBlock.FACING);
-                    volume = FrameTools.floorVolume(this.blockPos, direction, projectorTile.data.audioOffset, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+                    volume = WFMath.floorVolume(this.blockPos, direction, projectorTile.data.audioOffset, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
                 } else {
-                    volume = FrameTools.floorVolume(this.blockPos, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+                    volume = WFMath.floorVolume(this.blockPos, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
                 }
 
                 if (currentVolume != volume) mediaPlayer.setVolume(currentVolume = volume);
@@ -175,8 +176,8 @@ public class TextureDisplay {
 
                     mediaPlayer.setPauseMode(!canPlay);
                     if (!stream && mediaPlayer.isSeekAble()) {
-                        long time = MathAPI.tickToMs(tile.data.tick) + (canPlay ? MathAPI.tickToMs(FrameTools.deltaFrames()) : 0);
-                        if (time > mediaPlayer.getTime() && tile.data.loop) time = FrameTools.floorMod(time, mediaPlayer.getMediaInfoDuration());
+                        long time = MathAPI.tickToMs(tile.data.tick) + (canPlay ? MathAPI.tickToMs(WaterFrames.deltaFrames()) : 0);
+                        if (time > mediaPlayer.getTime() && tile.data.loop) time = WFMath.floorMod(time, mediaPlayer.getMediaInfoDuration());
 
                         if (Math.abs(time - mediaPlayer.getTime()) > DisplayControl.SYNC_TIME && Math.abs(time - currentLastTime.get()) > DisplayControl.SYNC_TIME) {
                             currentLastTime.set(time);

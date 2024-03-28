@@ -15,12 +15,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.server.command.EnumArgument;
-import team.creative.creativecore.common.gui.GuiControl;
 
 public class WaterFramesCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -80,13 +78,13 @@ public class WaterFramesCommand {
             tile.data.url = url;
             tile.setDirty();
             source.sendSuccess(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.set.url.success"))
+                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.set.url.success"))
                             .withStyle(ChatFormatting.GREEN), true
             );
             return 0;
         } else {
             source.sendFailure(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
+                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
                             .withStyle(ChatFormatting.RED))
             );
             return 1;
@@ -105,13 +103,13 @@ public class WaterFramesCommand {
 
             tile.setDirty();
             source.sendSuccess(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.set.size.success"))
+                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.set.size.success"))
                             .withStyle(ChatFormatting.GREEN), true
             );
             return 0;
         } else {
             source.sendFailure(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
+                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
                             .withStyle(ChatFormatting.RED))
             );
             return 1;
@@ -129,13 +127,13 @@ public class WaterFramesCommand {
             displayBE.data.setHeight(vertical, displayBE.data.getHeight());
             displayBE.setDirty();
             source.sendSuccess(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.set.position.success"))
+                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.set.position.success"))
                             .withStyle(ChatFormatting.GREEN), true
             );
             return 0;
         } else {
             source.sendFailure(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
+                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
                             .withStyle(ChatFormatting.RED))
             );
             return 1;
@@ -152,13 +150,13 @@ public class WaterFramesCommand {
             tile.data.volume = volume;
             tile.setDirty();
             source.sendSuccess(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.set.volume.success"))
+                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.set.volume.success"))
                             .withStyle(ChatFormatting.GREEN), true
             );
             return 0;
         } else {
             source.sendFailure(
-                    new TextComponent(WaterFrames.COMM_PREFIX).append(new TranslatableComponent("waterframes.commands.invalid").withStyle(ChatFormatting.RED))
+                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.invalid").withStyle(ChatFormatting.RED))
             );
             return 1;
         }

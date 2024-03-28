@@ -3,7 +3,7 @@ package me.srrapero720.waterframes.common.block.entity;
 import me.srrapero720.waterframes.client.renderer.engine.RenderBox;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
-import me.srrapero720.waterframes.util.FrameRegistry;
+import me.srrapero720.waterframes.WFRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -13,7 +13,7 @@ import team.creative.creativecore.common.util.math.base.Facing;
 
 public class ProjectorTile extends DisplayTile {
     public ProjectorTile(BlockPos pos, BlockState state) {
-        super(new DisplayData(), FrameRegistry.TILE_PROJECTOR.get(), pos, state);
+        super(new DisplayData(), WFRegistry.TILE_PROJECTOR.get(), pos, state);
     }
 
     @Override

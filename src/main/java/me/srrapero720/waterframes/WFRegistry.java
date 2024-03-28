@@ -1,6 +1,5 @@
-package me.srrapero720.waterframes.util;
+package me.srrapero720.waterframes;
 
-import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.DisplayControl;
 import me.srrapero720.waterframes.client.renderer.FrameRender;
 import me.srrapero720.waterframes.client.renderer.ProjectorRender;
@@ -41,7 +40,7 @@ import net.minecraftforge.registries.*;
 
 import java.util.function.Supplier;
 
-public class FrameRegistry {
+public class WFRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, WaterFrames.ID);
     public static final DeferredRegister<Block> BLOCKS =  DeferredRegister.create(ForgeRegistries.BLOCKS, WaterFrames.ID);
     public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, WaterFrames.ID);
@@ -88,11 +87,8 @@ public class FrameRegistry {
         private static void init(FMLCommonSetupEvent event) { common(); }
         private static void common() {
             DisplaysNet.register();
-            if (FrameTools.isLoadingMod("stellarity")) {
+            if (WaterFrames.isInstalled("stellarity")) {
                 throw new IllegalModException("stellarity", "breaks displays rendering");
-            }
-            if (FrameTools.isLoadingMod("xenon")) {
-                throw new IllegalModException("xenon", "is not supported", "Embeddium or Sodium");
             }
         }
 
@@ -108,9 +104,9 @@ public class FrameRegistry {
 
         @OnlyIn(Dist.CLIENT)
         private static void client() {
-            BlockEntityRenderers.register(FrameRegistry.TILE_FRAME.get(), (x) -> new FrameRender());
-            BlockEntityRenderers.register(FrameRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRender());
-            BlockEntityRenderers.register(FrameRegistry.TILE_TV.get(), (x) -> new TvRender());
+            BlockEntityRenderers.register(WFRegistry.TILE_FRAME.get(), (x) -> new FrameRender());
+            BlockEntityRenderers.register(WFRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRender());
+            BlockEntityRenderers.register(WFRegistry.TILE_TV.get(), (x) -> new TvRender());
         }
 
         @SubscribeEvent
@@ -123,7 +119,7 @@ public class FrameRegistry {
         @SubscribeEvent
         @OnlyIn(Dist.CLIENT)
         public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
-            if (event.phase == TickEvent.Phase.END) FrameTools.tick();
+            if (event.phase == TickEvent.Phase.END) WaterFrames.tick();
         }
 
         @SubscribeEvent

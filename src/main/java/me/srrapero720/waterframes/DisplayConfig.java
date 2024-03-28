@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes;
 
-import me.srrapero720.waterframes.util.FrameTools;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,15 +12,25 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 public class DisplayConfig {
     private static final ForgeConfigSpec server_spec;
     private static final ForgeConfigSpec client_spec;
+    private static final Gson GSON = new Gson();
+    private static final Marker IT = MarkerManager.getMarker("Tools");
 
     // RENDERING
     private static ForgeConfigSpec.DoubleValue maxWidth;
@@ -98,7 +109,7 @@ public class DisplayConfig {
             usableForAny = b.comment("Changes if any player can use displays, otherwise only admins can use it").define("usableForAnyone", true);
 
             useWhitelist = serverBuilder.booleanGroup("whitelist", true, b2 -> {
-                whitelist = b2.define("url", FrameTools.readStringList("whitelist_url.json"));
+                whitelist = b2.define("url", readStringList("whitelist_url.json"));
             }, "Whitelist config");
 
         }, "Configures player permissions and url restrictions");
@@ -118,10 +129,10 @@ public class DisplayConfig {
     public static float maxHeight() { return (float) (double) maxHeight.get(); }
 
     public static short maxRenderDistance() { return (short) (int) maxRenderDistance.get(); }
-    public static short maxRenderDistance(short value) { return FrameTools.minShort(value, maxRenderDistance()); }
+    public static short maxRenderDistance(short value) { return WFMath.minShort(value, maxRenderDistance()); }
 
     public static short maxProjectionDistance() { return (short) (int) maxProjectionDistance.get(); }
-    public static short maxProjectionDistance(short value) { return FrameTools.minShort(value, maxProjectionDistance()); }
+    public static short maxProjectionDistance(short value) { return WFMath.minShort(value, maxProjectionDistance()); }
 
     // MULTIMEDIA
     public static int maxVolumeDistance() { return maxVolumeDistance.get(); }
@@ -187,6 +198,23 @@ public class DisplayConfig {
         if (!usableForAny()) return isOperator;
 
         return player.getAbilities().mayBuild;
+    }
+
+    public static List<String> readStringList(String path) {
+        List<String> result = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(readResource(Thread.currentThread().getContextClassLoader(), path)))) {
+            result.addAll(GSON.fromJson(reader, new TypeToken<List<String>>(){}.getType()));
+        } catch (Exception e) {
+            LOGGER.fatal(IT, "Exception trying to read JSON from {}", path, e);
+        }
+
+        return result;
+    }
+
+    public static InputStream readResource(ClassLoader loader, String source) {
+        InputStream is = loader.getResourceAsStream(source);
+        if (is == null && source.startsWith("/")) is = loader.getResourceAsStream(source.substring(1));
+        return is;
     }
 
 
