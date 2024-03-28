@@ -17,6 +17,7 @@ import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.network.DisplaysNet;
 import me.srrapero720.waterframes.util.events.ClientPauseUpdateEvent;
+import me.srrapero720.waterframes.util.exceptions.IllegalModException;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -88,7 +89,10 @@ public class FrameRegistry {
         private static void common() {
             DisplaysNet.register();
             if (FrameTools.isLoadingMod("stellarity")) {
-                throw new IllegalStateException("Mod 'Stellatity' is NOT compatible with WaterFrames, report it to Stellarity");
+                throw new IllegalModException("stellarity", "breaks displays rendering");
+            }
+            if (FrameTools.isLoadingMod("xenon")) {
+                throw new IllegalModException("xenon", "is not supported", "Embeddium or Sodium");
             }
         }
 
