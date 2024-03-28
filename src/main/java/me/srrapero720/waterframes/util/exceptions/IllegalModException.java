@@ -11,10 +11,10 @@ public class IllegalModException extends RuntimeException {
     }
 
     public IllegalModException(String modid, String reason) {
-        super(String.format(MSG, modid, WaterFrames.ID, reason));
+        this(String.format(MSG, modid, WaterFrames.ID, reason));
     }
 
     public IllegalModException(String modid, String reason, String alternatives) {
-        super(String.format(MSG_REASON, modid, WaterFrames.ID, reason, alternatives));
+        this(String.format(MSG_REASON, modid, WaterFrames.ID, reason, alternatives));
     }
 }
