@@ -1,7 +1,8 @@
 package me.srrapero720.waterframes;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
 import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 public class WFMath {
@@ -31,9 +32,10 @@ public class WFMath {
         }
     }
 
-    public static int floorVolume(Vec3d pos, int volume, int min, int max) {
+    public static int floorVolume(BlockPos pos, int volume, int min, int max) {
         assert Minecraft.getInstance().player != null;
-        double distance = pos.distance(Minecraft.getInstance().player.getPosition(WaterFrames.deltaFrames()));
+        Position position = Minecraft.getInstance().player.getPosition(WaterFrames.deltaFrames());
+        double distance = Math.sqrt(pos.distToLowCornerSqr(position.x(), position.y(), position.z()));
         if (min > max) {
             int temp = max;
             max = min;
@@ -41,23 +43,7 @@ public class WFMath {
         }
 
         if (distance > min)
-            volume = (distance > max) ? 0 : (int) (volume * (1 - ((distance - min) / (max - min))));
-        return volume;
-    }
-
-    public static int floorVolume(Vec3d pos, Direction direction, float offSet, int volume, int min, int max) {
-        assert Minecraft.getInstance().player != null;
-        pos = new Vec3d(pos.toBlockPos().relative(direction, (int) offSet));
-        double distance = pos.distance(Minecraft.getInstance().player.getPosition(WaterFrames.deltaFrames()));
-        if (min > max) {
-            int temp = max;
-            max = min;
-            min = temp;
-        }
-
-        if (distance > min)
-            volume = (distance > max) ? 0 : (int) (volume * (1 - ((distance - min) / (max - min))));
-
+            volume = (distance > max + 1) ? 0 : (int) (volume * (1 - ((distance - min) / ((1 + max) - min))));
         return volume;
     }
 }

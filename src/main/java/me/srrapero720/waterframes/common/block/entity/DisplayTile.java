@@ -10,6 +10,7 @@ import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -44,35 +45,35 @@ public abstract class DisplayTile extends BlockEntity {
     @OnlyIn(Dist.CLIENT)
     public synchronized TextureDisplay requestDisplay() {
         if (this.data.url.isEmpty() && display != null) {
-            cleanDisplay();
+            this.cleanDisplay();
             return null;
         }
 
-        if (isReleased) {
-            imageCache = null;
+        if (this.isReleased) {
+            this.imageCache = null;
             return null;
         }
 
-        if (imageCache == null || !imageCache.url.equals(this.data.url)) {
-            imageCache = ImageAPI.getCache(this.data.url, Minecraft.getInstance());
+        if (this.imageCache == null || !this.imageCache.url.equals(this.data.url)) {
+            this.imageCache = ImageAPI.getCache(this.data.url, Minecraft.getInstance());
             this.cleanDisplay();
         }
 
         switch (imageCache.getStatus()) {
             case LOADING, FAILED, READY -> {
-                if (display != null) return display;
-                return display = new TextureDisplay(imageCache, new Vec3d(worldPosition), this);
+                if (this.display != null) return this.display;
+                return this.display = new TextureDisplay(this);
             }
 
             case WAITING -> {
-                cleanDisplay();
-                imageCache.load();
+                this.cleanDisplay();
+                this.imageCache.load();
                 return display;
             }
 
             case FORGOTTEN -> {
                 LOGGER.warn("Cached picture is forgotten, cleaning and reloading");
-                imageCache = null;
+                this.imageCache = null;
                 return null;
             }
 
@@ -85,42 +86,41 @@ public abstract class DisplayTile extends BlockEntity {
 
     @Override
     public void saveAdditional(CompoundTag nbt) {
-        data.save(nbt, this);
+        this.data.save(nbt, this);
         super.saveAdditional(nbt);
     }
 
     @Override
     public void load(CompoundTag nbt) {
-        data.load(nbt, this);
+        this.data.load(nbt, this);
         super.load(nbt);
     }
 
     @OnlyIn(Dist.CLIENT)
     private void cleanDisplay() {
-        if (display != null) {
-            display.release();
-            display = null;
+        if (this.display != null) {
+            this.display.release();
+            this.display = null;
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     private void release() {
-        cleanDisplay();
-        isReleased = true;
+        this.cleanDisplay();
+        this.isReleased = true;
     }
 
     @Override
     public void setRemoved() {
-        if (isClient()) release();
+        if (this.isClient()) this.release();
         super.setRemoved();
     }
 
     @Override
     public void onChunkUnloaded() {
-        if (isClient()) release();
+        if (this.isClient()) this.release();
         super.onChunkUnloaded();
     }
-
 
     public void setActiveMode(boolean mode) {
         assert isClient();
@@ -158,6 +158,10 @@ public abstract class DisplayTile extends BlockEntity {
         return this.level != null && this.level.isClientSide;
     }
 
+    public Direction getDirection() {
+        return this.getBlockState().getValue(((DisplayBlock) this.getBlockState().getBlock()).getFacing());
+    }
+
     /* SPECIAL TICKS */
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity be) {
         if (be instanceof DisplayTile tile) {
@@ -173,12 +177,8 @@ public abstract class DisplayTile extends BlockEntity {
                 }
             }
 
-            // EXTRA IMPORTANT TICKERS FOR OTHER TILES
-            if (tile instanceof FrameTile frame) {
-                if (state.getValue(DisplayBlock.VISIBLE) != frame.data.frameVisibility) {
-                    var brandNewState = state.setValue(DisplayBlock.VISIBLE, frame.data.frameVisibility);
-                    level.setBlock(pos, brandNewState, 0);
-                }
+            if (state.hasProperty(DisplayBlock.VISIBLE) && state.getValue(DisplayBlock.VISIBLE) != tile.data.frameVisibility) {
+                level.setBlock(pos, state.setValue(DisplayBlock.VISIBLE, tile.data.frameVisibility), 0);
             }
         }
     }

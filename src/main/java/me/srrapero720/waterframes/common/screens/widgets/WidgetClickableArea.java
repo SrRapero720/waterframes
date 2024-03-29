@@ -2,8 +2,8 @@ package me.srrapero720.waterframes.common.screens.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.srrapero720.waterframes.common.block.data.PositionHorizontal;
-import me.srrapero720.waterframes.common.block.data.PositionVertical;
+import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
+import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.GameRenderer;

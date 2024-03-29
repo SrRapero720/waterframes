@@ -1,9 +1,12 @@
 package me.srrapero720.waterframes.common.block.data;
 
 import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.WFMath;
+import me.srrapero720.waterframes.common.block.data.types.AudioPosition;
+import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
+import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
-import me.srrapero720.waterframes.WFMath;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
@@ -191,6 +194,17 @@ public class DisplayData {
         this.restrictHeight();
     }
 
+    public void setAudioPosition(AudioPosition position) {
+        this.audioOffset = switch (position) {
+            case BLOCK -> 0f;
+            case PROJECTION -> projectionDistance;
+            case CENTER -> projectionDistance / 2f;
+        };
+    }
+    public AudioPosition getAudioPosition() {
+        return audioOffset == 0 ? AudioPosition.BLOCK : audioOffset == projectionDistance ? AudioPosition.PROJECTION : AudioPosition.CENTER;
+    }
+
     public void setWidth(final float width) { this.setWidth(this.getPosX(), width); }
     public void setWidth(final PositionHorizontal position, final float width) {
         switch (position) {
@@ -255,24 +269,20 @@ public class DisplayData {
         if (getHeight() > height) {
             switch (getPosY()) {
                 case TOP -> {
-                    this.min.y = 0;
+                    this.min.y = 0f;
                     this.max.y = height;
                 }
                 case BOTTOM -> {
-                    this.min.y = 1 - height;
-                    this.max.y = 1;
+                    this.min.y = 1f - height;
+                    this.max.y = 1f;
                 }
                 default -> {
-                    float middle = height / 2;
+                    float middle = height / 2f;
                     this.min.y = 0.5F - middle;
                     this.max.y = 0.5F + middle;
                 }
             }
         }
-    }
-
-    public int getOffsetMode() {
-        return (audioOffset == projectionDistance) ? 2 : (audioOffset == projectionDistance / 2f) ? 1 : 0;
     }
 
     public static CompoundTag build(DisplayScreen screen, DisplayTile tile) {
@@ -310,7 +320,7 @@ public class DisplayData {
 
         if (tile.canProject()) {
             nbt.putInt(PROJECTION_DISTANCE, screen.projection_distance.getIntValue());
-            nbt.putInt("audio_offset_mode", screen.audioOffset.getState());
+            nbt.putInt(AUDIO_OFFSET, screen.audioOffset.getState());
         }
 
         return nbt;
@@ -345,7 +355,8 @@ public class DisplayData {
             block.data.volume = DisplayConfig.maxVolume(nbt.getInt(VOLUME));
             block.data.maxVolumeDistance = DisplayConfig.maxVolumeDistance(nbt.getInt(VOL_RANGE_MAX));
             block.data.minVolumeDistance = Math.min(nbt.getInt(VOL_RANGE_MIN), block.data.maxVolumeDistance);
-            if (block.data.minVolumeDistance > block.data.maxVolumeDistance) block.data.maxVolumeDistance = block.data.minVolumeDistance;
+            if (block.data.minVolumeDistance > block.data.maxVolumeDistance)
+                block.data.maxVolumeDistance = block.data.minVolumeDistance;
 
             if (block.canHideModel()) {
                 block.data.frameVisibility = nbt.getBoolean(VISIBLE_FRAME);
@@ -356,10 +367,10 @@ public class DisplayData {
             }
 
             if (block.canProject()) {
-                block.data.projectionDistance = DisplayConfig.maxProjectionDistance(nbt.getInt(PROJECTION_DISTANCE));
+                int mode = nbt.getInt(AUDIO_OFFSET);
 
-                int mode = nbt.getInt("audio_offset_mode");
-                block.data.audioOffset = mode == 2 ? block.data.projectionDistance : mode == 1 ? block.data.projectionDistance / 2f : 0;
+                block.data.projectionDistance = DisplayConfig.maxProjectionDistance(nbt.getInt(PROJECTION_DISTANCE));
+                block.data.setAudioPosition(AudioPosition.VALUES[mode]);
             }
         }
 

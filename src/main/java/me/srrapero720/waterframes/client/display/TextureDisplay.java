@@ -2,20 +2,16 @@ package me.srrapero720.waterframes.client.display;
 
 import me.lib720.caprica.vlcj.player.base.State;
 import me.srrapero720.waterframes.DisplayConfig;
-import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.common.block.ProjectorBlock;
-import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
-import me.srrapero720.waterframes.WFNetwork;
 import me.srrapero720.waterframes.WFMath;
+import me.srrapero720.waterframes.WFNetwork;
+import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
 import me.srrapero720.watermedia.api.player.SyncVideoPlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -26,18 +22,18 @@ public class TextureDisplay {
     private final DisplayTile tile;
 
     // CONFIG
-    private Vec3d blockPos;
+    private BlockPos blockPos;
     private int currentVolume = 0;
     private final AtomicLong currentLastTime = new AtomicLong(Long.MIN_VALUE);
     private Mode displayMode = Mode.PICTURE;
     private boolean stream = false;
     private boolean synced = false;
 
-    public TextureDisplay(ImageCache cache, Vec3d blockPos, DisplayTile tile) {
-        this.imageCache = cache;
-        this.blockPos = blockPos;
+    public TextureDisplay(DisplayTile tile) {
+        this.imageCache = tile.imageCache;
+        this.blockPos = tile.getBlockPos();
         this.tile = tile;
-        if (cache.isVideo()) this.switchVideoMode();
+        if (this.imageCache.isVideo()) this.switchVideoMode();
     }
 
     private void switchVideoMode() {
@@ -60,12 +56,8 @@ public class TextureDisplay {
             this.displayMode = Mode.PICTURE;
         }
 
-        if (tile instanceof ProjectorTile projector) {
-            Direction direction = projector.getBlockState().getValue(ProjectorBlock.FACING);
-            this.currentVolume = WFMath.floorVolume(this.blockPos, direction, projector.data.audioOffset, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
-        } else {
-            this.currentVolume = WFMath.floorVolume(this.blockPos, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
-        }
+
+        this.currentVolume = WFMath.floorVolume(this.blockPos.relative(tile.getDirection(), (int) tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
         // PLAYER CONFIG
         this.mediaPlayer.setVolume(this.currentVolume);
@@ -119,7 +111,7 @@ public class TextureDisplay {
         };
     }
 
-    public int  timeInTicks() {
+    public int timeInTicks() {
         return switch (displayMode) {
             case PICTURE -> this.tile.data.tick;
             default -> MathAPI.msToTick(time());
@@ -148,6 +140,7 @@ public class TextureDisplay {
     }
 
     public void tick(BlockPos pos) {
+        this.blockPos = pos;
         if (!synced && canRender()) {
             syncDuration();
             synced = true;
@@ -157,15 +150,7 @@ public class TextureDisplay {
                 if (imageCache.isVideo()) switchVideoMode();
             }
             case VIDEO -> {
-                this.blockPos = new Vec3d(pos);
-
-                int volume;
-                if (tile instanceof ProjectorTile projectorTile) { // TODO: OPTIMIZE DATA
-                    Direction direction = projectorTile.getBlockState().getValue(ProjectorBlock.FACING);
-                    volume = WFMath.floorVolume(this.blockPos, direction, projectorTile.data.audioOffset, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
-                } else {
-                    volume = WFMath.floorVolume(this.blockPos, this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
-                }
+                int volume = WFMath.floorVolume(this.blockPos.relative(tile.getDirection(), (int) this.tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
                 if (currentVolume != volume) mediaPlayer.setVolume(currentVolume = volume);
                 if (mediaPlayer.isSafeUse() && mediaPlayer.isValid()) {

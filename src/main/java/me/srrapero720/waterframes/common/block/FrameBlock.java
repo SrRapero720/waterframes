@@ -35,7 +35,7 @@ public class FrameBlock extends DisplayBlock {
 
     @Override
     public DirectionProperty getFacing() {
-        return BlockStateProperties.FACING;
+        return FACING;
     }
 
     @Override

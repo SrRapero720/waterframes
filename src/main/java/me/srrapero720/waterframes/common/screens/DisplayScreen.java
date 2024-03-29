@@ -24,7 +24,6 @@ import team.creative.creativecore.common.gui.parser.LongValueParser;
 import team.creative.creativecore.common.gui.style.ControlFormatting;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
-import team.creative.creativecore.common.util.math.Maths;
 import team.creative.creativecore.common.util.type.Color;
 
 import java.util.ArrayList;
@@ -149,7 +148,7 @@ public class DisplayScreen extends GuiLayer {
                 ));
                 return tooltip;
             }
-        }.setControlFormatting(ControlFormatting.CLICKABLE_NO_PADDING).setState(tile.data.getOffsetMode());
+        }.setControlFormatting(ControlFormatting.CLICKABLE_NO_PADDING).setState(tile.data.getAudioPosition().ordinal());
         this.audioOffset.setShadow(Color.NONE);
 
         this.show_model = new GuiCheckBox(DisplayData.VISIBLE_FRAME, tile.data.frameVisibility);

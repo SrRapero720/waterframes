@@ -34,13 +34,13 @@ public class DisplayControl {
 
     public static void pause() {
         for (int i = 0; i < position; i++) {
-            if (displays[i] != null) displays[i].pause();
+            if (displays[i] != null) displays[i].setPauseMode(true);
         }
     }
 
     public static void resume() {
         for (int i = 0; i < position; i++) {
-            if (displays[i] != null) displays[i].resume();
+            if (displays[i] != null) displays[i].setPauseMode(false);
         }
     }
 
