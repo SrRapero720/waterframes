@@ -32,8 +32,7 @@ public class FrameRender implements BlockEntityRenderer<DisplayTile> {
         if (display == null) return;
 
         Facing facing = Facing.get(block.getBlockState().getValue(FrameBlock.FACING));
-        AlignedBox alignedBox = RenderBox.getBasic(block, facing, FrameBlock.THICKNESS);
-        alignedBox.grow(facing.axis, 0.01f);
+        AlignedBox alignedBox = RenderBox.getBasic(block, facing, FrameBlock.THICKNESS + 0.001f);
 
         DisplayRender.render(pose, block, facing, alignedBox, true, block.data.renderBothSides, false, false);
 

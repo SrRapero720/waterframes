@@ -13,7 +13,7 @@ import team.creative.creativecore.common.util.math.base.Facing;
 
 public class FrameTile extends DisplayTile {
     public FrameTile(BlockPos pos, BlockState state) {
-        super(new DisplayData(){}, WFRegistry.TILE_FRAME.get(), pos, state);
+        super(new DisplayData(), WFRegistry.TILE_FRAME.get(), pos, state);
     }
 
     @Override

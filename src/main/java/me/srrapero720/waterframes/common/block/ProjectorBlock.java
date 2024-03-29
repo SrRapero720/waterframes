@@ -38,12 +38,12 @@ public class ProjectorBlock extends DisplayBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return getBlockBox(state.getValue(getFacing())).voxelShape();
+        return getProjectorBlockBox(state.getValue(getFacing())).voxelShape();
     }
 
     @Override
     public VoxelShape getInteractionShape(BlockState state, BlockGetter level, BlockPos pos) {
-        return getBlockBox(state.getValue(getFacing())).voxelShape();
+        return getProjectorBlockBox(state.getValue(getFacing())).voxelShape();
     }
 
     @Override

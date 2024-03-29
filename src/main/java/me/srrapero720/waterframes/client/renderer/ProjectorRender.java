@@ -20,16 +20,16 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 @OnlyIn(Dist.CLIENT)
 public class ProjectorRender implements BlockEntityRenderer<DisplayTile> {
     @Override
-    public boolean shouldRenderOffScreen(DisplayTile frame) {
-        return frame.data.getWidth() > 8 || frame.data.getHeight() > 8;
+    public boolean shouldRenderOffScreen(DisplayTile tile) {
+        return tile.data.getWidth() > 8 || tile.data.getHeight() > 8;
     }
     
     @Override
-    public boolean shouldRender(DisplayTile block, @NotNull Vec3 playerPos) {
-        Direction direction = block.getBlockState().getValue(ProjectorBlock.FACING);
-        BlockPos blockPos = block.getBlockPos();
-        BlockPos projectionPos = blockPos.relative(direction, block.data.projectionDistance);
-        return Vec3.atCenterOf(projectionPos).closerThan(playerPos, block.data.renderDistance) && Vec3.atCenterOf(blockPos).closerThan(playerPos, block.data.projectionDistance + (double) block.data.renderDistance / 2);
+    public boolean shouldRender(DisplayTile tile, @NotNull Vec3 playerPos) {
+        Direction direction = tile.getBlockState().getValue(ProjectorBlock.FACING);
+        BlockPos blockPos = tile.getBlockPos();
+        BlockPos projectionPos = blockPos.relative(direction, tile.data.projectionDistance);
+        return Vec3.atCenterOf(projectionPos).closerThan(playerPos, tile.data.renderDistance) && Vec3.atCenterOf(blockPos).closerThan(playerPos, tile.data.projectionDistance + (double) tile.data.renderDistance / 2);
     }
 
     @Override
@@ -38,9 +38,7 @@ public class ProjectorRender implements BlockEntityRenderer<DisplayTile> {
         if (display == null) return;
 
         Facing facing = Facing.get(block.getBlockState().getValue(ProjectorBlock.FACING));
-        AlignedBox alignedBox = RenderBox.getBasic(block, facing, block.data.projectionDistance);
-
-        alignedBox.grow(facing.axis, 0.99f);
+        AlignedBox alignedBox = RenderBox.getBasic(block, facing, block.data.projectionDistance + 0.999f);
         DisplayRender.render(pose, block, facing, alignedBox, false, true, true, false);
 
         RenderSystem.disableDepthTest();

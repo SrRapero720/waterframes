@@ -61,7 +61,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     }
 
     // FOR PROJECTORS
-    public static AlignedBox getBlockBox(Direction direction) {
+    public static AlignedBox getProjectorBlockBox(Direction direction) {
         Facing facing = Facing.get(direction);
         var box = new AlignedBox();
 

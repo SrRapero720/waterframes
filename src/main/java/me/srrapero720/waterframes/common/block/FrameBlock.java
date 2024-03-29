@@ -30,7 +30,7 @@ public class FrameBlock extends DisplayBlock {
 
     public FrameBlock() {
         super(Properties.of(Material.METAL).strength(1f).sound(SoundType.METAL).noOcclusion());
-        registerDefaultState(defaultBlockState().setValue(VISIBLE, false));
+        this.registerDefaultState(defaultBlockState().setValue(VISIBLE, false));
     }
 
     @Override

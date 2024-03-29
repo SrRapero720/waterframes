@@ -35,7 +35,7 @@ public class TvRender implements BlockEntityRenderer<DisplayTile> {
         Direction direction = block.getBlockState().getValue(TvBlock.FACING);
         Facing facing = Facing.get(direction.getOpposite());
         AlignedBox alignedBox = TvBlock.box(direction, block.getBlockState().getValue(TvBlock.ATTACHED_FACE), true);
-//        alignedBox.grow(facing.axis, 0.01f);
+        alignedBox.grow(facing.axis, 0.001f);
 
 
         DisplayRender.render(pose, block, facing, alignedBox, true, false, false, false);
