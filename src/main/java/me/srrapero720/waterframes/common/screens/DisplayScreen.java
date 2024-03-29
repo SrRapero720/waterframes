@@ -8,6 +8,7 @@ import me.srrapero720.waterframes.common.network.DisplaysNet;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
+import me.srrapero720.waterframes.common.helpers.ScalableText;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -36,9 +37,9 @@ public class DisplayScreen extends GuiLayer {
     public final DisplayTile tile;
 
     // LABELS
-    private final WidgetLabel url_l = new WidgetLabel("media_label", 0.75f).setTranslate("waterframes.gui.label.url");
-    private final WidgetLabel tex_l = new WidgetLabel("tex_label", 0.75f).setTranslate("waterframes.gui.label.texture_settings");
-    private final WidgetLabel media_l = new WidgetLabel("media_label", 0.75f).setTranslate("waterframes.gui.label.media_settings");
+    private final GuiLabel url_l = new GuiLabel("media_label").setTranslate("waterframes.gui.label.url");
+    private final GuiLabel tex_l = new GuiLabel("tex_label").setTranslate("waterframes.gui.label.texture_settings");
+    private final GuiLabel media_l = new GuiLabel("media_label").setTranslate("waterframes.gui.label.media_settings");
 
     // ICONS
     private final GuiIcon rot_i = (GuiIcon) new GuiIcon("r_icon", IconStyles.ROTATION).setTooltip("waterframes.gui.icon.rotation");
@@ -198,9 +199,9 @@ public class DisplayScreen extends GuiLayer {
             }
         });
 
-        this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax, LongValueParser.TIME_DURATION_TICK)
-                .setOnTimeUpdate(v -> tile.data.tick = (int) v)
-                .setOnLastTimeUpdate(v -> DisplaysNet.sendPlaytimeServer(tile, tile.data.tick = (int) v, tile.data.tickMax));
+        ((ScalableText) url_l).wf$setScale(0.75f);
+        ((ScalableText) tex_l).wf$setScale(0.75f);
+        ((ScalableText) media_l).wf$setScale(0.75f);
     }
 
     @Override
