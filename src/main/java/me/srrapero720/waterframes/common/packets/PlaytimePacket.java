@@ -1,13 +1,12 @@
-package me.srrapero720.waterframes.common.network.packets;
+package me.srrapero720.waterframes.common.packets;
 
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.network.DisplaysNet;
+import me.srrapero720.waterframes.WFNetwork;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import team.creative.creativecore.common.network.CreativePacket;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
@@ -24,7 +23,7 @@ public class PlaytimePacket extends DisplayPacket {
 
     @Override
     public void executeServer(DisplayTile tile, ServerPlayer player, ServerLevel level) {
-        DisplaysNet.sendPlaytimeClient(this, player.level);
+        WFNetwork.sendPlaytimeClient(this, player.level);
     }
 
     @Override

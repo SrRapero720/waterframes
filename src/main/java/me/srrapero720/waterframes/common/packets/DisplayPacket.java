@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.common.network.packets;
+package me.srrapero720.waterframes.common.packets;
 
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.core.BlockPos;

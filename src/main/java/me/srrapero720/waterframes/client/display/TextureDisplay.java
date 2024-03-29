@@ -6,7 +6,7 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
-import me.srrapero720.waterframes.common.network.DisplaysNet;
+import me.srrapero720.waterframes.WFNetwork;
 import me.srrapero720.waterframes.WFMath;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
@@ -144,7 +144,7 @@ public class TextureDisplay {
 
     public void syncDuration() {
         if (tile.data.tickMax == -1) tile.data.tick = 0;
-        DisplaysNet.sendPlaytimeServer(tile, tile.data.tick, durationInTicks());
+        WFNetwork.sendPlaytimeServer(tile, tile.data.tick, durationInTicks());
     }
 
     public void tick(BlockPos pos) {

@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.common.network.packets;
+package me.srrapero720.waterframes.common.packets;
 
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
@@ -8,7 +8,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import team.creative.creativecore.common.network.CreativePacket;
 
 public class SyncBlockPacket extends DisplayPacket {
     public CompoundTag nbt;

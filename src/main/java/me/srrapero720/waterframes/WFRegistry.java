@@ -14,7 +14,6 @@ import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
 import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
-import me.srrapero720.waterframes.common.network.DisplaysNet;
 import me.srrapero720.waterframes.util.events.ClientPauseUpdateEvent;
 import me.srrapero720.waterframes.util.exceptions.IllegalModException;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
@@ -86,7 +85,7 @@ public class WFRegistry {
     private static class Common {
         private static void init(FMLCommonSetupEvent event) { common(); }
         private static void common() {
-            DisplaysNet.register();
+            WFNetwork.register();
             if (WaterFrames.isInstalled("stellarity")) {
                 throw new IllegalModException("stellarity", "breaks displays rendering");
             }

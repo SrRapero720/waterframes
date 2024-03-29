@@ -4,7 +4,7 @@ import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
-import me.srrapero720.waterframes.common.network.DisplaysNet;
+import me.srrapero720.waterframes.WFNetwork;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
@@ -124,34 +124,34 @@ public abstract class DisplayTile extends BlockEntity {
 
     public void setActiveMode(boolean mode) {
         assert isClient();
-        DisplaysNet.sendActiveServer(this, mode);
+        WFNetwork.sendActiveServer(this, mode);
     }
     public void setMutedMode(boolean mode) {
         assert isClient();
-        DisplaysNet.sendMutedServer(this, mode);
+        WFNetwork.sendMutedServer(this, mode);
     }
     public void setPauseMode(boolean pause) {
         assert isClient();
-        DisplaysNet.sendPlaybackServer(this, pause, this.data.tick);
+        WFNetwork.sendPlaybackServer(this, pause, this.data.tick);
     }
     public void stop() {
         assert isClient();
-        DisplaysNet.sendPlaybackServer(this, true, 0);
+        WFNetwork.sendPlaybackServer(this, true, 0);
     }
     public void volumeUp() {
         assert isClient();
-        DisplaysNet.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance,  DisplayConfig.maxVolume(this.data.volume + 5));
+        WFNetwork.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance,  DisplayConfig.maxVolume(this.data.volume + 5));
     }
     public void volumeDown() {
         assert isClient();
-        DisplaysNet.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance, DisplayConfig.maxVolume(this.data.volume - 5));
+        WFNetwork.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance, DisplayConfig.maxVolume(this.data.volume - 5));
     }
     public void fastForward() {
         assert isClient();
-        DisplaysNet.sendPlaytimeServer(this, Math.min(data.tick + MathAPI.msToTick(5000), data.tickMax), data.tickMax);
+        WFNetwork.sendPlaytimeServer(this, Math.min(data.tick + MathAPI.msToTick(5000), data.tickMax), data.tickMax);
     }
     public void fastBackwards() {
-        DisplaysNet.sendPlaytimeServer(this, Math.max(data.tick - MathAPI.msToTick(5000), 0), data.tickMax);
+        WFNetwork.sendPlaytimeServer(this, Math.max(data.tick - MathAPI.msToTick(5000), 0), data.tickMax);
     }
 
     public boolean isClient() {

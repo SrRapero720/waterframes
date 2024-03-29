@@ -1,25 +1,25 @@
-package me.srrapero720.waterframes.common.network.packets;
+package me.srrapero720.waterframes.common.packets;
 
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.network.DisplaysNet;
+import me.srrapero720.waterframes.WFNetwork;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
-public class LoopPacket extends DisplayPacket {
+public class ActivePacket extends DisplayPacket {
 
-    public boolean loop;
-    public LoopPacket(){ super(); }
-    public LoopPacket(BlockPos pos, boolean loop) {
+    public boolean active;
+    public ActivePacket() { super(); }
+    public ActivePacket(BlockPos pos, boolean active) {
         super(pos);
-        this.loop = loop;
+        this.active = active;
     }
 
     @Override
     public void executeServer(DisplayTile tile, ServerPlayer player, ServerLevel level) {
-        DisplaysNet.sendLoopClient(this, level);
+        WFNetwork.sendActiveClient(this, level);
     }
 
     @Override
@@ -29,6 +29,6 @@ public class LoopPacket extends DisplayPacket {
 
     @Override
     public void execute(DisplayTile tile, Player player, Level level) {
-        tile.data.loop = this.loop;
+        tile.data.active = active;
     }
 }

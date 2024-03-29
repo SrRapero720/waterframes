@@ -49,21 +49,6 @@ public class IconStyles {
     public static final Icon POS_ICON = create(4, 12);
     public static final Icon POS_BASE = create(4, 13, 3, 3);
 
-    public static final Icon POS_1 = create(3, 0);
-    public static final Icon POS_2 = create(3, 1);
-    public static final Icon POS_3 = create(3, 2);
-    public static final Icon POS_4 = create(3, 3);
-    public static final Icon POS_5 = create(3, 4);
-    public static final Icon POS_6 = create(3, 5);
-    public static final Icon POS_7 = create(3, 6);
-    public static final Icon POS_8 = create(3, 7);
-    public static final Icon POS_9 = create(3, 8);
-    public static final Icon[][] POS_CORD = new Icon[][] {
-            new Icon[] { POS_1, POS_7, POS_4, },
-            new Icon[] { POS_3, POS_9, POS_6, },
-            new Icon[] { POS_2, POS_8, POS_5, }
-    };
-
     // ACTION COLUM (chunk 15)
     public static final Icon PLAY = create(15, 0);
     public static final Icon PAUSE = create(15, 1);

@@ -1,9 +1,8 @@
-package me.srrapero720.waterframes.common.network;
+package me.srrapero720.waterframes;
 
-import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.network.packets.*;
+import me.srrapero720.waterframes.common.packets.*;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -11,7 +10,7 @@ import team.creative.creativecore.common.network.CreativeNetwork;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
-public class DisplaysNet {
+public class WFNetwork {
     private static final CreativeNetwork NET_DISPLAYS = new CreativeNetwork(1, LOGGER, new ResourceLocation(WaterFrames.ID, "displays"));
     private static final CreativeNetwork NET_DATA = new CreativeNetwork(1, LOGGER, new ResourceLocation(WaterFrames.ID, "data"));
 

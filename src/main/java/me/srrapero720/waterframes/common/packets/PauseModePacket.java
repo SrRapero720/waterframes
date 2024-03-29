@@ -1,7 +1,7 @@
-package me.srrapero720.waterframes.common.network.packets;
+package me.srrapero720.waterframes.common.packets;
 
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.network.DisplaysNet;
+import me.srrapero720.waterframes.WFNetwork;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,7 +21,7 @@ public class PauseModePacket extends DisplayPacket {
 
     @Override
     public void executeServer(DisplayTile tile, ServerPlayer player, ServerLevel level) {
-        DisplaysNet.sendPlaybackClient(this, player.level);
+        WFNetwork.sendPlaybackClient(this, player.level);
     }
 
     @Override

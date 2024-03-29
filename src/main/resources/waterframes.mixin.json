@@ -8,6 +8,8 @@
     "MinecraftMixin"
   ],
   "mixins": [
-    "LevelMixin"
+    "LevelMixin",
+    "creativecore.CompiledTextMixin",
+    "creativecore.GuiLabelMixin"
   ]
 }
