@@ -8,10 +8,6 @@ import team.creative.creativecore.common.util.math.vec.Vec3d;
 public class WFMath {
     private static final long negativeZeroDoubleBits = Float.floatToRawIntBits(-0.0f);
 
-    public static short minShort(short a, short b) {
-        return (a <= b) ? a : b;
-    }
-
     public static float minFloat(float a, float b) {
         if (a != a) return a;   // a is NaN
         if ((a == 0.0f) && (b == 0.0f) && (Float.floatToRawIntBits(b) == negativeZeroDoubleBits)) {
@@ -22,14 +18,12 @@ public class WFMath {
     }
 
     public static long floorMod(long x, long y) {
-        try {
-            final long r = x % y;
-            // if the signs are different and modulo not zero, adjust result
-            if ((x ^ y) < 0 && r != 0) return r + y;
-            return r;
-        } catch (ArithmeticException e) {
-            return 0;
-        }
+        if (x == 0 || y == 0) return 0;
+
+        final long r = x % y;
+        // if the signs are different and modulo not zero, adjust result
+        if ((x ^ y) < 0 && r != 0) return r + y;
+        return r;
     }
 
     public static int floorVolume(BlockPos pos, int volume, int min, int max) {
