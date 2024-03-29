@@ -30,24 +30,4 @@ public abstract class GuiLabelMixin extends GuiControl implements ScalableText {
         }
         return 0;
     }
-
-//    /**
-//     * @author
-//     * @reason
-//     */
-//    @Overwrite(remap = false)
-//    @Override
-//    public int preferredWidth(int width) {
-//        return (int) ((text.getTotalWidth() * wf$getScale())) + 4;
-//    }
-
-//    /**
-//     * @author
-//     * @reason
-//     */
-//    @Overwrite(remap = false)
-//    @Override
-//    protected int preferredHeight(int width, int availableHeight) {
-//        return (int) (text.getTotalHeight() * wf$getScale()) + 1;
-//    }
 }

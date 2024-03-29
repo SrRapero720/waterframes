@@ -24,6 +24,7 @@ import team.creative.creativecore.common.gui.parser.LongValueParser;
 import team.creative.creativecore.common.gui.style.ControlFormatting;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
+import team.creative.creativecore.common.util.math.Maths;
 import team.creative.creativecore.common.util.type.Color;
 
 import java.util.ArrayList;
@@ -61,8 +62,8 @@ public class DisplayScreen extends GuiLayer {
     public final GuiSlider rotation;
     public final GuiSlider visibility;
     public final GuiSlider brightness;
-    public final GuiSlider render_distance;
-    public final GuiSlider projection_distance;
+    public final GuiSteppedSlider render_distance;
+    public final GuiSteppedSlider projection_distance;
 
     public final GuiCheckBox show_model;
     public final GuiCheckBox render_behind;
@@ -83,7 +84,7 @@ public class DisplayScreen extends GuiLayer {
     public final GuiCheckBox flip_x;
     public final GuiCheckBox flip_y;
 
-    public final GuiSlider volume;
+    public final GuiSteppedSlider volume;
     public final GuiSteppedSlider volume_min;
     public final GuiSteppedSlider volume_max;
 
@@ -174,9 +175,9 @@ public class DisplayScreen extends GuiLayer {
             }
         };
 
-        this.volume = new GuiSlider(DisplayData.VOLUME, tile.data.volume, 0, DisplayConfig.maxVolume(), DoubleValueParser.PERCENT);
-        this.volume_min = new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, tile.data.minVolumeDistance, 0, Math.min(tile.data.maxVolumeDistance, DisplayConfig.maxVolumeDistance()));
-        this.volume_max = new GuiSteppedSlider(DisplayData.VOL_RANGE_MAX, tile.data.maxVolumeDistance, 0, DisplayConfig.maxVolumeDistance());
+        this.volume = new GuiSteppedSlider(DisplayData.VOLUME, tile.data.volume, 0, DisplayConfig.maxVolume(), (v, max) -> v + "%");
+        this.volume_min = new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, tile.data.minVolumeDistance, 0, Math.min(tile.data.maxVolumeDistance, DisplayConfig.maxVolumeDistance()), IntValueParser.BLOCKS);
+        this.volume_max = new GuiSteppedSlider(DisplayData.VOL_RANGE_MAX, tile.data.maxVolumeDistance, 0, DisplayConfig.maxVolumeDistance(), IntValueParser.BLOCKS);
         this.volume_max.setMinSlider(this.volume_min);
 
         this.reload_all = new GuiButton("reload_all", x -> ImageAPI.reloadCache());

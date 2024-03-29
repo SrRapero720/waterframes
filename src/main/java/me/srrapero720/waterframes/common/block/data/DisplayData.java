@@ -55,7 +55,7 @@ public class DisplayData {
     public float rotation = 0;
     public float alpha = 1;
     public float brightness = 1;
-    public short renderDistance = DisplayConfig.maxRenderDistance((short) 32);
+    public int renderDistance = DisplayConfig.maxRenderDistance(32);
 
     public int volume = DisplayConfig.maxVolume();
     public int maxVolumeDistance = Math.min(20, DisplayConfig.maxVolumeDistance());
@@ -72,11 +72,11 @@ public class DisplayData {
     public boolean renderBothSides = false;
 
     // PROJECTOR VALUES
-    public short projectionDistance = DisplayConfig.maxProjectionDistance((short) 8);
+    public int projectionDistance = DisplayConfig.maxProjectionDistance(8);
     public float audioOffset = 0;
 
-    public HorizontalPosition getPosX() { return this.min.x == 0 ? HorizontalPosition.LEFT : this.max.x == 1 ? HorizontalPosition.RIGHT : HorizontalPosition.CENTER; }
-    public VerticalPosition getPosY() { return this.min.y == 0 ? VerticalPosition.TOP : this.max.y == 1 ? VerticalPosition.BOTTOM : VerticalPosition.CENTER; }
+    public PositionHorizontal getPosX() { return this.min.x == 0 ? PositionHorizontal.LEFT : this.max.x == 1 ? PositionHorizontal.RIGHT : PositionHorizontal.CENTER; }
+    public PositionVertical getPosY() { return this.min.y == 0 ? PositionVertical.TOP : this.max.y == 1 ? PositionVertical.BOTTOM : PositionVertical.CENTER; }
     public float getWidth() { return this.max.x - this.min.x; }
     public float getHeight() { return this.max.y - this.min.y; }
 
@@ -90,7 +90,7 @@ public class DisplayData {
             nbt.putFloat(MAX_Y, max.y);
         }
         nbt.putFloat(ROTATION, rotation);
-        nbt.putShort(RENDER_DISTANCE, renderDistance);
+        nbt.putInt(RENDER_DISTANCE, renderDistance);
         nbt.putBoolean(FLIP_X, flipX);
         nbt.putBoolean(FLIP_Y, flipY);
         nbt.putFloat(ALPHA, alpha);
@@ -117,7 +117,7 @@ public class DisplayData {
             nbt.putFloat(AUDIO_OFFSET, audioOffset);
         }
 
-        nbt.putInt(DATA_V, V);
+        nbt.putShort(DATA_V, V);
     }
 
     public void load(CompoundTag nbt, DisplayTile displayTile) {
@@ -130,7 +130,7 @@ public class DisplayData {
             this.max.y = nbt.getFloat(MAX_Y);
         }
         this.rotation = nbt.getFloat(ROTATION);
-        this.renderDistance = DisplayConfig.maxRenderDistance(nbt.getShort(RENDER_DISTANCE));
+        this.renderDistance = DisplayConfig.maxRenderDistance(nbt.getInt(RENDER_DISTANCE));
         this.flipX = nbt.getBoolean(FLIP_X);
         this.flipY = nbt.getBoolean(FLIP_Y);
         this.alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : alpha;
@@ -153,7 +153,7 @@ public class DisplayData {
         }
 
         if (displayTile.canProject()) {
-            projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? DisplayConfig.maxProjectionDistance(nbt.getShort(PROJECTION_DISTANCE)) : projectionDistance;
+            projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? DisplayConfig.maxProjectionDistance(nbt.getInt(PROJECTION_DISTANCE)) : projectionDistance;
             audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : audioOffset;
         }
 
@@ -175,7 +175,7 @@ public class DisplayData {
                 this.maxVolumeDistance = DisplayConfig.maxVolumeDistance((int) nbt.getFloat("max"));
                 this.minVolumeDistance = Math.min((int) nbt.getFloat("min"), maxVolumeDistance);
 
-                this.renderDistance = nbt.getShort("render");
+                this.renderDistance = nbt.getInt("render");
 
                 if (displayTile.canHideModel()) {
                     this.frameVisibility = nbt.getBoolean("visibleFrame");
@@ -191,7 +191,8 @@ public class DisplayData {
         this.restrictHeight();
     }
 
-    public void setWidth(final HorizontalPosition position, final float width) {
+    public void setWidth(final float width) { this.setWidth(this.getPosX(), width); }
+    public void setWidth(final PositionHorizontal position, final float width) {
         switch (position) {
             case LEFT -> {
                 this.min.x = 0;
@@ -209,7 +210,8 @@ public class DisplayData {
         }
     }
 
-    public void setHeight(final VerticalPosition position, final float height) {
+    public void setHeight(final float height) { this.setHeight(this.getPosY(), height); }
+    public void setHeight(final PositionVertical position, final float height) {
         switch (position) {
             case TOP -> {
                 this.min.y = 0;
@@ -292,11 +294,11 @@ public class DisplayData {
         nbt.putFloat(ROTATION, (float) screen.rotation.getValue());
         nbt.putFloat(ALPHA, (float) screen.visibility.getValue());
         nbt.putFloat(BRIGHTNESS, (float) screen.brightness.getValue());
-        nbt.putShort(RENDER_DISTANCE, (short) screen.render_distance.getValue());
+        nbt.putInt(RENDER_DISTANCE, screen.render_distance.getIntValue());
 
-        nbt.putByte(VOLUME, (byte) screen.volume.getValue());
-        nbt.putShort(VOL_RANGE_MIN, (short) screen.volume_min.getValue());
-        nbt.putShort(VOL_RANGE_MAX, (short) screen.volume_max.getValue());
+        nbt.putInt(VOLUME, screen.volume.getIntValue());
+        nbt.putInt(VOL_RANGE_MIN, screen.volume_min.getIntValue());
+        nbt.putInt(VOL_RANGE_MAX, screen.volume_max.getIntValue());
 
         if (tile.canHideModel()) {
             nbt.putBoolean(VISIBLE_FRAME, screen.show_model.value);
@@ -307,7 +309,7 @@ public class DisplayData {
         }
 
         if (tile.canProject()) {
-            nbt.putShort(PROJECTION_DISTANCE, (short) screen.projection_distance.getValue());
+            nbt.putInt(PROJECTION_DISTANCE, screen.projection_distance.getIntValue());
             nbt.putInt("audio_offset_mode", screen.audioOffset.getState());
         }
 
@@ -330,8 +332,8 @@ public class DisplayData {
                 int posX = nbt.getInt("pos_x");
                 int posY = nbt.getInt("pos_y");
 
-                block.data.setWidth(HorizontalPosition.VALUES[posX], width);
-                block.data.setHeight(VerticalPosition.VALUES[posY], height);
+                block.data.setWidth(PositionHorizontal.VALUES[posX], width);
+                block.data.setHeight(PositionVertical.VALUES[posY], height);
             }
 
             block.data.flipX = nbt.getBoolean(FLIP_X);
@@ -339,10 +341,10 @@ public class DisplayData {
             block.data.rotation = nbt.getFloat(ROTATION);
             block.data.alpha = nbt.getFloat(ALPHA);
             block.data.brightness = nbt.getFloat(BRIGHTNESS);
-            block.data.renderDistance = DisplayConfig.maxRenderDistance(nbt.getShort(RENDER_DISTANCE));
+            block.data.renderDistance = DisplayConfig.maxRenderDistance(nbt.getInt(RENDER_DISTANCE));
             block.data.volume = DisplayConfig.maxVolume(nbt.getInt(VOLUME));
-            block.data.maxVolumeDistance = DisplayConfig.maxVolumeDistance(nbt.getShort(VOL_RANGE_MAX));
-            block.data.minVolumeDistance = (short) Math.min(nbt.getShort(VOL_RANGE_MIN), block.data.maxVolumeDistance);
+            block.data.maxVolumeDistance = DisplayConfig.maxVolumeDistance(nbt.getInt(VOL_RANGE_MAX));
+            block.data.minVolumeDistance = Math.min(nbt.getInt(VOL_RANGE_MIN), block.data.maxVolumeDistance);
             if (block.data.minVolumeDistance > block.data.maxVolumeDistance) block.data.maxVolumeDistance = block.data.minVolumeDistance;
 
             if (block.canHideModel()) {
@@ -354,7 +356,7 @@ public class DisplayData {
             }
 
             if (block.canProject()) {
-                block.data.projectionDistance = DisplayConfig.maxProjectionDistance(nbt.getShort(PROJECTION_DISTANCE));
+                block.data.projectionDistance = DisplayConfig.maxProjectionDistance(nbt.getInt(PROJECTION_DISTANCE));
 
                 int mode = nbt.getInt("audio_offset_mode");
                 block.data.audioOffset = mode == 2 ? block.data.projectionDistance : mode == 1 ? block.data.projectionDistance / 2f : 0;
@@ -362,24 +364,5 @@ public class DisplayData {
         }
 
         block.setDirty();
-    }
-
-    public enum VerticalPosition {
-        TOP, BOTTOM, CENTER;
-        public static final VerticalPosition[] VALUES = values();
-    }
-
-    public enum HorizontalPosition {
-        LEFT, RIGHT, CENTER;
-        public static final HorizontalPosition[] VALUES = values();
-    }
-
-    public enum AudioSource {
-        BLOCK, BETWEEN, PROJECTION;
-        public static final AudioSource[] VALUES = values();
-    }
-
-    public interface ExtraData {
-        void set(DisplayData data);
     }
 }

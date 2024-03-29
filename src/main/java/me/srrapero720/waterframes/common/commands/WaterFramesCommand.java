@@ -4,17 +4,17 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import me.srrapero720.waterframes.DisplayConfig;
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.common.block.data.DisplayData;
+import me.srrapero720.waterframes.common.block.data.PositionHorizontal;
+import me.srrapero720.waterframes.common.block.data.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
@@ -22,144 +22,287 @@ import net.minecraftforge.server.command.EnumArgument;
 
 public class WaterFramesCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        // COMMAND REGISTER
-        dispatcher.register(Commands.literal("waterframes").requires(WaterFramesCommand::hasPermissions)
+        var waterframes = Commands.literal("waterframes").requires(WaterFramesCommand::hasPermissions);
 
-                .then(Commands.literal("set")
-                        .then(Commands.argument("pos", BlockPosArgument.blockPos())
-                                .then(Commands.literal("url")
-                                        .then(Commands.argument("url", StringArgumentType.greedyString())
-                                                .executes(WaterFramesCommand::setUrl)
+        var posArg = Commands.argument("blockpos", BlockPosArgument.blockPos());
+
+        // URL
+        posArg.then(Commands.literal("url")
+                .then(Commands.argument("url", StringArgumentType.greedyString())
+                        .executes(c -> setUrl(getTile(c), c.getSource(), getStr(c, "url")))
+                )
+        );
+
+        var position = Commands.literal("position")
+                .then(Commands.argument("vertical", EnumArgument.enumArgument(PositionVertical.class))
+                        .executes(c -> setPosition(
+                                getTile(c),
+                                c.getSource(),
+                                getEnum(c,"vertical", PositionVertical.class),
+                                null
+                                )
+                        )
+                        .then(Commands.argument("horizontal", EnumArgument.enumArgument(PositionHorizontal.class))
+                                .executes(c -> setPosition(
+                                        getTile(c),
+                                        c.getSource(),
+                                        getEnum(c,"vertical", PositionVertical.class),
+                                        getEnum(c, "horizontal", PositionHorizontal.class)
                                         )
                                 )
+                        )
+                );
+        posArg.then(position);
 
-                                .then(Commands.literal("size")
-                                        .then(Commands.argument("width", FloatArgumentType.floatArg(0.1f, DisplayConfig.maxWidth()))
-                                                .executes(c -> setSize(c, c.getArgument("width", float.class), -1))
-                                                .then(Commands.argument("height", FloatArgumentType.floatArg(0.1f, DisplayConfig.maxHeight()))
-                                                        .executes(c -> setSize(c, c.getArgument("width", float.class), c.getArgument("height", float.class)))
-                                                        .then(positionLiteral)
-                                                )
-                                        )
-                                )
-
-                                .then(positionLiteral)
-
-                                .then(Commands.literal("volume")
-                                        .then(Commands.argument("volume", IntegerArgumentType.integer(0, DisplayConfig.maxVolume()))
-                                                .executes(c -> setVolume(c, c.getArgument("volume", int.class)))
+        // SIZE
+        posArg.then(Commands.literal("size")
+                .then(Commands.argument("width", FloatArgumentType.floatArg(0.1f))
+                        .executes(c -> setSize(
+                                getTile(c),
+                                c.getSource(),
+                                getFloat(c,"width"),
+                                -1)
+                        )
+                        .then(Commands.argument("height", FloatArgumentType.floatArg(0.1f))
+                                .executes(c -> setSize(
+                                        getTile(c),
+                                        c.getSource(),
+                                        getFloat(c, "width"), getFloat(c,"height")
                                         )
                                 )
                         )
                 )
         );
+
+        // ROTATION
+        posArg.then(Commands.literal("rotation")
+                .then(Commands.argument("rotation", FloatArgumentType.floatArg(0f, 360.0f))
+                        .executes(c -> setRotation(getTile(c), c.getSource(), getFloat(c, "rotation")))
+                )
+        );
+
+        // TRANSPARENCY
+        posArg.then(Commands.literal("transparency")
+                .then(Commands.argument("transparency", FloatArgumentType.floatArg(0f, 1f))
+                        .executes(c -> setTransparency(getTile(c), c.getSource(), getFloat(c, "transparency")))
+                )
+        );
+
+        // BRIGHTNESS
+        posArg.then(Commands.literal("brightness")
+                .then(Commands.argument("brightness", FloatArgumentType.floatArg(0f, 1f))
+                        .executes(c -> setBrightness(getTile(c), c.getSource(), getFloat(c, "brightness")))
+                )
+        );
+
+        // RENDER DISTANCE
+        posArg.then(Commands.literal("renderDistance")
+                .then(Commands.argument("render_distance", IntegerArgumentType.integer(4))
+                        .executes(c -> setRenderDistance(getTile(c), c.getSource(), getInt(c, "render_distance")))
+                )
+        );
+
+        // RENDER DISTANCE
+        posArg.then(Commands.literal("projectionDistance")
+                .then(Commands.argument("projection_distance", IntegerArgumentType.integer(4))
+                        .executes(c -> setProjectionDistance(getTile(c), c.getSource(), getInt(c, "projection_distance")))
+                )
+        );
+
+        // VOLUME DISTANCE
+        var volumeDistance = Commands.argument("min_distance", IntegerArgumentType.integer(0))
+                .executes(c -> setVolume(getTile(c), c.getSource(), getIntOr(c, "volume", -1), getInt(c, "min_distance"), -1))
+                .then(Commands.argument("max_distance", IntegerArgumentType.integer(0))
+                        .executes(c -> setVolume(getTile(c), c.getSource(), getIntOr(c, "volume", -1), getInt(c, "min_distance"), getInt(c, "max_distance")))
+                );
+
+        posArg.then(Commands.literal("volumeDistance")
+                .then(volumeDistance)
+        );
+
+        // VOLUME
+        posArg.then(Commands.literal("volume")
+                .then(Commands.argument("volume", IntegerArgumentType.integer(0, 120))
+                        .executes(c -> setVolume(getTile(c), c.getSource(), getInt(c, "volume"), -1, -1))
+                        .then(volumeDistance)
+                )
+        );
+
+        waterframes.then(Commands.literal("edit").then(posArg));
+        dispatcher.register(waterframes);
     }
 
-    private static final LiteralArgumentBuilder<CommandSourceStack> positionLiteral = Commands.literal("position")
-            .then(Commands.argument("vertical", EnumArgument.enumArgument(DisplayData.VerticalPosition.class))
-                    .executes(c -> setPosition(c, c.getArgument("vertical", DisplayData.VerticalPosition.class), null))
-                    .then(Commands.argument("horizontal", EnumArgument.enumArgument(DisplayData.HorizontalPosition.class))
-                            .executes(c -> setPosition(c, c.getArgument("vertical", DisplayData.VerticalPosition.class), c.getArgument("horizontal", DisplayData.HorizontalPosition.class)))
-                    )
-            );
+    public static int setUrl(DisplayTile tile, CommandSourceStack source, String url) {
+        if (tile == null) return 1;
 
-    public static int setUrl(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
-        final var source = context.getSource();
-        final var level = source.getLevel();
-        final var blockpos = BlockPosArgument.getLoadedBlockPos(context, "pos");
-        final var url = StringArgumentType.getString(context, "url");
+        if (!tile.data.url.equals(url)) {
+            tile.data.tick = 0;
+            tile.data.tickMax = -1;
+        }
+        tile.data.url = url;
 
-        final var displayTile = level.getBlockEntity(blockpos);
-        if (displayTile instanceof DisplayTile tile) {
-            if (!tile.data.url.equals(url)) {
-                tile.data.tick = 0;
-                tile.data.tickMax = -1;
-            }
-            tile.data.url = url;
-            tile.setDirty();
-            source.sendSuccess(
-                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.set.url.success"))
-                            .withStyle(ChatFormatting.GREEN), true
-            );
-            return 0;
-        } else {
-            source.sendFailure(
-                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
-                            .withStyle(ChatFormatting.RED))
-            );
-            return 1;
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.url.success"), true);
+        return 0;
+    }
+
+    public static int setSize(DisplayTile tile, CommandSourceStack source, float width, float height) {
+        if (tile == null) return 1;
+
+        if (!tile.canResize()) {
+            source.sendFailure(msgFailed("waterframes.commands.edit.size.failed"));
+            return 2;
+        }
+
+        tile.data.setWidth(width);
+        tile.data.setHeight(height);
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.size.success"), true);
+        return 0;
+    }
+
+    public static int setPosition(DisplayTile tile, CommandSourceStack source, PositionVertical vertical, PositionHorizontal horizontal) {
+        if (tile == null) return 1;
+
+        if (!tile.canResize()) {
+            source.sendFailure(msgFailed("waterframes.commands.edit.position.failed"));
+            return 2;
+        }
+
+        tile.data.setHeight(vertical, tile.data.getHeight());
+        if (horizontal != null) tile.data.setWidth(horizontal, tile.data.getWidth());
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.position.success"),true);
+        return 0;
+    }
+
+    public static int setRotation(DisplayTile tile, CommandSourceStack source, float volume) {
+        if (tile == null) return 1;
+
+        if (!tile.canResize()) {
+            source.sendFailure(msgFailed("waterframes.commands.edit.rotation.failed"));
+            return 2;
+        }
+
+        tile.data.rotation = volume;
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.rotation.success"), true);
+        return 0;
+    }
+
+    public static int setTransparency(DisplayTile tile, CommandSourceStack source, float transparency) {
+        if (tile == null) return 1;
+
+        tile.data.alpha = transparency;
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.transparency.success"), true);
+        return 0;
+    }
+
+    public static int setBrightness(DisplayTile tile, CommandSourceStack source, float brightness) {
+        if (tile == null) return 1;
+
+        tile.data.brightness = brightness;
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.brightness.success"), true);
+        return 0;
+    }
+
+    public static int setRenderDistance(DisplayTile tile, CommandSourceStack source, int renderDistance) {
+        if (tile == null) return 1;
+
+        tile.data.renderDistance = renderDistance;
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.render_distance.success"), true);
+        return 0;
+    }
+
+    public static int setProjectionDistance(DisplayTile tile, CommandSourceStack source, int projectionDistance) {
+        if (tile == null) return 1;
+
+        if (!tile.canProject()) {
+            source.sendFailure(msgFailed("waterframes.commands.edit.projection.failed"));
+            return 2;
+        }
+
+        tile.data.projectionDistance = projectionDistance;
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.projection.success"), true);
+        return 0;
+    }
+
+    public static int setVolume(DisplayTile tile, CommandSourceStack source, int volume, int min, int max) {
+        if (tile == null) return 1;
+
+        if (volume != -1) tile.data.volume = volume;
+        if (min != -1) tile.data.minVolumeDistance = min;
+        if (max != -1) tile.data.maxVolumeDistance = max;
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.volume.success"), true);
+        return 0;
+    }
+
+    public static <E extends Enum<E>> E getEnum(CommandContext<CommandSourceStack> context, String name, Class<E> enumClass) {
+        return context.getArgument(name, enumClass);
+    }
+
+    public static String getStr(CommandContext<CommandSourceStack> context, String name) {
+        return context.getArgument(name, String.class);
+    }
+
+    public static byte getByte(CommandContext<CommandSourceStack> context, String name) {
+        return context.getArgument(name, byte.class);
+    }
+
+    public static double getShort(CommandContext<CommandSourceStack> context, String name) {
+        return context.getArgument(name, short.class);
+    }
+
+    public static int getInt(CommandContext<CommandSourceStack> context, String name) {
+        return context.getArgument(name, int.class);
+    }
+
+    public static int getIntOr(CommandContext<CommandSourceStack> context, String name, int def) {
+        try {
+            return context.getArgument(name, int.class);
+        } catch (Exception ignored) {
+            return def;
         }
     }
 
-    public static int setSize(CommandContext<CommandSourceStack> context, float width, float height) throws CommandSyntaxException {
-        final var source = context.getSource();
-        final var level = source.getLevel();
-        final var blockpos = BlockPosArgument.getLoadedBlockPos(context, "pos");
-
-        final var displayTile = level.getBlockEntity(blockpos);
-        if (displayTile instanceof DisplayTile tile) {
-            if (width > 0.1f) tile.data.setWidth(tile.data.getPosX(), width);
-            if (height > 0.1f) tile.data.setHeight(tile.data.getPosY(), height);
-
-            tile.setDirty();
-            source.sendSuccess(
-                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.set.size.success"))
-                            .withStyle(ChatFormatting.GREEN), true
-            );
-            return 0;
-        } else {
-            source.sendFailure(
-                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
-                            .withStyle(ChatFormatting.RED))
-            );
-            return 1;
-        }
+    public static float getFloat(CommandContext<CommandSourceStack> context, String name) {
+        return context.getArgument(name, float.class);
     }
 
-    public static int setPosition(CommandContext<CommandSourceStack> context, DisplayData.VerticalPosition vertical, DisplayData.HorizontalPosition horizontal) throws CommandSyntaxException {
-        final var source = context.getSource();
-        final var level = source.getLevel();
-        final var blockpos = BlockPosArgument.getLoadedBlockPos(context, "pos");
-
-        final var displayTile = level.getBlockEntity(blockpos);
-        if (displayTile instanceof DisplayTile displayBE) {
-            if (horizontal != null) displayBE.data.setWidth(horizontal, displayBE.data.getWidth());
-            displayBE.data.setHeight(vertical, displayBE.data.getHeight());
-            displayBE.setDirty();
-            source.sendSuccess(
-                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.set.position.success"))
-                            .withStyle(ChatFormatting.GREEN), true
-            );
-            return 0;
-        } else {
-            source.sendFailure(
-                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.invalid")
-                            .withStyle(ChatFormatting.RED))
-            );
-            return 1;
-        }
+    public static double getDouble(CommandContext<CommandSourceStack> context, String name) {
+        return context.getArgument(name, double.class);
     }
 
-    public static int setVolume(CommandContext<CommandSourceStack> context, int volume) throws CommandSyntaxException {
-        final var source = context.getSource();
-        final var level = source.getLevel();
-        final var blockpos = BlockPosArgument.getLoadedBlockPos(context, "pos");
+    private static DisplayTile getTile(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        final var blockpos = BlockPosArgument.getLoadedBlockPos(context, "blockpos");
+        final var blockEntity = context.getSource().getLevel().getBlockEntity(blockpos);
 
-        final var displayTile = level.getBlockEntity(blockpos);
-        if (displayTile instanceof DisplayTile tile) {
-            tile.data.volume = volume;
-            tile.setDirty();
-            source.sendSuccess(
-                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.set.volume.success"))
-                            .withStyle(ChatFormatting.GREEN), true
-            );
-            return 0;
-        } else {
-            source.sendFailure(
-                    new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent("waterframes.commands.invalid").withStyle(ChatFormatting.RED))
-            );
-            return 1;
+        if (blockEntity instanceof DisplayTile tile) {
+            return tile;
         }
+        context.getSource().sendFailure(msgFailed("waterframes.commands.invalid_block"));
+        return null;
+    }
+
+    private static Component msgFailed(String t) {
+        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.RED));
+    }
+
+    private static Component msgSuccess(String t) {
+        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN));
     }
 
     public static boolean hasPermissions(CommandSourceStack sourceStack) {

@@ -14,8 +14,6 @@ import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
 import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
-import me.srrapero720.waterframes.util.events.ClientPauseUpdateEvent;
-import me.srrapero720.waterframes.util.exceptions.IllegalModException;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -120,11 +118,22 @@ public class WFRegistry {
         public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
             if (event.phase == TickEvent.Phase.END) WaterFrames.tick();
         }
+    }
 
-        @SubscribeEvent
-        @OnlyIn(Dist.CLIENT)
-        public static void onPause(ClientPauseUpdateEvent event) {
-            if (event.isPaused()) DisplayControl.pause();
+    public static class IllegalModException extends RuntimeException {
+        private static final String MSG = "§fMod §6%s §fis not compatible with §e%s §fbecause §c%s §fplease remove it";
+        private static final String MSG_REASON = "§fMod §6%s §fis not compatible with §e%s §fbecause §c%s §fuse §a%s §finstead";
+
+        private IllegalModException(String msg) {
+            super(msg);
+        }
+
+        public IllegalModException(String modid, String reason) {
+            this(String.format(MSG, modid, WaterFrames.ID, reason));
+        }
+
+        public IllegalModException(String modid, String reason, String alternatives) {
+            this(String.format(MSG_REASON, modid, WaterFrames.ID, reason, alternatives));
         }
     }
 }

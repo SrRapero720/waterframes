@@ -2,32 +2,25 @@ package me.srrapero720.waterframes.common.screens.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.common.block.data.DisplayData;
+import me.srrapero720.waterframes.common.block.data.PositionHorizontal;
+import me.srrapero720.waterframes.common.block.data.PositionVertical;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import team.creative.creativecore.client.render.GuiRenderHelper;
 import team.creative.creativecore.common.gui.GuiChildControl;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
-import team.creative.creativecore.common.gui.controls.simple.GuiSeekBar;
-import team.creative.creativecore.common.gui.controls.simple.GuiSlider;
-import team.creative.creativecore.common.gui.style.Icon;
 import team.creative.creativecore.common.util.math.geo.Rect;
-import team.creative.creativecore.common.util.text.TextBuilder;
-import team.creative.creativecore.common.util.type.Color;
 
-import javax.print.DocFlavor;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WidgetClickableArea extends GuiIcon {
-    private DisplayData.HorizontalPosition x;
-    private DisplayData.VerticalPosition y;
-    public WidgetClickableArea(String name, DisplayData.HorizontalPosition x, DisplayData.VerticalPosition y) {
+    private PositionHorizontal x;
+    private PositionVertical y;
+    public WidgetClickableArea(String name, PositionHorizontal x, PositionVertical y) {
         super(name, IconStyles.POS_BASE);
         this.x = x;
         this.y = y;
@@ -76,16 +69,16 @@ public class WidgetClickableArea extends GuiIcon {
         int areaY = (int) ((mouseY / rect.getHeight()) * 3);
 
         this.x = switch (areaX) {
-            case 0 -> DisplayData.HorizontalPosition.LEFT;
-            case 1 -> DisplayData.HorizontalPosition.CENTER;
-            case 2, 3 -> DisplayData.HorizontalPosition.RIGHT;
+            case 0 -> PositionHorizontal.LEFT;
+            case 1 -> PositionHorizontal.CENTER;
+            case 2, 3 -> PositionHorizontal.RIGHT;
             default -> throw new IllegalStateException("Invalid area");
         };
 
         this.y = switch (areaY) {
-            case 0 -> DisplayData.VerticalPosition.TOP;
-            case 1 -> DisplayData.VerticalPosition.CENTER;
-            case 2, 3 -> DisplayData.VerticalPosition.BOTTOM;
+            case 0 -> PositionVertical.TOP;
+            case 1 -> PositionVertical.CENTER;
+            case 2, 3 -> PositionVertical.BOTTOM;
             default -> throw new IllegalStateException("Invalid area");
         };
         return true;
@@ -100,11 +93,11 @@ public class WidgetClickableArea extends GuiIcon {
         return tooltips;
     }
 
-    public DisplayData.HorizontalPosition getX() {
+    public PositionHorizontal getX() {
         return x;
     }
 
-    public DisplayData.VerticalPosition getY() {
+    public PositionVertical getY() {
         return y;
     }
 }
