@@ -130,18 +130,16 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
         if (!DisplayConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof DisplayTile tile)) return;
-
         boolean signal = level.hasNeighborSignal(pos);
-        if (tile.data.paused == signal) return;
 
-        // TODO: add a config to make redstone more powerful (even to overwrite screen or RC actions)
-        state.setValue(POWERED, signal);
-
-        if (!level.isClientSide) {
+        if (!level.isClientSide && state.getValue(POWERED) != signal) {
             // FIXME: rewrite networking again
             PauseModePacket packet = new PauseModePacket(pos, signal, -1);
             packet.execute(tile, null, null);
             WFNetwork.sendPlaybackClient(packet, level);
+
+            // TODO: add a config to make redstone more powerful (even to overwrite screen or RC actions)
+            state.setValue(POWERED, signal);
         }
     }
 
