@@ -20,7 +20,7 @@ public class FrameTile extends DisplayTile {
     @Override
     @OnlyIn(Dist.CLIENT)
     public AABB getRenderBoundingBox() {
-        return RenderBox.simple(this, Facing.get(this.getBlockState().getValue(FrameBlock.FACING)), 0).getBB(getBlockPos());
+        return RenderBox.get(this, Facing.get(this.getBlockState().getValue(FrameBlock.FACING)), 0, false).getBB(getBlockPos());
     }
 
     @Override

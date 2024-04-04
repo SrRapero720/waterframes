@@ -151,6 +151,7 @@ public abstract class DisplayTile extends BlockEntity {
         WFNetwork.sendPlaytimeServer(this, Math.min(data.tick + MathAPI.msToTick(5000), data.tickMax), data.tickMax);
     }
     public void fastBackwards() {
+        assert isClient();
         WFNetwork.sendPlaytimeServer(this, Math.max(data.tick - MathAPI.msToTick(5000), 0), data.tickMax);
     }
 
@@ -198,8 +199,8 @@ public abstract class DisplayTile extends BlockEntity {
 
     @Override
     public void handleUpdateTag(CompoundTag tag) {
-        data.load(tag, this);
-        setDirty();
+        this.data.load(tag, this);
+        this.setDirty();
     }
 
     @Override public @NotNull CompoundTag getUpdateTag() { return this.saveWithFullMetadata(); }

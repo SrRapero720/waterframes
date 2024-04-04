@@ -6,7 +6,7 @@ import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 public class RenderBox {
-    public static AlignedBox simple(DisplayTile tile, Facing facing, float spacing) {
+    public static AlignedBox get(DisplayTile tile, Facing facing, float spacing, boolean squared) {
         var box = new AlignedBox();
 
         if (facing.positive) box.setMax(facing.axis, (tile.data.projectionDistance + spacing));
@@ -26,28 +26,7 @@ public class RenderBox {
         box.setMin(two, tile.data.min.y);
         box.setMax(two, tile.data.max.y);
 
-        return box;
-    }
-
-    public static AlignedBox squared(DisplayTile tile, Facing facing, float spacing) {
-        var box = new AlignedBox();
-
-        if (facing.positive) box.setMax(facing.axis, (tile.data.projectionDistance + spacing));
-        else box.setMin(facing.axis, 1 - (tile.data.projectionDistance + spacing));
-
-        Axis one = facing.one();
-        Axis two = facing.two();
-
-        if (facing.axis != Axis.Z) {
-            one = facing.two();
-            two = facing.one();
-        }
-
-        box.setMin(one, tile.data.min.x);
-        box.setMax(one, tile.data.max.x);
-
-        box.setMin(two, tile.data.min.y);
-        box.setMax(two, tile.data.max.y);
+        if (!squared) return box;
 
         float width = tile.data.getWidth();
         float height = tile.data.getHeight();
