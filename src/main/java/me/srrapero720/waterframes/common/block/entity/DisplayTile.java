@@ -159,7 +159,7 @@ public abstract class DisplayTile extends BlockEntity {
     }
 
     public Direction getDirection() {
-        return this.getBlockState().getValue(getDisplayBlock().getFacing());
+        return this.getBlockState().getValue(this.getDisplayBlock().getFacing());
     }
 
     public DisplayBlock getDisplayBlock() {

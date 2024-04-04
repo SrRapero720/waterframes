@@ -62,7 +62,7 @@ public class DisplayScreen extends GuiLayer {
     public final GuiSlider visibility;
     public final GuiSlider brightness;
     public final GuiSteppedSlider render_distance;
-    public final GuiSteppedSlider projection_distance;
+    public final GuiSlider projection_distance;
 
     public final GuiCheckBox show_model;
     public final GuiCheckBox render_behind;
@@ -137,7 +137,7 @@ public class DisplayScreen extends GuiLayer {
         this.visibility = new GuiSlider(DisplayData.ALPHA, tile.data.alpha, 0, 1, DoubleValueParser.PERCENT);
         this.brightness = new GuiSlider(DisplayData.BRIGHTNESS, tile.data.brightness, 0, 1, DoubleValueParser.PERCENT);
         this.render_distance = new GuiSteppedSlider(DisplayData.RENDER_DISTANCE, tile.data.renderDistance, 4, DisplayConfig.maxRenderDistance(), IntValueParser.BLOCKS.BLOCKS);
-        this.projection_distance = new GuiSteppedSlider(DisplayData.PROJECTION_DISTANCE, tile.data.projectionDistance, 4, DisplayConfig.maxProjectionDistance(), IntValueParser.BLOCKS);
+        this.projection_distance = new GuiSlider(DisplayData.PROJECTION_DISTANCE, tile.data.projectionDistance, 4, DisplayConfig.maxProjectionDistance(), DoubleValueParser.BLOCKS);
         this.audioOffset = new GuiStateButtonIcon(DisplayData.AUDIO_OFFSET, IconStyles.AUDIO_POS_BLOCK, IconStyles.AUDIO_POS_PICTURE, IconStyles.AUDIO_POS_CENTER) {
             @Override
             public List<Component> getTooltip() {

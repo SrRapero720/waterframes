@@ -1,9 +1,9 @@
 package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.client.display.DisplayControl;
-import me.srrapero720.waterframes.client.renderer.FrameRender;
-import me.srrapero720.waterframes.client.renderer.ProjectorRender;
-import me.srrapero720.waterframes.client.renderer.TvRender;
+import me.srrapero720.waterframes.client.rendering.FrameRenderer;
+import me.srrapero720.waterframes.client.rendering.ProjectorRenderer;
+import me.srrapero720.waterframes.client.rendering.TvRenderer;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.FrameBlock;
 import me.srrapero720.waterframes.common.block.ProjectorBlock;
@@ -33,7 +33,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.registries.*;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 
 import java.util.function.Supplier;
 
@@ -101,9 +103,9 @@ public class WFRegistry {
 
         @OnlyIn(Dist.CLIENT)
         private static void client() {
-            BlockEntityRenderers.register(WFRegistry.TILE_FRAME.get(), (x) -> new FrameRender());
-            BlockEntityRenderers.register(WFRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRender());
-            BlockEntityRenderers.register(WFRegistry.TILE_TV.get(), (x) -> new TvRender());
+            BlockEntityRenderers.register(WFRegistry.TILE_FRAME.get(), (x) -> new FrameRenderer());
+            BlockEntityRenderers.register(WFRegistry.TILE_PROJECTOR.get(), (x) -> new ProjectorRenderer());
+            BlockEntityRenderers.register(WFRegistry.TILE_TV.get(), (x) -> new TvRenderer());
         }
 
         @SubscribeEvent

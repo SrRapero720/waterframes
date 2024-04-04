@@ -48,8 +48,14 @@ public class WidgetStatusIcon extends GuiIcon {
             case WAITING, FORGOTTEN -> {
                 if (tile.imageCache.url.isEmpty())
                     yield ChatFormatting.AQUA + translate("waterframes.status.idle");
-                else
-                    yield ChatFormatting.DARK_RED + tile.imageCache.getException().getLocalizedMessage();
+                else {
+                    Exception e = tile.imageCache.getException();
+                    if (e != null) {
+                        yield ChatFormatting.DARK_RED + tile.imageCache.getException().getLocalizedMessage();
+                    } else {
+                        yield ChatFormatting.DARK_RED + translate("waterframes.status.not_working");
+                    }
+                }
             }
         };
         tooltip.add(translatable("waterframes.status", status));

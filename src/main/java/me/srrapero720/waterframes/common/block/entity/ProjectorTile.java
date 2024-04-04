@@ -1,7 +1,6 @@
 package me.srrapero720.waterframes.common.block.entity;
 
-import me.srrapero720.waterframes.client.renderer.engine.RenderBox;
-import me.srrapero720.waterframes.common.block.ProjectorBlock;
+import me.srrapero720.waterframes.client.rendering.core.RenderBox;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.WFRegistry;
 import net.minecraft.core.BlockPos;
@@ -19,7 +18,7 @@ public class ProjectorTile extends DisplayTile {
     @Override
     @OnlyIn(Dist.CLIENT)
     public AABB getRenderBoundingBox() {
-        return RenderBox.getBasic(this, Facing.get(this.getBlockState().getValue(getDisplayBlock().getFacing())), data.projectionDistance + 1f).getBB(getBlockPos());
+        return RenderBox.simple(this, Facing.get(this.getBlockState().getValue(getDisplayBlock().getFacing())), 0).getBB(getBlockPos());
     }
 
     @Override

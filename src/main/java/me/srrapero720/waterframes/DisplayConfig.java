@@ -36,7 +36,7 @@ public class DisplayConfig {
     private static ForgeConfigSpec.DoubleValue maxWidth;
     private static ForgeConfigSpec.DoubleValue maxHeight;
     private static ForgeConfigSpec.IntValue maxRenderDistance;
-    private static ForgeConfigSpec.IntValue maxProjectionDistance;
+    private static ForgeConfigSpec.DoubleValue maxProjectionDistance;
     // MULTIMEDIA
     private static ForgeConfigSpec.IntValue maxVolumeDistance;
     private static ForgeConfigSpec.IntValue maxVolume;
@@ -70,7 +70,7 @@ public class DisplayConfig {
             maxWidth = b.defineInRange("maxWidth", 40d, 1d, 128d);
             maxHeight = b.defineInRange("maxHeight", 40d, 1d, 128d);
             maxRenderDistance = b.defineInRange("maxRenderDistance", 128, 8, 512);
-            maxProjectionDistance = b.defineInRange("maxProjectionDistance", 32, 8, 128);
+            maxProjectionDistance = b.defineInRange("maxProjectionDistance", 32f, 8f, 128f);
         }, "Configures all rendering limits, size, distance");
 
         serverBuilder.group("multimedia", b -> {
@@ -131,8 +131,8 @@ public class DisplayConfig {
     public static int maxRenderDistance() { return maxRenderDistance.get(); }
     public static int maxRenderDistance(int value) { return Math.min(value, maxRenderDistance()); }
 
-    public static int maxProjectionDistance() { return maxProjectionDistance.get(); }
-    public static int maxProjectionDistance(int value) { return Math.min(value, maxProjectionDistance()); }
+    public static float maxProjectionDistance() { return (float) (double) maxProjectionDistance.get(); }
+    public static float maxProjectionDistance(float value) { return Math.min(value, maxProjectionDistance()); }
 
     // MULTIMEDIA
     public static int maxVolumeDistance() { return maxVolumeDistance.get(); }

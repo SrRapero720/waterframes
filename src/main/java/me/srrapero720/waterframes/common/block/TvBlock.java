@@ -81,7 +81,6 @@ public class TvBlock extends DisplayBlock {
         }
 
         // SETUP WIDE
-
         renderMargin = renderMode ? 1f : 0;
         if (attachedBlockFace == Direction.DOWN || attachedBlockFace == Direction.UP) {
             box.setMax(facingClockWise.axis, ((24f - renderMargin) / 16f)); // render: 23
@@ -100,11 +99,12 @@ public class TvBlock extends DisplayBlock {
         }
 
         if (!renderMode) box.scale(1.01f);
+        else box.grow(facing.axis, 0.001f);
         return box;
     }
 
     @Override
-    public BlockState getStateForPlacement( BlockPlaceContext context) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction current = context.getHorizontalDirection();
         return this.defaultBlockState()
                 .setValue(getFacing(), context.getPlayer().isCrouching() ? current.getOpposite() : current)

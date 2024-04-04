@@ -75,7 +75,7 @@ public class DisplayData {
     public boolean renderBothSides = false;
 
     // PROJECTOR VALUES
-    public int projectionDistance = DisplayConfig.maxProjectionDistance(8);
+    public float projectionDistance = DisplayConfig.maxProjectionDistance(8f);
     public float audioOffset = 0;
 
     public PositionHorizontal getPosX() { return this.min.x == 0 ? PositionHorizontal.LEFT : this.max.x == 1 ? PositionHorizontal.RIGHT : PositionHorizontal.CENTER; }
@@ -116,7 +116,7 @@ public class DisplayData {
         }
 
         if (displayTile.canProject()) {
-            nbt.putInt(PROJECTION_DISTANCE, projectionDistance);
+            nbt.putFloat(PROJECTION_DISTANCE, projectionDistance);
             nbt.putFloat(AUDIO_OFFSET, audioOffset);
         }
 
@@ -319,7 +319,7 @@ public class DisplayData {
         }
 
         if (tile.canProject()) {
-            nbt.putInt(PROJECTION_DISTANCE, screen.projection_distance.getIntValue());
+            nbt.putFloat(PROJECTION_DISTANCE, (float) screen.projection_distance.getValue());
             nbt.putInt(AUDIO_OFFSET, screen.audioOffset.getState());
         }
 
@@ -369,7 +369,7 @@ public class DisplayData {
             if (block.canProject()) {
                 int mode = nbt.getInt(AUDIO_OFFSET);
 
-                block.data.projectionDistance = DisplayConfig.maxProjectionDistance(nbt.getInt(PROJECTION_DISTANCE));
+                block.data.projectionDistance = DisplayConfig.maxProjectionDistance(nbt.getFloat(PROJECTION_DISTANCE));
                 block.data.setAudioPosition(AudioPosition.VALUES[mode]);
             }
         }

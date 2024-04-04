@@ -11,7 +11,7 @@ import team.creative.creativecore.common.gui.controls.simple.GuiLabel;
 @Mixin(GuiLabel.class)
 public abstract class GuiLabelMixin extends GuiControl implements ScalableText {
 
-    @Shadow protected CompiledText text;
+    @Shadow(remap = false) protected CompiledText text;
 
     public GuiLabelMixin(String name) { super(name); }
 

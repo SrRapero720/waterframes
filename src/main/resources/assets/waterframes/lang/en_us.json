@@ -33,6 +33,7 @@
     "waterframes.status.loading": "Loading",
     "waterframes.status.idle": "Idle",
     "waterframes.status.failed": "Failed to load",
+    "waterframes.status.not_working": "Something wrong happened",
 
     "waterframes.download.exception.forbidden": "Forbidden",
     "waterframes.download.exception.notfound": "Not found",
