@@ -5,8 +5,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
-import me.srrapero720.waterframes.client.rendering.core.RenderBox;
 import me.srrapero720.waterframes.client.rendering.core.RenderCore;
+import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageRenderer;
@@ -109,7 +109,7 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
 
     public void renderLoading(PoseStack pose, DisplayTile tile, Facing facing, BoxFace face, boolean front, boolean back, boolean flipX, boolean flipY, int colorARGB) {
         RenderCore.bindTex(LOADING_TEX.texture(WaterFrames.getTicks(), MathAPI.tickToMs(WaterFrames.deltaFrames()), true));
-        AlignedBox squaredBox = RenderBox.get(tile, facing, this.grwSize(), true);
+        AlignedBox squaredBox = DisplayBlock.getBox(tile, facing, this.grwSize(), true);
 
         if (front)
             RenderCore.vertexF(pose, squaredBox, face, flipX, flipY, colorARGB);

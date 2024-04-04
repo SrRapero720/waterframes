@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.block.entity;
 
-import me.srrapero720.waterframes.client.rendering.core.RenderBox;
+import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.FrameBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.WFRegistry;
@@ -20,7 +20,7 @@ public class FrameTile extends DisplayTile {
     @Override
     @OnlyIn(Dist.CLIENT)
     public AABB getRenderBoundingBox() {
-        return RenderBox.get(this, Facing.get(this.getBlockState().getValue(FrameBlock.FACING)), 0, false).getBB(getBlockPos());
+        return DisplayBlock.getBox(this, Facing.get(this.getBlockState().getValue(FrameBlock.FACING)), 0, false).getBB(getBlockPos());
     }
 
     @Override

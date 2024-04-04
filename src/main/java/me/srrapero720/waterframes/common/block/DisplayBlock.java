@@ -26,6 +26,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
 import team.creative.creativecore.common.gui.creator.GuiCreator;
+import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
@@ -105,6 +106,59 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
 //        if (state.getValue(POWERED) && tile.data.playing) tile.pause();
 //        if (!state.getValue(POWERED) && !tile.data.playing) tile.play();
+    }
+
+    public static AlignedBox getBox(DisplayTile tile, Facing facing, float spacing, boolean squared) {
+        var box = new AlignedBox();
+
+        if (facing.positive) box.setMax(facing.axis, (tile.data.projectionDistance + spacing));
+        else box.setMin(facing.axis, 1 - (tile.data.projectionDistance + spacing));
+
+        Axis one = facing.one();
+        Axis two = facing.two();
+
+        if (facing.axis != Axis.Z) {
+            one = facing.two();
+            two = facing.one();
+        }
+
+        box.setMin(one, tile.data.min.x);
+        box.setMax(one, tile.data.max.x);
+
+        box.setMin(two, tile.data.min.y);
+        box.setMax(two, tile.data.max.y);
+
+        if (!squared) return box;
+
+        float width = tile.data.getWidth();
+        float height = tile.data.getHeight();
+
+        // FIXME: corner pictures makes squared look closer to the block
+        if (width > height) {
+            getBox$square(box, one, tile.data.getPosX().ordinal(), height);
+        } else {
+            getBox$square(box, two, tile.data.getPosY().ordinal(), width);
+        }
+
+        return box;
+    }
+
+    private static void getBox$square(final AlignedBox box, Axis axis, int mode, float size) {
+        switch (mode) {
+            case 0 -> {
+                box.setMin(axis, 0f);
+                box.setMax(axis, size);
+            }
+            case 1 -> {
+                box.setMin(axis, 1 - size);
+                box.setMax(axis, 1);
+            }
+            default -> {
+                float middle = size / 2;
+                box.setMin(axis, 0.5f - middle);
+                box.setMax(axis, 0.5f + middle);
+            }
+        }
     }
 
     @Override
