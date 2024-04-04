@@ -45,7 +45,6 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
         // PREPARE RENDERING
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        RenderSystem.enableTexture();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShaderColor(tile.data.brightness, tile.data.brightness, tile.data.brightness, tile.data.alpha);
         RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
@@ -68,7 +67,6 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
         pose.popPose();
         RenderSystem.disableBlend();
         RenderSystem.disableDepthTest();
-        RenderSystem.disableTexture();
         RenderSystem.setShaderColor(color[0], color[1], color[2], color[3]);
     }
 
