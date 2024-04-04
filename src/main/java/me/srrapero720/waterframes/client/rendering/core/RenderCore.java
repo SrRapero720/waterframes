@@ -17,6 +17,7 @@ public class RenderCore {
     public static void bufferPrepare() {
         if (builder.building()) bufferFinish();
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.getShader().clear();
     }
 
     public static void bufferBegin() {
