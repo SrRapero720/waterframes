@@ -14,7 +14,7 @@ public class ProjectorRenderer extends DisplayRenderer {
 
     @Override
     public AlignedBox box(DisplayTile tile, Direction direction, Facing facing) {
-        return DisplayBlock.getBox(tile, facing, this.grwSize(), false);
+        return DisplayBlock.getRenderBox(tile, facing, this.grwSize(), false);
     }
 
     @Override

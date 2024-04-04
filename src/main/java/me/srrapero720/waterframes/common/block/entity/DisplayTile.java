@@ -1,10 +1,10 @@
 package me.srrapero720.waterframes.common.block.entity;
 
 import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.WFNetwork;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
-import me.srrapero720.waterframes.WFNetwork;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
-import team.creative.creativecore.common.util.math.vec.Vec3d;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
@@ -122,49 +121,37 @@ public abstract class DisplayTile extends BlockEntity {
         super.onChunkUnloaded();
     }
 
-    public void setActiveMode(boolean mode) {
+    public void setActiveClient(boolean mode) {
         assert isClient();
         WFNetwork.sendActiveServer(this, mode);
     }
-    public void setMutedMode(boolean mode) {
+    public void setMuteClient(boolean mode) {
         assert isClient();
         WFNetwork.sendMutedServer(this, mode);
     }
-    public void setPauseMode(boolean pause) {
+    public void setPauseClient(boolean pause) {
         assert isClient();
         WFNetwork.sendPlaybackServer(this, pause, this.data.tick);
     }
-    public void stop() {
+    public void stopClient() {
         assert isClient();
         WFNetwork.sendPlaybackServer(this, true, 0);
     }
-    public void volumeUp() {
+    public void volumeUpClient() {
         assert isClient();
         WFNetwork.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance,  DisplayConfig.maxVolume(this.data.volume + 5));
     }
-    public void volumeDown() {
+    public void volumeDownClient() {
         assert isClient();
         WFNetwork.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance, DisplayConfig.maxVolume(this.data.volume - 5));
     }
-    public void fastForward() {
+    public void ffClient() {
         assert isClient();
         WFNetwork.sendPlaytimeServer(this, Math.min(data.tick + MathAPI.msToTick(5000), data.tickMax), data.tickMax);
     }
-    public void fastBackwards() {
+    public void rwClient() {
         assert isClient();
         WFNetwork.sendPlaytimeServer(this, Math.max(data.tick - MathAPI.msToTick(5000), 0), data.tickMax);
-    }
-
-    public boolean isClient() {
-        return this.level != null && this.level.isClientSide;
-    }
-
-    public Direction getDirection() {
-        return this.getBlockState().getValue(this.getDisplayBlock().getFacing());
-    }
-
-    public DisplayBlock getDisplayBlock() {
-        return (DisplayBlock) this.getBlockState().getBlock();
     }
 
     /* SPECIAL TICKS */
@@ -188,6 +175,28 @@ public abstract class DisplayTile extends BlockEntity {
         }
     }
 
+    public boolean isClient() {
+        return this.level != null && this.level.isClientSide;
+    }
+
+    public boolean isServer() {
+        return !isClient();
+    }
+
+    public Direction getDirection() {
+        return this.getBlockState().getValue(this.getDisplayBlock().getFacing());
+    }
+
+    public DisplayBlock getDisplayBlock() {
+        return (DisplayBlock) this.getBlockState().getBlock();
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundTag tag) {
+        this.data.load(tag, this);
+        this.setDirty();
+    }
+
     public void setDirty() {
         if (this.level != null) {
             this.level.blockEntityChanged(this.worldPosition);
@@ -195,12 +204,6 @@ public abstract class DisplayTile extends BlockEntity {
         } else {
             LOGGER.warn("Cannot be stored block data, level is NULL");
         }
-    }
-
-    @Override
-    public void handleUpdateTag(CompoundTag tag) {
-        this.data.load(tag, this);
-        this.setDirty();
     }
 
     @Override public @NotNull CompoundTag getUpdateTag() { return this.saveWithFullMetadata(); }

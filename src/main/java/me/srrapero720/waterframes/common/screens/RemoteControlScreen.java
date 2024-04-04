@@ -44,7 +44,7 @@ public class RemoteControlScreen extends GuiLayer {
         this.flow = GuiFlow.STACK_Y;
         this.tile = tile;
 
-        this.active = new GuiButtonIcon("active_toggle", IconStyles.OFF_ON, button -> tile.setActiveMode(!tile.data.active)) {
+        this.active = new GuiButtonIcon("active_toggle", IconStyles.OFF_ON, button -> tile.setActiveClient(!tile.data.active)) {
             @Override
             @OnlyIn(Dist.CLIENT)
             public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
@@ -58,7 +58,7 @@ public class RemoteControlScreen extends GuiLayer {
             }
         };
 
-        this.muted = new GuiButtonIcon("muted_toggle", IconStyles.MUTE, button -> tile.setMutedMode(!tile.data.muted)) {
+        this.muted = new GuiButtonIcon("muted_toggle", IconStyles.MUTE, button -> tile.setMuteClient(!tile.data.muted)) {
             @Override
             @OnlyIn(Dist.CLIENT)
             public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
@@ -74,12 +74,12 @@ public class RemoteControlScreen extends GuiLayer {
 
         this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, button -> { if (tile.imageCache != null) tile.imageCache.reload(); });
 
-        this.play = new GuiButtonIcon("pause", IconStyles.PAUSE, button -> tile.setPauseMode(true));
-        this.pause = new GuiButtonIcon("play", IconStyles.PLAY, button -> tile.setPauseMode(false));
-        this.stop = new GuiButtonIcon("stop", IconStyles.STOP, button -> tile.stop());
+        this.play = new GuiButtonIcon("pause", IconStyles.PAUSE, button -> tile.setPauseClient(true));
+        this.pause = new GuiButtonIcon("play", IconStyles.PLAY, button -> tile.setPauseClient(false));
+        this.stop = new GuiButtonIcon("stop", IconStyles.STOP, button -> tile.stopClient());
 
-        this.volumeUp = new GuiButtonIcon("volume_up", IconStyles.VOLUME_UP, button -> tile.volumeUp());
-        this.volumeDown = new GuiButtonIcon("volume_down", IconStyles.VOLUME_DOWN, button -> tile.volumeDown());
+        this.volumeUp = new GuiButtonIcon("volume_up", IconStyles.VOLUME_UP, button -> tile.volumeUpClient());
+        this.volumeDown = new GuiButtonIcon("volume_down", IconStyles.VOLUME_DOWN, button -> tile.volumeDownClient());
     }
 
 
@@ -117,8 +117,8 @@ public class RemoteControlScreen extends GuiLayer {
         );
 
         this.add(new WidgetPairTable(GuiFlow.STACK_X)
-                .addLeft(new GuiButtonIcon("fast_backward", IconStyles.FAST_BACKWARD, button -> tile.fastBackwards()))
-                .addRight(new GuiButtonIcon("fast_foward", IconStyles.FAST_FOWARD, button -> tile.fastForward()))
+                .addLeft(new GuiButtonIcon("fast_backward", IconStyles.FAST_BACKWARD, button -> tile.rwClient()))
+                .addRight(new GuiButtonIcon("fast_foward", IconStyles.FAST_FOWARD, button -> tile.ffClient()))
                 .setAlignRight(Align.RIGHT)
         );
     }

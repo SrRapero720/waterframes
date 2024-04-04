@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.common.block;
 
 import me.srrapero720.waterframes.common.block.entity.FrameTile;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
@@ -24,6 +25,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @SuppressWarnings("deprecation")
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class FrameBlock extends DisplayBlock {
     public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final float THICKNESS = 0.0625F / 2F;

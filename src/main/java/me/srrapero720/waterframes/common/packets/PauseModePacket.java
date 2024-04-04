@@ -34,6 +34,6 @@ public class PauseModePacket extends DisplayPacket {
     @Override
     public void execute(DisplayTile tile, Player player, Level level) {
         tile.data.paused = this.paused;
-        tile.data.tick = this.tick;
+        if (this.tick != -1) tile.data.tick = this.tick;
     }
 }

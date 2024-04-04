@@ -18,7 +18,7 @@ public class ProjectorTile extends DisplayTile {
     @Override
     @OnlyIn(Dist.CLIENT)
     public AABB getRenderBoundingBox() {
-        return DisplayBlock.getBox(this, Facing.get(this.getBlockState().getValue(getDisplayBlock().getFacing())), 0, false).getBB(getBlockPos());
+        return DisplayBlock.getRenderBox(this, Facing.get(this.getBlockState().getValue(getDisplayBlock().getFacing())), 0, false).getBB(getBlockPos());
     }
 
     @Override

@@ -1,7 +1,10 @@
 package me.srrapero720.waterframes.common.block;
 
 import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.WFNetwork;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.packets.ActivePacket;
+import me.srrapero720.waterframes.common.packets.PauseModePacket;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -82,33 +85,8 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return box;
     }
 
-    @Override
-    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide && DisplayConfig.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
-        return InteractionResult.SUCCESS;
-    }
-
-    @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
-        if (DisplayConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof DisplayTile tile)) return;
-
-        state.setValue(POWERED, false);
-
-        for (var direction: Direction.values()) {
-            BlockPos neighPos = pos.relative(direction);
-            BlockState neighState = level.getBlockState(neighPos);
-
-            if (neighState.getSignal(level, neighPos, direction) != 0) {
-                state.setValue(POWERED, true);
-                break;
-            }
-        }
-
-//        if (state.getValue(POWERED) && tile.data.playing) tile.pause();
-//        if (!state.getValue(POWERED) && !tile.data.playing) tile.play();
-    }
-
-    public static AlignedBox getBox(DisplayTile tile, Facing facing, float spacing, boolean squared) {
+    // FOR PROJECTORS AND FRAMES
+    public static AlignedBox getRenderBox(DisplayTile tile, Facing facing, float spacing, boolean squared) {
         var box = new AlignedBox();
 
         if (facing.positive) box.setMax(facing.axis, (tile.data.projectionDistance + spacing));
@@ -143,6 +121,47 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return box;
     }
 
+    @Override
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide && DisplayConfig.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
+        if (!DisplayConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof DisplayTile tile)) return;
+
+        boolean signal = level.hasNeighborSignal(pos);
+        if (tile.data.paused == signal) return;
+
+        // TODO: add a config to make redstone more powerful (even to overwrite screen or RC actions)
+        state.setValue(POWERED, signal);
+
+        if (!level.isClientSide) {
+            // FIXME: rewrite networking again
+            PauseModePacket packet = new PauseModePacket(pos, signal, -1);
+            packet.execute(tile, null, null);
+            WFNetwork.sendPlaybackClient(packet, level);
+        }
+    }
+
+    @Override
+    public boolean hasAnalogOutputSignal(BlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+        if (level.getBlockEntity(pos) instanceof DisplayTile tile) {
+            if (tile.data.tickMax == -1) return 0;
+            if (!tile.data.active) return 0;
+
+            return 1 + ((tile.data.tick / tile.data.tickMax) * BlockStateProperties.MAX_LEVEL_15 - 1);
+        }
+
+        return 0;
+    }
+
     private static void getBox$square(final AlignedBox box, Axis axis, int mode, float size) {
         switch (mode) {
             case 0 -> {
@@ -175,13 +194,13 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     }
 
     @Override
-    protected void registerDefaultState(BlockState pState) {
-        super.registerDefaultState(pState.setValue(WATERLOGGED, false).setValue(POWERED, false));
+    protected void registerDefaultState(BlockState state) {
+        super.registerDefaultState(state.setValue(WATERLOGGED, false).setValue(POWERED, false));
     }
 
     @Override
     public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return state.getValue(getFacing()).getOpposite() == direction;
+        return state.getValue(this.getFacing()) == direction;
     }
 
     @Override
@@ -218,10 +237,10 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     }
 
     @Override public BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(getFacing(), rotation.rotate(state.getValue(getFacing())));
+        return state.setValue(this.getFacing(), rotation.rotate(state.getValue(this.getFacing())));
     }
 
     @Override public BlockState mirror(BlockState state, Mirror mirror) {
-        return state.setValue(getFacing(), mirror.mirror(state.getValue(getFacing())));
+        return state.setValue(this.getFacing(), mirror.mirror(state.getValue(this.getFacing())));
     }
 }

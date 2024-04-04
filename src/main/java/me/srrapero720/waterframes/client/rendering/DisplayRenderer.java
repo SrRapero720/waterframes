@@ -109,7 +109,7 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
 
     public void renderLoading(PoseStack pose, DisplayTile tile, Facing facing, BoxFace face, boolean front, boolean back, boolean flipX, boolean flipY, int colorARGB) {
         RenderCore.bindTex(LOADING_TEX.texture(WaterFrames.getTicks(), MathAPI.tickToMs(WaterFrames.deltaFrames()), true));
-        AlignedBox squaredBox = DisplayBlock.getBox(tile, facing, this.grwSize(), true);
+        AlignedBox squaredBox = DisplayBlock.getRenderBox(tile, facing, this.grwSize(), true);
 
         if (front)
             RenderCore.vertexF(pose, squaredBox, face, flipX, flipY, colorARGB);
