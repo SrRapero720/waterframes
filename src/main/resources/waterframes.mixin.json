@@ -7,7 +7,6 @@
   "client": [
     "MinecraftMixin"
   ],
-
   "mixins": [
     "LevelMixin",
     "creativecore.CompiledTextMixin",
