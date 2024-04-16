@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.mixin;
+package me.srrapero720.waterframes.mixin.impl;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

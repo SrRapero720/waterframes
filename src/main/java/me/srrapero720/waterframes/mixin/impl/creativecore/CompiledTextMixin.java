@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.mixin.creativecore;
+package me.srrapero720.waterframes.mixin.impl.creativecore;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.common.helpers.ScalableText;

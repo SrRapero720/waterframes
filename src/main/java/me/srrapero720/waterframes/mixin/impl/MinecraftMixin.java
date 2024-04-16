@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.mixin;
+package me.srrapero720.waterframes.mixin.impl;
 
 import me.srrapero720.waterframes.client.display.DisplayControl;
 import net.minecraft.client.Minecraft;

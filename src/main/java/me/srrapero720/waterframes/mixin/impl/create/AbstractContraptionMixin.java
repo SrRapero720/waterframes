@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.mixin.create;
+package me.srrapero720.waterframes.mixin.impl.create;
 
 import com.simibubi.create.content.contraptions.AbstractContraptionEntity;
 import net.minecraft.world.entity.Entity;
