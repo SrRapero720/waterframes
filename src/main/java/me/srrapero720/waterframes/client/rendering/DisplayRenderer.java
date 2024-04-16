@@ -39,6 +39,7 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
         if (display == null) return;
 
         // STORE AND CLEAN ANY "EARLY" STATE
+        float[] color = RenderSystem.getShaderColor();
         RenderCore.bufferPrepare();
 
         // PREPARE RENDERING
@@ -67,6 +68,7 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
         RenderSystem.disableBlend();
         RenderSystem.disableDepthTest();
         RenderSystem.getShader().clear();
+        RenderSystem.setShaderColor(color[0], color[1], color[2], color[3]);
     }
 
     public void render(PoseStack pose, DisplayTile tile, TextureDisplay display, AlignedBox box, Facing facing, BoxFace face, int colorARGB) {
