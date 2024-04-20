@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.box.BoxFace;
@@ -39,16 +38,14 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
         if (display == null) return;
 
         // STORE AND CLEAN ANY "EARLY" STATE
-        float[] color = RenderSystem.getShaderColor();
         RenderCore.bufferPrepare();
+        float[] color = RenderSystem.getShaderColor();
 
         // PREPARE RENDERING
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.setShaderColor(tile.data.brightness, tile.data.brightness, tile.data.brightness, tile.data.alpha);
-        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-        RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 
         // variables
         var direction = this.direction(tile);
