@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.common.packets;
 
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.WFNetwork;
 import net.minecraft.core.BlockPos;
@@ -33,7 +34,7 @@ public class PauseModePacket extends DisplayPacket {
 
     @Override
     public void execute(DisplayTile tile, Player player, Level level) {
-        tile.data.paused = this.paused;
+        tile.data.paused = WFConfig.useMasterModeRedstone() && tile.isPowered() || this.paused;
         if (this.tick != -1) tile.data.tick = this.tick;
     }
 }

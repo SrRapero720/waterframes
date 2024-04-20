@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.block.entity;
 
-import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WFNetwork;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
@@ -139,11 +139,11 @@ public abstract class DisplayTile extends BlockEntity {
     }
     public void volumeUpClient() {
         assert isClient();
-        WFNetwork.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance,  DisplayConfig.maxVolume(this.data.volume + 5));
+        WFNetwork.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance,  WFConfig.maxVol(this.data.volume + 5));
     }
     public void volumeDownClient() {
         assert isClient();
-        WFNetwork.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance, DisplayConfig.maxVolume(this.data.volume - 5));
+        WFNetwork.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance, WFConfig.maxVol(this.data.volume - 5));
     }
     public void ffClient() {
         assert isClient();
@@ -189,6 +189,11 @@ public abstract class DisplayTile extends BlockEntity {
 
     public DisplayBlock getDisplayBlock() {
         return (DisplayBlock) this.getBlockState().getBlock();
+    }
+
+
+    public boolean isPowered() {
+        return this.getBlockState().getValue(DisplayBlock.POWERED);
     }
 
     @Override

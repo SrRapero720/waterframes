@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.ModList;
@@ -17,11 +18,12 @@ public class WaterFrames {
     public static final String NAME = "WATERFrAMES";
     public static final String PREFIX = "§6§l[§r§bWATERF§3r§bAMES§6§l]: §r";
     public static final Logger LOGGER = LogManager.getLogger(ID);
-    private static int ticks = 0;
+    private static int SERVER_OP_LEVEL = -1;
+    private static long ticks = 0;
 
     // BOOTSTRAP
     public WaterFrames() {
-        DisplayConfig.init();
+        WFConfig.init();
         WFRegistry.init(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
@@ -30,11 +32,22 @@ public class WaterFrames {
         return (list = ModList.get()) != null ? list.isLoaded(modId) : FMLLoader.getLoadingModList().getModFileById(modId) != null;
     }
 
-    public static void tick() {
-        if (++ticks == Integer.MAX_VALUE) ticks = 0;
+    public static int getServerOpPermissionLevel(Level level) {
+        if (level != null && !level.isClientSide) {
+            SERVER_OP_LEVEL = level.getServer().getOperatorUserPermissionLevel();
+        }
+        return SERVER_OP_LEVEL;
     }
 
-    public static int getTicks() { return ticks; }
+    public static void setOpPermissionLevel(int level) {
+        SERVER_OP_LEVEL = level;
+    }
+
+    public static void tick() {
+        if (++ticks == Long.MAX_VALUE) ticks = 0;
+    }
+
+    public static long getTicks() { return ticks; }
 
     @OnlyIn(Dist.CLIENT)
     public static float deltaFrames() { return Minecraft.getInstance().isPaused() ? 1.0F : Minecraft.getInstance().getFrameTime(); }

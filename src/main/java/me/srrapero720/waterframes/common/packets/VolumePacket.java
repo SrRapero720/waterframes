@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.packets;
 
-import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.WFNetwork;
 import net.minecraft.core.BlockPos;
@@ -32,8 +32,8 @@ public class VolumePacket extends DisplayPacket {
 
     @Override
     public void execute(DisplayTile tile, Player player, Level level) {
-        tile.data.volume = DisplayConfig.maxVolume(this.volume);
-        tile.data.maxVolumeDistance = DisplayConfig.maxVolumeDistance(this.max);
+        tile.data.volume = WFConfig.maxVol(this.volume);
+        tile.data.maxVolumeDistance = WFConfig.maxVolDis(this.max);
         tile.data.minVolumeDistance = Math.min(this.max, this.min);
     }
 }

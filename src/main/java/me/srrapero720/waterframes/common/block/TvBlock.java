@@ -138,6 +138,7 @@ public class TvBlock extends DisplayBlock {
 
     @Override
     public GuiLayer create(CompoundTag compoundTag, Level level, BlockPos blockPos, BlockState blockState, Player player) {
+        super.create(compoundTag, level, blockPos, blockState, player);
         return (level.getBlockEntity(blockPos) instanceof TvTile projector) ? new DisplayScreen(projector) : null;
     }
 }

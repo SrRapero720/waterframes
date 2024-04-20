@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.screens.widgets;
 
-import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
@@ -42,7 +42,7 @@ public class WidgetURLTextField extends GuiTextfield {
             builder.text(ChatFormatting.BLUE + GuiControl.translate("waterframes.gui.url.tooltip.empty"));
         } else if (!isUrlValid(this.getText())) {
             builder.text(ChatFormatting.RED + GuiControl.translate("waterframes.gui.url.tooltip.invalid_url"));
-        } else if (DisplayConfig.isWhiteListed(this.getText())) {
+        } else if (!WFConfig.isWhiteListed(this.getText())) {
             builder.text(ChatFormatting.RED + GuiControl.translate("waterframes.gui.url.tooltip.not_whitelisted"));
         }
 

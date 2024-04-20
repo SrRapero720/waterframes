@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -59,6 +60,7 @@ public class ProjectorBlock extends DisplayBlock {
 
     @Override
     public GuiLayer create(CompoundTag compoundTag, Level level, BlockPos blockPos, BlockState blockState, Player player) {
+        super.create(compoundTag, level, blockPos, blockState, player);
         return (level.getBlockEntity(blockPos) instanceof ProjectorTile projector) ? new DisplayScreen(projector) : null;
     }
 }

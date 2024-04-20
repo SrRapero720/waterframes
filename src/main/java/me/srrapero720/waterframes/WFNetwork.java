@@ -11,8 +11,8 @@ import team.creative.creativecore.common.network.CreativeNetwork;
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 public class WFNetwork {
-    private static final CreativeNetwork NET_DISPLAYS = new CreativeNetwork(1, LOGGER, new ResourceLocation(WaterFrames.ID, "displays"));
-    private static final CreativeNetwork NET_DATA = new CreativeNetwork(1, LOGGER, new ResourceLocation(WaterFrames.ID, "data"));
+    public static final CreativeNetwork NET_DISPLAYS = new CreativeNetwork(1, LOGGER, new ResourceLocation(WaterFrames.ID, "displays"));
+    public static final CreativeNetwork NET_DATA = new CreativeNetwork(1, LOGGER, new ResourceLocation(WaterFrames.ID, "data"));
 
     public static void updateDataServer(DisplayTile tile, DisplayScreen screen) {
         NET_DATA.sendToServer(new SyncBlockPacket(tile.getBlockPos(), DisplayData.build(screen, tile)));
@@ -66,6 +66,7 @@ public class WFNetwork {
     public static void register() {
         // DATA CHANNEL
         NET_DATA.registerType(SyncBlockPacket.class, SyncBlockPacket::new);
+        NET_DATA.registerType(PermissionLevelPacket.class, PermissionLevelPacket::new);
 
         // ACTIONS CHANNELS
         NET_DISPLAYS.registerType(ActivePacket.class, ActivePacket::new);

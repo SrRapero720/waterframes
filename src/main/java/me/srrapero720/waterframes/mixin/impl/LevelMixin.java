@@ -9,7 +9,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(Level.class)
 public class LevelMixin {
-
     // TODO: remove before official release.
     @Redirect(method = "blockEntityChanged", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;updateNeighbourForOutputSignal(Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/Block;)V"))
     public void redirect$noTwiceCall(Level instance, BlockPos blockpos, Block direction) {

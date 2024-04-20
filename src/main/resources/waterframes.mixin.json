@@ -5,11 +5,12 @@
   "refmap": "${modid}.${mixin_refmap_suffix}",
   "minVersion": "0.8.5",
   "client": [
-    "impl.MinecraftMixin"
+    "MinecraftMixin"
   ],
   "mixins": [
-    "impl.LevelMixin",
-    "impl.creativecore.CompiledTextMixin",
-    "impl.creativecore.GuiLabelMixin"
+    "LevelMixin",
+    "PlayerListMixin",
+    "creativecore.CompiledTextMixin",
+    "creativecore.GuiLabelMixin"
   ]
 }

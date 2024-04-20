@@ -1,10 +1,7 @@
 package me.srrapero720.waterframes.client.display;
 
 import me.lib720.caprica.vlcj.player.base.State;
-import me.srrapero720.waterframes.DisplayConfig;
-import me.srrapero720.waterframes.WFMath;
-import me.srrapero720.waterframes.WFNetwork;
-import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.*;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
@@ -16,6 +13,8 @@ import net.minecraft.core.BlockPos;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class TextureDisplay {
+    private static final ImageCache VLC_NOT_FOUND = new ImageCache(ImageAPI.failedVLC());
+
     // MEDIA AND DATA
     private SyncVideoPlayer mediaPlayer;
     private ImageCache imageCache;
@@ -38,9 +37,8 @@ public class TextureDisplay {
 
     private void switchVideoMode() {
         // DO NOT USE VIDEOLAN IF I DONT WANT
-        if (!DisplayConfig.useVideoLan()) {
-            imageCache.deuse();
-            imageCache = new ImageCache(ImageAPI.failedVLC());
+        if (!WFConfig.useMultimedia()) {
+            this.imageCache = VLC_NOT_FOUND;
             this.displayMode = Mode.PICTURE;
             return;
         }
@@ -51,9 +49,9 @@ public class TextureDisplay {
 
         // CHECK IF VLC CAN BE USED
         if (mediaPlayer.isBroken()) {
-            imageCache.deuse();
-            imageCache = new ImageCache(ImageAPI.failedVLC());
+            this.imageCache = VLC_NOT_FOUND;
             this.displayMode = Mode.PICTURE;
+            return;
         }
 
 
@@ -70,7 +68,7 @@ public class TextureDisplay {
 
     public int width() {
         return switch (displayMode) {
-            case PICTURE -> this.imageCache.getRenderer().width;
+            case PICTURE -> this.imageCache.getRenderer() != null ? this.imageCache.getRenderer().width : 1;
             case VIDEO -> this.mediaPlayer.getWidth();
             case AUDIO -> 0;
         };
@@ -78,7 +76,7 @@ public class TextureDisplay {
 
     public int height() {
         return switch (displayMode) {
-            case PICTURE -> this.imageCache.getRenderer().height;
+            case PICTURE -> this.imageCache.getRenderer() != null ? this.imageCache.getRenderer().height : 1;
             case VIDEO -> this.mediaPlayer.getHeight();
             case AUDIO -> 0;
         };
@@ -101,20 +99,6 @@ public class TextureDisplay {
             case PICTURE -> this.imageCache.getRenderer() != null ? this.imageCache.getRenderer().duration : 0;
             case VIDEO -> this.mediaPlayer.getDuration();
             case AUDIO -> 0;
-        };
-    }
-
-    public long time() {
-        return switch (displayMode) {
-            case PICTURE -> MathAPI.tickToMs(this.tile.data.tick);
-            case VIDEO, AUDIO -> this.mediaPlayer.getTime();
-        };
-    }
-
-    public int timeInTicks() {
-        return switch (displayMode) {
-            case PICTURE -> this.tile.data.tick;
-            default -> MathAPI.msToTick(time());
         };
     }
 
@@ -217,38 +201,6 @@ public class TextureDisplay {
             case PICTURE -> {}
             case VIDEO, AUDIO -> {
                 mediaPlayer.setMuteMode(mute);
-            }
-        }
-    }
-
-    @Deprecated
-    public void pause() {
-        switch (displayMode) {
-            case PICTURE -> {}
-            case VIDEO, AUDIO -> {
-                mediaPlayer.seekTo(MathAPI.tickToMs(this.tile.data.tick));
-                mediaPlayer.setPauseMode(true);
-            }
-        }
-    }
-
-    @Deprecated
-    public void resume() {
-        switch (displayMode) {
-            case PICTURE -> {}
-            case VIDEO, AUDIO -> {
-                mediaPlayer.seekTo(MathAPI.tickToMs(this.tile.data.tick));
-                mediaPlayer.setPauseMode(false);
-            }
-        }
-    }
-
-    public void stop() {
-        switch (displayMode) {
-            case PICTURE -> {}
-            case VIDEO, AUDIO -> {
-                mediaPlayer.seekTo(0);
-                mediaPlayer.setPauseMode(true);
             }
         }
     }

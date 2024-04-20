@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.item;
 
-import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.RemoteControlScreen;
 import net.minecraft.core.BlockPos;
@@ -32,7 +32,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         if (pUsedHand == InteractionHand.OFF_HAND)
             return new InteractionResultHolder<>(InteractionResult.FAIL, player.getItemInHand(pUsedHand));
 
-        if (!level.isClientSide && DisplayConfig.canInteract(player, level)) {
+        if (!level.isClientSide && WFConfig.canInteractItem(player)) {
             var tag = player.getItemInHand(pUsedHand).getOrCreateTag();
             if (tag.isEmpty()) {
                 player.displayClientMessage(new TextComponent("No display Binded"), true);
@@ -45,11 +45,11 @@ public class RemoteControl extends Item implements ItemGuiCreator {
 
                 if (!(level.getBlockEntity(blockPos) instanceof DisplayTile)) {
                     player.getItemInHand(pUsedHand).setTag(new CompoundTag());
-                    player.displayClientMessage(new TextComponent("Display is removed"), false);
+                    player.displayClientMessage(new TextComponent("Display is removed"), true);
                     return new InteractionResultHolder<>(InteractionResult.FAIL, player.getItemInHand(pUsedHand));
                 } else {
-                    if (!level.dimension().location().equals(dimension) || !Vec3.atCenterOf(blockPos).closerThan(player.position(), 32)) {
-                        player.displayClientMessage(new TextComponent("You're out of distance"), false);
+                    if (!level.dimension().location().equals(dimension) || !Vec3.atCenterOf(blockPos).closerThan(player.position(), WFConfig.maxRcDis())) {
+                        player.displayClientMessage(new TextComponent("You're out of distance"), true);
                         return new InteractionResultHolder<>(InteractionResult.FAIL, player.getItemInHand(pUsedHand));
                     } else {
                         GuiCreator.ITEM_OPENER.open(player.getItemInHand(pUsedHand).getOrCreateTag(), player, pUsedHand);

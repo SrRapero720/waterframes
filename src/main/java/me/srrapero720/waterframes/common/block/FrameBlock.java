@@ -67,6 +67,7 @@ public class FrameBlock extends DisplayBlock {
 
     @Override
     public GuiLayer create(CompoundTag nbt, Level level, BlockPos pos, BlockState state, Player player) {
+        super.create(nbt, level, pos, state, player);
         return (level.getBlockEntity(pos) instanceof FrameTile frame) ? new DisplayScreen(frame) : null;
     }
 }

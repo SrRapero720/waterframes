@@ -1,13 +1,15 @@
 package me.srrapero720.waterframes.common.block;
 
-import me.srrapero720.waterframes.DisplayConfig;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WFNetwork;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.packets.ActivePacket;
 import me.srrapero720.waterframes.common.packets.PauseModePacket;
+import me.srrapero720.waterframes.common.packets.PermissionLevelPacket;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -27,6 +29,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
+import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
 import team.creative.creativecore.common.gui.creator.GuiCreator;
 import team.creative.creativecore.common.util.math.base.Axis;
@@ -53,6 +56,14 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     // FRAMES AND TVs
     public static AlignedBox getBlockBox(Direction direction, float thickness) {
         return getBlockBox(Facing.get(direction), thickness);
+    }
+
+    @Override
+    public GuiLayer create(CompoundTag compoundTag, Level level, BlockPos blockPos, BlockState blockState, Player player) {
+        if (!level.isClientSide) {
+            WFNetwork.NET_DATA.sendToClient(new PermissionLevelPacket(level.getServer()), (ServerPlayer) player);
+        }
+        return null;
     }
 
     // FRAMES AND TVs
@@ -123,13 +134,13 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!level.isClientSide && DisplayConfig.canInteract(player, level)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        if (!level.isClientSide && WFConfig.canInteractBlock(player)) GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
     }
 
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
-        if (!DisplayConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof DisplayTile tile)) return;
+        if (!WFConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof DisplayTile tile)) return;
         boolean signal = level.hasNeighborSignal(pos);
 
         if (!level.isClientSide && state.getValue(POWERED) != signal) {

@@ -1,7 +1,6 @@
 package me.srrapero720.waterframes.common.block.data;
 
-import me.srrapero720.waterframes.DisplayConfig;
-import me.srrapero720.waterframes.WFMath;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.data.types.AudioPosition;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
@@ -58,10 +57,10 @@ public class DisplayData {
     public float rotation = 0;
     public float alpha = 1;
     public float brightness = 1;
-    public int renderDistance = DisplayConfig.maxRenderDistance(32);
+    public int renderDistance = WFConfig.maxRenDis(32);
 
-    public int volume = DisplayConfig.maxVolume();
-    public int maxVolumeDistance = Math.min(20, DisplayConfig.maxVolumeDistance());
+    public int volume = WFConfig.maxVol();
+    public int maxVolumeDistance = WFConfig.maxVolDis(20);
     public int minVolumeDistance = Math.min(5, maxVolumeDistance);
 
     public boolean loop = true;
@@ -75,7 +74,7 @@ public class DisplayData {
     public boolean renderBothSides = false;
 
     // PROJECTOR VALUES
-    public float projectionDistance = DisplayConfig.maxProjectionDistance(8f);
+    public float projectionDistance = WFConfig.maxProjDis(8f);
     public float audioOffset = 0;
 
     public PositionHorizontal getPosX() { return this.min.x == 0 ? PositionHorizontal.LEFT : this.max.x == 1 ? PositionHorizontal.RIGHT : PositionHorizontal.CENTER; }
@@ -133,13 +132,13 @@ public class DisplayData {
             this.max.y = nbt.getFloat(MAX_Y);
         }
         this.rotation = nbt.getFloat(ROTATION);
-        this.renderDistance = DisplayConfig.maxRenderDistance(nbt.getInt(RENDER_DISTANCE));
+        this.renderDistance = WFConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
         this.flipX = nbt.getBoolean(FLIP_X);
         this.flipY = nbt.getBoolean(FLIP_Y);
         this.alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : alpha;
         this.brightness = nbt.contains(BRIGHTNESS) ? nbt.getFloat(BRIGHTNESS) : alpha;
-        this.volume = nbt.contains(VOLUME) ? DisplayConfig.maxVolume(nbt.getInt(VOLUME)) : volume;
-        this.maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? DisplayConfig.maxVolumeDistance(nbt.getInt(VOL_RANGE_MAX)) : maxVolumeDistance;
+        this.volume = nbt.contains(VOLUME) ? WFConfig.maxVol(nbt.getInt(VOLUME)) : volume;
+        this.maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? WFConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX)) : maxVolumeDistance;
         this.minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), maxVolumeDistance) : minVolumeDistance;
         this.paused = nbt.getBoolean(PAUSED);
         this.muted = nbt.getBoolean(MUTED);
@@ -156,7 +155,7 @@ public class DisplayData {
         }
 
         if (displayTile.canProject()) {
-            projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? DisplayConfig.maxProjectionDistance(nbt.getInt(PROJECTION_DISTANCE)) : projectionDistance;
+            projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? WFConfig.maxProjDis(nbt.getInt(PROJECTION_DISTANCE)) : projectionDistance;
             audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : audioOffset;
         }
 
@@ -175,7 +174,7 @@ public class DisplayData {
                 this.flipX = nbt.getBoolean("flipX");
                 this.flipY = nbt.getBoolean("flipY");
 
-                this.maxVolumeDistance = DisplayConfig.maxVolumeDistance((int) nbt.getFloat("max"));
+                this.maxVolumeDistance = WFConfig.maxVolDis((int) nbt.getFloat("max"));
                 this.minVolumeDistance = Math.min((int) nbt.getFloat("min"), maxVolumeDistance);
 
                 this.renderDistance = nbt.getInt("render");
@@ -244,7 +243,7 @@ public class DisplayData {
     }
 
     private void restrictWidth() {
-        float maxWidth = DisplayConfig.maxWidth();
+        float maxWidth = WFConfig.maxWidth();
         if (getWidth() > maxWidth) {
             switch (getPosX()) {
                 case LEFT -> {
@@ -265,19 +264,19 @@ public class DisplayData {
     }
 
     private void restrictHeight() {
-        float height = DisplayConfig.maxHeight();
-        if (getHeight() > height) {
+        float maxHeight = WFConfig.maxHeight();
+        if (getHeight() > maxHeight) {
             switch (getPosY()) {
                 case TOP -> {
                     this.min.y = 0f;
-                    this.max.y = height;
+                    this.max.y = maxHeight;
                 }
                 case BOTTOM -> {
-                    this.min.y = 1f - height;
+                    this.min.y = 1f - maxHeight;
                     this.max.y = 1f;
                 }
                 default -> {
-                    float middle = height / 2f;
+                    float middle = maxHeight / 2f;
                     this.min.y = 0.5F - middle;
                     this.max.y = 0.5F + middle;
                 }
@@ -328,7 +327,7 @@ public class DisplayData {
 
     public static void sync(DisplayTile block, Player player, CompoundTag nbt) {
         String url = nbt.getString(URL);
-        if (DisplayConfig.canSave(player, url)) {
+        if (WFConfig.canSave(player, url)) {
             if (!block.data.url.equals(url)) {
                 block.data.tick = 0;
                 block.data.tickMax = -1;
@@ -337,8 +336,8 @@ public class DisplayData {
             block.data.active = nbt.getBoolean(ACTIVE);
 
             if (block.canResize()) {
-                float width = WFMath.minFloat(nbt.getFloat("width"), DisplayConfig.maxWidth());
-                float height = WFMath.minFloat(nbt.getFloat("height"), DisplayConfig.maxHeight());
+                float width = WFConfig.maxWidth(nbt.getFloat("width"));
+                float height = WFConfig.maxHeight(nbt.getFloat("height"));
                 int posX = nbt.getInt("pos_x");
                 int posY = nbt.getInt("pos_y");
 
@@ -351,9 +350,9 @@ public class DisplayData {
             block.data.rotation = nbt.getFloat(ROTATION);
             block.data.alpha = nbt.getFloat(ALPHA);
             block.data.brightness = nbt.getFloat(BRIGHTNESS);
-            block.data.renderDistance = DisplayConfig.maxRenderDistance(nbt.getInt(RENDER_DISTANCE));
-            block.data.volume = DisplayConfig.maxVolume(nbt.getInt(VOLUME));
-            block.data.maxVolumeDistance = DisplayConfig.maxVolumeDistance(nbt.getInt(VOL_RANGE_MAX));
+            block.data.renderDistance = WFConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
+            block.data.volume = WFConfig.maxVol(nbt.getInt(VOLUME));
+            block.data.maxVolumeDistance = WFConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX));
             block.data.minVolumeDistance = Math.min(nbt.getInt(VOL_RANGE_MIN), block.data.maxVolumeDistance);
             if (block.data.minVolumeDistance > block.data.maxVolumeDistance)
                 block.data.maxVolumeDistance = block.data.minVolumeDistance;
@@ -369,7 +368,7 @@ public class DisplayData {
             if (block.canProject()) {
                 int mode = nbt.getInt(AUDIO_OFFSET);
 
-                block.data.projectionDistance = DisplayConfig.maxProjectionDistance(nbt.getFloat(PROJECTION_DISTANCE));
+                block.data.projectionDistance = WFConfig.maxProjDis(nbt.getFloat(PROJECTION_DISTANCE));
                 block.data.setAudioPosition(AudioPosition.VALUES[mode]);
             }
         }
