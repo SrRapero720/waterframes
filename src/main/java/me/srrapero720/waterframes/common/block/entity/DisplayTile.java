@@ -1,10 +1,10 @@
 package me.srrapero720.waterframes.common.block.entity;
 
-import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.WFNetwork;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
+import me.srrapero720.waterframes.common.network.DisplayNetwork;
+import me.srrapero720.waterframes.common.network.packets.*;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
@@ -121,37 +121,54 @@ public abstract class DisplayTile extends BlockEntity {
         super.onChunkUnloaded();
     }
 
-    public void setActiveClient(boolean mode) {
-        assert isClient();
-        WFNetwork.sendActiveServer(this, mode);
+    public void setActive(boolean clientSide, boolean mode) {
+        if (clientSide) DisplayNetwork.sendServer(new ActivePacket(this.worldPosition, mode, true));
+        else            DisplayNetwork.sendClient(new ActivePacket(this.worldPosition, mode, true), this);
     }
-    public void setMuteClient(boolean mode) {
-        assert isClient();
-        WFNetwork.sendMutedServer(this, mode);
+
+    public void setMute(boolean clientSide, boolean mode) {
+        if (clientSide) DisplayNetwork.sendServer(new MutePacket(this.worldPosition, mode, true));
+        else            DisplayNetwork.sendClient(new MutePacket(this.worldPosition, mode, true), this);
     }
-    public void setPauseClient(boolean pause) {
-        assert isClient();
-        WFNetwork.sendPlaybackServer(this, pause, this.data.tick);
+
+    public void setPause(boolean clientSide, boolean pause) {
+        if (clientSide) DisplayNetwork.sendServer(new PausePacket(this.worldPosition, pause, this.data.tick, true));
+        else            DisplayNetwork.sendClient(new PausePacket(this.worldPosition, pause, this.data.tick, true), this);
     }
-    public void stopClient() {
-        assert isClient();
-        WFNetwork.sendPlaybackServer(this, true, 0);
+
+    public void setStop(boolean clientSide) {
+        if (clientSide) DisplayNetwork.sendServer(new PausePacket(this.worldPosition, true, 0, true));
+        else            DisplayNetwork.sendClient(new PausePacket(this.worldPosition, true, 0, true), this);
     }
-    public void volumeUpClient() {
-        assert isClient();
-        WFNetwork.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance,  WFConfig.maxVol(this.data.volume + 5));
+
+    public void volumeUp(boolean clientSide) {
+        if (clientSide) DisplayNetwork.sendServer(new VolumePacket(this.worldPosition, this.data.volume + 5, true));
+        else            DisplayNetwork.sendClient(new VolumePacket(this.worldPosition, this.data.volume + 5, true), this);
     }
-    public void volumeDownClient() {
-        assert isClient();
-        WFNetwork.sendVolumeServer(this, this.data.minVolumeDistance, this.data.maxVolumeDistance, WFConfig.maxVol(this.data.volume - 5));
+
+    public void volumeDown(boolean clientSide) {
+        if (clientSide) DisplayNetwork.sendServer(new VolumePacket(this.worldPosition, this.data.volume - 5, true));
+        else            DisplayNetwork.sendClient(new VolumePacket(this.worldPosition, this.data.volume - 5, true), this);
     }
-    public void ffClient() {
-        assert isClient();
-        WFNetwork.sendPlaytimeServer(this, Math.min(data.tick + MathAPI.msToTick(5000), data.tickMax), data.tickMax);
+
+    public void fastFoward(boolean clientSide) {
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.worldPosition, Math.min(data.tick + MathAPI.msToTick(5000), this.data.tickMax), this.data.tickMax, true));
+        else            DisplayNetwork.sendClient(new TimePacket(this.worldPosition, Math.min(data.tick + (5000 / 50), this.data.tickMax), this.data.tickMax, true), this);
     }
-    public void rwClient() {
-        assert isClient();
-        WFNetwork.sendPlaytimeServer(this, Math.max(data.tick - MathAPI.msToTick(5000), 0), data.tickMax);
+
+    public void rewind(boolean clientSide) {
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.worldPosition, Math.max(data.tick - MathAPI.msToTick(5000), 0), this.data.tickMax, true));
+        else            DisplayNetwork.sendClient(new TimePacket(this.worldPosition, Math.max(data.tick - (5000 / 50), 0), this.data.tickMax, true), this);
+    }
+
+    public void syncTime(boolean clientSide, long tick, long maxTick) {
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.worldPosition, tick, maxTick, true));
+        else            DisplayNetwork.sendClient(new TimePacket(this.worldPosition, tick, maxTick, true), this);
+    }
+
+    public void loop(boolean clientSide, boolean loop) {
+        if (clientSide) DisplayNetwork.sendServer(new LoopPacket(this.worldPosition, loop, true));
+        else            DisplayNetwork.sendClient(new LoopPacket(this.worldPosition, loop, true), this);
     }
 
     /* SPECIAL TICKS */

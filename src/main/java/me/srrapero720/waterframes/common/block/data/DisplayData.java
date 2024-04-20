@@ -66,8 +66,8 @@ public class DisplayData {
     public boolean loop = true;
     public boolean paused = false;
     public boolean muted = false;
-    public int tick = 0;
-    public int tickMax = -1;
+    public long tick = 0;
+    public long tickMax = -1;
 
     // FRAME VALUES
     public boolean frameVisibility = true;
@@ -102,8 +102,8 @@ public class DisplayData {
         nbt.putInt(VOL_RANGE_MAX, maxVolumeDistance);
         nbt.putBoolean(PAUSED, paused);
         nbt.putBoolean(MUTED, muted);
-        nbt.putInt(TICK, tick);
-        nbt.putInt(TICK_MAX, tickMax);
+        nbt.putLong(TICK, tick);
+        nbt.putLong(TICK_MAX, tickMax);
         nbt.putBoolean(LOOP, loop);
 
         if (displayTile.canRenderBackside()) {
@@ -142,8 +142,8 @@ public class DisplayData {
         this.minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), maxVolumeDistance) : minVolumeDistance;
         this.paused = nbt.getBoolean(PAUSED);
         this.muted = nbt.getBoolean(MUTED);
-        this.tick = nbt.getInt(TICK);
-        this.tickMax = nbt.contains(TICK_MAX) ? nbt.getInt(TICK_MAX) : this.tickMax;
+        this.tick = nbt.getLong(TICK);
+        this.tickMax = nbt.contains(TICK_MAX) ? nbt.getLong(TICK_MAX) : this.tickMax;
         this.loop = nbt.getBoolean(LOOP);
 
         if (displayTile.canHideModel()) {

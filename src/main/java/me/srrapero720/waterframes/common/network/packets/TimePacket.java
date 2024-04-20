@@ -1,38 +1,34 @@
-package me.srrapero720.waterframes.common.packets;
+package me.srrapero720.waterframes.common.network.packets;
 
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.WFNetwork;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
-public class PlaytimePacket extends DisplayPacket {
-    public int tick;
-    public int tickMax;
+public class TimePacket extends DisplayControlPacket {
+    public long tick;
+    public long tickMax;
 
-    public PlaytimePacket(){ super(); }
-    public PlaytimePacket(BlockPos pos, int tick, int tickMax) {
-        super(pos);
+    public TimePacket(){}
+    public TimePacket(BlockPos pos, long tick, long tickMax, boolean bounce) {
+        super(pos, bounce);
         this.tick = tick;
         this.tickMax = tickMax;
     }
 
-    @Override
-    public void executeServer(DisplayTile tile, ServerPlayer player, ServerLevel level) {
-        WFNetwork.sendPlaytimeClient(this, player.level);
-    }
 
     @Override
-    public void executeClient(DisplayTile tile, Player player, Level level) {
+    public void execServer(DisplayTile tile) {
 
     }
 
     @Override
-    public void execute(DisplayTile tile, Player player, Level level) {
+    public void execClient(DisplayTile tile) {
+
+    }
+
+    @Override
+    public void exec(DisplayTile tile) {
         if (tile.data.url.isEmpty()) {
             tile.data.tickMax = -1;
             tile.data.tick = 0;
@@ -49,4 +45,5 @@ public class PlaytimePacket extends DisplayPacket {
             }
         }
     }
+
 }

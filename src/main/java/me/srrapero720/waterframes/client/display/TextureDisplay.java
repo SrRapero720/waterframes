@@ -9,6 +9,7 @@ import me.srrapero720.watermedia.api.math.MathAPI;
 import me.srrapero720.watermedia.api.player.SyncVideoPlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraftforge.fml.LogicalSide;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -120,7 +121,7 @@ public class TextureDisplay {
 
     public void syncDuration() {
         if (tile.data.tickMax == -1) tile.data.tick = 0;
-        WFNetwork.sendPlaytimeServer(tile, tile.data.tick, durationInTicks());
+        tile.syncTime(true, tile.data.tick, durationInTicks());
     }
 
     public void tick(BlockPos pos) {
@@ -133,7 +134,7 @@ public class TextureDisplay {
             case PICTURE -> {
                 if (imageCache.isVideo()) switchVideoMode();
             }
-            case VIDEO -> {
+            case VIDEO, AUDIO -> {
                 int volume = WFMath.floorVolume(this.blockPos.relative(tile.getDirection(), (int) this.tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
                 if (currentVolume != volume) mediaPlayer.setVolume(currentVolume = volume);
@@ -141,11 +142,11 @@ public class TextureDisplay {
                     if (mediaPlayer.getRepeatMode() != tile.data.loop) mediaPlayer.setRepeatMode(tile.data.loop);
                     if (!stream && mediaPlayer.isLive()) stream = true;
 
-                    boolean canPlay = !tile.data.paused && tile.data.active && !Minecraft.getInstance().isPaused();
+                    boolean mayPause = tile.data.paused || !tile.data.active || Minecraft.getInstance().isPaused();
 
-                    mediaPlayer.setPauseMode(!canPlay);
+                    if (mediaPlayer.isPaused() != mayPause) mediaPlayer.setPauseMode(mayPause);
                     if (!stream && mediaPlayer.isSeekAble()) {
-                        long time = MathAPI.tickToMs(tile.data.tick) + (canPlay ? MathAPI.tickToMs(WaterFrames.deltaFrames()) : 0);
+                        long time = MathAPI.tickToMs(tile.data.tick) + (!mayPause ? MathAPI.tickToMs(WaterFrames.deltaFrames()) : 0);
                         if (time > mediaPlayer.getTime() && tile.data.loop) time = WFMath.floorMod(time, mediaPlayer.getMediaInfoDuration());
 
                         if (Math.abs(time - mediaPlayer.getTime()) > DisplayControl.SYNC_TIME && Math.abs(time - currentLastTime.get()) > DisplayControl.SYNC_TIME) {
@@ -154,9 +155,6 @@ public class TextureDisplay {
                         }
                     }
                 }
-            }
-            case AUDIO -> {
-                // MISSING IMPL
             }
         }
     }

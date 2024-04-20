@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.mixin.impl;
 
-import me.srrapero720.waterframes.WFNetwork;
-import me.srrapero720.waterframes.common.packets.PermissionLevelPacket;
+import me.srrapero720.waterframes.common.network.DisplayNetwork;
+import me.srrapero720.waterframes.common.network.packets.PermLevelPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
@@ -18,6 +18,6 @@ public class PlayerListMixin {
 
     @Inject(method = "sendPlayerPermissionLevel(Lnet/minecraft/server/level/ServerPlayer;)V", at = @At("RETURN"))
     private void wf$sendMaxServerPermissionLevel(ServerPlayer player, CallbackInfo ci) {
-        WFNetwork.NET_DATA.sendToClient(new PermissionLevelPacket(this.server), player);
+        DisplayNetwork.sendClient(new PermLevelPacket(this.server), player);
     }
 }

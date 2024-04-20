@@ -1,15 +1,13 @@
 package me.srrapero720.waterframes.common.block;
 
 import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.WFNetwork;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.packets.PauseModePacket;
-import me.srrapero720.waterframes.common.packets.PermissionLevelPacket;
+import me.srrapero720.waterframes.common.network.DisplayNetwork;
+import me.srrapero720.waterframes.common.network.packets.PermLevelPacket;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -29,6 +27,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.fml.LogicalSide;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
 import team.creative.creativecore.common.gui.creator.GuiCreator;
@@ -61,7 +60,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     @Override
     public GuiLayer create(CompoundTag compoundTag, Level level, BlockPos blockPos, BlockState blockState, Player player) {
         if (!level.isClientSide) {
-            WFNetwork.NET_DATA.sendToClient(new PermissionLevelPacket(level.getServer()), (ServerPlayer) player);
+            DisplayNetwork.sendClient(new PermLevelPacket(level.getServer()), level, blockPos);
         }
         return null;
     }
@@ -143,14 +142,9 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         if (!WFConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof DisplayTile tile)) return;
         boolean signal = level.hasNeighborSignal(pos);
 
-        if (!level.isClientSide && state.getValue(POWERED) != signal) {
-            // FIXME: rewrite networking again
-            PauseModePacket packet = new PauseModePacket(pos, signal, -1);
-            packet.execute(tile, null, null);
-            WFNetwork.sendPlaybackClient(packet, level);
-
-            // TODO: add a config to make redstone more powerful (even to overwrite screen or RC actions)
-            state.setValue(POWERED, signal);
+        state.setValue(POWERED, signal);
+        if (!level.isClientSide) {
+            tile.setPause(false, signal);
         }
     }
 
@@ -165,7 +159,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
             if (tile.data.tickMax == -1) return 0;
             if (!tile.data.active) return 0;
 
-            return 1 + ((tile.data.tick / tile.data.tickMax) * BlockStateProperties.MAX_LEVEL_15 - 1);
+            return 1 + (Math.round((float) tile.data.tick / tile.data.tickMax) * BlockStateProperties.MAX_LEVEL_15 - 1);
         }
 
         return 0;

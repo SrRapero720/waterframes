@@ -4,7 +4,8 @@ import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.compat.videoplayer.VPCompat;
-import me.srrapero720.waterframes.WFNetwork;
+import me.srrapero720.waterframes.common.network.DisplayNetwork;
+import me.srrapero720.waterframes.common.network.packets.DataSyncPacket;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
@@ -14,6 +15,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.LogicalSide;
 import team.creative.creativecore.common.gui.*;
 import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.gui.event.GuiTextUpdateEvent;
@@ -96,7 +98,7 @@ public class DisplayScreen extends GuiLayer {
         this.flow = GuiFlow.STACK_Y;
         this.tile = tile;
 
-        this.save = new GuiButton("save", x -> WFNetwork.updateDataServer(tile, this));
+        this.save = new GuiButton("save", x -> DisplayNetwork.sendServer(new DataSyncPacket(tile.getBlockPos(), DisplayData.build(this, tile))));
         this.save.setTranslate("waterframes.gui.save");
 
         this.urlField = new WidgetURLTextField(this.tile);
@@ -159,12 +161,10 @@ public class DisplayScreen extends GuiLayer {
         this.pos_view = new WidgetClickableArea("pos_area", tile.data.getPosX(), tile.data.getPosY());
 
         this.playback = new GuiCheckButtonIcon("playback", IconStyles.PLAY, IconStyles.PAUSE, tile.data.paused, button ->
-                WFNetwork.sendPlaybackServer(tile, !tile.data.paused, tile.data.tick)
+                tile.setPause(true, !tile.data.paused)
         );
-        this.stop = new GuiButtonIcon("stop", IconStyles.STOP, button -> WFNetwork.sendPlaybackServer(tile, true, 0));
-        this.loop = new GuiCheckButtonIcon(DisplayData.LOOP, IconStyles.REPEAT_ON, IconStyles.REPEAT_OFF, tile.data.loop, button ->
-                WFNetwork.sendLoopServer(tile, !tile.data.loop)
-        ) {
+        this.stop = new GuiButtonIcon("stop", IconStyles.STOP, button -> tile.setStop(true));
+        this.loop = new GuiCheckButtonIcon(DisplayData.LOOP, IconStyles.REPEAT_ON, IconStyles.REPEAT_OFF, tile.data.loop, button -> tile.loop(true, !tile.data.loop)) {
             @Override
             public List<Component> getTooltip() {
                 return Collections.singletonList(
@@ -187,14 +187,14 @@ public class DisplayScreen extends GuiLayer {
         if (VPCompat.installed()) {
             this.videoplayer = new GuiButtonIcon("", IconStyles.VIDEOPLAYER_PLAY, button -> {
                 VPCompat.playVideo(tile.data.url, tile.data.volume, true);
-                WFNetwork.sendPlaybackServer(tile, true, tile.data.tick);
+                tile.setPause(true, true);
             });
             this.videoplayer.setTooltip("waterframes.gui.videoplayer");
         }
 
         this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax, LongValueParser.TIME_DURATION_TICK)
                 .setOnTimeUpdate(v -> tile.data.tick = (int) v)
-                .setOnLastTimeUpdate(v -> WFNetwork.sendPlaytimeServer(tile, tile.data.tick = (int) v, tile.data.tickMax));
+                .setOnLastTimeUpdate(v -> tile.syncTime(true, (int) v, tile.data.tickMax));
 
         this.registerEvent(GuiTextUpdateEvent.class, guiTextUpdateEvent -> {
             if (guiTextUpdateEvent.control.name.equals(DisplayData.URL)) {
