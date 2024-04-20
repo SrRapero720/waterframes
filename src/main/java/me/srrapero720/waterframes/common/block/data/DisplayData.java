@@ -90,8 +90,8 @@ public class DisplayData {
             nbt.putFloat(MIN_Y, min.y);
             nbt.putFloat(MAX_X, max.x);
             nbt.putFloat(MAX_Y, max.y);
+            nbt.putFloat(ROTATION, rotation);
         }
-        nbt.putFloat(ROTATION, rotation);
         nbt.putInt(RENDER_DISTANCE, renderDistance);
         nbt.putBoolean(FLIP_X, flipX);
         nbt.putBoolean(FLIP_Y, flipY);
@@ -130,8 +130,8 @@ public class DisplayData {
             this.min.y = nbt.getFloat(MIN_Y);
             this.max.x = nbt.getFloat(MAX_X);
             this.max.y = nbt.getFloat(MAX_Y);
+            this.rotation = nbt.getFloat(ROTATION);
         }
-        this.rotation = nbt.getFloat(ROTATION);
         this.renderDistance = WFConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
         this.flipX = nbt.getBoolean(FLIP_X);
         this.flipY = nbt.getBoolean(FLIP_Y);
@@ -295,12 +295,12 @@ public class DisplayData {
             nbt.putFloat("height", Math.max(0.1F, (float) screen.heightField.getValue()));
             nbt.putInt("pos_x",  screen.pos_view.getX().ordinal());
             nbt.putInt("pos_y", screen.pos_view.getY().ordinal());
+            nbt.putFloat(ROTATION, (float) screen.rotation.getValue());
         }
 
         nbt.putBoolean(FLIP_X, screen.flip_x.value);
         nbt.putBoolean(FLIP_Y, screen.flip_y.value);
 
-        nbt.putFloat(ROTATION, (float) screen.rotation.getValue());
         nbt.putFloat(ALPHA, (float) screen.visibility.getValue());
         nbt.putFloat(BRIGHTNESS, (float) screen.brightness.getValue());
         nbt.putInt(RENDER_DISTANCE, screen.render_distance.getIntValue());
@@ -343,11 +343,11 @@ public class DisplayData {
 
                 block.data.setWidth(PositionHorizontal.VALUES[posX], width);
                 block.data.setHeight(PositionVertical.VALUES[posY], height);
+                block.data.rotation = nbt.getFloat(ROTATION);
             }
 
             block.data.flipX = nbt.getBoolean(FLIP_X);
             block.data.flipY = nbt.getBoolean(FLIP_Y);
-            block.data.rotation = nbt.getFloat(ROTATION);
             block.data.alpha = nbt.getFloat(ALPHA);
             block.data.brightness = nbt.getFloat(BRIGHTNESS);
             block.data.renderDistance = WFConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));

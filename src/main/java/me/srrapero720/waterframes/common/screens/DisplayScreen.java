@@ -240,7 +240,7 @@ public class DisplayScreen extends GuiLayer {
 
         this.add(tex_l);
         this.add(new WidgetPairTable(GuiFlow.STACK_Y, 2)
-                .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(rot_i).addWidget(rotation.setDim(130, 12)).setVAlign(VAlign.CENTER))
+                .addLeftIf(tile.canResize(), () -> new GuiParent(GuiFlow.STACK_X).addWidget(rot_i).addWidget(rotation.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(vis_i).addWidget(visibility.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(bright_i).addWidget(brightness.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(render_i).addWidget(render_distance.setDim(130, 12)).setVAlign(VAlign.CENTER))
