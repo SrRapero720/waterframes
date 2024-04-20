@@ -58,9 +58,9 @@ public class WFRegistry {
     /* ITEMS */
     public static final RegistryObject<Item>
             REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties().tab(TAB))),
-            FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().tab(TAB))),
-            PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().tab(TAB))),
-            TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties().tab(TAB)));
+            FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), new Item.Properties().stacksTo(16).tab(TAB))),
+            PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), new Item.Properties().stacksTo(16).tab(TAB))),
+            TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), new Item.Properties().stacksTo(16).tab(TAB)));
 
     /* TILES */
     public static final RegistryObject<BlockEntityType<DisplayTile>>
