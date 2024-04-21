@@ -116,6 +116,19 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         box.setMin(two, tile.data.min.y);
         box.setMax(two, tile.data.max.y);
 
+        if ((facing.positive && !tile.canProject()) || (!facing.positive && tile.canProject())) {
+            switch (tile.data.getPosX()) {
+                case LEFT -> {
+                    box.setMin(one, 1 - tile.data.getWidth());
+                    box.setMax(one, 1);
+                }
+                case RIGHT -> {
+                    box.setMin(one, 0f);
+                    box.setMax(one, tile.data.getWidth());
+                }
+            }
+        }
+
         if (!squared) return box;
 
         float width = tile.data.getWidth();
