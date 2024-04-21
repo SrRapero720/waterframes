@@ -9,7 +9,7 @@ import me.srrapero720.watermedia.api.math.MathAPI;
 import me.srrapero720.watermedia.api.player.SyncVideoPlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.fml.LogicalSide;
+import net.minecraft.core.Position;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -56,7 +56,7 @@ public class TextureDisplay {
         }
 
 
-        this.currentVolume = WFMath.floorVolume(this.blockPos.relative(tile.getDirection(), (int) tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+        this.currentVolume = limitVolume(this.blockPos.relative(tile.getDirection(), (int) tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
         // PLAYER CONFIG
         this.mediaPlayer.setVolume(this.currentVolume);
@@ -135,7 +135,7 @@ public class TextureDisplay {
                 if (imageCache.isVideo()) switchVideoMode();
             }
             case VIDEO, AUDIO -> {
-                int volume = WFMath.floorVolume(this.blockPos.relative(tile.getDirection(), (int) this.tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+                int volume = limitVolume(this.blockPos.relative(tile.getDirection(), (int) this.tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
                 if (currentVolume != volume) mediaPlayer.setVolume(currentVolume = volume);
                 if (mediaPlayer.isSafeUse() && mediaPlayer.isValid()) {
@@ -147,7 +147,10 @@ public class TextureDisplay {
                     if (mediaPlayer.isPaused() != mayPause) mediaPlayer.setPauseMode(mayPause);
                     if (!stream && mediaPlayer.isSeekAble()) {
                         long time = MathAPI.tickToMs(tile.data.tick) + (!mayPause ? MathAPI.tickToMs(WaterFrames.deltaFrames()) : 0);
-                        if (time > mediaPlayer.getTime() && tile.data.loop) time = WFMath.floorMod(time, mediaPlayer.getMediaInfoDuration());
+                        if (time > mediaPlayer.getTime() && tile.data.loop) {
+                            long mediaDuration = mediaPlayer.getMediaInfoDuration();
+                            time = (time == 0 || mediaDuration == 0) ? 0 : Math.floorMod(time, mediaPlayer.getMediaInfoDuration());
+                        }
 
                         if (Math.abs(time - mediaPlayer.getTime()) > DisplayControl.SYNC_TIME && Math.abs(time - currentLastTime.get()) > DisplayControl.SYNC_TIME) {
                             currentLastTime.set(time);
@@ -213,6 +216,21 @@ public class TextureDisplay {
                 DisplayControl.remove(this);
             }
         }
+    }
+
+    public static int limitVolume(BlockPos pos, int volume, int min, int max) {
+        assert Minecraft.getInstance().player != null;
+        Position position = Minecraft.getInstance().player.getPosition(WaterFrames.deltaFrames());
+        double distance = Math.sqrt(pos.distToLowCornerSqr(position.x(), position.y(), position.z()));
+        if (min > max) {
+            int temp = max;
+            max = min;
+            min = temp;
+        }
+
+        if (distance > min)
+            volume = (distance > max + 1) ? 0 : (int) (volume * (1 - ((distance - min) / ((1 + max) - min))));
+        return volume;
     }
 
     public enum Mode {

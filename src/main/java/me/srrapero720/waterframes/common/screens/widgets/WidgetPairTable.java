@@ -56,12 +56,12 @@ public class WidgetPairTable extends GuiTable {
         return this;
     }
 
-    public WidgetPairTable addLeftIf(boolean condition, Supplier<GuiControl> guiControls) {
+    public WidgetPairTable addLeft(boolean condition, Supplier<GuiControl> guiControls) {
         if (condition) this.addLeft(guiControls.get());
         return this;
     }
 
-    public WidgetPairTable addRightIf(boolean conditional, Supplier<GuiControl> guiControls) {
+    public WidgetPairTable addRight(boolean conditional, Supplier<GuiControl> guiControls) {
         if (conditional) this.addRight(guiControls.get());
         return this;
     }

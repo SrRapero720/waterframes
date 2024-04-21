@@ -95,15 +95,15 @@ public class RemoteControlScreen extends GuiLayer {
         this.add(new GuiParent().setDim(0, 20));
 
         this.add(new GuiParent("", GuiFlow.STACK_X, Align.STRETCH)
-                .addWidget(new GuiParent("", GuiFlow.STACK_Y, Align.LEFT)
-                        .addWidget(this.volumeUp.setDim(12, 25).setExpandableX())
-                        .addWidget(this.volumeDown.setDim(12, 25).setExpandableX())
+                .add(new GuiParent("", GuiFlow.STACK_Y, Align.LEFT)
+                        .add(this.volumeUp.setDim(12, 25).setExpandableX())
+                        .add(this.volumeDown.setDim(12, 25).setExpandableX())
                         .setSpacing(0)
                 )
-                .addWidget(reload)
-                .addWidget(new GuiParent("", GuiFlow.STACK_Y, Align.LEFT)
-                        .addWidget(this.volumeUp.setDim(12, 25).setExpandableX())
-                        .addWidget(this.volumeDown.setDim(12, 25).setExpandableX())
+                .add(reload)
+                .add(new GuiParent("", GuiFlow.STACK_Y, Align.LEFT)
+                        .add(this.volumeUp.setDim(12, 25).setExpandableX())
+                        .add(this.volumeDown.setDim(12, 25).setExpandableX())
                         .setSpacing(0)
                 )
                 .setVAlign(VAlign.BOTTOM)
@@ -112,9 +112,9 @@ public class RemoteControlScreen extends GuiLayer {
         this.add(new GuiParent().setDim(0, 20));
 
         this.add(new GuiParent("", GuiFlow.STACK_X, Align.CENTER)
-                .addWidget(this.pause.setExpandableX())
-                .addWidget(this.play.setExpandableX())
-                .addWidget(this.stop.setExpandableX())
+                .add(this.pause.setExpandableX())
+                .add(this.play.setExpandableX())
+                .add(this.stop.setExpandableX())
         );
 
         this.add(new WidgetPairTable(GuiFlow.STACK_X)

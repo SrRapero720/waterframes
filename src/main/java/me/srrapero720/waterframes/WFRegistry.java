@@ -88,9 +88,6 @@ public class WFRegistry {
         private static void init(FMLCommonSetupEvent event) { common(); }
         private static void common() {
             DisplayNetwork.init();
-            if (WaterFrames.isInstalled("stellarity")) { // TODO: check if compat was solved
-                throw new IllegalModException("stellarity", "breaks displays rendering");
-            }
         }
 
         @SubscribeEvent

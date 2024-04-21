@@ -15,7 +15,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.LogicalSide;
 import team.creative.creativecore.common.gui.*;
 import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.gui.event.GuiTextUpdateEvent;
@@ -222,31 +221,31 @@ public class DisplayScreen extends GuiLayer {
         // IMAGE SIZE
         var sizeTable = new GuiParent("", GuiFlow.STACK_X, Align.STRETCH).setSpacing(4);
         if (tile.canResize()) {
-            sizeTable.addWidget(this.widthField.setExpandableX())
-                    .addWidget(this.heightField.setExpandableX())
-                    .addWidget(new GuiParent(GuiFlow.STACK_Y)
-                            .addWidget(flip_x)
-                            .addWidget(flip_y)
+            sizeTable.add(this.widthField.setExpandableX())
+                    .add(this.heightField.setExpandableX())
+                    .add(new GuiParent(GuiFlow.STACK_Y)
+                            .add(flip_x)
+                            .add(flip_y)
                     );
             this.add(sizeTable);
         }
 
         // PICTURE PROPERTIES
         final var basicOptions = new GuiParent("", GuiFlow.STACK_X, Align.STRETCH).setSpacing(1)
-                .addWidget(tile.canHideModel(), () -> show_model)
-                .addWidget(tile.canRenderBackside(), () -> render_behind)
-                .addWidget(!tile.canResize(), () -> flip_x)
-                .addWidget(!tile.canResize(), () -> flip_y);
+                .add(tile.canHideModel(), () -> show_model)
+                .add(tile.canRenderBackside(), () -> render_behind)
+                .add(!tile.canResize(), () -> flip_x)
+                .add(!tile.canResize(), () -> flip_y);
 
         this.add(tex_l);
         this.add(new WidgetPairTable(GuiFlow.STACK_Y, 2)
-                .addLeftIf(tile.canResize(), () -> new GuiParent(GuiFlow.STACK_X).addWidget(rot_i).addWidget(rotation.setDim(130, 12)).setVAlign(VAlign.CENTER))
-                .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(vis_i).addWidget(visibility.setDim(130, 12)).setVAlign(VAlign.CENTER))
-                .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(bright_i).addWidget(brightness.setDim(130, 12)).setVAlign(VAlign.CENTER))
-                .addLeft(new GuiParent(GuiFlow.STACK_X).addWidget(render_i).addWidget(render_distance.setDim(130, 12)).setVAlign(VAlign.CENTER))
-                .addLeftIf(tile.canProject(), () -> new GuiParent(GuiFlow.STACK_X).addWidget(project_i).addWidget(projection_distance.setDim(100, 13)).addWidget(audioOffset.setDim(26, 13)).setVAlign(VAlign.CENTER))
-                .addLeftIf(!basicOptions.isEmpty(), () -> basicOptions)
-                .addRightIf(tile.canResize(), () -> pos_view.setDim(80, 80))
+                .addLeft(tile.canResize(), () -> new GuiParent(GuiFlow.STACK_X).add(rot_i).add(rotation.setDim(130, 12)).setVAlign(VAlign.CENTER))
+                .addLeft(new GuiParent(GuiFlow.STACK_X).add(vis_i).add(visibility.setDim(130, 12)).setVAlign(VAlign.CENTER))
+                .addLeft(new GuiParent(GuiFlow.STACK_X).add(bright_i).add(brightness.setDim(130, 12)).setVAlign(VAlign.CENTER))
+                .addLeft(new GuiParent(GuiFlow.STACK_X).add(render_i).add(render_distance.setDim(130, 12)).setVAlign(VAlign.CENTER))
+                .addLeft(tile.canProject(), () -> new GuiParent(GuiFlow.STACK_X).add(project_i).add(projection_distance.setDim(100, 13)).add(audioOffset.setDim(26, 13)).setVAlign(VAlign.CENTER))
+                .addLeft(!basicOptions.isEmpty(), () -> basicOptions)
+                .addRight(tile.canResize(), () -> pos_view.setDim(80, 80))
                 .setAlignRight(Align.CENTER)
                 .setExpandableY()
         );
@@ -255,7 +254,7 @@ public class DisplayScreen extends GuiLayer {
         this.add(media_l);
         final var mediaSettingsTable = new WidgetPairTable(GuiFlow.STACK_X, 2)
                 .addRight(this.vol_i.setIcon(IconStyles.getVolumeIcon(tile.data.volume)), this.volume.setDim(100, 15).setExpandableX())
-                .addLeftIf(VPCompat.installed(), () -> this.videoplayer.setDim(16, 12))
+                .addLeft(VPCompat.installed(), () -> this.videoplayer.setDim(16, 12))
                 .setAlignRight(Align.RIGHT)
                 .setVAlignRight(VAlign.CENTER)
                 .setLeftExpandableX()
@@ -274,7 +273,7 @@ public class DisplayScreen extends GuiLayer {
         this.add(mediaSettingsTable);
 
         // SEEKBAR + buttons
-        this.add(new GuiParent(GuiFlow.STACK_X).addWidget(
+        this.add(new GuiParent(GuiFlow.STACK_X).add(
                 this.loop.setDim(14, 14),
                 this.playback.setSquared(true).setDim(20, 14),
                 this.stop.setDim(14, 14),

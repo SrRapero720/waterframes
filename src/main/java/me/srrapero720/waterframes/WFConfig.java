@@ -22,6 +22,43 @@ public class WFConfig {
     private static final Builder SERVER = new Builder();
     private static final Builder CLIENT = new Builder();
 
+    private static final String[] WHITELIST = new String[] {
+            "imgur.com",
+            "gyazo.com",
+            "prntscr.com",
+            "tinypic.com",
+            "puu.sh",
+            "pinimg.com",
+            "photobucket.com",
+            "staticflickr.com",
+            "flic.kr",
+            "tenor.co",
+            "gfycat.com",
+            "giphy.com",
+            "gph.is",
+            "gifbin.com",
+            "i.redd.it",
+            "media.tumblr.com",
+            "twimg.com",
+            "discordapp.com",
+            "images.discordapp.net",
+            "discord.com",
+            "githubusercontent.com",
+            "googleusercontent.com",
+            "googleapis.com",
+            "wikimedia.org",
+            "ytimg.com",
+            "youtube.com",
+            "youtu.be",
+            "twitch.com",
+            "twitter.com",
+            "soundcloud.com",
+            "kick.com",
+            "srrapero720.me",
+            "fbcdn.net",
+            "drive.google.com",
+    };
+
     // RENDERING
     private static final DoubleValue maxWidth;
     private static final DoubleValue maxHeight;
@@ -148,7 +185,7 @@ public class WFConfig {
                 )
                 .define("enable", true);
 
-        whitelist = SERVER.define("urls", () -> Arrays.asList(DisplayConstants.WHITELIST), o -> false);
+        whitelist = SERVER.define("urls", () -> Arrays.asList(WHITELIST), o -> false);
 
         SERVER.pop();
 
@@ -197,8 +234,8 @@ public class WFConfig {
 
     public static float maxWidth() { return (float) (double) maxWidth.get(); }
     public static float maxHeight() { return (float) (double) maxHeight.get(); }
-    public static float maxWidth(float width) { return WFMath.minFloat(width, maxWidth()); }
-    public static float maxHeight(float height) { return WFMath.minFloat(height, maxHeight()); }
+    public static float maxWidth(float width) { return Math.min(width, maxWidth()); }
+    public static float maxHeight(float height) { return Math.min(height, maxHeight()); }
 
     public static int maxRenDis() { return maxRenderDistance.get(); }
     public static int maxRenDis(int value) { return Math.min(value, maxRenDis()); }
