@@ -30,6 +30,9 @@ public class RemoteControlScreen extends GuiLayer {
     public GuiButtonIcon volumeUp;
     public GuiButtonIcon volumeDown;
 
+    public GuiButtonIcon channelUp;
+    public GuiButtonIcon channelDown;
+
     protected final DisplayTile tile;
     private final Player player;
     private final CompoundTag nbt;
@@ -81,6 +84,11 @@ public class RemoteControlScreen extends GuiLayer {
 
         this.volumeUp = new GuiButtonIcon("volume_up", IconStyles.VOLUME_UP, button -> tile.volumeUp(true));
         this.volumeDown = new GuiButtonIcon("volume_down", IconStyles.VOLUME_DOWN, button -> tile.volumeDown(true));
+
+        this.channelUp = new GuiButtonIcon("channel_up", IconStyles.CHANNEL_UP, button -> {});
+        this.channelDown = new GuiButtonIcon("channel_down", IconStyles.CHANNEL_DOWN, button -> {});
+        this.channelUp.setTooltip("waterframes.common.soon");
+        this.channelDown.setTooltip("waterframes.common.soon");
     }
 
 
@@ -102,8 +110,8 @@ public class RemoteControlScreen extends GuiLayer {
                 )
                 .add(reload)
                 .add(new GuiParent("", GuiFlow.STACK_Y, Align.LEFT)
-                        .add(this.volumeUp.setDim(12, 25).setExpandableX())
-                        .add(this.volumeDown.setDim(12, 25).setExpandableX())
+                        .add(this.channelUp.setDim(12, 25).setEnabled(false).setExpandableX())
+                        .add(this.channelDown.setDim(12, 25).setEnabled(false).setExpandableX())
                         .setSpacing(0)
                 )
                 .setVAlign(VAlign.BOTTOM)

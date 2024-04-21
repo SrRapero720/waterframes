@@ -9,6 +9,16 @@
     "waterframes.common.false": "disabled",
     "waterframes.common.width": "width",
     "waterframes.common.height": "height",
+    "waterframes.common.soon": "soon!",
+    "waterframes.common.access.denied": "Access denied",
+
+    "waterframes.remote.description.1": "§8[%s§8]§8 + [%s§8] to bound and unbound",
+    "waterframes.remote.bound.success": "Bounded successfully",
+    "waterframes.remote.unbound.success": "Unbounded successfully",
+    "waterframes.remote.bound.failed": "Not bounded",
+    "waterframes.remote.distance.failed": "You're out of distance",
+    "waterframes.remote.display.failed": "Display is broken, unbounded",
+    "waterframes.remote.display.invalid": "Needs to bound it first.",
 
     "waterframes.commands.invalid_block": "Block was not a valid display",
     "waterframes.commands.edit.url.success": "URL updated successfully",
