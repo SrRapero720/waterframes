@@ -62,9 +62,10 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
 
         // POST RENDERING
         pose.popPose();
+        RenderSystem.getShader().clear();
         RenderSystem.disableBlend();
         RenderSystem.disableDepthTest();
-        RenderSystem.getShader().clear();
+        RenderSystem.bindTexture(0);
         RenderSystem.setShaderColor(color[0], color[1], color[2], color[3]);
     }
 
