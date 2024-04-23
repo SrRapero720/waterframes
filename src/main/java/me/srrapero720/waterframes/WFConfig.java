@@ -272,8 +272,6 @@ public class WFConfig {
                 || url.startsWith("user://")
                 || url.startsWith("users://")) return true; // local files = anything you have
 
-        if (!url.startsWith("http://") || !url.startsWith("https://")) return false; // disallow anything else
-
         try {
             var host = new URL(url).getHost();
 

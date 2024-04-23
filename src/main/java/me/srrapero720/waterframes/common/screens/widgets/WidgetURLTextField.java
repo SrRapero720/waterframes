@@ -42,7 +42,7 @@ public class WidgetURLTextField extends GuiTextfield {
             builder.text(ChatFormatting.BLUE + GuiControl.translate("waterframes.gui.url.tooltip.empty"));
         } else if (!isUrlValid(this.getText())) {
             builder.text(ChatFormatting.RED + GuiControl.translate("waterframes.gui.url.tooltip.invalid_url"));
-        } else if (!WFConfig.isWhiteListed(this.getText())) {
+        } else if (!WFConfig.canSave(this.getPlayer(), this.getText())) {
             builder.text(ChatFormatting.RED + GuiControl.translate("waterframes.gui.url.tooltip.not_whitelisted"));
         }
 

@@ -197,8 +197,9 @@ public class DisplayScreen extends GuiLayer {
 
         this.registerEvent(GuiTextUpdateEvent.class, guiTextUpdateEvent -> {
             if (guiTextUpdateEvent.control.name.equals(DisplayData.URL)) {
-                save.setEnabled(WFConfig.canSave(getPlayer(), this.urlField.getText()));
-                reload.setEnabled(!this.urlField.getText().isEmpty() && this.urlField.getText().equals(tile.data.url));
+                var text = this.urlField.getText();
+                save.setEnabled(WFConfig.canSave(getPlayer(), text));
+                reload.setEnabled(!text.isEmpty() && !tile.data.url.isEmpty() && text.equals(tile.data.url));
             }
         });
 
@@ -293,11 +294,6 @@ public class DisplayScreen extends GuiLayer {
     public void tick() {
         super.tick();
         if (!isClient()) return;
-        if (!this.urlField.getText().isEmpty() && !WFConfig.isWhiteListed(this.urlField.getText())) {
-            this.save.setTooltip(GuiControl.translate("waterframes.gui.url.tooltip.not_whitelisted"));
-        } else {
-            this.save.setTooltip(Collections.emptyList());
-        }
         this.vol_i.setIcon(IconStyles.getVolumeIcon((int) volume.getValue()));
         this.playback.setState(tile.data.paused);
     }
