@@ -13,7 +13,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
@@ -283,7 +282,7 @@ public class WFConfig {
                     return true;
                 }
             }
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
         return false;
     }
 
@@ -291,7 +290,7 @@ public class WFConfig {
         if (isAdmin(player)) return true;
 
         try {
-            return isWhiteListed(new URI(url).toURL().getHost().toLowerCase());
+            return isWhiteListed(url);
         } catch (Exception e) {
             return false;
         }
