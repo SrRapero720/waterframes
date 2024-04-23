@@ -30,7 +30,6 @@ minecraft {
             property 'terminal.jline', 'true'
             arg '--mixin.config'
             arg "${modid}.${mixin_file_suffix}"
-            arg '--username=dev2'
 
             mods {
                 "${modid}" {
@@ -39,7 +38,9 @@ minecraft {
             }
         }
 
-        client {}
+        client {
+            arg '--username=dev2'
+        }
         server {}
     }
 }
