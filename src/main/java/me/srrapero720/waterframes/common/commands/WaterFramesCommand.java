@@ -140,7 +140,12 @@ public class WaterFramesCommand {
 
 
         waterframes.then(Commands.literal("edit").then(edit));
-        waterframes.then(Commands.literal("audit").then(audit));
+        waterframes.then(Commands.literal("audit")
+                .then(audit)
+//                .then(Commands.literal("in_range")
+//                        .executes(c -> auditFramesRange(c.getSource().getPlayerOrException(), c.getSource()))
+//                )
+        );
 
         dispatcher.register(waterframes);
     }
