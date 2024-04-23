@@ -11,6 +11,7 @@ import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
@@ -24,10 +25,10 @@ public class WaterFramesCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var waterframes = Commands.literal("waterframes").requires(WaterFramesCommand::hasPermissions);
 
-        var posArg = Commands.argument("blockpos", BlockPosArgument.blockPos());
+        var edit = Commands.argument("blockpos", BlockPosArgument.blockPos());
 
         // URL
-        posArg.then(Commands.literal("url")
+        edit.then(Commands.literal("url")
                 .then(Commands.argument("url", StringArgumentType.greedyString())
                         .executes(c -> setUrl(getTile(c), c.getSource(), getStr(c, "url")))
                 )
@@ -52,10 +53,10 @@ public class WaterFramesCommand {
                                 )
                         )
                 );
-        posArg.then(position);
+        edit.then(position);
 
         // SIZE
-        posArg.then(Commands.literal("size")
+        edit.then(Commands.literal("size")
                 .then(Commands.argument("width", FloatArgumentType.floatArg(0.1f))
                         .executes(c -> setSize(
                                 getTile(c),
@@ -75,35 +76,35 @@ public class WaterFramesCommand {
         );
 
         // ROTATION
-        posArg.then(Commands.literal("rotation")
+        edit.then(Commands.literal("rotation")
                 .then(Commands.argument("rotation", FloatArgumentType.floatArg(0f, 360.0f))
                         .executes(c -> setRotation(getTile(c), c.getSource(), getFloat(c, "rotation")))
                 )
         );
 
         // TRANSPARENCY
-        posArg.then(Commands.literal("transparency")
+        edit.then(Commands.literal("transparency")
                 .then(Commands.argument("transparency", FloatArgumentType.floatArg(0f, 1f))
                         .executes(c -> setTransparency(getTile(c), c.getSource(), getFloat(c, "transparency")))
                 )
         );
 
         // BRIGHTNESS
-        posArg.then(Commands.literal("brightness")
+        edit.then(Commands.literal("brightness")
                 .then(Commands.argument("brightness", FloatArgumentType.floatArg(0f, 1f))
                         .executes(c -> setBrightness(getTile(c), c.getSource(), getFloat(c, "brightness")))
                 )
         );
 
         // RENDER DISTANCE
-        posArg.then(Commands.literal("renderDistance")
+        edit.then(Commands.literal("renderDistance")
                 .then(Commands.argument("render_distance", IntegerArgumentType.integer(4))
                         .executes(c -> setRenderDistance(getTile(c), c.getSource(), getInt(c, "render_distance")))
                 )
         );
 
         // RENDER DISTANCE
-        posArg.then(Commands.literal("projectionDistance")
+        edit.then(Commands.literal("projectionDistance")
                 .then(Commands.argument("projection_distance", IntegerArgumentType.integer(4))
                         .executes(c -> setProjectionDistance(getTile(c), c.getSource(), getInt(c, "projection_distance")))
                 )
@@ -116,19 +117,31 @@ public class WaterFramesCommand {
                         .executes(c -> setVolume(getTile(c), c.getSource(), getIntOr(c, "volume", -1), getInt(c, "min_distance"), getInt(c, "max_distance")))
                 );
 
-        posArg.then(Commands.literal("volumeDistance")
+        edit.then(Commands.literal("volumeDistance")
                 .then(volumeDistance)
         );
 
         // VOLUME
-        posArg.then(Commands.literal("volume")
+        edit.then(Commands.literal("volume")
                 .then(Commands.argument("volume", IntegerArgumentType.integer(0, 120))
                         .executes(c -> setVolume(getTile(c), c.getSource(), getInt(c, "volume"), -1, -1))
                         .then(volumeDistance)
                 )
         );
 
-        waterframes.then(Commands.literal("edit").then(posArg));
+        var audit = Commands.argument("blockpos", BlockPosArgument.blockPos());
+
+        // AUDIT AUTHOR
+        audit.then(Commands.literal("audit")
+                .then(Commands.literal("author")
+                        .executes(c -> auditURLAuthor(getTile(c), c.getSource()))
+                )
+        );
+
+
+        waterframes.then(Commands.literal("edit").then(edit));
+        waterframes.then(Commands.literal("audit").then(audit));
+
         dispatcher.register(waterframes);
     }
 
@@ -139,7 +152,9 @@ public class WaterFramesCommand {
             tile.data.tick = 0;
             tile.data.tickMax = -1;
         }
+
         tile.data.url = url;
+        tile.data.uuid = (source.getEntity() instanceof Player player) ? player.getUUID() : Util.NIL_UUID;
 
         tile.setDirty();
         source.sendSuccess(msgSuccess("waterframes.commands.edit.url.success"), true);
@@ -238,6 +253,22 @@ public class WaterFramesCommand {
         return 0;
     }
 
+    public static int auditURLAuthor(DisplayTile tile, CommandSourceStack source) {
+        if (tile == null) return 1;
+
+        if (tile.data.uuid == Util.NIL_UUID) {
+            source.sendSuccess(msgSuccess("waterframes.commands.audit.author.console"), true);
+        } else {
+            var profiler = source.getServer().getProfileCache().get(tile.data.uuid);
+            if (profiler.isEmpty()) {
+                source.sendFailure(msgFailed("waterframes.commands.audit.author.failed", tile.data.uuid.toString()));
+                return 2;
+            }
+            source.sendSuccess(msgSuccess("waterframes.commands.audit.author", new TextComponent(profiler.get().getName()).withStyle(ChatFormatting.AQUA)), true);
+        }
+        return 0;
+    }
+
     public static int setVolume(DisplayTile tile, CommandSourceStack source, int volume, int min, int max) {
         if (tile == null) return 1;
 
@@ -301,8 +332,16 @@ public class WaterFramesCommand {
         return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.RED));
     }
 
+    private static Component msgFailed(String t, String t2) {
+        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t, t2).withStyle(ChatFormatting.RED));
+    }
+
     private static Component msgSuccess(String t) {
         return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN));
+    }
+
+    private static Component msgSuccess(String t, Component c) {
+        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN).append(c));
     }
 
     public static boolean hasPermissions(CommandSourceStack sourceStack) {

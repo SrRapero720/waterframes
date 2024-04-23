@@ -35,6 +35,9 @@
     "waterframes.commands.edit.projection.failed": "Cannot update the Projection Distance for this Display type",
     "waterframes.commands.edit.projection.success": "Projection Distance successfully updated",
     "waterframes.commands.edit.volume.success": "Volume updated successfully",
+    "waterframes.commands.audit.author": "The author of this command is: ",
+    "waterframes.commands.audit.author.failed": "Player with UUID [%s] cannot be founded",
+    "waterframes.commands.audit.author.console": "The author of this URL is: [console]",
 
     "waterframes.status": "Status: %s",
     "waterframes.status.off": "Off",

@@ -6,12 +6,16 @@ import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
+import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
 
+import java.util.UUID;
+
 public class DisplayData {
     public static final String URL = "url";
+    public static final String PLAYER_UUID = "player_uuid";
     public static final String ACTIVE = "active";
     public static final String MIN_X = "min_x";
     public static final String MIN_Y = "min_y";
@@ -47,6 +51,7 @@ public class DisplayData {
     public static final short V = 1;
 
     public String url = "";
+    public UUID uuid = Util.NIL_UUID;
     public boolean active = true;
     public final Vec2f min = new Vec2f(0f, 0f);
     public final Vec2f max = new Vec2f(1f, 1f);
@@ -84,6 +89,7 @@ public class DisplayData {
 
     public void save(CompoundTag nbt, DisplayTile displayTile) {
         nbt.putString(URL, url);
+        nbt.putUUID(PLAYER_UUID, uuid);
         nbt.putBoolean(ACTIVE, active);
         if (displayTile.canResize()) {
             nbt.putFloat(MIN_X, min.x);
@@ -124,6 +130,7 @@ public class DisplayData {
 
     public void load(CompoundTag nbt, DisplayTile displayTile) {
         this.url = nbt.getString(URL);
+        this.uuid = nbt.contains(PLAYER_UUID) ? nbt.getUUID(PLAYER_UUID) : this.uuid;
         this.active = nbt.contains(ACTIVE) ? nbt.getBoolean(ACTIVE) : this.active;
         if (displayTile.canResize()) {
             this.min.x = nbt.getFloat(MIN_X);
@@ -135,11 +142,11 @@ public class DisplayData {
         this.renderDistance = WFConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
         this.flipX = nbt.getBoolean(FLIP_X);
         this.flipY = nbt.getBoolean(FLIP_Y);
-        this.alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : alpha;
-        this.brightness = nbt.contains(BRIGHTNESS) ? nbt.getFloat(BRIGHTNESS) : alpha;
-        this.volume = nbt.contains(VOLUME) ? WFConfig.maxVol(nbt.getInt(VOLUME)) : volume;
-        this.maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? WFConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX)) : maxVolumeDistance;
-        this.minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), maxVolumeDistance) : minVolumeDistance;
+        this.alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : this.alpha;
+        this.brightness = nbt.contains(BRIGHTNESS) ? nbt.getFloat(BRIGHTNESS) : this.alpha;
+        this.volume = nbt.contains(VOLUME) ? WFConfig.maxVol(nbt.getInt(VOLUME)) : this.volume;
+        this.maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? WFConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX)) : this.maxVolumeDistance;
+        this.minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), this.maxVolumeDistance) : this.minVolumeDistance;
         this.paused = nbt.getBoolean(PAUSED);
         this.muted = nbt.getBoolean(MUTED);
         this.tick = nbt.getLong(TICK);
@@ -155,8 +162,8 @@ public class DisplayData {
         }
 
         if (displayTile.canProject()) {
-            projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? WFConfig.maxProjDis(nbt.getInt(PROJECTION_DISTANCE)) : projectionDistance;
-            audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : audioOffset;
+            this.projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? WFConfig.maxProjDis(nbt.getInt(PROJECTION_DISTANCE)) : this.projectionDistance;
+            this.audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : this.audioOffset;
         }
 
         switch (nbt.getShort(DATA_V)) {
@@ -333,6 +340,7 @@ public class DisplayData {
                 block.data.tickMax = -1;
             }
             block.data.url = url;
+            block.data.uuid = !block.data.url.isEmpty() ? player.getUUID() : Util.NIL_UUID;
             block.data.active = nbt.getBoolean(ACTIVE);
 
             if (block.canResize()) {
