@@ -69,14 +69,15 @@ public class ProjectorBlock extends DisplayBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder);
+        super.createBlockStateDefinition(builder.add(VISIBLE));
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction current = context.getHorizontalDirection();
         return super.getStateForPlacement(context)
-                .setValue(getFacing(), context.getPlayer().isCrouching() ? current.getOpposite() : current);
+                .setValue(getFacing(), context.getPlayer().isCrouching() ? current.getOpposite() : current)
+                .setValue(VISIBLE, true);
     }
 
     @Override

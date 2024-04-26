@@ -100,8 +100,8 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder.add(getFacing()).add(ATTACHED_FACE).add(POWERED).add(WATERLOGGED));
+    public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return state.getValue(this.getFacing()) == direction;
     }
 
     @Override
@@ -110,8 +110,8 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     }
 
     @Override
-    public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return state.getValue(this.getFacing()) == direction;
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder.add(getFacing()).add(ATTACHED_FACE).add(POWERED).add(WATERLOGGED));
     }
 
     @Override
