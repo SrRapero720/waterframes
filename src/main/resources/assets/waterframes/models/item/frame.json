@@ -1,8 +1,7 @@
 {
 	"credit": "Made with Blockbench by J-RAP",
 	"textures": {
-		"2": "waterframes:block/frame/back",
-		"3": "waterframes:block/frame/front",
+		"1": "waterframes:block/frame",
 		"particle": "waterframes:particles/displays"
 	},
 	"elements": [
@@ -10,12 +9,12 @@
 			"from": [0, 0, 15.5],
 			"to": [16, 16, 16],
 			"faces": {
-				"north": {"uv": [0, 0, 16, 16], "texture": "#3"},
-				"east": {"uv": [0, 0, 0.5, 16], "texture": "#3"},
-				"south": {"uv": [0, 0, 16, 16], "texture": "#2"},
-				"west": {"uv": [15.5, 0, 16, 16], "texture": "#3"},
-				"up": {"uv": [0, 0, 16, 0.5], "texture": "#3"},
-				"down": {"uv": [16, 15.5, 0, 16], "texture": "#3"}
+				"north": {"uv": [0, 0, 8, 16], "texture": "#1"},
+				"east": {"uv": [0, 0, 0.5, 16], "texture": "#1"},
+				"south": {"uv": [8, 0, 16, 16], "texture": "#1"},
+				"west": {"uv": [15.5, 0, 16, 16], "texture": "#1"},
+				"up": {"uv": [0, 0, 16, 0.5], "texture": "#1"},
+				"down": {"uv": [16, 15.5, 0, 16], "texture": "#1"}
 			}
 		}
 	],

@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.client.rendering.core.RenderCore;
-import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageRenderer;
@@ -16,6 +15,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.box.BoxFace;
@@ -49,16 +49,24 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
 
         // variables
         var direction = this.direction(tile);
-        var facing = this.facing(tile, direction);
-        var box = this.box(tile, direction, facing);
+        var facing = Facing.get(direction);
+        var box = tile.getRenderBox();
 
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-tile.data.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
 
+        if (facing.positive) {
+            if (!this.invBoxFace(tile)) box.setMax(facing.axis, box.getMax(facing.axis) + this.grwSize());
+            else box.setMin(facing.axis, box.getMin(facing.axis) - this.grwSize());
+        } else {
+            if (!this.invBoxFace(tile)) box.setMin(facing.axis, box.getMin(facing.axis) - this.grwSize());
+            else box.setMax(facing.axis, box.getMax(facing.axis) + this.grwSize());
+        }
+
         // RENDERING
-        this.render(pose, tile, display, box, facing, BoxFace.get(facing), -1);
+        this.render(pose, tile, display, box, BoxFace.get(this.invBoxFace(tile) ? facing.opposite() : facing), -1);
 
         // POST RENDERING
         pose.popPose();
@@ -69,7 +77,7 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
         RenderSystem.setShaderColor(color[0], color[1], color[2], color[3]);
     }
 
-    public void render(PoseStack pose, DisplayTile tile, TextureDisplay display, AlignedBox box, Facing facing, BoxFace face, int colorARGB) {
+    public void render(PoseStack pose, DisplayTile tile, TextureDisplay display, AlignedBox box, BoxFace face, int colorARGB) {
         // VAR DECLARE
         final boolean flipX = this.flipX(tile);
         final boolean flipY = this.flipY(tile);
@@ -78,7 +86,7 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
 
         if (display.isLoading()) {
             RenderCore.bufferBegin();
-            this.renderLoading(pose, tile, facing, face, front, back, flipX, flipY, colorARGB);
+            this.renderLoading(pose, tile, box, face, front, back, flipX, flipY, colorARGB);
             RenderCore.bufferEnd();
             return;
         }
@@ -99,20 +107,50 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
 
         if (display.isBuffering()) {
             RenderCore.bufferBegin();
-            this.renderLoading(pose, tile, facing, face, front, back, flipX, flipY, colorARGB);
+            this.renderLoading(pose, tile, box, face, front, back, flipX, flipY, colorARGB);
             RenderCore.bufferEnd();
         }
     }
 
-    public void renderLoading(PoseStack pose, DisplayTile tile, Facing facing, BoxFace face, boolean front, boolean back, boolean flipX, boolean flipY, int colorARGB) {
+    public void renderLoading(PoseStack pose, DisplayTile tile, AlignedBox alignedBox, BoxFace face, boolean front, boolean back, boolean flipX, boolean flipY, int colorARGB) {
         RenderCore.bindTex(LOADING_TEX.texture(WaterFrames.getTicks(), MathAPI.tickToMs(WaterFrames.deltaFrames()), true));
-        AlignedBox squaredBox = DisplayBlock.getRenderBox(tile, facing, this.grwSize(), true);
+
+        AlignedBox box = new AlignedBox(alignedBox);
+        Facing facing = face.getFacing();
+
+        Axis one = facing.one();
+        Axis two = facing.two();
+
+        float width = box.getSize(one);
+        float height = box.getSize(two);
+
+        if (width > height) {
+            float subtracts = ((width - height) / 2f);
+            float marginSubstract = height / 4;
+            box.setMin(one, (box.getMin(one) + subtracts) + marginSubstract);
+            box.setMax(one, (box.getMax(one) - subtracts) - marginSubstract);
+            box.setMin(two, box.getMin(two) + marginSubstract);
+            box.setMax(two, box.getMax(two) - marginSubstract);
+        } else if (height > width) {
+            float subtracts = ((height - width) / 2f);
+            float marginSubstract = width / 4;
+            box.setMin(two, (box.getMin(two) + subtracts) + marginSubstract);
+            box.setMax(two, (box.getMax(two) - subtracts) - marginSubstract);
+            box.setMin(one, box.getMin(one) + marginSubstract);
+            box.setMax(one, box.getMax(one) - marginSubstract);
+        }
+
+        if (facing.positive) {
+            box.setMax(face.getFacing().axis, alignedBox.getMax(facing.axis) + (tile.canProject() ? -0.001f : 0.001f));
+        } else {
+            box.setMin(facing.axis, alignedBox.getMin(facing.axis) - (tile.canProject() ? -0.001f : 0.001f));
+        }
 
         if (front)
-            RenderCore.vertexF(pose, squaredBox, face, flipX, flipY, colorARGB);
+            RenderCore.vertexF(pose, box, face, flipX, flipY, colorARGB);
 
         if (back)
-            RenderCore.vertexB(pose, squaredBox, face, flipX, flipY, colorARGB);
+            RenderCore.vertexB(pose, box, face, flipX, flipY, colorARGB);
     }
 
     public boolean inFront(DisplayTile tile) {
@@ -135,7 +173,7 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
         return tile.getDirection();
     }
 
+    public abstract boolean invBoxFace(DisplayTile tile);
     public abstract Facing facing(DisplayTile tile, final Direction direction);
-    public abstract AlignedBox box(DisplayTile tile, Direction direction, final Facing facing);
     public abstract float grwSize();
 }

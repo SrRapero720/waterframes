@@ -19,9 +19,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
+import team.creative.creativecore.common.util.math.base.Axis;
+import team.creative.creativecore.common.util.math.base.Facing;
+import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
@@ -35,7 +39,6 @@ public abstract class DisplayTile extends BlockEntity {
     public abstract boolean canRenderBackside();
     public abstract boolean canProject();
     public abstract boolean canResize();
-
     public DisplayTile(DisplayData data, BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
         this.data = data;
@@ -107,6 +110,62 @@ public abstract class DisplayTile extends BlockEntity {
     private void release() {
         this.cleanDisplay();
         this.isReleased = true;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public AlignedBox getRenderBox() {
+        final var facing = Facing.get(getDirection());
+        final var box = new AlignedBox();
+
+        if (facing.positive) box.setMax(facing.axis, this.data.projectionDistance);
+        else box.setMin(facing.axis, 1 - this.data.projectionDistance);
+
+        Axis one = facing.one();
+        Axis two = facing.two();
+
+        if (facing.axis != Axis.Z) {
+            one = facing.two();
+            two = facing.one();
+        }
+
+        box.setMin(one, this.data.min.x);
+        box.setMax(one, this.data.max.x);
+
+        box.setMin(two, this.data.min.y);
+        box.setMax(two, this.data.max.y);
+
+        if (canProject() && (facing.toVanilla() == Direction.NORTH || facing.toVanilla() == Direction.EAST)) {
+            switch (this.data.getPosX()) {
+                case LEFT -> {
+                    box.setMin(one, 1 - this.data.getWidth());
+                    box.setMax(one, 1);
+                }
+                case RIGHT -> {
+                    box.setMax(one, this.data.getWidth());
+                    box.setMin(one, 0f);
+                }
+            }
+        }
+
+        if (!canProject() && (facing.toVanilla() == Direction.WEST || facing.toVanilla() == Direction.SOUTH)) {
+            switch (this.data.getPosX()) {
+                case LEFT -> {
+                    box.setMin(one, 1 - this.data.getWidth());
+                    box.setMax(one, 1);
+                }
+                case RIGHT -> {
+                    box.setMax(one, this.data.getWidth());
+                    box.setMin(one, 0f);
+                }
+            }
+        }
+        return box;
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public AABB getRenderBoundingBox() {
+        return this.getRenderBox().getBB(this.getBlockPos());
     }
 
     @Override
@@ -207,7 +266,6 @@ public abstract class DisplayTile extends BlockEntity {
     public DisplayBlock getDisplayBlock() {
         return (DisplayBlock) this.getBlockState().getBlock();
     }
-
 
     public boolean isPowered() {
         return this.getBlockState().getValue(DisplayBlock.POWERED);

@@ -27,13 +27,9 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.fml.LogicalSide;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
 import team.creative.creativecore.common.gui.creator.GuiCreator;
-import team.creative.creativecore.common.util.math.base.Axis;
-import team.creative.creativecore.common.util.math.base.Facing;
-import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -44,6 +40,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
+    public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
 
     protected DisplayBlock(Properties pProperties) {
         super(pProperties);
@@ -52,96 +49,12 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     public abstract DirectionProperty getFacing();
 
-    // FRAMES AND TVs
-    public static AlignedBox getBlockBox(Direction direction, float thickness) {
-        return getBlockBox(Facing.get(direction), thickness);
-    }
-
     @Override
     public GuiLayer create(CompoundTag compoundTag, Level level, BlockPos blockPos, BlockState blockState, Player player) {
         if (!level.isClientSide) {
             DisplayNetwork.sendClient(new PermLevelPacket(level.getServer()), level, blockPos);
         }
         return null;
-    }
-
-    // FRAMES AND TVs
-    public static AlignedBox getBlockBox(Facing facing, float thickness) {
-        var box = new AlignedBox();
-
-        if (facing.positive) box.setMax(facing.axis, thickness);
-        else box.setMin(facing.axis, 1 - thickness);
-        return box;
-    }
-
-    // FOR PROJECTORS
-    public static AlignedBox getProjectorBlockBox(Direction direction) {
-        Facing facing = Facing.get(direction);
-        var box = new AlignedBox();
-
-        // fit projector model height
-        box.maxY = 8f / 16f;
-
-        // fit projector thickness
-        float blockThickness = 4f / 16f;
-        box.setMin(facing.axis, blockThickness);
-        box.setMax(facing.axis, 1 - blockThickness);
-
-        // fit anchor of it
-        Facing clockWise = Facing.get(direction.getClockWise());
-        box.setMin(clockWise.axis, 1f / 16f);
-        box.setMax(clockWise.axis, 15f / 16f);
-
-        return box;
-    }
-
-    // FOR PROJECTORS AND FRAMES
-    public static AlignedBox getRenderBox(DisplayTile tile, Facing facing, float spacing, boolean squared) {
-        var box = new AlignedBox();
-
-        if (facing.positive) box.setMax(facing.axis, (tile.data.projectionDistance + spacing));
-        else box.setMin(facing.axis, 1 - (tile.data.projectionDistance + spacing));
-
-        Axis one = facing.one();
-        Axis two = facing.two();
-
-        if (facing.axis != Axis.Z) {
-            one = facing.two();
-            two = facing.one();
-        }
-
-        box.setMin(one, tile.data.min.x);
-        box.setMax(one, tile.data.max.x);
-
-        box.setMin(two, tile.data.min.y);
-        box.setMax(two, tile.data.max.y);
-
-        if ((facing.positive && !tile.canProject()) || (!facing.positive && tile.canProject())) {
-            switch (tile.data.getPosX()) {
-                case LEFT -> {
-                    box.setMin(one, 1 - tile.data.getWidth());
-                    box.setMax(one, 1);
-                }
-                case RIGHT -> {
-                    box.setMin(one, 0f);
-                    box.setMax(one, tile.data.getWidth());
-                }
-            }
-        }
-
-        if (!squared) return box;
-
-        float width = tile.data.getWidth();
-        float height = tile.data.getHeight();
-
-        // FIXME: corner pictures makes squared look closer to the block
-        if (width > height) {
-            getBox$square(box, one, tile.data.getPosX().ordinal(), height);
-        } else {
-            getBox$square(box, two, tile.data.getPosY().ordinal(), width);
-        }
-
-        return box;
     }
 
     @Override
@@ -155,10 +68,10 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         if (!WFConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof DisplayTile tile)) return;
         boolean signal = level.hasNeighborSignal(pos);
 
-        state.setValue(POWERED, signal);
-        if (!level.isClientSide) {
+        if (!level.isClientSide && state.getValue(POWERED) != signal) {
             tile.setPause(false, signal);
         }
+        state.setValue(POWERED, signal);
     }
 
     @Override
@@ -178,24 +91,6 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return 0;
     }
 
-    private static void getBox$square(final AlignedBox box, Axis axis, int mode, float size) {
-        switch (mode) {
-            case 0 -> {
-                box.setMin(axis, 0f);
-                box.setMax(axis, size);
-            }
-            case 1 -> {
-                box.setMin(axis, 1 - size);
-                box.setMax(axis, 1);
-            }
-            default -> {
-                float middle = size / 2;
-                box.setMin(axis, 0.5f - middle);
-                box.setMax(axis, 0.5f + middle);
-            }
-        }
-    }
-
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         if (state.getValue(WATERLOGGED)) {
@@ -206,7 +101,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder.add(getFacing()).add(POWERED).add(WATERLOGGED));
+        super.createBlockStateDefinition(builder.add(getFacing()).add(ATTACHED_FACE).add(POWERED).add(WATERLOGGED));
     }
 
     @Override
@@ -221,7 +116,10 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
-        return this.defaultBlockState().setValue(WATERLOGGED, false).setValue(POWERED, false);
+        return this.defaultBlockState()
+                .setValue(WATERLOGGED, false)
+                .setValue(POWERED, false)
+                .setValue(ATTACHED_FACE, pContext.getClickedFace());
     }
 
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {

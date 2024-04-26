@@ -20,6 +20,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.gui.GuiLayer;
+import team.creative.creativecore.common.util.math.base.Facing;
+import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -42,12 +44,17 @@ public class FrameBlock extends DisplayBlock {
 
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return getBlockBox(state.getValue(getFacing()), THICKNESS).voxelShape();
+        var facing = Facing.get(state.getValue(getFacing()));
+        var box = new AlignedBox();
+
+        if (facing.positive) box.setMax(facing.axis, THICKNESS);
+        else box.setMin(facing.axis, 1 - THICKNESS);
+        return box.voxelShape();
     }
 
     @Override
     public @NotNull VoxelShape getInteractionShape(@NotNull BlockState state, BlockGetter level, BlockPos pos) {
-        return getBlockBox(state.getValue(getFacing()), THICKNESS).voxelShape();
+        return this.getShape(state, level, pos, null);
     }
 
     @Override
@@ -57,7 +64,9 @@ public class FrameBlock extends DisplayBlock {
 
     @Override
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
-        return this.defaultBlockState().setValue(getFacing(), context.getClickedFace()).setValue(VISIBLE, true);
+        return super.getStateForPlacement(context)
+                .setValue(getFacing(), context.getClickedFace())
+                .setValue(VISIBLE, true);
     }
 
     @Override
