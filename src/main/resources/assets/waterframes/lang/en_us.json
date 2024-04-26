@@ -3,6 +3,7 @@
     "block.waterframes.frame": "Picture Frame",
     "block.waterframes.projector": "Picture Projector",
     "block.waterframes.tv": "Television",
+    "block.waterframes.big_tv": "Big Television",
     "item.waterframes.remote": "Remote Control",
 
     "waterframes.common.true": "enabled",

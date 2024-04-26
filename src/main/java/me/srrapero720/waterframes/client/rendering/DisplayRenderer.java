@@ -174,6 +174,5 @@ public abstract class DisplayRenderer implements BlockEntityRenderer<DisplayTile
     }
 
     public abstract boolean invBoxFace(DisplayTile tile);
-    public abstract Facing facing(DisplayTile tile, final Direction direction);
     public abstract float grwSize();
 }
