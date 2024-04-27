@@ -5,7 +5,8 @@
   "refmap": "${modid}.${mixin_refmap_suffix}",
   "minVersion": "0.8.5",
   "client": [
-    "MinecraftMixin"
+    "MinecraftMixin",
+    "vp.VideoPlayerMixin"
   ],
   "mixins": [
     "LevelMixin",
