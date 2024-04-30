@@ -294,7 +294,7 @@ public class DisplayData {
     public static CompoundTag build(DisplayScreen screen, DisplayTile tile) {
         CompoundTag nbt = new CompoundTag();
 
-        nbt.putString(URL, screen.urlField.getText());
+        nbt.putString(URL, screen.url.getText());
         nbt.putBoolean(ACTIVE, true); // reset
 
         if (tile.canResize()) {

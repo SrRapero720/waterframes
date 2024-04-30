@@ -17,7 +17,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.gui.*;
 import team.creative.creativecore.common.gui.controls.simple.*;
-import team.creative.creativecore.common.gui.event.GuiTextUpdateEvent;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.parser.DoubleValueParser;
 import team.creative.creativecore.common.gui.parser.IntValueParser;
@@ -54,7 +53,7 @@ public class DisplayScreen extends GuiLayer {
 
     // WIDGETS INSTANCES
     public final GuiButton save;
-    public final WidgetURLTextField urlField;
+    public final WidgetURLTextField url;
 
     public final GuiCounterDecimal widthField;
     public final GuiCounterDecimal heightField;
@@ -100,7 +99,7 @@ public class DisplayScreen extends GuiLayer {
         this.save = new GuiButton("save", x -> DisplayNetwork.sendServer(new DataSyncPacket(tile.getBlockPos(), DisplayData.build(this, tile))));
         this.save.setTranslate("waterframes.gui.save");
 
-        this.urlField = new WidgetURLTextField(this.tile);
+        this.url = new WidgetURLTextField(this.tile);
 
         this.widthField = new GuiCounterDecimal("width", tile.data.getWidth(), 0.1, WFConfig.maxWidth(), ControlFormatting.CLICKABLE_NO_PADDING);
         this.widthField.setSpacing(0).setStep(SCALE).setAlign(Align.STRETCH).setVAlign(VAlign.STRETCH);
@@ -195,14 +194,6 @@ public class DisplayScreen extends GuiLayer {
                 .setOnTimeUpdate(v -> tile.data.tick = (int) v)
                 .setOnLastTimeUpdate(v -> tile.syncTime(true, (int) v, tile.data.tickMax));
 
-        this.registerEvent(GuiTextUpdateEvent.class, guiTextUpdateEvent -> {
-            if (guiTextUpdateEvent.control.name.equals(DisplayData.URL)) {
-                var text = this.urlField.getText();
-                save.setEnabled(WFConfig.canSave(getPlayer(), text));
-                reload.setEnabled(!text.isEmpty() && !tile.data.url.isEmpty() && text.equals(tile.data.url));
-            }
-        });
-
         ((ScalableText) url_l).wf$setScale(0.75f);
         ((ScalableText) tex_l).wf$setScale(0.75f);
         ((ScalableText) media_l).wf$setScale(0.75f);
@@ -214,7 +205,7 @@ public class DisplayScreen extends GuiLayer {
         // URL FIELD
         final var table = new WidgetPairTable(GuiFlow.STACK_Y, 4)
                 .addLeft(url_l)
-                .addLeft(urlField.setExpandableX())
+                .addLeft(url.setExpandableX())
                 .addRight(new WidgetStatusIcon("", IconStyles.STATUS_OK, tile).setDim(30, 30));
         this.add(table);
 
@@ -284,7 +275,7 @@ public class DisplayScreen extends GuiLayer {
         // SAVE BUTTONS
         this.add(new WidgetPairTable(GuiFlow.STACK_X, Align.RIGHT, 2)
                 .addLeft(this.reload_all.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(50, 10))
-                .addRight(this.save.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(60, 10).setEnabled(WFConfig.canSave(getPlayer(), urlField.getText())))
+                .addRight(this.save.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(60, 10).setEnabled(WFConfig.canSave(getPlayer(), url.getText())))
                 .addRight(this.reload.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(50, 10))
                 .setAlignRight(Align.RIGHT)
         );
@@ -296,6 +287,9 @@ public class DisplayScreen extends GuiLayer {
         if (!isClient()) return;
         this.vol_i.setIcon(IconStyles.getVolumeIcon((int) volume.getValue()));
         this.playback.setState(tile.data.paused);
+        var text = this.url.getText();
+        save.setEnabled(WFConfig.canSave(getPlayer(), text));
+        reload.setEnabled(tile.imageCache != null && !text.isEmpty() && !tile.data.url.isEmpty() && text.equals(tile.data.url));
     }
 
     @Override
