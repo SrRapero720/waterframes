@@ -1,8 +1,6 @@
 {
   "pack": {
-    "description": "Design of WaterFrames textures made by J-RAP",
-    "pack_format": 9,
-    "forge:resource_pack_format": 8,
-    "forge:data_pack_format": 9
+    "description": "Voxeloper Design by J-RAP",
+    "pack_format": ${respack_version}
   }
 }

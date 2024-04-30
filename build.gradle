@@ -7,12 +7,13 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
-version = mcversion + "-" +  modversion
+base {
+    archivesName = modid
+    version = mcversion + "-" +  modversion
+}
 
-java {
-    archivesBaseName = modid
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+java.toolchain {
+    languageVersion = JavaLanguageVersion.of(17)
 }
 
 println "Gradle Java: ${JavaVersion.current()}"
@@ -74,7 +75,7 @@ dependencies {
 
     //DEPENDENCIES
     implementation fileTree('libs') { include '*.jar' }
-//    implementation "com.github.SrRapero720.watermedia:build:${watermediaversion}"
+    implementation "com.github.SrRapero720.watermedia:build:${watermediaversion}"
     implementation fg.deobf("curse.maven:video-player-645407:4782050")
 //    implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
 
@@ -95,7 +96,7 @@ dependencies {
 }
 
 processResources {
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta', "${modid}.${mixin_file_suffix}".toString()]) {
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta', 'resourcepacks/**/pack.mcmeta', "${modid}.${mixin_file_suffix}".toString()]) {
         expand project.properties
     }
 }
