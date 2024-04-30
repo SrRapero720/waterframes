@@ -1,33 +1,26 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "##R",
-    "12G",
-    "##B"
+    "##A",
+    "#GA",
+    "#RA"
   ],
   "key": {
     "#": {
       "item": "minecraft:iron_block"
     },
-    "1": {
-      "item": "minecraft:redstone"
+    "A": {
+      "item": "minecraft:amethyst_shard"
     },
-    "2": {
+    "G": {
       "item": "minecraft:glowstone"
     },
     "R": {
-      "item": "minecraft:red_stained_glass"
-    },
-    "G": {
-      "item": "minecraft:green_stained_glass"
-    },
-    "B": {
-      "item": "minecraft:blue_stained_glass"
+      "item": "waterframes:remote"
     }
   },
   "result": {
     "item": "waterframes:projector",
     "count": 1
-  },
-  "group": "stuff"
+  }
 }

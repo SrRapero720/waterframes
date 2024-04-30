@@ -2,23 +2,25 @@
     "type": "minecraft:crafting_shaped",
     "pattern": [
         "iGi",
-        "GOG",
-        "iGi"
+        "iTi",
+        "iSi"
     ],
     "key": {
         "i": {
-            "item": "minecraft:iron_nugget"
-        },
-        "O": {
-            "item": "minecraft:oak_log"
+            "item": "minecraft:iron_ingot"
         },
         "G": {
-            "item": "minecraft:glass_pane"
+            "item": "minecraft:glowstone"
+        },
+        "T": {
+            "item": "minecraft:tinted_glass"
+        },
+        "S": {
+            "item": "waterframes:remote"
         }
     },
     "result": {
         "item": "waterframes:frame",
         "count": 1
-    },
-    "group": "stuff"
+    }
 }
