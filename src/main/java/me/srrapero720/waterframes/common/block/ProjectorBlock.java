@@ -11,13 +11,11 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import team.creative.creativecore.common.gui.GuiLayer;
@@ -30,13 +28,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ProjectorBlock extends DisplayBlock {
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
-    public ProjectorBlock() {
-    }
-
     @Override
     public DirectionProperty getFacing() {
-        return FACING;
+        return BlockStateProperties.HORIZONTAL_FACING;
     }
 
     @Override
@@ -67,6 +61,11 @@ public class ProjectorBlock extends DisplayBlock {
     }
 
     @Override
+    protected void registerDefaultState(BlockState state) {
+        super.registerDefaultState(state.setValue(VISIBLE, true));
+    }
+
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(VISIBLE));
     }
@@ -75,8 +74,7 @@ public class ProjectorBlock extends DisplayBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction current = context.getHorizontalDirection();
         return super.getStateForPlacement(context)
-                .setValue(getFacing(), context.getPlayer().isCrouching() ? current.getOpposite() : current)
-                .setValue(VISIBLE, true);
+                .setValue(getFacing(), context.getPlayer().isCrouching() ? current.getOpposite() : current);
     }
 
     @Override

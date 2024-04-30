@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
@@ -29,16 +28,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FrameBlock extends DisplayBlock {
-    public static final DirectionProperty FACING = BlockStateProperties.FACING;
     public static final float THICKNESS = 0.0625F / 2F;
-
-    public FrameBlock() {
-        this.registerDefaultState(defaultBlockState().setValue(VISIBLE, false));
-    }
 
     @Override
     public DirectionProperty getFacing() {
-        return FACING;
+        return BlockStateProperties.FACING;
     }
 
     @Override
@@ -57,6 +51,11 @@ public class FrameBlock extends DisplayBlock {
     }
 
     @Override
+    protected void registerDefaultState(BlockState state) {
+        super.registerDefaultState(state.setValue(VISIBLE, true));
+    }
+
+    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(VISIBLE));
     }
@@ -64,8 +63,7 @@ public class FrameBlock extends DisplayBlock {
     @Override
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
         return super.getStateForPlacement(context)
-                .setValue(getFacing(), context.getClickedFace())
-                .setValue(VISIBLE, true);
+                .setValue(getFacing(), context.getClickedFace());
     }
 
     @Override

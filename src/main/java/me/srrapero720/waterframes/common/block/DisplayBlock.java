@@ -21,13 +21,11 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.BlockHitResult;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
@@ -43,17 +41,17 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
+    private static final Material MATERIAL = new Material.Builder(MaterialColor.NONE).noCollider().build();
+    private static final Properties PROPERTIES = Properties.of(MATERIAL)
+            .strength(1f)
+            .sound(SoundType.METAL)
+            .noOcclusion()
+            .isSuffocating(Blocks::never)
+            .isViewBlocking(Blocks::never)
+            .requiresCorrectToolForDrops();
 
     protected DisplayBlock() {
-        super(Properties.of(new Material.Builder(MaterialColor.NONE).destroyOnPush().build())
-                .strength(4f)
-                .sound(SoundType.METAL)
-                .noOcclusion()
-                .isSuffocating(Blocks::never)
-                .dynamicShape()
-                .requiresCorrectToolForDrops()
-        );
-        this.registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
+        super(PROPERTIES);
     }
 
     public abstract DirectionProperty getFacing();
@@ -149,6 +147,11 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
         return level.getMaxLightLevel();
+    }
+
+    @Override
+    public PushReaction getPistonPushReaction(BlockState pState) {
+        return PushReaction.DESTROY;
     }
 
     @Override public FluidState getFluidState(BlockState state) {
