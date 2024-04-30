@@ -122,7 +122,7 @@ public class DisplayScreen extends GuiLayer {
 
         var resize_x = new GuiButtonIcon("resize_x", IconStyles.EXPAND_X, integer -> {
             if (tile.display != null) {
-                this.widthField.setValue((float) (tile.display.width() / (tile.display.height() / widthField.getValue())));
+                this.widthField.setValue((float) (tile.display.width() / (tile.display.height() / heightField.getValue())));
             }
         }).setTooltip("waterframes.gui.resize_x");
 
