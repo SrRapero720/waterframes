@@ -168,6 +168,9 @@ public abstract class DisplayTile extends BlockEntity {
         return this.getRenderBox().getBB(this.getBlockPos());
     }
 
+    public abstract boolean flip3DFace();
+    public abstract float growSize();
+
     @Override
     public void setRemoved() {
         if (this.isClient()) this.release();

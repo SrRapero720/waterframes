@@ -19,6 +19,16 @@ public class BigTvTile extends DisplayTile {
     }
 
     @Override
+    public boolean flip3DFace() {
+        return true;
+    }
+
+    @Override
+    public float growSize() {
+        return 0.001F;
+    }
+
+    @Override
     public boolean canHideModel() {
         return false;
     }

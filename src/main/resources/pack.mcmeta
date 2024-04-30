@@ -1,6 +1,6 @@
 {
     "pack": {
-        "description": "${modname} resources",
+        "description": "Resources of ${modname}. Models by FabiAcr and Textured by Kotyarendj",
         "pack_format": 9,
         "forge:resource_pack_format": 8,
         "forge:data_pack_format": 9

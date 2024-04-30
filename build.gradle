@@ -86,6 +86,7 @@ dependencies {
     implementation fg.deobf("curse.maven:embeddium-908741:${embeddiumversion}")
     implementation fg.deobf("curse.maven:worldedit-225608:3697298")
 //    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
+    implementation fg.deobf("curse.maven:jei-238222:5068328")
 
     // MOD SUPPORT
     implementation fg.deobf("com.simibubi.create:create-${mcversion}:${createversion}:slim") { transitive = false }

@@ -19,6 +19,16 @@ public class TvTile extends DisplayTile {
     }
 
     @Override
+    public boolean flip3DFace() {
+        return getBlockState().getValue(DisplayBlock.ATTACHED_FACE) != getDirection();
+    }
+
+    @Override
+    public float growSize() {
+        return 0.001F;
+    }
+
+    @Override
     public boolean canHideModel() {
         return false;
     }

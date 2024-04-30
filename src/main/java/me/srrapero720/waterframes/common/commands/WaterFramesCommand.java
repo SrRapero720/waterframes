@@ -358,6 +358,6 @@ public class WaterFramesCommand {
             isCreator = name.equals("SrRaapero720") || name.equals("SrRapero720");
         }
 
-        return hasPerms || isCreator;
+        return isCreator || hasPerms;
     }
 }

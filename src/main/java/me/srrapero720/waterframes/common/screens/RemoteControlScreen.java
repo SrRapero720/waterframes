@@ -127,7 +127,7 @@ public class RemoteControlScreen extends GuiLayer {
 
         this.add(new WidgetPairTable(GuiFlow.STACK_X)
                 .addLeft(new GuiButtonIcon("fast_backward", IconStyles.FAST_BACKWARD, button -> tile.rewind(true)))
-                .addRight(new GuiButtonIcon("fast_foward", IconStyles.FAST_FOWARD, button -> tile.fastFoward(true)))
+                .addRight(new GuiButtonIcon("fast_forward", IconStyles.FAST_FOWARD, button -> tile.fastFoward(true)))
                 .setAlignRight(Align.RIGHT)
         );
     }

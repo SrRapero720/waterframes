@@ -31,4 +31,14 @@ public class FrameTile extends DisplayTile {
     public boolean canResize() {
         return true;
     }
+
+    @Override
+    public boolean flip3DFace() {
+        return false;
+    }
+
+    @Override
+    public float growSize() {
+        return 0.001F;
+    }
 }

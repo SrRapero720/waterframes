@@ -17,18 +17,7 @@ public class DisplayNetwork {
     public static final CreativeNetwork CONTROL = new CreativeNetwork(1, LOGGER, new ResourceLocation(WaterFrames.ID, "control"));
 
     public static void init() {
-        // DATA
-        DATA.registerType(DataSyncPacket.class, DataSyncPacket::new);
-        DATA.registerType(PermLevelPacket.class, PermLevelPacket::new); // neoteam sucks
 
-        // CONTROLS
-        CONTROL.registerType(ActivePacket.class, ActivePacket::new);
-        CONTROL.registerType(LoopPacket.class, LoopPacket::new);
-        CONTROL.registerType(MutePacket.class, MutePacket::new);
-        CONTROL.registerType(PausePacket.class, PausePacket::new);
-        CONTROL.registerType(TimePacket.class, TimePacket::new);
-        CONTROL.registerType(VolumePacket.class, VolumePacket::new);
-        CONTROL.registerType(VolumeRangePacket.class, VolumeRangePacket::new);
     }
 
     public static void sendClient(CreativePacket packet, Level level, BlockPos pos) {

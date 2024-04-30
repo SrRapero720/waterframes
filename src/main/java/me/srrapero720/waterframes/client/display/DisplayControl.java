@@ -1,16 +1,27 @@
 package me.srrapero720.waterframes.client.display;
 
+import me.srrapero720.waterframes.WaterFrames;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
+@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@OnlyIn(Dist.CLIENT)
 public class DisplayControl {
     private static final Marker IT = MarkerManager.getMarker("DisplayControl");
-    private static final Integer DEFAULT_SIZE = 32;
-    static final int SYNC_TIME = 1500;
+    public static final Integer DEFAULT_SIZE = 32;
+    public static final int SYNC_TIME = 1500;
 
     private static volatile TextureDisplay[] displays = new TextureDisplay[DEFAULT_SIZE];
     private static int position = 0;
     private static boolean checkSize = false;
+    private static long ticks = 0;
 
     public static void add(TextureDisplay display) {
         if (checkSize) {
@@ -80,5 +91,22 @@ public class DisplayControl {
             }
         }
         return freshPosition;
+    }
+
+    public static void tick() {
+        if (++ticks == Long.MAX_VALUE) ticks = 0;
+    }
+
+    public static long getTicks() { return ticks; }
+
+    @SubscribeEvent
+    public static void onUnloadingLevel(WorldEvent.Unload event) {
+        LevelAccessor level = event.getWorld();
+        if (level != null && level.isClientSide()) DisplayControl.release();
+    }
+
+    @SubscribeEvent
+    public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
+        if (event.phase == TickEvent.Phase.END) DisplayControl.tick();
     }
 }
