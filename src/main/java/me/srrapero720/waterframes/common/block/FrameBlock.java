@@ -33,7 +33,6 @@ public class FrameBlock extends DisplayBlock {
     public static final float THICKNESS = 0.0625F / 2F;
 
     public FrameBlock() {
-        super(Properties.of(Material.METAL).strength(1f).sound(SoundType.METAL).noOcclusion());
         this.registerDefaultState(defaultBlockState().setValue(VISIBLE, false));
     }
 

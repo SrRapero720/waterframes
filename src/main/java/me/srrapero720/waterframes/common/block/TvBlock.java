@@ -34,7 +34,6 @@ public class TvBlock extends DisplayBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public TvBlock() {
-        super(Properties.of(Material.METAL).strength(1f).sound(SoundType.METAL).noOcclusion());
     }
 
     @Override

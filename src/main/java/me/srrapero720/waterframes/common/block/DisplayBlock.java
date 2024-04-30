@@ -26,6 +26,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.phys.BlockHitResult;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
@@ -42,8 +44,15 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
 
-    protected DisplayBlock(Properties pProperties) {
-        super(pProperties);
+    protected DisplayBlock() {
+        super(Properties.of(new Material.Builder(MaterialColor.NONE).destroyOnPush().build())
+                .strength(4f)
+                .sound(SoundType.METAL)
+                .noOcclusion()
+                .isSuffocating(Blocks::never)
+                .dynamicShape()
+                .requiresCorrectToolForDrops()
+        );
         this.registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false));
     }
 

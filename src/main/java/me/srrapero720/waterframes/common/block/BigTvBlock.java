@@ -28,7 +28,6 @@ public class BigTvBlock extends DisplayBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public BigTvBlock() {
-        super(Properties.of(Material.METAL).strength(1f).sound(SoundType.METAL).noOcclusion());
     }
 
     @Override

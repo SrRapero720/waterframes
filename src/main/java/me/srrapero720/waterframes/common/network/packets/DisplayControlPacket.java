@@ -38,7 +38,7 @@ public abstract class DisplayControlPacket extends CreativePacket {
 
     @Override
     public void execute(Player player) {
-        if (player.getLevel().getBlockEntity(pos) instanceof DisplayTile tile) {
+        if (player.level.getBlockEntity(pos) instanceof DisplayTile tile) {
             this.execute(tile, player.level.isClientSide);
         } else {
             LOGGER.error("Received packet pointing to the invalid DisplayTile position {}", pos);

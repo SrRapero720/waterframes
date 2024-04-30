@@ -32,7 +32,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class ProjectorBlock extends DisplayBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public ProjectorBlock() {
-        super(Properties.of(Material.METAL).strength(2f).sound(SoundType.METAL).noOcclusion());
     }
 
     @Override
