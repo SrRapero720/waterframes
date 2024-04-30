@@ -288,7 +288,7 @@ public class WFConfig {
         if (isAdmin(player)) return true;
 
         try {
-            return isWhiteListed(url);
+            return url.isEmpty() || isWhiteListed(url);
         } catch (Exception e) {
             return false;
         }
