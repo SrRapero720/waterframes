@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "waterframes:projector"
+    "waterframes:frame",
+    "waterframes:projector",
+    "waterframes:tv",
+    "waterframes:big_tv"
   ]
 }
