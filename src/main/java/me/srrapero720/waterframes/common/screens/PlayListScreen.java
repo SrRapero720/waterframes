@@ -9,15 +9,15 @@ import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.WidgetPlaylistEntry;
 import me.srrapero720.waterframes.common.screens.widgets.WidgetURLTextField;
 import net.minecraft.ChatFormatting;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.gui.Align;
-import team.creative.creativecore.common.gui.GuiChildControl;
+import team.creative.creativecore.common.gui.GuiControl;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.GuiParent;
-import team.creative.creativecore.common.gui.controls.parent.GuiScrollY;
-import team.creative.creativecore.common.gui.controls.simple.GuiButtonIcon;
-import team.creative.creativecore.common.gui.controls.simple.GuiCheckButtonIcon;
+import team.creative.creativecore.common.gui.control.parent.GuiScrollY;
+import team.creative.creativecore.common.gui.control.simple.GuiButtonIcon;
+import team.creative.creativecore.common.gui.control.simple.GuiCheckButtonIcon;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
@@ -52,19 +52,19 @@ public class PlayListScreen extends GuiLayer {
         this.urls = new ArrayList<>();
         this.scrollY = new GuiScrollY("parent_scroll");
         this.list = new GuiParent(GuiFlow.STACK_Y);
-        this.scrollY.addControl(list);
+        this.scrollY.add(list);
         this.setSpacing(4);
 
-        // Load existing URLs from tile
-        for (String url : tile.data.urls) {
-            this.list.addControl(new WidgetPlaylistEntry(tile, this.urls, url));
+        // LOAD EXISTING URLS FROM TILE
+        for (String url: tile.data.urls) {
+            this.list.add(new WidgetPlaylistEntry(tile, this.urls, url));
         }
 
         this.urlTextField = new WidgetURLTextField(null);
         this.addButton = new GuiButtonIcon("add", IconStyles.ADD, mouse -> {
             String url = urlTextField.getUrl();
             if (url != null && urlTextField.isUrlValid()) {
-                this.list.addControl(new WidgetPlaylistEntry(tile, this.urls, url));
+                this.list.add(new WidgetPlaylistEntry(tile, this.urls, url));
                 this.urlTextField.setText("");
                 this.reflow();
             }
@@ -83,8 +83,8 @@ public class PlayListScreen extends GuiLayer {
      */
     public List<String> getUrls() {
         List<String> urls = new ArrayList<>();
-        for (GuiChildControl control : this.list) {
-            if (control.control instanceof WidgetPlaylistEntry element) {
+        for (GuiControl control: this.list) {
+            if (control instanceof WidgetPlaylistEntry element) {
                 urls.add(element.url);
             }
         }

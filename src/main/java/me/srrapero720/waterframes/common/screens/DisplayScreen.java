@@ -12,11 +12,11 @@ import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
 import team.creative.creativecore.common.gui.*;
-import team.creative.creativecore.common.gui.controls.simple.*;
+import team.creative.creativecore.common.gui.control.simple.*;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.parser.DoubleValueParser;
 import team.creative.creativecore.common.gui.parser.IntValueParser;
@@ -24,7 +24,6 @@ import team.creative.creativecore.common.gui.parser.LongValueParser;
 import team.creative.creativecore.common.gui.style.ControlFormatting;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
-import team.creative.creativecore.common.util.math.geo.Rect;
 import team.creative.creativecore.common.util.type.Color;
 
 import java.math.BigDecimal;
@@ -108,14 +107,14 @@ public class DisplayScreen extends GuiLayer {
 
         this.widthField.buttons.setVAlign(VAlign.STRETCH);
         this.widthField.get("value").setTooltip("waterframes.common.width");
-        this.widthField.addControl(resize_y.setDim(16, 16));
+        this.widthField.add(resize_y.setDim(16, 16));
 
         this.heightField = new GuiCounterDecimal("height", BigDecimal.valueOf(tile.data.getHeight()).setScale(2, RoundingMode.CEILING).doubleValue(), 0.1, DisplaysConfig.maxHeight(), ControlFormatting.CLICKABLE_NO_PADDING);
         this.heightField.setSpacing(0).setStep(SCALE).setAlign(Align.STRETCH).setVAlign(VAlign.STRETCH);
 
         this.heightField.buttons.setVAlign(VAlign.STRETCH);
         this.heightField.get("value").setTooltip("waterframes.common.height");
-        this.heightField.addControl(resize_x.setDim(16, 16));
+        this.heightField.add(resize_x.setDim(16, 16));
 
         this.flip_x = new GuiCheckBox(DisplayData.FLIP_X, tile.data.flipX);
         this.flip_y = new GuiCheckBox(DisplayData.FLIP_Y, tile.data.flipY);
@@ -159,7 +158,7 @@ public class DisplayScreen extends GuiLayer {
 
         this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax, LongValueParser.TIME_DURATION_TICK) {
             @Override
-            public boolean mouseScrolled(Rect rect, double x, double y, double scrolled) {
+            public boolean mouseScrolled(double x, double y, double scrolled) {
                 if (scrolled > 0.0f) {
                     tile.fastFoward(true);
                 } else {

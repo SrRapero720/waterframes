@@ -11,8 +11,8 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import org.joml.Matrix4f;
-import team.creative.creativecore.common.gui.GuiChildControl;
-import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
+import team.creative.creativecore.client.render.GuiRenderHelper;
+import team.creative.creativecore.common.gui.control.simple.GuiIcon;
 import team.creative.creativecore.common.util.math.geo.Rect;
 
 import java.util.ArrayList;
@@ -29,13 +29,13 @@ public class WidgetClickableArea extends GuiIcon {
     }
 
     @Override
-    protected void renderContent(GuiGraphics guiGraphics, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
-        PoseStack pose = guiGraphics.pose();
-        super.renderContent(guiGraphics, control, rect, mouseX, mouseY);
-        this.renderSelector(pose, control, rect, mouseX, mouseY);
+    protected void renderContent(GuiGraphics graphics, Rect control, Rect rect, double scale, int mouseX, int mouseY) {
+        super.renderContent(graphics, control, rect, scale, mouseX, mouseY);
+        this.renderSelector(graphics, control, rect, mouseX, mouseY);
     }
 
-    protected void renderSelector(PoseStack pose, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
+    protected void renderSelector(GuiGraphics graphics, Rect control, Rect rect, int mouseX, int mouseY) {
+        PoseStack pose = graphics.pose();
         var icon = IconStyles.POS_ICON;
         float width = ((float) rect.getWidth()) / 3f;
         float height = ((float) rect.getWidth()) / 3f;
@@ -75,29 +75,28 @@ public class WidgetClickableArea extends GuiIcon {
         v2 = (icon.minY() + icon.height()) / 256f;
 
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
-        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferbuilder.vertex(matrix, x, y2, 0).uv(u, v2).endVertex();
-        bufferbuilder.vertex(matrix, x2, y2, 0).uv(u2, v2).endVertex();
-        bufferbuilder.vertex(matrix, x2, y, 0).uv(u2, v).endVertex();
-        bufferbuilder.vertex(matrix, x, y, 0).uv(u, v).endVertex();
-        Tesselator.getInstance().end();
+        BufferBuilder bufferbuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        bufferbuilder.addVertex(matrix, x, y2, 0).setUv(u, v2);
+        bufferbuilder.addVertex(matrix, x2, y2, 0).setUv(u2, v2);
+        bufferbuilder.addVertex(matrix, x2, y, 0).setUv(u2, v);
+        bufferbuilder.addVertex(matrix, x, y, 0).setUv(u, v);
+        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
 
         RenderSystem.disableBlend();
         pose.popPose();
     }
 
     @Override
-    public boolean mouseClicked(Rect rect, double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         playSound(SoundEvents.UI_BUTTON_CLICK);
         this.selected = true;
-        this.mouseMoved(rect, mouseX, mouseY);
+        this.mouseMoved(mouseX, mouseY);
         return true;
     }
 
     @Override
-    public void mouseMoved(Rect rect, double mouseX, double mouseY) {
-        super.mouseMoved(rect, mouseX, mouseY);
+    public void mouseMoved(double mouseX, double mouseY) {
+        super.mouseMoved(mouseX, mouseY);
         if (selected) {
             int areaX = (int) (mouseX / rect.getWidth() * 3d);
             int areaY = (int) (mouseY / rect.getHeight() * 3d);
@@ -120,9 +119,9 @@ public class WidgetClickableArea extends GuiIcon {
     }
 
     @Override
-    public void mouseReleased(Rect rect, double x, double y, int button) {
+    public void mouseReleased(double x, double y, int button) {
         this.selected = false;
-        super.mouseReleased(rect, x, y, button);
+        super.mouseReleased(x, y, button);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.common.block;
 
+import com.mojang.serialization.MapCodec;
 import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.common.block.entity.TVBoxTile;
 import net.minecraft.core.BlockPos;
@@ -7,8 +8,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -16,13 +19,14 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.server.permission.nodes.PermissionNode;
+import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
 import org.jetbrains.annotations.Nullable;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 public class TVBoxBlock extends DisplayBlock {
+    public static final MapCodec<TVBoxBlock> CODEC = simpleCodec(TVBoxBlock::new);
     private static final AlignedBox STATIC_BOX = new AlignedBox();
     protected static final Properties TV_BOX_PROPERTIES = Properties.of()
             .strength(1f)
@@ -30,6 +34,12 @@ public class TVBoxBlock extends DisplayBlock {
 
     public TVBoxBlock() {
         super(TV_BOX_PROPERTIES);
+    }
+    public TVBoxBlock(BlockBehaviour.Properties p) {}
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
     }
 
     @Override
