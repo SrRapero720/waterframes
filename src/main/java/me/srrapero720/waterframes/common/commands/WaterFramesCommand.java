@@ -19,9 +19,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -37,8 +36,8 @@ import java.util.List;
 
 public class WaterFramesCommand {
     private static final Marker IT = MarkerManager.getMarker("Commands");
-    public static final Component ACTIVATED = new TranslatableComponent("waterframes.common.activated");
-    public static final Component DEACTIVATED = new TranslatableComponent("waterframes.common.deactivated");
+    public static final Component ACTIVATED = Component.translatable("waterframes.common.activated");
+    public static final Component DEACTIVATED = Component.translatable("waterframes.common.deactivated");
 
     public static ItemInput[] DEFAULT_INPUTS = new ItemInput[0];
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -186,11 +185,11 @@ public class WaterFramesCommand {
         );
 
         DEFAULT_INPUTS = new ItemInput[] {
-                new ItemInput(WFRegistry.REMOTE_ITEM.get(), null),
-                new ItemInput(WFRegistry.FRAME_ITEM.get(), null),
-                new ItemInput(WFRegistry.PROJECTOR_ITEM.get(), null),
-                new ItemInput(WFRegistry.TV_ITEM.get(), null),
-                new ItemInput(WFRegistry.BIG_TV_ITEM.get(), null),
+                new ItemInput(Holder.direct(WFRegistry.REMOTE_ITEM.get()), null),
+                new ItemInput(Holder.direct(WFRegistry.FRAME_ITEM.get()), null),
+                new ItemInput(Holder.direct(WFRegistry.PROJECTOR_ITEM.get()), null),
+                new ItemInput(Holder.direct(WFRegistry.TV_ITEM.get()), null),
+                new ItemInput(Holder.direct(WFRegistry.BIG_TV_ITEM.get()), null),
         };
 
         dispatcher.register(waterframes);
@@ -315,7 +314,7 @@ public class WaterFramesCommand {
                 source.sendFailure(msgFailed("waterframes.commands.audit.author.failed", tile.data.uuid.toString()));
                 return 2;
             }
-            source.sendSuccess(msgSuccess("waterframes.commands.audit.author", new TextComponent(profiler.get().getName()).withStyle(ChatFormatting.AQUA)), true);
+            source.sendSuccess(msgSuccess("waterframes.commands.audit.author", Component.literal(profiler.get().getName()).withStyle(ChatFormatting.AQUA)), true);
         }
         return 0;
     }
@@ -438,23 +437,23 @@ public class WaterFramesCommand {
     }
 
     private static Component msgFailed(String t) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.RED));
+        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.RED));
     }
 
     private static Component msgFailed(String t, String t2) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t, t2).withStyle(ChatFormatting.RED));
+        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t, t2).withStyle(ChatFormatting.RED));
     }
 
     private static Component msgSuccess(String t) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN));
+        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.GREEN));
     }
 
     private static Component msgSuccess(String t, Component c) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN).append(c));
+        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.GREEN).append(c));
     }
 
     private static Component msgSuccess(String t, String... a) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
+        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
     }
 
     public static boolean hasPermissions(CommandSourceStack sourceStack) {
