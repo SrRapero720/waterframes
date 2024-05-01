@@ -1,7 +1,5 @@
 package me.srrapero720.waterframes;
 
-import com.simibubi.create.Create;
-import com.simibubi.create.foundation.ModFilePackResources;
 import me.srrapero720.waterframes.client.rendering.DisplayRenderer;
 import me.srrapero720.waterframes.common.block.*;
 import me.srrapero720.waterframes.common.block.entity.*;
@@ -26,12 +24,14 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import net.minecraftforge.resource.PathResourcePack;
+import org.jetbrains.annotations.NotNull;
 
+import java.nio.file.Path;
 import java.util.function.Supplier;
 
 import static me.srrapero720.waterframes.common.network.DisplayNetwork.*;
@@ -108,17 +108,16 @@ public class WFRegistry {
         @SubscribeEvent
         public static void init(FMLClientSetupEvent e) {
             if (ModList.get().getModFileById("stellarity") != null) {
-                throw new UnsupportedModException("stellarity", "breaks picture rendering (idk how but is unfixable");
+                throw new UnsupportedModException("stellarity", "breaks picture rendering (idk how but is unfixable)");
             }
         }
 
         @SubscribeEvent
         public static void registerResourcePacks(AddPackFindersEvent e) {
             if (e.getPackType() == PackType.CLIENT_RESOURCES) {
-                IModFileInfo modFileInfo = ModList.get().getModFileById(ID);
-                IModFile modFile = modFileInfo.getFile();
+                IModFile modFile = ModList.get().getModFileById(ID).getFile();
                 e.addRepositorySource((consumer, constructor) ->
-                        consumer.accept(Pack.create(ID + "/voxeloper", false, () -> new ModFilePackResources("WaterFrames: Voxeloper", modFile, "resourcepacks/wf_voxeloper"), constructor, Pack.Position.TOP, PackSource.DEFAULT))
+                        consumer.accept(Pack.create(ID + "/voxeloper", false, () -> new ModPackResources("WaterFrames: Voxeloper", modFile, "resourcepacks/wf_voxeloper"), constructor, Pack.Position.TOP, PackSource.DEFAULT))
                 );
             }
         }
@@ -150,4 +149,24 @@ public class WFRegistry {
             super(String.format(MSG_REASON_ALT, modid, ID, reason, alternatives));
         }
     }
+
+    public static class ModPackResources extends PathResourcePack {
+        protected final IModFile modFile;
+        protected final String sourcePath;
+
+        public ModPackResources(String name, IModFile modFile, String sourcePath) {
+            super(name, modFile.findResource(sourcePath));
+            this.modFile = modFile;
+            this.sourcePath = sourcePath;
+        }
+
+        @NotNull
+        protected Path resolve(String... paths) {
+            String[] allPaths = new String[paths.length + 1];
+            allPaths[0] = this.sourcePath;
+            System.arraycopy(paths, 0, allPaths, 1, paths.length);
+            return this.modFile.findResource(allPaths);
+        }
+    }
+
 }
