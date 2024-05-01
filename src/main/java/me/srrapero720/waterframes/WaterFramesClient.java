@@ -12,6 +12,7 @@ import static me.srrapero720.waterframes.WaterFrames.ID;
 import static me.srrapero720.waterframes.WaterFrames.LOADING_ANIMATION;
 
 public class WaterFramesClient implements ClientModInitializer {
+
     @Override
     public void onInitializeClient() {
         WFRegistry.initClient();

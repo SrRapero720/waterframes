@@ -4,6 +4,7 @@ import me.srrapero720.waterframes.common.compat.creativecore.IScalableText;
 import net.minecraft.client.gui.GuiGraphics;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.GuiGraphics;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

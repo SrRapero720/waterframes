@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.client.rendering;
 
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.Tesselator;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
@@ -11,6 +12,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.util.math.base.Axis;
@@ -115,13 +117,12 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
     public void vertex(PoseStack pose, VertexConsumer builder, AlignedBox box, BoxFace boxface, BoxCorner corner, Facing facing, int packedLight, int packedOverlay, boolean flipX, boolean flipY, int r, int g, int b, int a) {
         Vec3i normal = facing.normal;
-        builder.vertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
-                .color(r, g, b, a)
-                .uv(corner.isFacing(boxface.getTexU()) != flipX ? 1f : 0f, corner.isFacing(boxface.getTexV()) != flipY ? 1f : 0f)
-                .uv2(packedLight)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .normal(pose.last().normal(), normal.getX(), normal.getY(), normal.getZ())
-                .endVertex();
+        builder.addVertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
+                .setColor(r, g, b, a)
+                .setUv(corner.isFacing(boxface.getTexU()) != flipX ? 1f : 0f, corner.isFacing(boxface.getTexV()) != flipY ? 1f : 0f)
+                .setLight(packedLight)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setNormal(pose.last(), normal.getX(), normal.getY(), normal.getZ());
     }
 
     public AlignedBox getLoadingBox(DisplayTile tile, AlignedBox parent, Facing facing) {

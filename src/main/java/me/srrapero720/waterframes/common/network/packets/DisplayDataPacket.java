@@ -32,12 +32,16 @@ public abstract class DisplayDataPacket extends CreativePacket {
     @Override
     @Deprecated
     public void executeClient(Player player) {
-        throw new UnsupportedOperationException("No-op");
+        if (player.level.getBlockEntity(pos) instanceof DisplayTile tile) {
+            this.execClient(tile, player);
+        }
     }
 
     @Override
     @Deprecated
-    public void executeServer(ServerPlayer serverPlayer) {
-        throw new UnsupportedOperationException("No-op");
+    public void executeServer(ServerPlayer player) {
+        if (player.level.getBlockEntity(pos) instanceof DisplayTile tile) {
+            this.execServer(tile, player);
+        }
     }
 }

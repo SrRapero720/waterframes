@@ -14,7 +14,7 @@ base {
 }
 
 java.toolchain {
-    languageVersion = JavaLanguageVersion.of(17)
+    languageVersion = JavaLanguageVersion.of(21)
 }
 
 println "Java: ${System.getProperty 'java.version'}, Gradle Java: ${JavaVersion.current()}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
@@ -63,7 +63,7 @@ dependencies {
     minecraft "com.mojang:minecraft:$mcversion"
     mappings loom.layered() {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-$mcversion:$mappings_version@zip")
+//        parchment("org.parchmentmc.data:parchment-$mcversion:$mappings_version@zip")
     }
     modImplementation "net.fabricmc:fabric-loader:${flversion}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricversion}"

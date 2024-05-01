@@ -19,10 +19,7 @@ public class DisplayNetwork {
     public static final CreativeNetwork NET = new CreativeNetwork(2, LOGGER, new ResourceLocation(WaterFrames.ID, "network"));
 
     public static void sendClient(CreativePacket packet, Level level, BlockPos pos) {
-        for (ServerPlayer player: (List<ServerPlayer>) level.players()) {
-            NET.sendToClient(packet, player);
-        }
-//        DATA.sendToClient(packet, level, pos);
+        NET.sendToClient(packet, level, pos);
     }
 
     public static void sendClient(CreativePacket packet, ServerPlayer player) {
@@ -34,9 +31,7 @@ public class DisplayNetwork {
     }
 
     public static void sendClient(DisplayDataPacket packet, DisplayTile tile) {
-        for (ServerPlayer player: (List<ServerPlayer>) tile.getLevel().players()) {
-            NET.sendToClient(packet, player);
-        }
+        NET.sendToClient(packet, tile.getLevel(), tile.getBlockPos());
     }
 
     public static void sendServer(DisplayDataPacket packet) {
@@ -48,10 +43,7 @@ public class DisplayNetwork {
             packet.bounce = false;
             packet.execute(tile, false);
         }
-        for (ServerPlayer player: (List<ServerPlayer>) tile.getLevel().players()) {
-            NET.sendToClient(packet, player);
-        }
-//        NET.sendToClient(packet, tile.getLevel().getChunkAt(packet.pos));
+        NET.sendToClient(packet, tile.getLevel(), tile.getBlockPos());
     }
 
     public static void sendServer(DisplayControlPacket packet) {

@@ -5,7 +5,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.compat.valkyrienskies.VSCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -65,7 +64,7 @@ public class WaterFrames implements ModInitializer {
 
     @Environment(EnvType.CLIENT)
     public static float deltaFrames() {
-        return Minecraft.getInstance().isPaused() ? 1.0F : Minecraft.getInstance().getFrameTime();
+        return Minecraft.getInstance().isPaused() ? 1.0F : Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
     }
 
     @Environment(EnvType.CLIENT)

@@ -5,6 +5,8 @@ import me.srrapero720.waterframes.common.block.*;
 import me.srrapero720.waterframes.common.block.entity.*;
 import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
+import me.srrapero720.waterframes.common.item.data.CodecManager;
+import me.srrapero720.waterframes.common.item.data.RemoteData;
 import me.srrapero720.waterframes.common.network.packets.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -13,10 +15,11 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -27,6 +30,11 @@ import static me.srrapero720.waterframes.common.network.DisplayNetwork.*;
 import static me.srrapero720.waterframes.WaterFrames.*;
 
 public class WFRegistry {
+    /* DATA */
+    public static final DataComponentType<RemoteData> REMOTE_DATA = Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, resloc("remote"), new DataComponentType.Builder<RemoteData>()
+            .persistent(CodecManager.REMOTE_CODEC)
+            .networkSynchronized(CodecManager.REMOTE_STREAM_CODEC)
+            .build());
 
     /* BLOCKS */
     public static final DisplayBlock
