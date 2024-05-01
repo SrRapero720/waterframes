@@ -6,37 +6,41 @@ import me.srrapero720.waterframes.common.block.*;
 import me.srrapero720.waterframes.common.block.entity.*;
 import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
+import me.srrapero720.waterframes.common.item.data.CodecManager;
+import me.srrapero720.waterframes.common.item.data.RemoteData;
 import me.srrapero720.waterframes.common.network.packets.*;
-import net.minecraftforge.server.permission.PermissionAPI;
-import net.minecraftforge.server.permission.events.PermissionGatherEvent;
-import net.minecraftforge.server.permission.nodes.PermissionNode;
-import net.minecraftforge.server.permission.nodes.PermissionTypes;
+import net.neoforged.neoforge.server.permission.PermissionAPI;
+import net.neoforged.neoforge.server.permission.events.PermissionGatherEvent;
+import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
+import net.neoforged.neoforge.server.permission.nodes.PermissionTypes;
 import org.watermedia.api.image.ImageAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -45,24 +49,32 @@ import static me.srrapero720.waterframes.common.network.DisplayNetwork.*;
 import static me.srrapero720.waterframes.WaterFrames.*;
 import static org.watermedia.WaterMedia.IT;
 
-@Mod.EventBusSubscriber(modid = ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ID, bus = EventBusSubscriber.Bus.GAME)
 public class DisplaysRegistry {
     private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ID);
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
-    private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ID);
-    private static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ID);
+    private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ID);
+    private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(ID);
+    private static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ID);
+    public static final DeferredRegister<DataComponentType<?>> DATA = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, ID);
+
+    /* DATA */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<RemoteData>> REMOTE_DATA = DATA.register("remote", () -> new DataComponentType.Builder<RemoteData>()
+                    .persistent(CodecManager.REMOTE_CODEC)
+                    .networkSynchronized(CodecManager.REMOTE_STREAM_CODEC)
+                    .build()
+    );
 
     /* BLOCKS */
-    public static final RegistryObject<DisplayBlock>
-            FRAME = BLOCKS.register("frame", FrameBlock::new),
-            PROJECTOR = BLOCKS.register("projector", ProjectorBlock::new),
-            TV = BLOCKS.register("tv", TvBlock::new),
-            BIG_TV = BLOCKS.register("big_tv", BigTvBlock::new),
-            TV_BOX = BLOCKS.register("tv_box", TVBoxBlock::new);
+    public static final DeferredBlock<DisplayBlock>
+            FRAME = BLOCKS.register("frame", () -> new FrameBlock()),
+            PROJECTOR = BLOCKS.register("projector", () -> new ProjectorBlock()),
+            TV = BLOCKS.register("tv", () -> new TvBlock()),
+            BIG_TV = BLOCKS.register("big_tv", () -> new BigTvBlock()),
+            TV_BOX = BLOCKS.register("tv_box", () -> new TVBoxBlock());
 //            GOLDEN_PROJECTOR = BLOCKS.register("golden_projector", ProjectorBlock::new);
 
     /* ITEMS */
-    public static final RegistryObject<Item>
+    public static final DeferredItem<Item>
             REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(remoteProp())),
             FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), prop())),
             PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), prop())),
@@ -72,7 +84,7 @@ public class DisplaysRegistry {
 //            GOLDEN_PROJECTOR_ITEM = ITEMS.register("golden_projector", () -> new BlockItem(GOLDEN_PROJECTOR.get(), prop().tab(null)));
 
     /* TILES */
-    public static final RegistryObject<BlockEntityType<DisplayTile>>
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DisplayTile>>
             TILE_FRAME = tile("frame", FrameTile::new, FRAME),
             TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR),
             TILE_TV = tile("tv", TvTile::new, TV),
@@ -81,7 +93,7 @@ public class DisplaysRegistry {
 //            TILE_GOLDEN_PROJECTOR = tile("golden_projector", ProjectorTile::new, GOLDEN_PROJECTOR);
 
     /* TABS */
-    public static final RegistryObject<CreativeModeTab> WATERTAB = TABS.register("tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WATERTAB = TABS.register("tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
             .icon(() -> new ItemStack(FRAME.get()))
             .title(Component.translatable("itemGroup.waterframes"))
             .build()
@@ -108,7 +120,7 @@ public class DisplaysRegistry {
         return PermissionAPI.getOfflinePermission(player, node);
     }
 
-    private static RegistryObject<BlockEntityType<DisplayTile>> tile(String name, BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
+    private static DeferredHolder<BlockEntityType<?>, BlockEntityType<DisplayTile>> tile(String name, BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
         return TILES.register(name, () -> BlockEntityType.Builder.of(creator, block.get()).build(null));
     }
 
@@ -120,7 +132,8 @@ public class DisplaysRegistry {
         return new Item.Properties().stacksTo(16).rarity(Rarity.RARE);
     }
 
-    public static void init(IEventBus bus) {
+    public static void init(IEventBus bus, ModContainer container) {
+        DATA.register(bus);
         BLOCKS.register(bus);
         ITEMS.register(bus);
         TILES.register(bus);
@@ -162,7 +175,7 @@ public class DisplaysRegistry {
         Minecraft.getInstance().getTextureManager().release(location);
     }
 
-    @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = WaterFrames.ID, bus = EventBusSubscriber.Bus.MOD)
     public static class ModEvents {
         @SubscribeEvent
         public static void onCreativeTabsLoading(BuildCreativeModeTabContentsEvent event) {

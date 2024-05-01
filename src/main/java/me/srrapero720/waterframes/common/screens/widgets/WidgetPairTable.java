@@ -3,9 +3,9 @@ package me.srrapero720.waterframes.common.screens.widgets;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.GuiControl;
 import team.creative.creativecore.common.gui.VAlign;
-import team.creative.creativecore.common.gui.controls.parent.GuiColumn;
-import team.creative.creativecore.common.gui.controls.parent.GuiRow;
-import team.creative.creativecore.common.gui.controls.parent.GuiTable;
+import team.creative.creativecore.common.gui.control.parent.GuiColumn;
+import team.creative.creativecore.common.gui.control.parent.GuiRow;
+import team.creative.creativecore.common.gui.control.parent.GuiTable;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 
 import java.util.function.Consumer;
