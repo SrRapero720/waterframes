@@ -41,12 +41,11 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
-
-    private static final Material MATERIAL = new Material.Builder(MaterialColor.NONE).noCollider().build();
-    private static final Properties PROPERTIES = Properties.of(MATERIAL)
+    private static final Properties PROPERTIES = Properties.of()
             .strength(1f)
             .sound(SoundType.METAL)
             .noOcclusion()
+            .forceSolidOff()
             .isSuffocating(Blocks::never)
             .isViewBlocking(Blocks::never)
             .requiresCorrectToolForDrops();

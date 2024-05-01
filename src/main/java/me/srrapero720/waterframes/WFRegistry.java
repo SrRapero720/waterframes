@@ -7,6 +7,8 @@ import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.network.packets.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -15,6 +17,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -40,12 +43,10 @@ import static me.srrapero720.waterframes.WaterFrames.*;
 
 @Mod.EventBusSubscriber(modid = ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WFRegistry {
+    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ID);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
     public static final DeferredRegister<Block> BLOCKS =  DeferredRegister.create(ForgeRegistries.BLOCKS, ID);
     public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ID);
-    public static final CreativeModeTab TAB = new CreativeModeTab(ID) {
-        @Override public ItemStack makeIcon() { return new ItemStack(FRAME_ITEM.get()); }
-    };
 
     /* BLOCKS */
     public static final RegistryObject<DisplayBlock>
@@ -56,7 +57,7 @@ public class WFRegistry {
 
     /* ITEMS */
     public static final RegistryObject<Item>
-            REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties().tab(TAB))),
+            REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties())),
             FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), prop())),
             PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), prop())),
             TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), prop())),
@@ -69,18 +70,26 @@ public class WFRegistry {
             TILE_TV = tile("tv", TvTile::new, TV),
             TILE_BIG_TV = tile("big_tv", BigTvTile::new, BIG_TV);
 
+    /* TABS */
+    public static final RegistryObject<CreativeModeTab> WATERTAB = TABS.register("tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
+            .icon(() -> new ItemStack(FRAME.get()))
+            .title(Component.translatable("itemGroup.waterframes"))
+            .build()
+    );
+
     private static RegistryObject<BlockEntityType<DisplayTile>> tile(String name, BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
         return TILES.register(name, () -> BlockEntityType.Builder.of(creator, block.get()).build(null));
     }
 
     private static Item.Properties prop() {
-        return new Item.Properties().stacksTo(16).tab(TAB).rarity(Rarity.EPIC);
+        return new Item.Properties().stacksTo(16).rarity(Rarity.EPIC);
     }
 
     public static void init(IEventBus bus) {
         BLOCKS.register(bus);
         ITEMS.register(bus);
         TILES.register(bus);
+        TABS.register(bus);
     }
 
     @SubscribeEvent
@@ -90,6 +99,17 @@ public class WFRegistry {
 
     @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ModEvents {
+        @SubscribeEvent
+        public static void onCreativeTabsLoading(BuildCreativeModeTabContentsEvent event) {
+            if (event.getTabKey() == WATERTAB.getKey()) {
+                event.accept(REMOTE_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+                event.accept(FRAME_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+                event.accept(PROJECTOR_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+                event.accept(TV_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+                event.accept(BIG_TV_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            }
+        }
+
         @SubscribeEvent
         public static void init(FMLCommonSetupEvent event) {
             NET.registerType(DataSyncPacket.class, DataSyncPacket::new);
@@ -103,6 +123,7 @@ public class WFRegistry {
             NET.registerType(VolumeRangePacket.class, VolumeRangePacket::new);
         }
 
+        @OnlyIn(Dist.CLIENT)
         @SubscribeEvent
         public static void init(FMLClientSetupEvent e) {
             if (WaterFrames.isInstalled("mr_stellarity") && (WFConfig.isDevMode())) {
@@ -114,9 +135,12 @@ public class WFRegistry {
         public static void registerResourcePacks(AddPackFindersEvent e) {
             if (e.getPackType() == PackType.CLIENT_RESOURCES) {
                 IModFile modFile = ModList.get().getModFileById(ID).getFile();
-                e.addRepositorySource((consumer, constructor) ->
-                        consumer.accept(Pack.create(ID + "/voxeloper", false, () -> new ModPackResources("WaterFrames: Voxeloper", modFile, "resourcepacks/wf_voxeloper"), constructor, Pack.Position.TOP, PackSource.DEFAULT))
-                );
+                e.addRepositorySource(consumer -> {
+                    Pack pack = Pack.readMetaAndCreate(ID + "/voxeloper", Component.literal("WaterFrames: Voxeloper"), false, id -> new ModPackResources(id, modFile, "resourcepacks/wf_voxeloper"), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
+                    if (pack != null) {
+                        consumer.accept(pack);
+                    }
+                });
             }
         }
 
@@ -153,7 +177,7 @@ public class WFRegistry {
         protected final String sourcePath;
 
         public ModPackResources(String name, IModFile modFile, String sourcePath) {
-            super(name, modFile.findResource(sourcePath));
+            super(name, true, modFile.findResource(sourcePath));
             this.modFile = modFile;
             this.sourcePath = sourcePath;
         }
