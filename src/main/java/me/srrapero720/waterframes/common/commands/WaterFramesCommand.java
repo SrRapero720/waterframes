@@ -11,7 +11,7 @@ import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLLoader;
 import org.watermedia.api.image.ImageAPI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -21,6 +21,7 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,17 +31,18 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.server.command.EnumArgument;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.server.command.EnumArgument;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import java.net.URI;
 import java.util.*;
 
-import java.util.function.Supplier;
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
+import java.util.function.Supplier;
 public class WaterFramesCommand {
     private static final Marker IT = MarkerManager.getMarker("Commands");
     public static final Component ACTIVATED = Component.translatable("waterframes.common.activated");
@@ -206,12 +208,12 @@ public class WaterFramesCommand {
         );
 
         DEFAULT_INPUTS = new ItemInput[] {
-                new ItemInput(Holder.direct(DisplaysRegistry.REMOTE_ITEM.get()), null),
-                new ItemInput(Holder.direct(DisplaysRegistry.FRAME_ITEM.get()), null),
-                new ItemInput(Holder.direct(DisplaysRegistry.PROJECTOR_ITEM.get()), null),
-                new ItemInput(Holder.direct(DisplaysRegistry.TV_ITEM.get()), null),
-                new ItemInput(Holder.direct(DisplaysRegistry.BIG_TV_ITEM.get()), null),
-                new ItemInput(Holder.direct(DisplaysRegistry.TV_BOX_ITEM.get()), null),
+                new ItemInput(Holder.direct(DisplaysRegistry.REMOTE_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(DisplaysRegistry.FRAME_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(DisplaysRegistry.PROJECTOR_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(DisplaysRegistry.TV_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(DisplaysRegistry.BIG_TV_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(DisplaysRegistry.TV_BOX_ITEM.get()), DataComponentPatch.builder().build()),
         };
 
         dispatcher.register(waterframes);
@@ -372,7 +374,7 @@ public class WaterFramesCommand {
             return 2;
         }
 
-        tile.syncTime(FMLLoader.getDist().isClient(),tickTime, -1);
+        tile.syncTime(FMLLoader.getDist().isClient(), tickTime, -1);
 
 
         source.sendSuccess(msgSuccess("waterframes.commands.edit.settime.success"), true);

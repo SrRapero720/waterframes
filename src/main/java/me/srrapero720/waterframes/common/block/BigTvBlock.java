@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.common.block;
 
+import com.mojang.serialization.MapCodec;
 import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.common.block.entity.BigTvTile;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -8,13 +9,15 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.server.permission.nodes.PermissionNode;
+import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
@@ -22,6 +25,16 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 @SuppressWarnings("deprecation")
 @MethodsReturnNonnullByDefault
 public class BigTvBlock extends DisplayBlock {
+    public static final MapCodec<BigTvBlock> CODEC = simpleCodec(BigTvBlock::new);
+
+    public BigTvBlock() {}
+    public BigTvBlock(BlockBehaviour.Properties p) {}
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
+
     @Override
     public DirectionProperty getFacing() {
         return BlockStateProperties.HORIZONTAL_FACING;
