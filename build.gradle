@@ -1,10 +1,13 @@
+import net.darkhax.curseforgegradle.TaskPublishCurseForge
+
 plugins {
     id 'java'
     id 'idea'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id 'com.modrinth.minotaur' version '2.+'
+    id 'net.darkhax.curseforgegradle' version '1.1.+'
 }
 
 base {
@@ -95,10 +98,15 @@ dependencies {
     implementation fg.deobf("com.tterrag.registrate:Registrate:$registrateversion")
 }
 
+tasks.processResources.outputs.upToDateWhen { false }
 processResources {
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta', 'resourcepacks/**/pack.mcmeta', "$modid.$mixin_file_suffix".toString()]) {
         expand project.properties
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = 'UTF-8'
 }
 
 jar {
@@ -114,10 +122,62 @@ jar {
             "MixinConfigs": "$modid.$mixin_file_suffix"
         ])
     }
+    finalizedBy('reobfJar')
 }
 
-jar.finalizedBy('reobfJar')
-tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = 'UTF-8'
+task upload(type: GradleBuild) {
+    description 'Uploads new version to modrinth and curseforge.'
+    group = 'publishing'
+    tasks = [ 'curseforge', 'modrinth']
 }
-tasks.processResources.outputs.upToDateWhen { false }
+
+tasks.modrinth.enabled = System.getenv("MODRINTH_TOKEN") != null
+tasks.modrinth.group = 'publishing'
+modrinth {
+    token = System.getenv("MODRINTH_TOKEN")
+    versionName = modnamebig + "/" + mcversion + "/" + modversion
+    projectId = modrinthid
+    versionNumber = mcversion + "-" + modversion
+    versionType = versiontype
+    uploadFile = jar
+    gameVersions = [ mcversion ]
+    changelog = getChangelogText(true)
+    loaders = [ "forge", /*"neoforge"*/ ]
+    dependencies {
+        required.project "creativecore"
+        required.project "watermedia"
+        incompatible.project "stellarity"
+    }
+}
+
+task curseforge(type: TaskPublishCurseForge) {
+    disableVersionDetection()
+
+    apiToken = System.getenv("CURSEFORGE_TOKEN") != null ? System.getenv("CURSEFORGE_TOKEN") : "empty"
+
+    // MAIN FILE
+    def mainFile = upload(curseforgeid, jar)
+    mainFile.displayName = modnamebig + "/" + mcversion + "/" + modversion
+    mainFile.changelog = getChangelogText(false)
+    mainFile.changelogType = "markdown"
+    mainFile.addModLoader("Forge")
+    // mainFile.addModLoader("NeoForge")
+    mainFile.addGameVersion(mcversion, "server", "client")
+    mainFile.addRequirement("creativecore", "watermedia")
+    mainFile.addIncompatibility("fancyvideo-api", "stellarity")
+    mainFile.releaseType = versiontype
+}
+
+String getChangelogText(boolean latest) {
+    String result = ''
+    List<String> lines = file('CHANGELOG.md').readLines('UTF-8')
+
+    for (String line: lines) {
+        if (latest && line.isEmpty()) {
+            return result
+        }
+
+        result += line + "\n"
+    }
+    return result
+}
