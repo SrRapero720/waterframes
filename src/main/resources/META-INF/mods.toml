@@ -16,7 +16,6 @@ license="${modlicense}"
 	side="BOTH"
 	description='''${mod_description}'''
 
-
 [[dependencies.${modid}]]
 	modId="forge"
 	mandatory=true
@@ -37,3 +36,10 @@ license="${modlicense}"
 	ordering="AFTER"
 	side="CLIENT"
 	versionRange="${watermediarange}"
+
+[[dependencies.${modid}]]
+	modId="videoplayer"
+	mandatory=false
+	ordering="NONE"
+	side="CLIENT"
+	versionRange="${videoplayerrange}"

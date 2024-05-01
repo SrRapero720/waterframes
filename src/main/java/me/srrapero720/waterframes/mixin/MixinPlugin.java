@@ -18,22 +18,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
     @Override
     public boolean shouldApplyMixin(String target, String mixin) {
         if (target.endsWith("vp.VideoPlayerMixin")) {
-            var videoplayer = FMLLoader.getLoadingModList().getModFileById("videoplayer");
-
-            if (videoplayer != null) {
-                String[] versions = videoplayer.versionString().split("\\.");
-                try {
-                    if (versions.length < 2) return false;
-                    int major = Integer.parseInt(versions[0]);
-                    int middle = Integer.parseInt(versions[1]);
-                    int minor = (versions.length >= 3) ? Integer.parseInt(versions[3]) : -1;
-                    return major == 2 && middle > 3 && (middle <= 5 || middle == 6 && minor <= 0);
-                } catch (Exception e) {
-                    return false;
-                }
-            } else {
-                return false;
-            }
+            return FMLLoader.getLoadingModList().getModFileById("videoplayer") != null;
         }
         return true;
     }

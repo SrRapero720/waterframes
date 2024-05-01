@@ -19,7 +19,7 @@ java.toolchain {
 println "Gradle Java: ${JavaVersion.current()}"
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: mappingsch, version: "${mappings_version}-${mcversion}"
+    mappings channel: mappingsch, version: "$mappings_version-$mcversion"
     accessTransformer file('src/main/resources/META-INF/accesstransformer.cfg')
     copyIdeResources = true
 
@@ -30,10 +30,10 @@ minecraft {
             property 'log4j.appender.Console', "org.apache.log4j.ConsoleAppender"
             property 'terminal.jline', 'true'
             arg '--mixin.config'
-            arg "${modid}.${mixin_file_suffix}"
+            arg "$modid.$mixin_file_suffix"
 
             mods {
-                "${modid}" {
+                "$modid" {
                     source sourceSets.main
                 }
             }
@@ -49,8 +49,8 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 mixin {
-    add sourceSets.main, "${modid}.${mixin_refmap_suffix}"
-    config "${modid}.${mixin_file_suffix}"
+    add sourceSets.main, "$modid.$mixin_refmap_suffix"
+    config "$modid.$mixin_file_suffix"
 }
 
 repositories {
@@ -70,33 +70,33 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${project.mcversion}-${project.fgversion}"
+    minecraft "net.minecraftforge:forge:$mcversion-$fgversion"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     //DEPENDENCIES
     implementation fileTree('libs') { include '*.jar' }
-    implementation "com.github.SrRapero720.watermedia:build:${watermediaversion}"
-    implementation fg.deobf("curse.maven:video-player-645407:4782050")
+    implementation "com.github.SrRapero720.watermedia:build:$watermediaversion"
+    implementation fg.deobf("curse.maven:video-player-645407:$videoplayerversion")
 //    implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
 
     // UTIL
-    implementation fg.deobf("curse.maven:ferritecore-429235:${ferritecoreversion}")
-    implementation fg.deobf("curse.maven:fastload-630620:${fastloadversion}")
-    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:${lazyversion}")
-    implementation fg.deobf("curse.maven:spark-361579:${sparkversion}")
-    implementation fg.deobf("curse.maven:embeddium-908741:${embeddiumversion}")
-    implementation fg.deobf("curse.maven:worldedit-225608:3697298")
+    implementation fg.deobf("curse.maven:ferritecore-429235:$ferritecoreversion")
+    implementation fg.deobf("curse.maven:fastload-630620:$fastloadversion")
+    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:$lazyversion")
+    implementation fg.deobf("curse.maven:spark-361579:$sparkversion")
+    implementation fg.deobf("curse.maven:embeddium-908741:$embeddiumversion")
+    implementation fg.deobf("curse.maven:worldedit-225608:$weversion")
 //    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
-    implementation fg.deobf("curse.maven:jei-238222:5068328")
+    implementation fg.deobf("curse.maven:jei-238222:$jeiversion")
 
     // MOD SUPPORT
-    implementation fg.deobf("com.simibubi.create:create-${mcversion}:${createversion}:slim") { transitive = false }
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-${mcversion}:${flywheelversion}")
-    implementation fg.deobf("com.tterrag.registrate:Registrate:${registrateversion}")
+    implementation fg.deobf("com.simibubi.create:create-$mcversion:$createversion:slim") { transitive = false }
+    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-$mcversion:$flywheelversion")
+    implementation fg.deobf("com.tterrag.registrate:Registrate:$registrateversion")
 }
 
 processResources {
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta', 'resourcepacks/**/pack.mcmeta', "${modid}.${mixin_file_suffix}".toString()]) {
+    filesMatching(['META-INF/mods.toml', 'pack.mcmeta', 'resourcepacks/**/pack.mcmeta', "$modid.$mixin_file_suffix".toString()]) {
         expand project.properties
     }
 }
@@ -111,7 +111,7 @@ jar {
             "Implementation-Version"  : modversion,
             "Implementation-Vendor": modauthor,
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConfigs": "${modid}.${mixin_file_suffix}"
+            "MixinConfigs": "$modid.$mixin_file_suffix"
         ])
     }
 }
