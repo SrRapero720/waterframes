@@ -80,15 +80,15 @@ dependencies {
     implementation fileTree('libs') { include '*.jar' }
     implementation "com.github.SrRapero720.watermedia:build:$watermediaversion"
     implementation fg.deobf("curse.maven:video-player-645407:$videoplayerversion")
-//    implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
+    implementation fg.deobf("curse.maven:creativecore-257814:$creativecoreversion")
 
     // UTIL
     implementation fg.deobf("curse.maven:ferritecore-429235:$ferritecoreversion")
     implementation fg.deobf("curse.maven:fastload-630620:$fastloadversion")
-    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:$lazyversion")
+//    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:$lazyversion")
     implementation fg.deobf("curse.maven:spark-361579:$sparkversion")
     implementation fg.deobf("curse.maven:embeddium-908741:$embeddiumversion")
-    implementation fg.deobf("curse.maven:worldedit-225608:$weversion")
+//    implementation fg.deobf("curse.maven:worldedit-225608:$weversion")
 //    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
     implementation fg.deobf("curse.maven:jei-238222:$jeiversion")
 
@@ -142,7 +142,7 @@ modrinth {
     uploadFile = jar
     gameVersions = [ mcversion ]
     changelog = getChangelogText(true)
-    loaders = [ "forge", /*"neoforge"*/ ]
+    loaders = [ "forge", "neoforge" ]
     dependencies {
         required.project "creativecore"
         required.project "watermedia"
@@ -161,7 +161,7 @@ task curseforge(type: TaskPublishCurseForge) {
     mainFile.changelog = getChangelogText(false)
     mainFile.changelogType = "markdown"
     mainFile.addModLoader("Forge")
-    // mainFile.addModLoader("NeoForge")
+    mainFile.addModLoader("NeoForge")
     mainFile.addGameVersion(mcversion, "server", "client")
     mainFile.addRequirement("creativecore", "watermedia")
     mainFile.addIncompatibility("fancyvideo-api", "stellarity")

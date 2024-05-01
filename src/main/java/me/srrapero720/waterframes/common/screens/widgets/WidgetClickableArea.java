@@ -6,6 +6,7 @@ import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -27,8 +28,9 @@ public class WidgetClickableArea extends GuiIcon {
     }
 
     @Override
-    protected void renderContent(PoseStack pose, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
-        super.renderContent(pose, control, rect, mouseX, mouseY);
+    protected void renderContent(GuiGraphics guiGraphics, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
+        PoseStack pose = guiGraphics.pose();
+        super.renderContent(guiGraphics, control, rect, mouseX, mouseY);
         this.renderSelector(pose, control, rect, mouseX, mouseY);
     }
 
