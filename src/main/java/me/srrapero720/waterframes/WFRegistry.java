@@ -29,7 +29,7 @@ import net.minecraftforge.forgespi.locating.IModFile;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.minecraftforge.resource.PathResourcePack;
+import net.minecraftforge.resource.PathPackResources;
 import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
@@ -42,7 +42,7 @@ import static me.srrapero720.waterframes.WaterFrames.*;
 public class WFRegistry {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
     public static final DeferredRegister<Block> BLOCKS =  DeferredRegister.create(ForgeRegistries.BLOCKS, ID);
-    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, ID);
+    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ID);
     public static final CreativeModeTab TAB = new CreativeModeTab(ID) {
         @Override public ItemStack makeIcon() { return new ItemStack(FRAME_ITEM.get()); }
     };
@@ -151,7 +151,7 @@ public class WFRegistry {
         }
     }
 
-    public static class ModPackResources extends PathResourcePack {
+    public static class ModPackResources extends PathPackResources {
         protected final IModFile modFile;
         protected final String sourcePath;
 
