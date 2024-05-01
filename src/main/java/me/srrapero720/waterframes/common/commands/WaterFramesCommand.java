@@ -19,6 +19,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.server.command.EnumArgument;
 
+import java.util.function.Supplier;
+
 public class WaterFramesCommand {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var waterframes = Commands.literal("waterframes").requires(WaterFramesCommand::hasPermissions);
@@ -267,7 +269,7 @@ public class WaterFramesCommand {
                 source.sendFailure(msgFailed("waterframes.commands.audit.author.failed", tile.data.uuid.toString()));
                 return 2;
             }
-            source.sendSuccess(msgSuccess("waterframes.commands.audit.author", Component.literal(profiler.get().getName()).withStyle(ChatFormatting.AQUA)), true);
+            source.sendSuccess(() -> msgSuccess("waterframes.commands.audit.author", Component.literal(profiler.get().getName()).withStyle(ChatFormatting.AQUA)), true);
         }
         return 0;
     }
@@ -339,8 +341,8 @@ public class WaterFramesCommand {
         return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t, t2).withStyle(ChatFormatting.RED));
     }
 
-    private static Component msgSuccess(String t) {
-        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.GREEN));
+    private static Supplier<Component> msgSuccess(String t) {
+        return () -> Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.GREEN));
     }
 
     private static Component msgSuccess(String t, Component c) {
