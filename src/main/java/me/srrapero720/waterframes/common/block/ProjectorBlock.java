@@ -1,12 +1,15 @@
 package me.srrapero720.waterframes.common.block;
 
+import com.mojang.serialization.MapCodec;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -19,6 +22,17 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 @SuppressWarnings({"deprecation", "null"})
 @MethodsReturnNonnullByDefault
 public class ProjectorBlock extends DisplayBlock {
+
+    public static final MapCodec<ProjectorBlock> CODEC = simpleCodec(ProjectorBlock::new);
+
+    public ProjectorBlock() {}
+    public ProjectorBlock(BlockBehaviour.Properties p) {}
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
+
     @Override
     public DirectionProperty getFacing() {
         return BlockStateProperties.HORIZONTAL_FACING;
@@ -47,7 +61,7 @@ public class ProjectorBlock extends DisplayBlock {
     }
 
     @Override
-    protected void registerDefaultState(BlockState state) {
+    public void registerDefaultState(BlockState state) {
         super.registerDefaultState(state.setValue(VISIBLE, true));
     }
 

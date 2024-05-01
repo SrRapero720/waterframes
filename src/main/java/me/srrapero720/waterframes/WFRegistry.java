@@ -5,58 +5,63 @@ import me.srrapero720.waterframes.common.block.*;
 import me.srrapero720.waterframes.common.block.entity.*;
 import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
+import me.srrapero720.waterframes.common.item.data.CodecManager;
+import me.srrapero720.waterframes.common.item.data.RemoteData;
 import me.srrapero720.waterframes.common.network.packets.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.event.AddPackFindersEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.forgespi.locating.IModFile;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
-import net.minecraftforge.resource.PathPackResources;
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforgespi.locating.IModFile;
 
-import java.nio.file.Path;
 import java.util.function.Supplier;
 
 import static me.srrapero720.waterframes.common.network.DisplayNetwork.*;
 import static me.srrapero720.waterframes.WaterFrames.*;
 
-@Mod.EventBusSubscriber(modid = ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = ID, bus = EventBusSubscriber.Bus.GAME)
 public class WFRegistry {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ID);
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
-    public static final DeferredRegister<Block> BLOCKS =  DeferredRegister.create(ForgeRegistries.BLOCKS, ID);
-    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ID);
+    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ID);
+    public static final DeferredRegister.Blocks BLOCKS =  DeferredRegister.createBlocks(ID);
+    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ID);
+    public static final DeferredRegister<DataComponentType<?>> DATA = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, ID);
+
+    /* DATA */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<RemoteData>> REMOTE_DATA = DATA.register("remote", () -> new DataComponentType.Builder<RemoteData>()
+                    .persistent(CodecManager.REMOTE_CODEC)
+                    .networkSynchronized(CodecManager.REMOTE_STREAM_CODEC)
+                    .build()
+    );
 
     /* BLOCKS */
-    public static final RegistryObject<DisplayBlock>
-            FRAME = BLOCKS.register("frame", FrameBlock::new),
-            PROJECTOR = BLOCKS.register("projector", ProjectorBlock::new),
-            TV = BLOCKS.register("tv", TvBlock::new),
-            BIG_TV = BLOCKS.register("big_tv", BigTvBlock::new);
+    public static final DeferredBlock<DisplayBlock>
+            FRAME = BLOCKS.register("frame", () -> new FrameBlock()),
+            PROJECTOR = BLOCKS.register("projector", () -> new ProjectorBlock()),
+            TV = BLOCKS.register("tv", () -> new TvBlock()),
+            BIG_TV = BLOCKS.register("big_tv", () -> new BigTvBlock());
 
     /* ITEMS */
-    public static final RegistryObject<Item>
+    public static final DeferredItem<Item>
             REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties())),
             FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), prop())),
             PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), prop())),
@@ -64,20 +69,20 @@ public class WFRegistry {
             BIG_TV_ITEM = ITEMS.register("big_tv", () -> new BlockItem(BIG_TV.get(), prop()));
 
     /* TILES */
-    public static final RegistryObject<BlockEntityType<DisplayTile>>
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DisplayTile>>
             TILE_FRAME = tile("frame", FrameTile::new, FRAME),
             TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR),
             TILE_TV = tile("tv", TvTile::new, TV),
             TILE_BIG_TV = tile("big_tv", BigTvTile::new, BIG_TV);
 
     /* TABS */
-    public static final RegistryObject<CreativeModeTab> WATERTAB = TABS.register("tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WATERTAB = TABS.register("tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
             .icon(() -> new ItemStack(FRAME.get()))
             .title(Component.translatable("itemGroup.waterframes"))
             .build()
     );
 
-    private static RegistryObject<BlockEntityType<DisplayTile>> tile(String name, BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
+    private static DeferredHolder<BlockEntityType<?>, BlockEntityType<DisplayTile>> tile(String name, BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
         return TILES.register(name, () -> BlockEntityType.Builder.of(creator, block.get()).build(null));
     }
 
@@ -85,7 +90,8 @@ public class WFRegistry {
         return new Item.Properties().stacksTo(16).rarity(Rarity.EPIC);
     }
 
-    public static void init(IEventBus bus) {
+    public static void init(IEventBus bus, ModContainer container) {
+        DATA.register(bus);
         BLOCKS.register(bus);
         ITEMS.register(bus);
         TILES.register(bus);
@@ -97,7 +103,7 @@ public class WFRegistry {
         WaterFramesCommand.register(event.getDispatcher());
     }
 
-    @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = WaterFrames.ID, bus = EventBusSubscriber.Bus.MOD)
     public static class ModEvents {
         @SubscribeEvent
         public static void onCreativeTabsLoading(BuildCreativeModeTabContentsEvent event) {
@@ -123,24 +129,16 @@ public class WFRegistry {
             NET.registerType(VolumeRangePacket.class, VolumeRangePacket::new);
         }
 
-        @OnlyIn(Dist.CLIENT)
-        @SubscribeEvent
-        public static void init(FMLClientSetupEvent e) {
-            if (WaterFrames.isInstalled("mr_stellarity") && (WFConfig.isDevMode())) {
-                throw new UnsupportedModException("mr_stellarity", "breaks picture rendering, overwrites the Minecraft core shaders and i can't do nothing to avoid that");
-            }
-        }
-
         @SubscribeEvent
         public static void registerResourcePacks(AddPackFindersEvent e) {
             if (e.getPackType() == PackType.CLIENT_RESOURCES) {
                 IModFile modFile = ModList.get().getModFileById(ID).getFile();
-                e.addRepositorySource(consumer -> {
-                    Pack pack = Pack.readMetaAndCreate(ID + "/voxeloper", Component.literal("WaterFrames: Voxeloper"), false, id -> new ModPackResources(id, modFile, "resourcepacks/wf_voxeloper"), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
-                    if (pack != null) {
-                        consumer.accept(pack);
-                    }
-                });
+//                e.addRepositorySource(consumer -> {
+//                    Pack pack = Pack.readMetaAndCreate(ID + "/voxeloper", Component.literal("WaterFrames: Voxeloper"), false, id -> new ModPackResources(id, modFile, "resourcepacks/wf_voxeloper"), PackType.CLIENT_RESOURCES, Pack.Position.TOP, PackSource.BUILT_IN);
+//                    if (pack != null) {
+//                        consumer.accept(pack);
+//                    }
+//                });
             }
         }
 
@@ -154,41 +152,24 @@ public class WFRegistry {
         }
     }
 
-    public static class UnsupportedModException extends UnsupportedOperationException {
-        private static final String MSG = "§fMod §6'%s' §fis not compatible with §e'%s'§f. please remove it";
-        private static final String MSG_REASON = "§fMod §6'%s' §fis not compatible with §e'%s' §fbecause §c%s §fplease remove it";
-        private static final String MSG_REASON_ALT = "§fMod §6'%s' §fis not compatible with §e'%s' §fbecause §c%s §fuse §a'%s' §finstead";
-
-        public UnsupportedModException(String modid) {
-            super(String.format(MSG, modid, NAME));
-        }
-
-        public UnsupportedModException(String modid, String reason) {
-            super(String.format(MSG_REASON, modid, NAME, reason));
-        }
-
-        public UnsupportedModException(String modid, String reason, String alternatives) {
-            super(String.format(MSG_REASON_ALT, modid, NAME, reason, alternatives));
-        }
-    }
-
-    public static class ModPackResources extends PathPackResources {
-        protected final IModFile modFile;
-        protected final String sourcePath;
-
-        public ModPackResources(String name, IModFile modFile, String sourcePath) {
-            super(name, true, modFile.findResource(sourcePath));
-            this.modFile = modFile;
-            this.sourcePath = sourcePath;
-        }
-
-        @NotNull
-        protected Path resolve(String... paths) {
-            String[] allPaths = new String[paths.length + 1];
-            allPaths[0] = this.sourcePath;
-            System.arraycopy(paths, 0, allPaths, 1, paths.length);
-            return this.modFile.findResource(allPaths);
-        }
-    }
+    //
+//    public static class ModPackResources extends PathPackResources {
+//        protected final IModFile modFile;
+//        protected final String sourcePath;
+//
+//        public ModPackResources(String name, IModFile modFile, String sourcePath) {
+//            super(, modFile.findResource(sourcePath));
+//            this.modFile = modFile;
+//            this.sourcePath = sourcePath;
+//        }
+//
+//        @NotNull
+//        protected Path resolve(String... paths) {
+//            String[] allPaths = new String[paths.length + 1];
+//            allPaths[0] = this.sourcePath;
+//            System.arraycopy(paths, 0, allPaths, 1, paths.length);
+//            return this.modFile.findResource(allPaths);
+//        }
+//    }
 
 }

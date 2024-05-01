@@ -29,13 +29,13 @@ public class WidgetClickableArea extends GuiIcon {
     }
 
     @Override
-    protected void renderContent(GuiGraphics guiGraphics, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
-        PoseStack pose = guiGraphics.pose();
-        super.renderContent(guiGraphics, control, rect, mouseX, mouseY);
-        this.renderSelector(pose, control, rect, mouseX, mouseY);
+    protected void renderContent(GuiGraphics graphics, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
+        super.renderContent(graphics, control, rect, mouseX, mouseY);
+        this.renderSelector(graphics, control, rect, mouseX, mouseY);
     }
 
-    protected void renderSelector(PoseStack pose, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
+    protected void renderSelector(GuiGraphics graphics, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
+        PoseStack pose = graphics.pose();
         var icon = IconStyles.POS_ICON;
         int width = Math.round(control.getContentWidth() / 3f);
         int height = Math.round(control.getContentHeight() / 3f);
@@ -60,7 +60,7 @@ public class WidgetClickableArea extends GuiIcon {
         RenderSystem.setShaderTexture(0, icon.location());
 
         this.color.glColor();
-        GuiRenderHelper.textureRect(pose, offsetX, offsetY, width, height, (float) icon.minX(), (float) icon.minY(), (float)(icon.minX() + icon.width()), (float)(icon.minY() + icon.height()));
+        GuiRenderHelper.textureRect(graphics, offsetX, offsetY, width, height, (float) icon.minX(), (float) icon.minY(), (float)(icon.minX() + icon.width()), (float)(icon.minY() + icon.height()));
         RenderSystem.disableBlend();
         pose.popPose();
     }

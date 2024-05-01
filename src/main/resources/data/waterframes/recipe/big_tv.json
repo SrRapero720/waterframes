@@ -1,13 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "iii",
+    "iIi",
     "iGi",
     "iRi"
   ],
   "key": {
     "i": {
       "item": "minecraft:iron_ingot"
+    },
+    "I": {
+      "item": "minecraft:iron_block"
     },
     "G": {
       "item": "minecraft:tinted_glass"
@@ -17,7 +20,7 @@
     }
   },
   "result": {
-    "item": "waterframes:tv",
+    "id": "waterframes:big_tv",
     "count": 1
   }
 }

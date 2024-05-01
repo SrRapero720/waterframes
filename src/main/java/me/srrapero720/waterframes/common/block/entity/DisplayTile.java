@@ -14,6 +14,7 @@ import me.srrapero720.watermedia.api.math.MathAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -22,19 +23,18 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.phys.AABB;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
-@Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = WaterFrames.ID, bus = EventBusSubscriber.Bus.GAME)
 public class DisplayTile extends BlockEntity {
     private static long lagTickTime;
 
@@ -63,10 +63,8 @@ public class DisplayTile extends BlockEntity {
     }
 
     @SubscribeEvent
-    public static void onTickLast(TickEvent.ServerTickEvent e) {
-        if (e.phase == TickEvent.Phase.END) {
-            clearLagTickTime();
-        }
+    public static void onTickLast(ServerTickEvent.Post e) {
+        clearLagTickTime();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -117,15 +115,15 @@ public class DisplayTile extends BlockEntity {
     }
 
     @Override
-    public void saveAdditional(CompoundTag nbt) {
+    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         this.data.save(nbt, this);
-        super.saveAdditional(nbt);
+        super.saveAdditional(nbt, registries);
     }
 
     @Override
-    public void load(CompoundTag nbt) {
+    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
         this.data.load(nbt, this);
-        super.load(nbt);
+        super.loadAdditional(nbt, registries);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -145,12 +143,6 @@ public class DisplayTile extends BlockEntity {
     @OnlyIn(Dist.CLIENT)
     public AlignedBox getRenderBox() {
         return this.caps.getBox(this, getDirection(), getAttachedFace(), true);
-    }
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public AABB getRenderBoundingBox() {
-        return this.getRenderBox().getBB(this.getBlockPos());
     }
 
     @Override
@@ -303,14 +295,15 @@ public class DisplayTile extends BlockEntity {
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag) {
+    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider lookupProvider) {
+        super.handleUpdateTag(tag, lookupProvider);
         this.data.load(tag, this);
         this.setDirty();
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithFullMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
+        return super.saveWithFullMetadata(pRegistries);
     }
 
     @Override

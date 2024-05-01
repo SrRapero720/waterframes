@@ -20,7 +20,7 @@
         }
     },
     "result": {
-        "item": "waterframes:frame",
+        "id": "waterframes:frame",
         "count": 1
     }
 }

@@ -2,16 +2,17 @@ package me.srrapero720.waterframes.client.display;
 
 import me.srrapero720.waterframes.WaterFrames;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPauseChangeEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = EventBusSubscriber.Bus.GAME)
 @OnlyIn(Dist.CLIENT)
 public class DisplayControl {
     private static final Marker IT = MarkerManager.getMarker("DisplayControl");
@@ -107,17 +108,17 @@ public class DisplayControl {
     @SubscribeEvent
     public static void onUnloadingLevel(LevelEvent.Unload event) {
         LevelAccessor level = event.getLevel();
-        if (level != null && level.isClientSide()) DisplayControl.release();
+        if (level.isClientSide()) DisplayControl.release();
     }
 
     @SubscribeEvent
-    public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) DisplayControl.tick();
+    public static void onClientTickEvent(ClientTickEvent.Post event) {
+        DisplayControl.tick();
     }
 
-    // @SubscribeEvent
-    public static void onClientPause(/*ClientPauseChangeEvent.Post event*/boolean paused) {
-        if (/*event.isPaused()*/paused) DisplayControl.pause();
+    @SubscribeEvent
+    public static void onClientPause(ClientPauseChangeEvent.Post event) {
+        if (event.isPaused()) DisplayControl.pause();
         else DisplayControl.resume();
     }
 }
