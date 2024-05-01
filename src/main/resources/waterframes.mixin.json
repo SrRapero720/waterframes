@@ -10,7 +10,6 @@
     "TextureManagerMixin"
   ],
   "mixins": [
-    "LevelMixin",
     "MinecraftServerMixin",
     "creativecore.CompiledTextMixin",
     "creativecore.GuiLabelMixin",

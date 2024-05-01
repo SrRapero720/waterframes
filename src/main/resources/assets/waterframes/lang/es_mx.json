@@ -31,7 +31,7 @@
     "waterframes.commands.prefix": "§6§l[§r§bWATERF§3r§bAMES§6§l]: ",
     "waterframes.commands.give.single": "%s Recibio el set de Displays",
     "waterframes.commands.give.multiple": "%s jugadores recibieron el set de Displays",
-    "waterframes.commands.whitelist.toggle": "La whitelist se encuentra %s",
+    "waterframes.commands.whitelist.toggle": "La whitelist se encuentra ",
     "waterframes.commands.whitelist.add": "Se agrego \"%s\" a la whitelist",
     "waterframes.commands.whitelist.remove": "Se elimino \"%s\" de la whitelist",
     "waterframes.commands.whitelist.remove.failed": "No se pudo eliminar la URL; no existe",

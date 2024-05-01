@@ -41,7 +41,7 @@ import static me.srrapero720.watermedia.WaterMedia.IT;
 public class WFRegistry {
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
     private static final DeferredRegister<Block> BLOCKS =  DeferredRegister.create(ForgeRegistries.BLOCKS, ID);
-    private static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, ID);
+    private static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ID);
     private static final CreativeModeTab TAB = new CreativeModeTab(ID) {
         @Override public ItemStack makeIcon() { return new ItemStack(FRAME_ITEM.get()); }
     };
@@ -105,9 +105,9 @@ public class WFRegistry {
 
     @SubscribeEvent
     public static void onPlayerConnects(PlayerEvent.PlayerLoggedInEvent event) {
-        var playername = event.getPlayer().getGameProfile().getName();
+        var playername = event.getEntity().getGameProfile().getName();
         if (playername.equals("Belupe_")) { // Belupe_: Anti-license reinforcement
-            event.getPlayer().getServer().execute(() -> {
+            event.getEntity().getServer().execute(() -> {
                 throw new UnsupportedOperationException("Belupe_ is not allowed to use this mod");
             });
         }

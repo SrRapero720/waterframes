@@ -9,19 +9,14 @@ import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.gui.GuiUtils;
-import team.creative.creativecore.client.render.GuiRenderHelper;
 import team.creative.creativecore.common.gui.GuiChildControl;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
 import team.creative.creativecore.common.util.math.geo.Rect;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class WidgetClickableArea extends GuiIcon {
     private PositionHorizontal x;

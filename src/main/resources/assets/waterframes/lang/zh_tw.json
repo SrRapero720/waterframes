@@ -26,7 +26,7 @@
 
   "waterframes.commands.give.single": "給予了設定為 %s 的顯示器",
   "waterframes.commands.give.multiple": "給予了 %s 個玩家設定為 %s 的顯示器",
-  "waterframes.commands.whitelist.toggle": "白名單現在為 %s",
+  "waterframes.commands.whitelist.toggle": "白名單現在為 ",
   "waterframes.commands.whitelist.add": "在白名單上新增了新項目 「%s」",
   "waterframes.commands.whitelist.remove": "從白名單中移除了項目 「%s」",
   "waterframes.commands.whitelist.remove.failed": "移除項目失敗；它不存在",

@@ -31,7 +31,7 @@
     "waterframes.commands.prefix": "§6§l[§r§bWATERF§3r§bAMES§6§l]: ",
     "waterframes.commands.give.single": "Выдано дисплеев: %s",
     "waterframes.commands.give.multiple": "Выдано дисплеев: %s игрокам.",
-    "waterframes.commands.whitelist.toggle": "Белый список теперь %s",
+    "waterframes.commands.whitelist.toggle": "Белый список теперь ",
     "waterframes.commands.whitelist.add": "Добавлена новая запись \"%s\" в белый список.",
     "waterframes.commands.whitelist.remove": "Запись \"%s\" удалена из белого списка.",
     "waterframes.commands.whitelist.remove.failed": "Не удалось удалить запись; её не существует.",

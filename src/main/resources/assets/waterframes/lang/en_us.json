@@ -31,7 +31,7 @@
     "waterframes.commands.prefix": "§6§l[§r§bWATERF§3r§bAMES§6§l]: ",
     "waterframes.commands.give.single": "Gave Displays set to %s",
     "waterframes.commands.give.multiple": "Gave Displays set to %s players",
-    "waterframes.commands.whitelist.toggle": "Whitelist is now %s",
+    "waterframes.commands.whitelist.toggle": "Whitelist is now ",
     "waterframes.commands.whitelist.add": "Added new entry \"%s\" on the whitelist",
     "waterframes.commands.whitelist.remove": "Removed entry \"%s\" from the whitelist",
     "waterframes.commands.whitelist.remove.failed": "Failed to remove entry; it doesn't exists",
