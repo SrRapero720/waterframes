@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.client.rendering;
 
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.Tesselator;
 import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
@@ -10,6 +11,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.util.math.base.Axis;
@@ -32,6 +34,11 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     @Override
     public boolean shouldRender(DisplayTile tile, @NotNull Vec3 cameraPos) {
         return Vec3.atCenterOf(tile.getBlockPos()).closerThan(cameraPos, tile.data.renderDistance);
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(DisplayTile tile) {
+        return tile.getRenderBox().getBB(tile.getBlockPos());
     }
 
     @Override
@@ -107,13 +114,12 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
     public void vertex(PoseStack pose, VertexConsumer builder, AlignedBox box, BoxFace boxface, BoxCorner corner, Facing facing, int packedLight, int packedOverlay, boolean flipX, boolean flipY, int r, int g, int b, int a) {
         Vec3i normal = facing.normal;
-        builder.vertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
-                .color(r, g, b, a)
-                .uv(corner.isFacing(boxface.getTexU()) != flipX ? 1f : 0f, corner.isFacing(boxface.getTexV()) != flipY ? 1f : 0f)
-                .overlayCoords(OverlayTexture.NO_OVERLAY)
-                .uv2(packedLight)
-                .normal(pose.last().normal(), normal.getX(), normal.getY(), normal.getZ())
-                .endVertex();
+        builder.addVertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
+                .setColor(r, g, b, a)
+                .setUv(corner.isFacing(boxface.getTexU()) != flipX ? 1f : 0f, corner.isFacing(boxface.getTexV()) != flipY ? 1f : 0f)
+                .setOverlay(OverlayTexture.NO_OVERLAY)
+                .setLight(packedLight)
+                .setNormal(pose.last(), normal.getX(), normal.getY(), normal.getZ());
     }
 
     public AlignedBox getLoadingBox(DisplayTile tile, AlignedBox parent, Facing facing) {
