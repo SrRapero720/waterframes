@@ -11,9 +11,9 @@ import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
 import me.srrapero720.waterframes.common.compat.creativecore.IScalableText;
 import me.srrapero720.watermedia.api.image.ImageCache;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
 import team.creative.creativecore.common.gui.*;
 import team.creative.creativecore.common.gui.controls.simple.*;
@@ -396,14 +396,14 @@ public class DisplayScreen extends GuiLayer {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) { return ScreenStyles.SCREEN_BACKGROUND; }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) { return ScreenStyles.SCREEN_BORDER; }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public GuiStyle getStyle() { return ScreenStyles.DISPLAYS; }
 }

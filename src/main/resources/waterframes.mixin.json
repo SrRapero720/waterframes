@@ -9,7 +9,9 @@
     "MinecraftMixin"
   ],
   "mixins": [
+    "ArgumentTypeMixin",
     "MinecraftServerMixin",
+    "RedstoneWireBlockMixin",
     "creativecore.CompiledTextMixin",
     "creativecore.GuiLabelMixin",
     "creativecore.GuiSliderMixin"

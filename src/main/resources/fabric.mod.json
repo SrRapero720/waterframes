@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "id": "waterframes",
+  "version": "$modversion",
+  "name": "$modname",
+  "description": "$mod_description",
+  "authors": [
+    "$modauthor"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/waterframes",
+    "sources": "https://github.com/${github_project}",
+    "issues": "https://github.com/${github_project}/issues"
+  },
+  "license": "$modlicense",
+  "icon": "pack.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.srrapero720.waterframes.WaterFrames"
+    ],
+    "client": [
+      "me.srrapero720.waterframes.WaterFramesClient"
+    ]
+  },
+  "mixins": [
+    "$modid.$mixin_file_suffix"
+  ],
+  "accessWidener": "waterframes.accesswidener",
+  "depends": {
+    "fabricloader": ">=0.14",
+    "minecraft": "~1.20.1",
+    "java": ">=17",
+    "fabric-api": "*",
+    "creativecore": ">=2.11.27",
+    "watermedia": ">=2.0.54"
+  },
+  "breaks": {
+    "stellarity": "*",
+    "mr_stellarity": "*"
+  }
+}

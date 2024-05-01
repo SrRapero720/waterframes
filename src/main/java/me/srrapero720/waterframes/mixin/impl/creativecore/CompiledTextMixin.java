@@ -2,8 +2,8 @@ package me.srrapero720.waterframes.mixin.impl.creativecore;
 
 import me.srrapero720.waterframes.common.compat.creativecore.IScalableText;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,7 +17,7 @@ public class CompiledTextMixin implements IScalableText {
     float wf$scale = 1.0f;
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", ordinal = 0, shift = At.Shift.AFTER))
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void render(GuiGraphics graphics, CallbackInfo ci) {
         graphics.pose().scale(wf$scale, wf$scale, wf$scale);
     }

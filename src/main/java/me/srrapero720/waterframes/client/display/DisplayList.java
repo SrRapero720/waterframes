@@ -1,15 +1,14 @@
 package me.srrapero720.waterframes.client.display;
 
-import me.srrapero720.waterframes.WaterFrames;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class DisplayList {
     public static final Integer DEFAULT_SIZE = 32;
 
@@ -93,9 +92,7 @@ public class DisplayList {
         return freshPosition;
     }
 
-    @SubscribeEvent
-    public static void onUnloadingLevel(LevelEvent.Unload event) {
-        LevelAccessor level = event.getLevel();
+    public static void onUnloadingLevel(Level level) {
         if (level != null && level.isClientSide()) DisplayList.release();
     }
 

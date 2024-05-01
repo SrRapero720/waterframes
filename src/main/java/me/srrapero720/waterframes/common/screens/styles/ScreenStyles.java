@@ -1,12 +1,12 @@
 package me.srrapero720.waterframes.common.screens.styles;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.DisplayColor;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class ScreenStyles {
     public static final GuiStyle REMOTE_CONTROL = new GuiStyle();
     public static final GuiStyle DISPLAYS = new GuiStyle();

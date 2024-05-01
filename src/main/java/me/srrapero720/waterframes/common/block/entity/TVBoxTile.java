@@ -8,6 +8,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class TVBoxTile extends DisplayTile {
     public TVBoxTile(BlockPos pos, BlockState state) {
-        super(new DisplayData(), DisplayCaps.TV_BOX, WFRegistry.TILE_TV_BOX.get(), pos, state);
+        super(new DisplayData(), DisplayCaps.TV_BOX, WFRegistry.TILE_TV_BOX, pos, state);
     }
 }

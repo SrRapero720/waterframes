@@ -1,7 +1,6 @@
 package me.srrapero720.waterframes.common.block.entity;
 
 import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.Display;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayCaps;
@@ -11,6 +10,10 @@ import me.srrapero720.waterframes.common.network.packets.*;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -23,26 +26,20 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
-@Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class DisplayTile extends BlockEntity {
     private static long lagTickTime;
 
     public final DisplayData data;
     public final DisplayCaps caps;
-    @OnlyIn(Dist.CLIENT) public ImageCache imageCache;
-    @OnlyIn(Dist.CLIENT) public Display display;
-    @OnlyIn(Dist.CLIENT) private boolean isReleased;
+    @Environment(EnvType.CLIENT) public ImageCache imageCache;
+    @Environment(EnvType.CLIENT) public Display display;
+    @Environment(EnvType.CLIENT) private boolean isReleased;
 
     // this is more a runtime-block calculation variables, doesn't fix on DisplayData
     private int lightLevel = 0;
@@ -66,19 +63,12 @@ public class DisplayTile extends BlockEntity {
         lagTickTime = 0;
     }
 
-    @SubscribeEvent
-    public static void onTickLast(TickEvent.ServerTickEvent e) {
-        if (e.phase == TickEvent.Phase.END) {
-            clearLagTickTime();
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public Display activeDisplay() {
         return display;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public Display requestDisplay() {
         if (!this.data.active || (this.data.url.isEmpty() && display != null)) {
             this.cleanDisplay();
@@ -130,9 +120,10 @@ public class DisplayTile extends BlockEntity {
     public void load(CompoundTag nbt) {
         this.data.load(nbt, this);
         super.load(nbt);
+        this.setDirty();
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void cleanDisplay() {
         if (this.display != null) {
             this.display.release();
@@ -140,20 +131,20 @@ public class DisplayTile extends BlockEntity {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     private void release() {
         this.cleanDisplay();
         this.isReleased = true;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public AlignedBox getRenderBox() {
         return this.caps.getBox(this, getDirection(), getAttachedFace(), true);
     }
 
-    @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public AABB getRenderBoundingBox() {
+        // This doesn't works on fabric
         return this.getRenderBox().getBB(this.getBlockPos());
     }
 
@@ -324,12 +315,6 @@ public class DisplayTile extends BlockEntity {
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag) {
-        this.data.load(tag, this);
-        this.setDirty();
-    }
-
-    @Override
     public CompoundTag getUpdateTag() {
         return this.saveWithFullMetadata();
     }
@@ -345,6 +330,12 @@ public class DisplayTile extends BlockEntity {
             this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), DisplayBlock.UPDATE_ALL);
         }
     }
+
+//
+//    public void setDirty(Player player) {
+//        player.level.blockEntityChanged(this.worldPosition);
+//        player.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+//    }
 
     public static AlignedBox getBasicBox(DisplayTile tile) {
         final var facing = Facing.get(tile.getDirection());
@@ -393,5 +384,16 @@ public class DisplayTile extends BlockEntity {
             }
         }
         return box;
+    }
+
+    public static void initCommon() {
+        ServerTickEvents.END_SERVER_TICK.register(server -> clearLagTickTime());
+    }
+
+    @Environment(EnvType.CLIENT)
+    public static void initClient() {
+        ClientBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register((blockEntity, world) -> {
+            if (blockEntity instanceof DisplayTile tile) tile.release();
+        });
     }
 }

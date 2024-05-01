@@ -2,10 +2,10 @@ package me.srrapero720.waterframes.common.screens.widgets;
 
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
 import team.creative.creativecore.common.gui.style.Icon;
 
@@ -28,7 +28,7 @@ public class WidgetStatusIcon extends GuiIcon {
         super.tick();
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public List<Component> getStatusTooltip() {
         List<Component> tooltip = new ArrayList<>();
         if (!tile.data.active) {
@@ -62,7 +62,7 @@ public class WidgetStatusIcon extends GuiIcon {
         return tooltip;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public Icon getStatusIcon() {
         if (!tile.data.active) return IconStyles.STATUS_OFF;
         if (tile.imageCache == null) return IconStyles.STATUS_ERROR;

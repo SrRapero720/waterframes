@@ -5,6 +5,7 @@ import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
 import net.minecraft.ChatFormatting;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -35,6 +36,8 @@ import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
 import team.creative.creativecore.common.gui.creator.GuiCreator;
 
+import java.util.function.ToIntFunction;
+
 @SuppressWarnings("deprecation")
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
@@ -43,13 +46,15 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
-    protected static final Properties PROPERTIES = Properties.of()
+    protected static final Properties PROPERTIES = FabricBlockSettings.create()
+            .luminance(value -> value.getValue(LIGHT_LEVEL))
             .strength(1f)
             .sound(SoundType.METAL)
             .noOcclusion()
             .forceSolidOff()
             .isSuffocating(Blocks::never)
             .isViewBlocking(Blocks::never)
+            .pushReaction(PushReaction.DESTROY)
             .requiresCorrectToolForDrops();
 
     protected DisplayBlock() {
@@ -104,12 +109,12 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return InteractionResult.SUCCESS;
     }
 
-    private double randomNegative(double v) {
-        return Math.random() > 0.5d ? -v : v;
+    public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return state.getValue(this.getFacing()) == direction;
     }
 
-    @Override public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return state.getValue(this.getFacing()) == direction;
+    private double randomNegative(double v) {
+        return Math.random() > 0.5d ? -v : v;
     }
 
     @Override protected void registerDefaultState(BlockState state) {
@@ -184,16 +189,8 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return false;
     }
 
-    @Override public PushReaction getPistonPushReaction(BlockState pState) {
-        return PushReaction.DESTROY;
-    }
-
     @Override public FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(true) : super.getFluidState(state);
-    }
-
-    @Override public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rotation) {
-        return this.rotate(state, rotation);
     }
 
     @Override public BlockState rotate(BlockState state, Rotation rotation) {

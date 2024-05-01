@@ -3,9 +3,7 @@ import net.darkhax.curseforgegradle.TaskPublishCurseForge
 plugins {
     id 'java'
     id 'idea'
-    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
-    id 'org.spongepowered.mixin' version '0.7.+'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'com.modrinth.minotaur' version '2.+'
     id 'net.darkhax.curseforgegradle' version '1.1.+'
 }
@@ -20,42 +18,26 @@ java.toolchain {
 }
 
 println "Java: ${System.getProperty 'java.version'}, Gradle Java: ${JavaVersion.current()}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    mappings channel: mappings_channel, version: "$mappings_version"
-    accessTransformer file('src/main/resources/META-INF/accesstransformer.cfg')
-    copyIdeResources = true
-
-    runs {
-        configureEach {
-            workingDirectory project.file('run')
-            property 'forge.logging.console.level', 'debug'
-            property 'log4j.appender.Console', "org.apache.log4j.ConsoleAppender"
-            property 'terminal.jline', 'true'
-            args '--mixin.config', "$modid.$mixin_file_suffix"
-            arg '--nogui'
-
-            mods {
-                "$modid" {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        client {}
-        server {}
+loom {
+    mixin {
+        defaultRefmapName = "${modid}.${mixin_refmap_suffix}"
     }
-}
 
+    accessWidenerPath = file("src/main/resources/${modid}.accesswidener")
+
+    mods {
+        "${modid}" {
+            sourceSet sourceSets.main
+        }
+    }
+
+}
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-mixin {
-    add sourceSets.main, "$modid.$mixin_refmap_suffix"
-    config "$modid.$mixin_file_suffix"
-}
 
 repositories {
     maven { url 'https://repo.spongepowered.org/maven' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.parchmentmc.org' }
     maven {
         url 'https://www.cursemaven.com'
         content {
@@ -70,7 +52,6 @@ repositories {
                 url = "https://api.modrinth.com/maven"
             }
         }
-        forRepositories(fg.repository) // Only add this if you're using ForgeGradle, otherwise remove this line
         filter {
             includeGroup "maven.modrinth"
         }
@@ -78,18 +59,24 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:$mcversion-$fgversion"
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    // To change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:$mcversion"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-$mcversion:$mappings_version@zip")
+    }
+    modImplementation "net.fabricmc:fabric-loader:${flversion}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricversion}"
 
     //DEPENDENCIES
-    implementation "com.github.WaterMediaTeam.watermedia:build:$watermediaversion"
-    implementation fg.deobf("maven.modrinth:video-player:$videoplayerversion")
-    implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
+    modImplementation "com.github.WaterMediaTeam.watermedia:build:$watermediaversion"
+//    modImplementation "maven.modrinth:video-player:$videoplayerversion"
+    modImplementation "curse.maven:creativecore-257814:$creativecoreversion"
 }
 
 tasks.processResources.outputs.upToDateWhen { false }
 processResources {
-    filesMatching(['META-INF/*.toml', 'pack.mcmeta', 'resourcepacks/**/pack.mcmeta', "$modid.$mixin_file_suffix".toString()]) {
+    filesMatching(['fabric.mod.json', 'pack.mcmeta', 'resourcepacks/**/pack.mcmeta', "$modid.$mixin_file_suffix".toString()]) {
         expand project.properties
     }
 }
@@ -106,7 +93,7 @@ jar {
         attributes "MixinConfigs"               : "$modid.$mixin_file_suffix"
     }
     exclude('org/valkyrienskies/**')
-    finalizedBy('reobfJar')
+    finalizedBy(remapJar)
 }
 
 task upload(type: GradleBuild) {
@@ -114,13 +101,14 @@ task upload(type: GradleBuild) {
     description 'Uploads new version to CurseForge and Modrinth'
     group = 'publishing'
     tasks = [ 'curseforge', 'modrinth' ]
+    dependsOn(remapJar)
 }
 
 task curseforge(type: TaskPublishCurseForge) {
     disableVersionDetection()
     apiToken = System.getenv("CURSEFORGE_TOKEN")
 
-    def mainFile = upload(curseforgeid, jar)
+    def mainFile = upload(curseforgeid, remapJar)
     mainFile.displayName = "$modbrandname/${modloader.toLowerCase().capitalize()}/mc$mcversion/v$modversion"
     mainFile.addModLoader(modloader.toLowerCase().capitalize())
     mainFile.addGameVersion(mcversion, "server", "client")
@@ -136,16 +124,17 @@ modrinth {
     token = System.getenv("MODRINTH_TOKEN")
     projectId = modrinthid
 
-    uploadFile = jar
+    uploadFile = remapJar
     versionName = "$modbrandname/${modloader.toLowerCase().capitalize()}/mc$mcversion/v$modversion"
     versionNumber = version.toString()
     versionType = versiontype
     gameVersions = [ mcversion ]
     changelog = getChangelogText(true)
-    loaders = [ "forge", "neoforge" ]
+    loaders = [ modloader.toLowerCase() ]
     dependencies {
         required.project "creativecore"
         required.project "watermedia"
+        required.project "fabric-api"
         incompatible.project "stellarity"
     }
 }

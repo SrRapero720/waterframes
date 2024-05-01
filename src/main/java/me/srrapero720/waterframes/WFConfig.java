@@ -1,337 +1,250 @@
 package me.srrapero720.waterframes;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.*;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.loading.FMLLoader;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+import org.jetbrains.annotations.NotNull;
+import team.creative.creativecore.Side;
+import team.creative.creativecore.common.config.api.CreativeConfig;
+import team.creative.creativecore.common.config.api.ICreativeConfig;
+import team.creative.creativecore.common.config.holder.CreativeConfigRegistry;
+import team.creative.creativecore.common.config.sync.ConfigSynchronization;
 
 import java.net.URL;
 import java.util.*;
 
-public class WFConfig {
-    private static final Builder SERVER = new Builder();
-    private static final Builder CLIENT = new Builder();
+import static me.srrapero720.waterframes.WaterFrames.ID;
 
-    private static final String[] WHITELIST = new String[] {
-            "imgur.com",
-            "gyazo.com",
-            "prntscr.com",
-            "tinypic.com",
-            "puu.sh",
-            "pinimg.com",
-            "photobucket.com",
-            "staticflickr.com",
-            "flic.kr",
-            "tenor.co",
-            "gfycat.com",
-            "giphy.com",
-            "gph.is",
-            "gifbin.com",
-            "i.redd.it",
-            "media.tumblr.com",
-            "twimg.com",
-            "discordapp.com",
-            "images.discordapp.net",
-            "discord.com",
-            "githubusercontent.com",
-            "googleusercontent.com",
-            "googleapis.com",
-            "wikimedia.org",
-            "ytimg.com",
-            "youtube.com",
-            "youtu.be",
-            "twitch.tv",
-            "twitter.com",
-            "soundcloud.com",
-            "kick.com",
-            "srrapero720.me",
-            "fbcdn.net",
-            "drive.google.com",
-    };
+public class WFConfig implements ICreativeConfig {
+    public static final Marker IT = MarkerManager.getMarker("Config");
+    public static final WFConfig ROOT = new WFConfig();
+    public static final WFConfig.Rendering RENDERING = new WFConfig.Rendering();
+    public static final WFConfig.Multimedia MULTIMEDIA = new WFConfig.Multimedia();
+    public static final WFConfig.Multimedia.WaterMedia WATERMEDIA = new WFConfig.Multimedia.WaterMedia();
+    public static final WFConfig.BlockBehavior BEHAVIOR = new WFConfig.BlockBehavior();
+    public static final WFConfig.RemoteControl REMOTE = new WFConfig.RemoteControl();
+    public static final WFConfig.Permissions PERMISSIONS = new WFConfig.Permissions();
+    public static final WFConfig.Permissions.Whitelist WHITELIST = new WFConfig.Permissions.Whitelist();
 
-    // RENDERING
-    private static final DoubleValue maxWidth;
-    private static final DoubleValue maxHeight;
-    private static final IntValue maxRenderDistance;
-    private static final DoubleValue maxProjectionDistance;
+    public static class Rendering {
+        // RENDERING
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        @CreativeConfig.DecimalRange(min = 1, max = 256)
+        public float maxWidth = 48;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        @CreativeConfig.DecimalRange(min = 1, max = 256)
+
+        public float maxHeight = 48;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        @CreativeConfig.IntRange(min = 1, max = 512)
+        public int maxRenderDistance = 64;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        @CreativeConfig.DecimalRange(min = 1, max = 256)
+        public float maxProjectionDistance = 64;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean keepRendering = true;
+    }
+
     // MULTIMEDIA
-    private static final IntValue maxVolumeDistance;
-    private static final IntValue maxVolume;
-    private static final BooleanValue useMasterVolume;
-    private static final BooleanValue useVSEurekaCompat;
-    private static final BooleanValue useMultimedia;
-    private static final BooleanValue keepRendering;
+    public static class Multimedia {
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        @CreativeConfig.IntRange(min = 8, max = 512)
+        public int maxVolumeDistance = 64;
+
+        // MULTIMEDIA
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        @CreativeConfig.IntRange(min = 10, max = 128)
+        public int maxVolume = 100;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean useMasterVolume = false;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean useVSEurekaCompat = true;
+
+        public static class WaterMedia {
+            @CreativeConfig(type = ConfigSynchronization.SERVER)
+            public boolean useMultimedia = true;
+        }
+    }
+
     // BEHAVIOR
-    private static final BooleanValue useLightsOnPlay;
-    private static final BooleanValue forceLightsOnPlay;
-    private static final BooleanValue useLagTickCorrection;
-    private static final BooleanValue useRedstone;
-    private static final BooleanValue useMasterModeOnRedstone;
+    public static class BlockBehavior {
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean useLightsOnPlay = true;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean forceLightsOnPlay = true;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean useRedstone = true;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean useMasterModeOnRedsone = false;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean useLagTickCorrection = true;
+    }
+
     // REMOTE CONTROL
-    private static final IntValue remoteDistance;
+    public static class RemoteControl {
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        @CreativeConfig.IntRange(min = 4, max = 128)
+        public int remoteDistance = 32;
+    }
 
     // PERMISSIONS
-    private static final BooleanValue useInAdventure;
-    private static final BooleanValue useInSurvival;
-    private static final BooleanValue useForAnyone;
-    private static final BooleanValue useWhitelist;
-    private static final ConfigValue<List<? extends String>> whitelist;
+    public static class Permissions {
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean useInAdventure = false;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean useInSurvival = true;
+
+        @CreativeConfig(type = ConfigSynchronization.SERVER)
+        public boolean useForAnyone = true;
+
+        public static class Whitelist {
+            @CreativeConfig(type = ConfigSynchronization.SERVER)
+            public boolean useWhitelist = true;
+
+            @CreativeConfig(type = ConfigSynchronization.SERVER)
+            public List<String> whitelist = List.of("imgur.com",
+                    "gyazo.com",
+                    "prntscr.com",
+                    "tinypic.com",
+                    "puu.sh",
+                    "pinimg.com",
+                    "photobucket.com",
+                    "staticflickr.com",
+                    "flic.kr",
+                    "tenor.co",
+                    "gfycat.com",
+                    "giphy.com",
+                    "gph.is",
+                    "gifbin.com",
+                    "i.redd.it",
+                    "media.tumblr.com",
+                    "twimg.com",
+                    "discordapp.com",
+                    "images.discordapp.net",
+                    "discord.com",
+                    "githubusercontent.com",
+                    "googleusercontent.com",
+                    "googleapis.com",
+                    "wikimedia.org",
+                    "ytimg.com",
+                    "youtube.com",
+                    "youtu.be",
+                    "twitch.tv",
+                    "twitter.com",
+                    "soundcloud.com",
+                    "kick.com",
+                    "srrapero720.me",
+                    "fbcdn.net",
+                    "drive.google.com");
+        }
+    }
 
     // OVERRIDES (client)
-    private final static BooleanValue overrideServerConfig;
-    private static final BooleanValue clientUseMultimedia;
-    private static final BooleanValue clientKeepsRendering;
-    private static final BooleanValue forceDevMode;
+    @CreativeConfig(type = ConfigSynchronization.CLIENT)
+    public boolean overrideServerConfig = false;
 
-    private static final ForgeConfigSpec SERVER_SPEC;
-    private static final ForgeConfigSpec CLIENT_SPEC;
+    @CreativeConfig(type = ConfigSynchronization.CLIENT)
+    public boolean clientUseMultimedia = false;
 
-    static {
-        // WATERFRAMES -> rendering
-        SERVER.comment("All configurations about rendering");
-        SERVER.push("waterframes.rendering");
+    @CreativeConfig(type = ConfigSynchronization.CLIENT)
+    public boolean clientKeepsRendering = false;
 
-        maxWidth = SERVER
-                .comment("Width limit of displays in blocks")
-                .defineInRange("maxWidth", 40d, 1d, 256d);
+    @CreativeConfig(type = ConfigSynchronization.CLIENT)
+    public boolean forceDevMode = false;
 
-        maxHeight = SERVER
-                .comment("Height limit of displays in blocks")
-                .defineInRange("maxHeight", 40d, 1d, 256d);
 
-        maxRenderDistance = SERVER
-                .comment("Max Radius of rendering distance in blocks")
-                .defineInRange("maxRenderDistance", 64, 4, 512);
-
-        maxProjectionDistance = SERVER
-                .comment("Max distance of projections in blocks")
-                .defineInRange("maxProjectionDistance", 64d, 4d, 512d);
-
-        keepRendering = SERVER
-                .comment("Enables media processing and rendering, disabling it will not render nothing, you can still hear videos")
-                .define("keepRendering", true);
-
-        // WATERFRAMES -> multimedia
-        SERVER.comment("Configuration related to multimedia sources like Videos or Music");
-        SERVER.pop().push("multimedia");
-
-        maxVolumeDistance = SERVER
-                .comment("Max volume distance radius")
-                .defineInRange("maxVolumeDistance", 64, 8, 512);
-
-        maxVolume = SERVER
-                .comment("Max volume value", "values over 100 uses VLC überVolume")
-                .defineInRange("maxVolume", 100, 10, 120);
-
-        useMasterVolume = SERVER
-                .comment("Makes Minecraft master volume affects waterframes volume")
-                .define("masterVolume", false);
-
-        useVSEurekaCompat = SERVER
-                .comment(
-                        "Enables compatibility with VSEureka",
-                        "In case VS breaks something on their side, this option should stop client/server crashing",
-                        "Or if the audio isn't working, disable this option should help",
-                        "(This option is called VSEureka because valkirienskies is too long, and VS may be misleading)"
-                )
-                .define("vsEurekaCompat", true);
-
-        // WATERFRAMES -> multimedia -> watermedia
-        SERVER.push("watermedia");
-
-        useMultimedia = SERVER
-                .comment("Enables VLC/FFMPEG usage for multimedia processing like videos and music (support added by WATERMeDIA)")
-                .define("enable", true);
-
-        // WATERFRAMES -> block_behavior
-        SERVER.comment("Configuration related to interactions with vanilla and modded features");
-        SERVER.pop(2).push("block_behavior");
-
-        useLightsOnPlay = SERVER
-                .comment("Enable light feature on frames while is playing")
-                .define("lightOnPlay", true);
-
-        forceLightsOnPlay = SERVER
-                .comment("Forces light feature on frames while is playing", "Requires lightOnPlay be true")
-                .define("forceLightOnPlay", false);
-
-        useLagTickCorrection = SERVER
-                .comment("Enable lag tick time correction", "Helps when server is too laggy and playback is regressing in time", "Disable if causes problems")
-                .define("lagTickCorrection", true);
-
-        SERVER.comment("Redstone interaction options");
-        SERVER.push("redstone");
-
-        useRedstone = SERVER
-                .comment("Enable the feature")
-                .define("enable", true);
-
-        useMasterModeOnRedstone = SERVER
-                .comment("Redstone inputs forces paused playback and ignores any other control sources")
-                .define("masterMode", false);
-
-        SERVER.pop();
-
-        // WATERFRAMES -> remote_control
-        SERVER.comment("Configuration related to remote control");
-        SERVER.pop().push("remote_control");
-
-        remoteDistance = SERVER
-                .comment("Distance in blocks of RC range")
-                .defineInRange("distance", 32, 4, 256);
-
-        // WATERFRAMES -> permissions
-        SERVER.comment("Configurations related to permissions");
-        SERVER.pop().push("permissions");
-
-        useInAdventure = SERVER
-                .comment("Changes if players in Adventure mode can use displays")
-                .define("usableInAdventureMode", false);
-
-        useInSurvival = SERVER
-                .comment("Changes if players in Survival mode can use displays")
-                .define("usableInSurvivalMode", true);
-        useForAnyone = SERVER
-                .comment("Changes if any player can use displays, otherwise only admins can use it")
-                .define("usableForAnyone", true);
-
-        SERVER.comment("Whitelist configuration: please stop bugging me with this :(");
-        SERVER.push("whitelist");
-
-        useWhitelist = SERVER
-                .comment(
-                        "Enables whitelist feature",
-                        "[WARNING]: THE AUTHOR OF THE MOD IS NOT RESPONSIBLE IF IN YOUR SERVER SOMEONE PUTS NSFW MEDIA",
-                        "WATERMEDIA HAVE SUPPORT FOR ADULT PAGES AND WHITELIST WAS DESIGNED TO PREVENT THAT"
-                )
-                .define("enable", true);
-
-        whitelist = SERVER.defineList("urls", Arrays.asList(WHITELIST), o -> true);
-
-        SERVER.pop();
-
-        SERVER.pop();
-
-        // ###################
-        // ### CLIENTSIDE ###
-        // #################
-        CLIENT.push("waterframes");
-
-        CLIENT.comment("Configurations to override server config");
-        CLIENT.push("overrideConfig");
-
-        overrideServerConfig = CLIENT
-                .comment("Enables the option")
-                .define("enable", false);
-
-        clientUseMultimedia = CLIENT
-                .comment(
-                        "Overrides 'waterframes.watermedia.enable' option",
-                        "Enables VLC/FFMPEG usage for multimedia processing (support added by WATERMeDIA)"
-                )
-                .define("useMultimedia", false);
-
-        clientKeepsRendering = CLIENT
-                .comment(
-                        "overrides 'waterframes.rendering.keepRendering'",
-                        "Enables media processing and rendering, disabling it will not render nothing, you can still hear videos"
-                )
-                .define("keepRendering", false);
-
-        forceDevMode = CLIENT
-                .comment(
-                        "WARNING: DO NOT CHANGE IT EXCEPT IF YOU KNOW WHAT ARE YOU DOING, TOGGLING IT ON MAY CAUSE CORRUPTIONS, UNEXPECTED BEHAVIORS OR WORLD DESTRUCTION",
-                        "forces WATERMeDIA and WATERFrAMES to run in developer mode",
-                        "This is was done for developers who has mods that causes compatibilities with waterframes (or watermedia)",
-                        "Let those modders test waterframes x incompatible mods (i see you stellarity owner)"
-                )
-                .define("forceDevMode", false);
-
-        CLIENT.pop();
-
-        CLIENT.pop();
-
-        // BULDING
-        CLIENT_SPEC = CLIENT.build();
-        SERVER_SPEC = SERVER.build();
-    }
 
     public static void init() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_SPEC);
-        if (FMLLoader.getDist().isClient()) // SKIPS TRASH CONFIG FILES ON SERVERS
-            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC);
+        var holder = CreativeConfigRegistry.ROOT.registerFolder(ID);
+        holder.registerValue("General", ROOT);
+        holder.registerValue("Rendering", RENDERING);
+
+        var folderMultimedia = holder.registerFolder("Multimedia");
+        folderMultimedia.registerValue("Multimedia", MULTIMEDIA);
+        var folderWaterMedia = folderMultimedia.registerFolder("WaterMedia");
+        folderWaterMedia.registerValue("WaterMedia", WATERMEDIA);
+
+        holder.registerValue("BlockBehavior", BEHAVIOR);
+        holder.registerValue("RemoteControl", REMOTE);
+        var permissions = holder.registerValue("Permissions", PERMISSIONS);
+        permissions.registerValue("Whitelist", WHITELIST);
     }
 
-    public static float maxWidth() { return (float) (double) maxWidth.get(); }
-    public static float maxHeight() { return (float) (double) maxHeight.get(); }
+    public WFConfig() {
+
+    }
+
+    @Override
+    public void configured(Side side) {
+
+    }
+
+    public static float maxWidth() { return RENDERING.maxWidth; }
+    public static float maxHeight() { return RENDERING.maxHeight; }
     public static float maxWidth(float width) { return Math.min(width, maxWidth()); }
     public static float maxHeight(float height) { return Math.min(height, maxHeight()); }
 
-    public static int maxRenDis() { return maxRenderDistance.get(); }
+    public static int maxRenDis() { return RENDERING.maxRenderDistance; }
     public static int maxRenDis(int value) { return Math.min(value, maxRenDis()); }
 
-    public static float maxProjDis() { return (float) (double) maxProjectionDistance.get(); }
+    public static float maxProjDis() { return RENDERING.maxProjectionDistance; }
     public static float maxProjDis(float value) { return Math.min(value, maxProjDis()); }
 
-    public static boolean keepsRendering() { return overrideServerConfig.get() ? clientKeepsRendering.get() : keepRendering.get(); }
-    public static boolean useLightOnPlay() { return useLightsOnPlay.get(); }
-    public static boolean forceLightOnPlay() { return forceLightsOnPlay.get(); }
-    public static boolean useLagTickCorrection() { return useLagTickCorrection.get(); }
+    public static boolean keepsRendering() { return ROOT.overrideServerConfig ? ROOT.clientKeepsRendering : RENDERING.keepRendering; }
+    public static boolean useLightOnPlay() { return BEHAVIOR.useLightsOnPlay; }
+    public static boolean forceLightOnPlay() { return BEHAVIOR.forceLightsOnPlay; }
+    public static boolean useLagTickCorrection() { return BEHAVIOR.useLagTickCorrection; }
 
     // MULTIMEDIA
-    public static int maxVolDis() { return maxVolumeDistance.get(); }
+    public static int maxVolDis() { return MULTIMEDIA.maxVolumeDistance; }
     public static int maxVolDis(int value) { return Math.min(value, maxVolDis()); }
-    public static boolean useMasterVolume() { return useMasterVolume.get(); }
-    public static boolean vsEurekaCompat() { return useVSEurekaCompat.get(); }
+    public static boolean useMasterVolume() { return MULTIMEDIA.useMasterVolume; }
+    public static boolean vsEurekaCompat() { return MULTIMEDIA.useVSEurekaCompat; }
 
-    public static int maxVol() { return maxVolume.get(); }
+    public static int maxVol() { return MULTIMEDIA.maxVolume; }
     public static int maxVol(int value) { return Math.max(Math.min(value, maxVol()), 0); }
 
-    public static boolean useMultimedia() { return overrideServerConfig.get() ? clientUseMultimedia.get() : useMultimedia.get(); }
+    public static boolean useMultimedia() { return ROOT.overrideServerConfig ? ROOT.clientUseMultimedia : WATERMEDIA.useMultimedia; }
 
     // BEHAVIOR
-    public static boolean useRedstone() { return useRedstone.get(); }
-    public static boolean useMasterModeRedstone() { return useRedstone() && useMasterModeOnRedstone.get(); }
-    public static int maxRcDis() { return remoteDistance.get(); }
+    public static boolean useRedstone() { return BEHAVIOR.useRedstone; }
+    public static boolean useMasterModeRedstone() { return useRedstone() && BEHAVIOR.useMasterModeOnRedsone; }
+    public static int maxRcDis() { return REMOTE.remoteDistance; }
 
     // PERMISSIONS
-    public static boolean useInAdv() { return useInAdventure.get(); }
-    public static boolean useInSurv() { return useInSurvival.get(); }
-    public static boolean useForAnyone() { return useForAnyone.get(); }
-    public static boolean useWhitelist() { return useWhitelist.get(); }
+    public static boolean useInAdv() { return PERMISSIONS.useInAdventure; }
+    public static boolean useInSurv() { return PERMISSIONS.useInSurvival; }
+    public static boolean useForAnyone() { return PERMISSIONS.useForAnyone; }
+    public static boolean useWhitelist() { return WHITELIST.useWhitelist; }
     public static boolean useWhitelist(boolean state) {
-        useWhitelist.set(state);
-        useWhitelist.save();
+        WHITELIST.useWhitelist = state;
         return state;
     }
     public static boolean toggleWhitelist() {
         return useWhitelist(!useWhitelist());
     }
     public static void addOnWhitelist(String url) {
-        @SuppressWarnings("unchecked")
-        var w = (Set<String>) mutableSet(whitelist.get().iterator());
-        w.add(url);
-        whitelist.set(new ArrayList<>(w));
-        whitelist.save();
+        WHITELIST.whitelist.add(url);
     }
     public static boolean removeOnWhitelist(String url) {
-        var w = mutableSet(whitelist.get().iterator());
-        boolean removed = false;
-        try {
-            return removed = w.remove(url);
-        } finally {
-            if (removed) {
-                whitelist.set(new ArrayList<>(w));
-                whitelist.save();
-            }
-        }
+        return WHITELIST.whitelist.remove(url);
     }
 
     public static boolean isWhiteListed(String url) {
@@ -345,7 +258,7 @@ public class WFConfig {
         try {
             var host = new URL(url).getHost();
 
-            for (var s: whitelist.get()) {
+            for (var s: WHITELIST.whitelist) {
                 if (host.endsWith("." + s) || host.equals(s)) {
                     return true;
                 }
@@ -410,6 +323,6 @@ public class WFConfig {
     }
 
     public static boolean isDevMode() {
-        return !FMLLoader.isProduction() || forceDevMode.get();
+        return FabricLoader.getInstance().isDevelopmentEnvironment() || ROOT.forceDevMode;
     }
 }

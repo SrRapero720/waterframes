@@ -6,11 +6,11 @@ import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.WidgetTripleTable;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.gui.*;
 import team.creative.creativecore.common.gui.controls.simple.GuiButtonIcon;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
@@ -71,13 +71,13 @@ public class RemoteControlScreen extends GuiLayer {
 
         this.active = new GuiButtonIcon("active_toggle", IconStyles.OFF_ON, button -> tile.setActive(true, !tile.data.active)) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
                 return ScreenStyles.RED_BACKGROUND;
             }
 
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
                 return ScreenStyles.RED_BORDER;
             }
@@ -85,13 +85,13 @@ public class RemoteControlScreen extends GuiLayer {
 
         this.muted = new GuiButtonIcon("muted_toggle", IconStyles.VOLUME_MUTE, button -> tile.setMute(true, !tile.data.muted)) {
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
                 return ScreenStyles.BLUE_BACKGROUND;
             }
 
             @Override
-            @OnlyIn(Dist.CLIENT)
+            @Environment(EnvType.CLIENT)
             public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
                 return ScreenStyles.BLUE_BORDER;
             }
@@ -235,19 +235,19 @@ public class RemoteControlScreen extends GuiLayer {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public GuiStyle getStyle() {
         return ScreenStyles.REMOTE_CONTROL;
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
         return ScreenStyles.SCREEN_BACKGROUND;
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
         return ScreenStyles.SCREEN_BORDER;
     }
