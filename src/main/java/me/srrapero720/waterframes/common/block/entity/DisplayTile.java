@@ -11,6 +11,7 @@ import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.*;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.Level;
 import org.watermedia.api.image.ImageAPI;
 import org.watermedia.api.image.ImageCache;
 import org.watermedia.api.math.MathAPI;
@@ -184,7 +185,7 @@ public class DisplayTile extends BlockEntity {
     }
 
     private int getLightLevel$internal() {
-        return !this.data.hasUri() ? 0 : (int) (((float) this.data.brightness / 255f) * level.getMaxLightLevel());
+        return !this.data.hasUri() ? 0 : (int) (((float) this.data.brightness / 255f) * Level.MAX_BRIGHTNESS);
     }
 
     private int getAnalogOutput$internal() {

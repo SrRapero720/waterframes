@@ -4,7 +4,9 @@
   "package": "me.srrapero720.waterframes.mixin.impl",
   "plugin": "me.srrapero720.waterframes.mixin.MixinPlugin",
   "minVersion": "0.8.5",
-  "client": [],
+  "client": [
+    "creativecore.GuiRenderHelperMixin"
+  ],
   "mixins": [
     "MinecraftServerMixin"
   ]

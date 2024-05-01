@@ -425,8 +425,8 @@ public class WaterFramesCommand {
         for (var tile: displayTiles) {
             BlockPos pos = tile.getBlockPos();
             Component index = Component.literal("- [" + i + "] ").withStyle(ChatFormatting.GOLD)
-                    .withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("/teleport %s %s %s %s", player.getGameProfile().getName(), pos.getX(), pos.getY(), pos.getZ()))))
-                    .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("waterframes.commands.audit.in_range.tooltip.position", pos.getX(), pos.getY(), pos.getZ()))));
+                    .withStyle(Style.EMPTY.withClickEvent(new ClickEvent.SuggestCommand(String.format("/teleport %s %s %s %s", player.getGameProfile().getName(), pos.getX(), pos.getY(), pos.getZ()))))
+                    .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(Component.translatable("waterframes.commands.audit.in_range.tooltip.position", pos.getX(), pos.getY(), pos.getZ()))));
             Component x = Component.literal("X: " + pos.getX()).withStyle(ChatFormatting.RED);
             Component y = Component.literal("Y: " + pos.getY()).withStyle(ChatFormatting.GREEN);
             Component z = Component.literal("Z: " + pos.getZ()).withStyle(ChatFormatting.AQUA);
@@ -440,7 +440,7 @@ public class WaterFramesCommand {
             }
             Component author = Component.translatable("waterframes.commands.audit.in_range.author", playerAuthor)
                     .withStyle(ChatFormatting.DARK_GRAY)
-                    .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("UUID: " + tile.data.uuid.toString()))));
+                    .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent.ShowText(Component.literal("UUID: " + tile.data.uuid.toString()))));
 
             response.append(index).append(x).append(" ").append(y).append(" ").append(z).append(" || ").append(author);
             if (i != displayTiles.size()) {

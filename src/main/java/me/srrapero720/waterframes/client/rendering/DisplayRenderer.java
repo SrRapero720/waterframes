@@ -1,19 +1,23 @@
 package me.srrapero720.waterframes.client.rendering;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.blaze3d.vertex.Tesselator;
 import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.TriState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -25,20 +29,27 @@ import team.creative.creativecore.common.util.math.box.BoxFace;
 
 import java.util.function.Function;
 
-public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
+import static net.minecraft.client.renderer.RenderStateShard.*;
 
-    private static final Function<ResourceLocation, RenderType> BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE = Util.memoize((p_173198_) -> {
-        RenderType.CompositeState rendertype$compositestate = RenderType.CompositeState.builder().setShaderState(RenderType.RENDERTYPE_TRANSLUCENT_SHADER).setTextureState(new RenderStateShard.TextureStateShard(p_173198_, false, false)).setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY).setLightmapState(RenderType.LIGHTMAP).setOverlayState(RenderType.NO_OVERLAY).createCompositeState(false);
-        return RenderType.create("block_translucent_cull_custom_texture", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 256, true, true, rendertype$compositestate);
-    });
+public record DisplayRenderer(BlockEntityRendererProvider.Context context) implements BlockEntityRenderer<DisplayTile> {
 
-    private final BlockEntityRendererProvider.Context context;
-    public DisplayRenderer(BlockEntityRendererProvider.Context context) {
-        this.context = context;
-    }
+    // THIS IS NOT WORKING
+    public static final Function<ResourceLocation, RenderType> BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE = Util.memoize((texture) -> RenderType.create(
+            "display_translucent",
+            786432,
+            false,
+            true,
+            RenderPipelines.TRANSLUCENT,
+            RenderType.CompositeState.builder()
+                    .setLightmapState(LIGHTMAP)
+                    .setTextureState(new TextureStateShard(texture, TriState.FALSE, false))
+                    .setOutputState(TRANSLUCENT_TARGET)
+                    .createCompositeState(false)
+    ));
 
     @Override
     public boolean shouldRenderOffScreen(DisplayTile tile) {
+
         return tile.data.getWidth() > 16 || tile.data.getHeight() > 16;
     }
 
@@ -54,10 +65,11 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     }
 
     @Override
-    public void render(DisplayTile tile, float partialTicks, PoseStack pose, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(DisplayTile tile, float partialTicks, PoseStack pose, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 p) {
         var display = tile.activeDisplay();
         if (display == null || !DisplaysConfig.keepsRendering()) return;
         display.preRender();
+        GlStateManager._bindTexture(0);
 
         var direction = tile.getDirection();
         var box = tile.getRenderBox();
@@ -82,7 +94,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
         // TWEAK FOR "EXTRA-RESIZING"
         if (tile.caps.growMax(tile, facing, invertedFace)) {
-            box.setMax(facing.axis,box.getMax(facing.axis) + tile.caps.growSize());
+            box.setMax(facing.axis, box.getMax(facing.axis) + tile.caps.growSize());
         } else {
             box.setMin(facing.axis, box.getMin(facing.axis) - tile.caps.growSize());
         }
@@ -110,7 +122,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     public void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing, int packedLight, int packedOverlay,
                        boolean front, boolean back, boolean flipX, boolean flipY, int r, int g, int b, int a, ResourceLocation texture) {
 
-        VertexConsumer builder = source.getBuffer(DisplaysConfig.shaderMode() ? RenderType.entityTranslucentCull(texture) : BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE.apply(texture));
+        VertexConsumer builder = source.getBuffer(DisplaysConfig.shaderMode() ? RenderType.entityTranslucent(texture, false) : BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE.apply(texture));
         if (front) {
             for (int i = 0; i < boxface.corners.length; i++) {
                 BoxCorner corner = boxface.corners[i];

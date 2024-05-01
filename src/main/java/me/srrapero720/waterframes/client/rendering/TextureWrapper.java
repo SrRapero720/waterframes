@@ -1,38 +1,13 @@
 package me.srrapero720.waterframes.client.rendering;
 
-import me.srrapero720.waterframes.WaterFrames;
-import org.watermedia.api.image.ImageRenderer;
+import com.mojang.blaze3d.opengl.GlTexture;
+import com.mojang.blaze3d.textures.TextureFormat;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
 public class TextureWrapper extends AbstractTexture {
-    public TextureWrapper(int id) {
-        this.id = id;
-    }
-
-    @Override public int getId() {
-        return this.id;
-    }
-
-    @Override public void load(ResourceManager manager) { /* NO OP */ }
-    @Override public void releaseId() { /* NO OP */ }
-    @Override public void close() { /* NO OP */}
-
-    @OnlyIn(Dist.CLIENT)
-    public static class Renderer extends TextureWrapper {
-        private final ImageRenderer renderer;
-
-        public Renderer(ImageRenderer imageRenderer) {
-            super(-1);
-            this.renderer = imageRenderer;
-        }
-
-        @Override
-        public int getId() {
-            return renderer.texture(WaterFrames.getTicks(), WaterFrames.deltaFrames(), true);
-        }
+    public TextureWrapper(final int id, final int width, final int height) {
+        this.texture = new GlTexture("texturewrapper_" + id, TextureFormat.RGBA8, width, height, 1, id, false) {
+            @Override public void close() { super.close(); }
+        };
     }
 }

@@ -6,6 +6,7 @@ import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -14,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
@@ -27,8 +28,13 @@ public class ProjectorBlock extends DisplayBlock {
 
     public static final MapCodec<ProjectorBlock> CODEC = simpleCodec(ProjectorBlock::new);
 
-    public ProjectorBlock() {}
-    public ProjectorBlock(BlockBehaviour.Properties p) {}
+    protected ProjectorBlock(BlockBehaviour.Properties p) {
+        super(p);
+    }
+
+    public ProjectorBlock(ResourceKey<Block> resourceKey) {
+        super(resourceKey);
+    }
 
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
@@ -36,7 +42,7 @@ public class ProjectorBlock extends DisplayBlock {
     }
 
     @Override
-    public DirectionProperty getFacing() {
+    public EnumProperty<Direction> getFacing() {
         return BlockStateProperties.HORIZONTAL_FACING;
     }
 

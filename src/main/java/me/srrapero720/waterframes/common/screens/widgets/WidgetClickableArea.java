@@ -7,11 +7,11 @@ import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import org.joml.Matrix4f;
-import team.creative.creativecore.client.render.GuiRenderHelper;
 import team.creative.creativecore.common.gui.control.simple.GuiIcon;
 import team.creative.creativecore.common.util.math.geo.Rect;
 
@@ -53,14 +53,7 @@ public class WidgetClickableArea extends GuiIcon {
         };
 
         pose.pushPose();
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, icon.location());
-
         this.color.glColor();
-        Matrix4f matrix = pose.last().pose();
 
         float x, x2, y, y2;
         x = offsetX;
@@ -74,15 +67,16 @@ public class WidgetClickableArea extends GuiIcon {
         u2 = (icon.minX() + icon.width()) / 256f;
         v2 = (icon.minY() + icon.height()) / 256f;
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        BufferBuilder bufferbuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferbuilder.addVertex(matrix, x, y2, 0).setUv(u, v2);
-        bufferbuilder.addVertex(matrix, x2, y2, 0).setUv(u2, v2);
-        bufferbuilder.addVertex(matrix, x2, y, 0).setUv(u2, v);
-        bufferbuilder.addVertex(matrix, x, y, 0).setUv(u, v);
-        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
-
-        RenderSystem.disableBlend();
+        graphics.drawSpecial(b -> {
+            ResourceLocation rl = icon.location();
+            final VertexConsumer vertexConsumer = b.getBuffer(RenderType.guiTextured(rl));
+            float bo = 0;
+            Matrix4f matrix = graphics.pose().last().pose();
+            vertexConsumer.addVertex(matrix, x, y2, 0).setUv(u, v2).setColor(-1);
+            vertexConsumer.addVertex(matrix, x2, y2, 0).setUv(u2, v2).setColor(-1);
+            vertexConsumer.addVertex(matrix, x2, y, 0).setUv(u2, v).setColor(-1);
+            vertexConsumer.addVertex(matrix, x, y, 0).setUv(u, v).setColor(-1);
+        });
         pose.popPose();
     }
 

@@ -111,7 +111,7 @@ public class WaterFrames {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static float deltaFrames() { return Minecraft.getInstance().isPaused() ? 1.0F : Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false); }
+    public static float deltaFrames() { return Minecraft.getInstance().isPaused() ? 1.0F : Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false); }
 
     @OnlyIn(Dist.CLIENT)
     public static void tick() {
