@@ -16,8 +16,6 @@ public class TextureWrapper extends AbstractTexture {
     @Override public int getId() {
         return this.id;
     }
-
-    @Override public void load(ResourceManager manager) { /* NO OP */ }
     @Override public void releaseId() { /* NO OP */ }
     @Override public void close() { /* NO OP */}
 

@@ -102,7 +102,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     public void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing, int packedLight, int packedOverlay,
                        boolean front, boolean back, boolean flipX, boolean flipY, int r, int g, int b, int a, ResourceLocation texture) {
 
-        VertexConsumer builder = source.getBuffer(RenderType.entityTranslucentCull(texture));
+        VertexConsumer builder = source.getBuffer(RenderType.entityTranslucent(texture, false));
         if (front) {
             for (int i = 0; i < boxface.corners.length; i++) {
                 BoxCorner corner = boxface.corners[i];
