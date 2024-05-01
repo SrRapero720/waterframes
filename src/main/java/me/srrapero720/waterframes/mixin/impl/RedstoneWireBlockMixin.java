@@ -1,6 +1,5 @@
 package me.srrapero720.waterframes.mixin.impl;
 
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.RedStoneWireBlock;

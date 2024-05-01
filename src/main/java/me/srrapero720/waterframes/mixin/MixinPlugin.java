@@ -17,6 +17,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String target, String mixin) {
+        if (mixin.endsWith("videoplayer.VideoPlayerMixin")) {
+            return FabricLoader.getInstance().isModLoaded("videoplayer");
+        }
         return true;
     }
 

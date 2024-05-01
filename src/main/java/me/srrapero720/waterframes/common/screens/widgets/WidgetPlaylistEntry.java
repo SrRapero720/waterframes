@@ -3,18 +3,17 @@ package me.srrapero720.waterframes.common.screens.widgets;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
 import team.creative.creativecore.common.gui.GuiParent;
 import team.creative.creativecore.common.gui.VAlign;
-import team.creative.creativecore.common.gui.controls.simple.GuiButtonIcon;
-import team.creative.creativecore.common.gui.controls.simple.GuiLabel;
+import team.creative.creativecore.common.gui.control.simple.GuiButtonIcon;
+import team.creative.creativecore.common.gui.control.simple.GuiLabel;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
-import team.creative.creativecore.common.util.math.geo.Rect;
 
 import java.net.URI;
 import java.util.LinkedList;
@@ -57,18 +56,18 @@ public class WidgetPlaylistEntry extends GuiParent {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
         return tile.data.hasUri() && tile.data.getUri().equals(uri) ? ScreenStyles.DARK_BLUE_HIGHLIGHT : ScreenStyles.DARK_BLUE_BACKGROUND;
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
-    public boolean mouseClicked(Rect rect, double x, double y, int button) {
+    @Environment(EnvType.CLIENT)
+    public boolean mouseClicked(double x, double y, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
             Util.getPlatform().openUri(this.uri);
         }
-        return super.mouseClicked(rect, x, y, button);
+        return super.mouseClicked(x, y, button);
     }
 
     @Override

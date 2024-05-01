@@ -8,17 +8,17 @@ import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.WidgetPlaylistEntry;
 import me.srrapero720.waterframes.common.screens.widgets.WidgetURLTextField;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.gui.Align;
-import team.creative.creativecore.common.gui.GuiChildControl;
+import team.creative.creativecore.common.gui.GuiControl;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.GuiParent;
-import team.creative.creativecore.common.gui.controls.parent.GuiScrollY;
-import team.creative.creativecore.common.gui.controls.simple.GuiButtonIcon;
-import team.creative.creativecore.common.gui.controls.simple.GuiCheckButtonIcon;
-import team.creative.creativecore.common.gui.controls.simple.GuiStateButtonIcon;
+import team.creative.creativecore.common.gui.control.parent.GuiScrollY;
+import team.creative.creativecore.common.gui.control.simple.GuiButtonIcon;
+import team.creative.creativecore.common.gui.control.simple.GuiCheckButtonIcon;
+import team.creative.creativecore.common.gui.control.simple.GuiStateButtonIcon;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
@@ -53,17 +53,17 @@ public class PlayListScreen extends GuiLayer {
         this.uris = new LinkedList<>();
         this.scrollY = new GuiScrollY("parent_scroll");
         this.list = new GuiParent(GuiFlow.STACK_Y);
-        this.scrollY.addControl(list);
+        this.scrollY.add(list);
         this.setSpacing(4);
 
         for (URI uri: tile.data.uris) {
-            this.list.addControl(new WidgetPlaylistEntry(tile, this.uris, uri));
+            this.list.add(new WidgetPlaylistEntry(tile, this.uris, uri));
         }
 
         this.urlTextField = new WidgetURLTextField(null);
         this.addButton = new GuiButtonIcon("add", IconStyles.ADD, mouse -> {
             if (urlTextField.isUrlValid()) {
-                this.list.addControl(new WidgetPlaylistEntry(tile, this.uris, urlTextField.getURI()));
+                this.list.add(new WidgetPlaylistEntry(tile, this.uris, urlTextField.getURI()));
                 this.urlTextField.setText("");
                 this.reflow();
             }
@@ -79,8 +79,8 @@ public class PlayListScreen extends GuiLayer {
 
     public LinkedList<URI> getUris() {
         LinkedList<URI> uris = new LinkedList<>();
-        for (GuiChildControl control: this.list) {
-            if (control.control instanceof WidgetPlaylistEntry element) {
+        for (GuiControl control: this.list) {
+            if (control instanceof WidgetPlaylistEntry element) {
                 uris.add(element.uri);
             }
         }
@@ -119,14 +119,14 @@ public class PlayListScreen extends GuiLayer {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) { return ScreenStyles.SCREEN_BACKGROUND; }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) { return ScreenStyles.SCREEN_BORDER; }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public GuiStyle getStyle() { return ScreenStyles.DISPLAYS; }
 }

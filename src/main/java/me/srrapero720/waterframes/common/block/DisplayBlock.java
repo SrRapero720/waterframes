@@ -15,6 +15,7 @@ import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -36,6 +37,8 @@ import org.joml.Vector3f;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
 import team.creative.creativecore.common.gui.creator.GuiCreator;
+
+import java.util.function.ToIntFunction;
 
 @SuppressWarnings("deprecation")
 @MethodsReturnNonnullByDefault
@@ -84,12 +87,12 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
     }
 
-    @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        ItemStack stack = player.getItemInHand(hand);
-        if (stack.getItem() instanceof RemoteControl control) {
-            boolean matchDim = control.getDimension(stack.getOrCreateTag()).equals(level.dimension().location().toString());
-            int[] position = control.getPosition(stack.getOrCreateTag());
-            if (position.length == 0) return InteractionResult.FAIL;
+    @Override public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        var data = stack.get(DisplaysRegistry.REMOTE_DATA);
+        if (stack.getItem() instanceof RemoteControl control && data != null) {
+            boolean matchDim = control.getDimension(data).equals(level.dimension().location().toString());
+            int[] position = control.getPosition(data);
+            if (position.length == 0) return ItemInteractionResult.FAIL;
             boolean matchPos = new BlockPos(position[0], position[1], position[2]).equals(pos);
 
             if (matchDim && matchPos && level.getBlockEntity(pos) instanceof DisplayTile tile) {
@@ -106,10 +109,15 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
                             randomNegative(Math.random()), Math.random() * 3, randomNegative(Math.random()));
                     i++;
                 } while (i < 4);
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
         }
+        if (!level.isClientSide && DisplaysConfig.canInteractBlock(player, this)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        return ItemInteractionResult.SUCCESS;
+    }
 
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && DisplaysConfig.canInteractBlock(player, this)) GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
     }
@@ -156,6 +164,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
         return (l, pos, state, be) -> {
             if (be instanceof DisplayTile tile) {
+                tile.setLevel(l);
                 tile.tick(state);
             }
         };

@@ -10,12 +10,14 @@ import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.WidgetTripleTable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import team.creative.creativecore.common.gui.*;
-import team.creative.creativecore.common.gui.controls.simple.GuiButtonIcon;
-import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
+import team.creative.creativecore.common.gui.control.simple.GuiButtonIcon;
+import team.creative.creativecore.common.gui.control.simple.GuiIcon;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
@@ -268,9 +270,9 @@ public class RemoteControlScreen extends GuiLayer {
         return ScreenStyles.SCREEN_BORDER;
     }
 
-    public static void hyperIterate(Iterator<GuiChildControl> iterator, Consumer<GuiControl> consumer) {
+    public static void hyperIterate(Iterator<GuiControl> iterator, Consumer<GuiControl> consumer) {
         while (iterator.hasNext()) {
-            var item = iterator.next().control;
+            var item = iterator.next();
             if (item instanceof GuiParent parent) {
                 hyperIterate(parent.iterator(), consumer);
             } else {

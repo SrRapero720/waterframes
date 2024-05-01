@@ -1,11 +1,12 @@
 {
   "required": true,
-  "compatibilityLevel": "JAVA_17",
+  "compatibilityLevel": "JAVA_21",
   "package": "me.srrapero720.waterframes.mixin.impl",
   "refmap": "${modid}.${mixin_refmap_suffix}",
   "plugin": "me.srrapero720.waterframes.mixin.MixinPlugin",
   "minVersion": "0.8.5",
   "client": [
+    "DeltaTrackerTimerMixin",
     "MinecraftMixin"
   ],
   "mixins": [

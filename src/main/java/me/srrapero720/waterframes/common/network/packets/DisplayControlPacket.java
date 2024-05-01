@@ -48,12 +48,12 @@ public abstract class DisplayControlPacket extends CreativePacket {
     @Override
     @Deprecated
     public void executeClient(Player player) {
-        throw new UnsupportedOperationException("No-op");
+        this.execute(player);
     }
 
     @Override
     @Deprecated
-    public void executeServer(ServerPlayer serverPlayer) {
-        throw new UnsupportedOperationException("No-op");
+    public void executeServer(ServerPlayer player) {
+        this.execute(player);
     }
 }

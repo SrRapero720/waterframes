@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.common.block;
 
+import com.mojang.serialization.MapCodec;
 import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.common.block.entity.FrameTile;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -8,6 +9,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -22,6 +24,16 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 @MethodsReturnNonnullByDefault
 public class FrameBlock extends DisplayBlock {
     public static final float THICKNESS = 0.0625F / 2F;
+
+    public static final MapCodec<FrameBlock> CODEC = simpleCodec(FrameBlock::new);
+
+    public FrameBlock() {}
+    public FrameBlock(BlockBehaviour.Properties p) {}
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
 
     @Override
     public DirectionProperty getFacing() {
