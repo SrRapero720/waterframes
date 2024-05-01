@@ -1,0 +1,61 @@
+# 🎉 RELEASE 2.0 🎉
+**THIS CHANGELOG CONTAINS EVERYTHING DONE FROM 1.3.x TO 2.0.0**
+
+- ## 📽️ | NEW BLOCK: PROJECTOR
+  - ✨ Let you project distanced pictures and videos
+  - ✨ Can configure the audio source of the video from image or centered with the block and the image
+  - 🧱 Includes a fancy model to ceiling it upward (model made by FabiAcr and J-RAP, texture by Kotyarendj)
+  - 🛜 Have a max-range of 64 blocks (configurable)
+- ## 📺 | NEW BLOCK: TELEVISION
+  - ✨ Cannot be resized, rotated and picture can't be repositioned
+  - 🧱 Includes a fancy models to ceiling it into too many sides (model made by FabiAcr and J-RAP, texture by Kotyarendj)
+- ## 📺 | NEW BLOCK: BIG TELEVISION
+  - ✨ Cannot be resized, rotated and picture can't be repositioned
+  - 🧱 Only had one design in different horizontal rotations, but it IS HUGE (model made by J-RAP, texture by Kotyarendj)
+- ## 🎮 | NEW ITEM: REMOTE CONTROL
+  - ✨ Let you control any display (Frame, Projector, TV, Big TV) from far away
+  - ✨ Can turn off, mute, volume up/down, pause, play, stop, rewind, fast-forward or reload the display
+  - 🛜 Have a range of 32 blocks (configurable)
+  - 🧱 Model made by J-RAP, texture by Kotyarendj
+- ## 🎛️ | REVAMPED THE WHOLE DISPLAYS SCREEN
+  - ✨ Added a small status icon indicating whatever was the state of the current display
+  - ✨ Picture position is now a big selection area (no longer need to click buttons many times)
+  - ✨ Now you have a seekbar to change the time for your videos or gifs
+  - ✨ Loop button is now a playback action and get sync whithout save
+  - ✨ Mute and Turn-Off states can be restarted by clicking on SAVE
+  - ✨ Reload is now disabled when URL is different from the active media
+  - ✨ Added compatibility with VideoPlayer (by Goedix) adding a new button on display screens to play the media fullscreen
+  - ✨ All displays share the same GUI, making all features common to each other
+- ## 🌐 | GENERAL IMPROVEMENTS
+  - ✨ SNEAK + CLICK will now flip the direction of all displays except FRAMES
+  - 🛠️ Now you can do your own frames! Internal rewrote the whole block system into an abstraction layer
+    - It Is easier now made your own blocks and tiles having custom properties and rendering sizes
+    - Data is fully abstracted, and easier to synchronize
+  - ✨ Max volume can now be configurable to the max value 120 (default: 100)
+  - ✨ Frame texture is revamped by Kotyarendj
+  - ✨ New command: ``/waterframes``
+    - ``/waterframes audit ~ ~ ~`` lets you find who put that URL in the frame (soon more audit capabilities)
+    - ``/waterframes edit ~ ~ ~`` lets you modify the attributes of the frame such as the rotation, volume distances or sizes
+  - ✨ Optimize performance when media is paused or turned off
+  - ✨ Added a loading gif rendered when the media is buffering or loading (customizable)}
+    - You can add your own loading gif placing the gif into ``config/watermedia/assets/waterframes/loading.gif`` (powered by WATERMeDIA)
+  - 🛠️ Reduced stack size to 16
+  - 🛠️ All displays can be removed faster using a pickaxe
+  - 🛠️ Now requires the right tool to get the block
+  - 🛠️ Updated crafting recipe for each display (all display requires the RC in the craft)
+- ## 🟥 REDSTONE HANDLING
+  - ✨ Now displays (using comparators) emits signal
+    - level 0 when have not a URL
+    - level 1 when have a URL and time is near to 0
+    - level 1 to 15 when have a URL and the time is between 0 to the media duration
+  - ✨ Redstone inputs will pause the media and can be overridden by RC and screen controls (configurable)
+- ## 🛠️ | BUGS FIXED
+  - 🐛 Position of the image in some directions is inverted (RIGHT position goes to the LEFT)
+  - 🐛 Redstone handling never works even if it was enabled in config
+  - 🐛 JEI overlaps with WaterFrames screens (fixed by CreativeMD, backported by me)
+  - 🐛 **[1.20.1]** Some block entities get obscured when you change the brightness of any display
+  - 🐛 Whitelist wasn't working properly on player with no OP permissions
+  - 🐛 Permissions wasn't working on the client-side (letting you save but not really saving)
+  - 🐛 Updating videos to another video makes it play with the time of the old video
+  - 🛠️ incompatibility with Stellarity (now crashes the game instead of make picture buggy)
+  - 🛠️ [EXTERNAL FIX]: fixed crashes by VideoPlayer about StackOverflowError 
