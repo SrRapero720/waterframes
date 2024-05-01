@@ -130,7 +130,7 @@ modrinth {
     versionType = versiontype
     gameVersions = [ mcversion ]
     changelog = getChangelogText(true)
-    loaders = [ "forge" ]
+    loaders = [ "forge", "neoforge" ]
     dependencies {
         required.project "creativecore"
         required.project "watermedia"

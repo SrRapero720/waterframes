@@ -34,6 +34,10 @@ import org.apache.logging.log4j.MarkerManager;
 import java.util.Collections;
 import java.util.List;
 
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+
+import java.util.function.Supplier;
+
 public class WaterFramesCommand {
     private static final Marker IT = MarkerManager.getMarker("Commands");
     public static final Component ACTIVATED = Component.translatable("waterframes.common.activated");
@@ -353,7 +357,7 @@ public class WaterFramesCommand {
                     ItemEntity itementity = serverplayer.drop(itemstack, false);
                     if (itementity != null) {
                         itementity.setNoPickUpDelay();
-                        itementity.setOwner(serverplayer.getUUID());
+                        itementity.setTarget(serverplayer.getUUID());
                     }
                 }
             }
@@ -444,16 +448,16 @@ public class WaterFramesCommand {
         return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t, t2).withStyle(ChatFormatting.RED));
     }
 
-    private static Component msgSuccess(String t) {
-        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.GREEN));
+    private static Supplier<Component> msgSuccess(String t) {
+        return () -> Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.GREEN));
     }
 
-    private static Component msgSuccess(String t, Component c) {
-        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.GREEN).append(c));
+    private static Supplier<Component> msgSuccess(String t, Component c) {
+        return () -> Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.GREEN).append(c));
     }
 
-    private static Component msgSuccess(String t, String... a) {
-        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
+    private static Supplier<Component> msgSuccess(String t, String... a) {
+        return () -> Component.literal(WaterFrames.PREFIX).append(Component.translatable(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
     }
 
     public static boolean hasPermissions(CommandSourceStack sourceStack) {
