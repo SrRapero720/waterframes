@@ -1,3 +1,7 @@
+# UPDATE 2.0.1
+**NON-ENGINNERS HAVE PROBLEM WITH THE 2.0**
+- 🐛 Fixed hard dependency on Create Mod (by accident)
+
 # 🎉 RELEASE 2.0 🎉
 **THIS CHANGELOG CONTAINS EVERYTHING DONE FROM 1.3.x TO 2.0.0**
 
