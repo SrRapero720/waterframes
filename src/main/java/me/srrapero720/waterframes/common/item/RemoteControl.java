@@ -10,8 +10,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -53,26 +51,26 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         }
 
         if (!WFConfig.canInteractItem(player)) {
-            this.sendFatal(player, new TranslatableComponent("waterframes.common.access.denied"));
+            this.sendFatal(player, Component.translatable("waterframes.common.access.denied"));
             return InteractionResultHolder.fail(stack);
         }
 
         var tag = stack.getOrCreateTag();
         if (tag.isEmpty()) {
-            this.sendFailed(player, new TranslatableComponent("waterframes.remote.bound.failed"));
+            this.sendFailed(player, Component.translatable("waterframes.remote.bound.failed"));
             return InteractionResultHolder.pass(stack);
         }
 
         if (player.isCrouching() && !tag.isEmpty()) {
             stack.setTag(null);
-            this.sendSuccess(player, new TranslatableComponent("waterframes.remote.unbound.success"));
+            this.sendSuccess(player, Component.translatable("waterframes.remote.unbound.success"));
             return InteractionResultHolder.success(stack);
         }
 
         long[] pos = tag.getLongArray("pos");
         String dim = tag.getString("dimension");
         if (pos.length < 3 || dim.isEmpty()) {
-            this.sendFailed(player, new TranslatableComponent("waterframes.remote.code.failed"));
+            this.sendFailed(player, Component.translatable("waterframes.remote.code.failed"));
             LOGGER.error(IT, "NBT data is invalid, ensure your set pos as a long-array and the dimension as a resource location");
             return InteractionResultHolder.fail(stack);
         }
@@ -82,7 +80,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
 
         if (level.getBlockEntity(blockPos) instanceof DisplayTile) {
             if (!level.dimension().location().equals(dimension) || !Vec3.atCenterOf(blockPos).closerThan(player.position(), WFConfig.maxRcDis())) {
-                this.sendFailed(player, new TranslatableComponent("waterframes.remote.distance.failed"));
+                this.sendFailed(player, Component.translatable("waterframes.remote.distance.failed"));
                 return InteractionResultHolder.fail(stack);
             } else {
                 GuiCreator.ITEM_OPENER.open(player.getItemInHand(hand).getOrCreateTag(), player, hand);
@@ -92,7 +90,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
 
         // FALLBACK UNBIND
         player.getItemInHand(hand).setTag(null);
-        this.sendFailed(player, new TranslatableComponent("waterframes.remote.display.failed"));
+        this.sendFailed(player, Component.translatable("waterframes.remote.display.failed"));
         return InteractionResultHolder.fail(stack);
     }
 
@@ -107,7 +105,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         }
 
         if (!WFConfig.canInteractItem(player)) {
-            this.sendFatal(player, new TranslatableComponent("waterframes.common.access.denied"));
+            this.sendFatal(player, Component.translatable("waterframes.common.access.denied"));
             return InteractionResult.FAIL;
         }
 
@@ -118,11 +116,11 @@ public class RemoteControl extends Item implements ItemGuiCreator {
             tag.putLongArray("pos", new long[] { pos.getX(), pos.getY(), pos.getZ() });
             tag.putString("dimension", level.dimension().location().toString());
 
-            this.sendSuccess(player, new TranslatableComponent("waterframes.remote.bound.success"));
+            this.sendSuccess(player, Component.translatable("waterframes.remote.bound.success"));
             return InteractionResult.SUCCESS;
         }
 
-        this.sendFailed(player, new TranslatableComponent("waterframes.remote.display.invalid"));
+        this.sendFailed(player, Component.translatable("waterframes.remote.display.invalid"));
         return InteractionResult.FAIL;
     }
 
@@ -147,7 +145,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
 
     @Override
     public Component getHighlightTip(ItemStack item, Component displayName) {
-        return new TextComponent(displayName.getString()).withStyle(ChatFormatting.AQUA);
+        return Component.literal(displayName.getString()).withStyle(ChatFormatting.AQUA);
     }
 
     @Override
@@ -155,7 +153,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         Options opts = Minecraft.getInstance().options;
 
-        pTooltipComponents.add(new TranslatableComponent("waterframes.remote.description.1", opts.keyShift.getKey().getDisplayName(), opts.keyUse.getKey().getDisplayName()));
+        pTooltipComponents.add(Component.translatable("waterframes.remote.description.1", opts.keyShift.getKey().getDisplayName(), opts.keyUse.getKey().getDisplayName()));
     }
 
     @Override

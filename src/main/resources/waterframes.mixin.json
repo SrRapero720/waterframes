@@ -10,7 +10,6 @@
     "vp.VideoPlayerMixin"
   ],
   "mixins": [
-    "LevelMixin",
     "PlayerListMixin",
     "creativecore.CompiledTextMixin",
     "creativecore.GuiLabelMixin",
