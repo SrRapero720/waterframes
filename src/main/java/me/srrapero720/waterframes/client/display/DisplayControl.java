@@ -5,7 +5,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.Marker;
@@ -100,8 +100,8 @@ public class DisplayControl {
     public static long getTicks() { return ticks; }
 
     @SubscribeEvent
-    public static void onUnloadingLevel(WorldEvent.Unload event) {
-        LevelAccessor level = event.getWorld();
+    public static void onUnloadingLevel(LevelEvent.Unload event) {
+        LevelAccessor level = event.getLevel();
         if (level != null && level.isClientSide()) DisplayControl.release();
     }
 

@@ -16,8 +16,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.server.command.EnumArgument;
 
@@ -269,7 +267,7 @@ public class WaterFramesCommand {
                 source.sendFailure(msgFailed("waterframes.commands.audit.author.failed", tile.data.uuid.toString()));
                 return 2;
             }
-            source.sendSuccess(msgSuccess("waterframes.commands.audit.author", new TextComponent(profiler.get().getName()).withStyle(ChatFormatting.AQUA)), true);
+            source.sendSuccess(msgSuccess("waterframes.commands.audit.author", Component.literal(profiler.get().getName()).withStyle(ChatFormatting.AQUA)), true);
         }
         return 0;
     }
@@ -334,19 +332,19 @@ public class WaterFramesCommand {
     }
 
     private static Component msgFailed(String t) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.RED));
+        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.RED));
     }
 
     private static Component msgFailed(String t, String t2) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t, t2).withStyle(ChatFormatting.RED));
+        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t, t2).withStyle(ChatFormatting.RED));
     }
 
     private static Component msgSuccess(String t) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN));
+        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.GREEN));
     }
 
     private static Component msgSuccess(String t, Component c) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN).append(c));
+        return Component.literal(WaterFrames.PREFIX).append(Component.translatable(t).withStyle(ChatFormatting.GREEN).append(c));
     }
 
     public static boolean hasPermissions(CommandSourceStack sourceStack) {
