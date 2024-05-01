@@ -8,6 +8,10 @@
 *.war
 *.ear
 
+# Package files located in lib
+!libs/*.jar
+libs/watermedia_**.jar
+
 # runConifgurations
 .idea/runConfigurations/
 .idea
