@@ -4,11 +4,10 @@ import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
 import team.creative.creativecore.common.gui.style.Icon;
-import team.creative.creativecore.common.util.text.TextBuilder;
 
 import java.util.ArrayList;
 import java.util.List;

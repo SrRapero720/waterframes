@@ -14,7 +14,7 @@ import static com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX_COLOR_N
 
 public class RenderCore {
     private static final Tesselator tesselator = Tesselator.getInstance();
-    private static final BufferBuilder builder = tesselator.getBuilder();
+    private static BufferBuilder builder;
 
     public static void cleanShader() {
         ShaderInstance shader = RenderSystem.getShader();
@@ -23,20 +23,18 @@ public class RenderCore {
     }
 
     public static void bufferPrepare() {
-        if (builder.building()) bufferEnd();
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
     }
 
-    public static void bufferBegin() {
-        builder.begin(VertexFormat.Mode.QUADS, POSITION_TEX_COLOR_NORMAL);
+    public static BufferBuilder bufferBegin() {
+        if (builder != null) bufferFinish();
+        builder = tesselator.begin(VertexFormat.Mode.QUADS, POSITION_TEX_COLOR_NORMAL);
+        return builder;
     }
 
     public static void bufferFinish() {
-        builder.end();
-    }
-
-    public static void bufferEnd() {
-        tesselator.end();
+        BufferUploader.drawWithShader(builder.buildOrThrow());
+        builder = null;
     }
 
     public static void bindTex(int texture) {
@@ -65,10 +63,11 @@ public class RenderCore {
 
     private static void vertex(PoseStack pose, AlignedBox box, BoxFace face, BoxCorner corner, boolean flipX, boolean flipY, int a, int r, int g, int b) {
         Vec3i normal = face.facing.normal;
-        builder.vertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
-                .uv(corner.isFacing(face.getTexU()) != flipX ? 1 : 0, corner.isFacing(face.getTexV()) != flipY ? 1 : 0)
-                .color(r, g, b, a)
-                .normal(pose.last().normal(), normal.getX(), normal.getY(), normal.getZ())
-                .endVertex();
+        builder.addVertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
+                .setUv(corner.isFacing(face.getTexU()) != flipX ? 1 : 0, corner.isFacing(face.getTexV()) != flipY ? 1 : 0)
+                .setUv1(corner.isFacing(face.getTexU()) != flipX ? 1 : 0, corner.isFacing(face.getTexV()) != flipY ? 1 : 0)
+                .setUv2(corner.isFacing(face.getTexU()) != flipX ? 1 : 0, corner.isFacing(face.getTexV()) != flipY ? 1 : 0)
+                .setColor(r, g, b, a)
+                .setNormal(pose.last(), normal.getX(), normal.getY(), normal.getZ());
     }
 }

@@ -20,7 +20,7 @@
     }
   },
   "result": {
-    "item": "waterframes:remote",
+    "id": "waterframes:remote",
     "count": 1
   }
 }

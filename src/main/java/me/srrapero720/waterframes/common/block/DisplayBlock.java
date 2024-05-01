@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.common.block;
 
+import com.mojang.serialization.MapCodec;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
@@ -12,7 +13,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -21,6 +24,7 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.LecternBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.*;
@@ -35,6 +39,7 @@ import team.creative.creativecore.common.gui.creator.GuiCreator;
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCreator, SimpleWaterloggedBlock {
+
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
@@ -72,7 +77,14 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
     }
 
-    @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!level.isClientSide && WFConfig.canInteractBlock(player)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        return ItemInteractionResult.SUCCESS;
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide && WFConfig.canInteractBlock(player)) GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
     }
@@ -81,7 +93,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return state.getValue(this.getFacing()) == direction;
     }
 
-    @Override protected void registerDefaultState(BlockState state) {
+    @Override public void registerDefaultState(BlockState state) {
         super.registerDefaultState(state
                 .setValue(WATERLOGGED, false)
                 .setValue(POWERED, false)

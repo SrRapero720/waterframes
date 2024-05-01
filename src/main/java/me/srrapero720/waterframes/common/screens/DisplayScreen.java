@@ -9,12 +9,11 @@ import me.srrapero720.waterframes.common.network.packets.DataSyncPacket;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
-import me.srrapero720.waterframes.common.helpers.ScalableText;
 import me.srrapero720.watermedia.api.image.ImageAPI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import team.creative.creativecore.common.gui.*;
 import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
@@ -196,18 +195,18 @@ public class DisplayScreen extends GuiLayer {
                 .setOnTimeUpdate(v -> tile.data.tick = v)
                 .setOnLastTimeUpdate(v -> tile.syncTime(true, v, tile.data.tickMax));
 
-        ((ScalableText) url_l).wf$setScale(0.75f);
-        ((ScalableText) tex_l).wf$setScale(0.75f);
-        ((ScalableText) media_l).wf$setScale(0.75f);
+//        url_l.set(0.75f);
+//        ((ScalableText) tex_l).wf$setScale(0.75f);
+//        ((ScalableText) media_l).wf$setScale(0.75f);
 
-        ((ScalableText) rotation).wf$setScale(0.90f);
-        ((ScalableText) alpha).wf$setScale(0.90f);
-        ((ScalableText) brightness).wf$setScale(0.90f);
-        ((ScalableText) render_distance).wf$setScale(0.90f);
-        ((ScalableText) projection_distance).wf$setScale(0.90f);
+//        ((ScalableText) rotation).wf$setScale(0.90f);
+//        ((ScalableText) alpha).wf$setScale(0.90f);
+//        ((ScalableText) brightness).wf$setScale(0.90f);
+//        ((ScalableText) render_distance).wf$setScale(0.90f);
+//        ((ScalableText) projection_distance).wf$setScale(0.90f);
 
-        ((ScalableText) volume_min).wf$setScale(0.90f);
-        ((ScalableText) volume_max).wf$setScale(0.90f);
+//        ((ScalableText) volume_min).wf$setScale(0.90f);
+//        ((ScalableText) volume_max).wf$setScale(0.90f);
 
         if (!tile.caps.resizes()) {
             this.setDim(WIDTH, HEIGHT - 50);

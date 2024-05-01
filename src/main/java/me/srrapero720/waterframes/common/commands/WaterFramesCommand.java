@@ -20,6 +20,7 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -27,7 +28,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.server.command.EnumArgument;
+import net.neoforged.neoforge.server.command.EnumArgument;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -35,6 +36,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+
+import java.util.function.Supplier;
 
 import java.util.function.Supplier;
 
@@ -189,11 +192,11 @@ public class WaterFramesCommand {
         );
 
         DEFAULT_INPUTS = new ItemInput[] {
-                new ItemInput(Holder.direct(WFRegistry.REMOTE_ITEM.get()), null),
-                new ItemInput(Holder.direct(WFRegistry.FRAME_ITEM.get()), null),
-                new ItemInput(Holder.direct(WFRegistry.PROJECTOR_ITEM.get()), null),
-                new ItemInput(Holder.direct(WFRegistry.TV_ITEM.get()), null),
-                new ItemInput(Holder.direct(WFRegistry.BIG_TV_ITEM.get()), null),
+                new ItemInput(Holder.direct(WFRegistry.REMOTE_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(WFRegistry.FRAME_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(WFRegistry.PROJECTOR_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(WFRegistry.TV_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(WFRegistry.BIG_TV_ITEM.get()), DataComponentPatch.builder().build()),
         };
 
         dispatcher.register(waterframes);
