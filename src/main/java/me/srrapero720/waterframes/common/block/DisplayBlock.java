@@ -1,6 +1,5 @@
 package me.srrapero720.waterframes.common.block;
 
-import com.mojang.math.Vector3f;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.item.RemoteControl;
@@ -31,6 +30,7 @@ import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.joml.Vector3f;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
 import team.creative.creativecore.common.gui.creator.GuiCreator;
@@ -43,12 +43,11 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
-
-    protected static final Material MATERIAL = new Material.Builder(MaterialColor.NONE).noCollider().build();
-    protected static final Properties PROPERTIES = Properties.of(MATERIAL)
+    protected static final Properties PROPERTIES = Properties.of()
             .strength(1f)
             .sound(SoundType.METAL)
             .noOcclusion()
+            .forceSolidOff()
             .isSuffocating(Blocks::never)
             .isViewBlocking(Blocks::never)
             .requiresCorrectToolForDrops();
@@ -89,7 +88,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
                     tile.setPause(true, !tile.data.paused);
                 }
                 Vec3 vec = Vec3.atCenterOf(pos);
-                var opts = new DustParticleOptions(new Vector3f(Vec3.fromRGB24(ChatFormatting.AQUA.getColor())), 1.3f);
+                var opts = new DustParticleOptions(new Vector3f(Vec3.fromRGB24(ChatFormatting.AQUA.getColor()).toVector3f()), 1.3f);
 
                 int i = 0;
                 do {

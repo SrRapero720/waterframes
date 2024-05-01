@@ -6,8 +6,7 @@
   "plugin": "me.srrapero720.waterframes.mixin.MixinPlugin",
   "minVersion": "0.8.5",
   "client": [
-    "MinecraftMixin",
-    "TextureManagerMixin"
+    "MinecraftMixin"
   ],
   "mixins": [
     "MinecraftServerMixin",

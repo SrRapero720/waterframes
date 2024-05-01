@@ -166,7 +166,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     @Override
     public GuiLayer create(CompoundTag tag, Player player) {
         int[] pos = this.getPosition(tag);
-        var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
+        var blockPos = new BlockPos((int) pos[0], (int) pos[1], (int) pos[2]);
         return new RemoteControlScreen(player, (DisplayTile) player.level.getBlockEntity(blockPos), tag, this);
     }
 

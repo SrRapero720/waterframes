@@ -11,8 +11,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -24,8 +22,7 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 public class TVBoxBlock extends DisplayBlock {
     private static final AlignedBox STATIC_BOX = new AlignedBox();
-    protected static final Material TV_BOX_MATERIAL = new Material.Builder(MaterialColor.NONE).build();
-    protected static final Properties TV_BOX_PROPERTIES = Properties.of(TV_BOX_MATERIAL)
+    protected static final Properties TV_BOX_PROPERTIES = Properties.of()
             .strength(1f)
             .sound(SoundType.WOOD);
 

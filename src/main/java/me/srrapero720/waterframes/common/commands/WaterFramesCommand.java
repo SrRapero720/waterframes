@@ -38,6 +38,10 @@ import org.apache.logging.log4j.MarkerManager;
 import java.util.*;
 import java.util.regex.Pattern;
 
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+
+import java.util.function.Supplier;
+
 public class WaterFramesCommand {
     private static final Marker IT = MarkerManager.getMarker("Commands");
     public static final Component ACTIVATED = Component.translatable("waterframes.common.activated");
@@ -352,7 +356,7 @@ public class WaterFramesCommand {
             return 1;
         }
 
-        MutableComponent response = msgSuccess("waterframes.commands.audit.in_range.success", displayTiles.size() + "");
+        MutableComponent response = msgSuccessSimple("waterframes.commands.audit.in_range.success", displayTiles.size() + "");
         int i = 1;
         response.append("\n");
         for (var tile: displayTiles) {
@@ -381,7 +385,7 @@ public class WaterFramesCommand {
             }
             i++;
         }
-        source.sendSuccess(response, true);
+        source.sendSuccess(() -> response, true);
         return 0;
     }
 
@@ -419,7 +423,7 @@ public class WaterFramesCommand {
                     ItemEntity itementity = serverplayer.drop(itemstack, false);
                     if (itementity != null) {
                         itementity.setNoPickUpDelay();
-                        itementity.setOwner(serverplayer.getUUID());
+                        itementity.setTarget(serverplayer.getUUID());
                     }
                 }
             }
@@ -517,15 +521,19 @@ public class WaterFramesCommand {
         return Component.translatable("waterframes.commands.prefix").append(Component.translatable(t, t2).withStyle(ChatFormatting.RED));
     }
 
-    private static MutableComponent msgSuccess(String t) {
-        return Component.translatable("waterframes.commands.prefix").append(Component.translatable(t).withStyle(ChatFormatting.GREEN));
+    private static Supplier<Component> msgSuccess(String t) {
+        return () -> Component.translatable("waterframes.commands.prefix").append(Component.translatable(t).withStyle(ChatFormatting.GREEN));
     }
 
-    private static MutableComponent msgSuccess(String t, Component c) {
-        return Component.translatable("waterframes.commands.prefix").append(Component.translatable(t).withStyle(ChatFormatting.GREEN).append(c));
+    private static Supplier<Component> msgSuccess(String t, Component c) {
+        return () -> Component.translatable("waterframes.commands.prefix").append(Component.translatable(t).withStyle(ChatFormatting.GREEN).append(c));
     }
 
-    private static MutableComponent msgSuccess(String t, String... a) {
+    private static Supplier<Component> msgSuccess(String t, String... a) {
+        return () -> Component.translatable("waterframes.commands.prefix").append(Component.translatable(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
+    }
+
+    private static MutableComponent msgSuccessSimple(String t, String... a) {
         return Component.translatable("waterframes.commands.prefix").append(Component.translatable(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
     }
 
