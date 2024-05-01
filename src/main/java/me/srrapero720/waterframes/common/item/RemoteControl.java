@@ -2,7 +2,9 @@ package me.srrapero720.waterframes.common.item;
 
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.WFRegistry;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.item.data.RemoteData;
 import me.srrapero720.waterframes.common.screens.RemoteControlScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -24,8 +26,8 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.Nullable;
@@ -57,33 +59,29 @@ public class RemoteControl extends Item implements ItemGuiCreator {
             return InteractionResultHolder.fail(stack);
         }
 
-        var tag = stack.getOrCreateTag();
-        if (tag.isEmpty()) {
+        var data = stack.get(WFRegistry.REMOTE_DATA);
+        if (data == null) {
             this.sendFailed(player, Component.translatable("waterframes.remote.bound.failed"));
             return InteractionResultHolder.pass(stack);
         }
 
-        if (player.isCrouching() && !tag.isEmpty()) {
-            stack.setTag(null);
+        if (player.isCrouching()) {
+            stack.set(WFRegistry.REMOTE_DATA, null);
             this.sendSuccess(player, Component.translatable("waterframes.remote.unbound.success"));
             return InteractionResultHolder.success(stack);
         }
 
-        int[] pos = this.getPosition(tag);
-        String dim = this.getDimension(tag);
-        if (pos.length < 3 || dim.isEmpty()) {
-            this.sendFailed(player, Component.translatable("waterframes.remote.code.failed"));
-            LOGGER.error(IT, "NBT data is invalid, ensure your set pos as a long-int and the dimension as a resource location");
-            return InteractionResultHolder.fail(stack);
-        }
-
-        var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
-        var dimension = new ResourceLocation(dim);
+        var blockPos = new BlockPos(data.x(), data.y(), data.z());
+        var dimension = ResourceLocation.parse(data.dimension());
 
         if (level.getBlockEntity(blockPos) instanceof DisplayTile tile) {
             double distance = WaterFrames.getDistance(tile, player.position());
             if (level.dimension().location().equals(dimension) && distance < WFConfig.maxRcDis()) {
-                GuiCreator.ITEM_OPENER.open(player.getItemInHand(hand).getOrCreateTag(), player, hand);
+                var tag = new CompoundTag();
+                tag.putString("dimension", data.dimension());
+                tag.putIntArray("position", data.getPos());
+
+                GuiCreator.ITEM_OPENER.open(tag, player, hand);
                 return InteractionResultHolder.success(stack);
             }
 
@@ -92,7 +90,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         }
 
         // FALLBACK UNBIND
-        player.getItemInHand(hand).setTag(null);
+        player.getItemInHand(hand).set(WFRegistry.REMOTE_DATA, null);
         this.sendFailed(player, Component.translatable("waterframes.remote.display.failed"));
         return InteractionResultHolder.fail(stack);
     }
@@ -102,8 +100,9 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         var pos = context.getClickedPos();
         var level = context.getLevel();
         var player = context.getPlayer();
+        var data = context.getItemInHand().get(WFRegistry.REMOTE_DATA);
 
-        if (player == null || context.getHand() == InteractionHand.OFF_HAND || !context.getItemInHand().getOrCreateTag().isEmpty()) {
+        if (player == null || context.getHand() == InteractionHand.OFF_HAND || data != null) {
             return InteractionResult.PASS;
         }
 
@@ -114,10 +113,8 @@ public class RemoteControl extends Item implements ItemGuiCreator {
 
         if (level.getBlockEntity(pos) instanceof DisplayTile) {
             var item = context.getItemInHand();
-            var tag = item.getOrCreateTag();
 
-            this.setPosition(tag, pos);
-            this.setDimension(tag, level);
+            item.set(WFRegistry.REMOTE_DATA, new RemoteData(level.dimension().location().toString(), pos.getX(), pos.getY(), pos.getZ()));
 
             this.sendSuccess(player, Component.translatable("waterframes.remote.bound.success"));
             return InteractionResult.SUCCESS;
@@ -147,12 +144,16 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         return tag.contains(DIMENSION);
     }
 
-    public int[] getPosition(CompoundTag tag) {
-        return tag.getIntArray(POSITION);
+    public int[] getPosition(CompoundTag data) {
+        return data.getIntArray(POSITION);
     }
 
-    public String getDimension(CompoundTag tag) {
-        return tag.getString(DIMENSION);
+    public int[] getPosition(RemoteData data) {
+        return data != null ? data.getPos() : new int[0];
+    }
+
+    public String getDimension(RemoteData data) {
+        return data != null ? data.dimension() : null;
     }
 
     public void setPosition(CompoundTag tag, BlockPos pos) {
@@ -166,7 +167,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     @Override
     public GuiLayer create(CompoundTag tag, Player player) {
         int[] pos = this.getPosition(tag);
-        var blockPos = new BlockPos((int) pos[0], (int) pos[1], (int) pos[2]);
+        var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
         return new RemoteControlScreen(player, (DisplayTile) player.level.getBlockEntity(blockPos), tag, this);
     }
 
@@ -177,15 +178,15 @@ public class RemoteControl extends Item implements ItemGuiCreator {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void appendHoverText(ItemStack stack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag isAdvanced) {
+    public void appendHoverText(ItemStack pStack, TooltipContext pContext, List<Component> pTooltipComponents, TooltipFlag pTooltipFlag) {
+        super.appendHoverText(pStack, pContext, pTooltipComponents, pTooltipFlag);
         Options opts = Minecraft.getInstance().options;
         pTooltipComponents.add(Component.translatable("waterframes.remote.description.1", opts.keyShift.getKey().getDisplayName(), opts.keyUse.getKey().getDisplayName()));
     }
 
     @Override
     public boolean isFoil(ItemStack pStack) {
-        var tag = pStack.getTag();
-        return tag != null && !tag.isEmpty() && (tag.contains("position") || tag.contains("pos")) && tag.contains("dimension");
+        return pStack.get(WFRegistry.REMOTE_DATA) != null;
     }
 
     @Override

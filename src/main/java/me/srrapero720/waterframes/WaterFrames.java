@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes;
 
+import me.srrapero720.waterframes.client.display.DisplayList;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.compat.valkyrienskies.VSCompat;
 import net.minecraft.client.Minecraft;
@@ -7,30 +8,34 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Mod(WaterFrames.ID)
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = EventBusSubscriber.Bus.GAME)
 public class WaterFrames {
     public static final String ID = "waterframes";
     public static final String NAME = "WATERFrAMES";
     public static final Logger LOGGER = LogManager.getLogger(ID);
     public static final ResourceLocation LOADING_ANIMATION = WaterFrames.asResource("loading_animation");
+    public static IEventBus bus;
+    public static ModContainer modContainer;
     public static final long SYNC_TIME = 1000L;
     private static long ticks = 0;
 
     // BOOTSTRAP
-    public WaterFrames() {
-        WFConfig.init();
-        WFRegistry.init(FMLJavaModLoadingContext.get().getModEventBus());
+    public WaterFrames(IEventBus bus, ModContainer container) {
+        WFConfig.init(bus, container);
+        WFRegistry.init(bus, container);
     }
 
     public static ResourceLocation asResource(String id) {
@@ -66,9 +71,7 @@ public class WaterFrames {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static float deltaFrames() {
-        return Minecraft.getInstance().isPaused() ? 1.0F : Minecraft.getInstance().getFrameTime();
-    }
+    public static float deltaFrames() { return Minecraft.getInstance().isPaused() ? 1.0F : Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false); }
 
     @OnlyIn(Dist.CLIENT)
     public static void tick() {
@@ -82,7 +85,7 @@ public class WaterFrames {
 
     @SubscribeEvent
     @OnlyIn(Dist.CLIENT)
-    public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) tick();
+    public static void onClientTickEvent(ClientTickEvent.Post event) {
+        ticks++;
     }
 }

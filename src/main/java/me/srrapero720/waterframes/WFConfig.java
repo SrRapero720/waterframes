@@ -6,11 +6,14 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.*;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.loading.FMLLoader;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
 import java.util.*;
@@ -90,8 +93,8 @@ public class WFConfig {
     private static final BooleanValue clientKeepsRendering;
     private static final BooleanValue forceDevMode;
 
-    private static final ForgeConfigSpec SERVER_SPEC;
-    private static final ForgeConfigSpec CLIENT_SPEC;
+    private static final ModConfigSpec SERVER_SPEC;
+    private static final ModConfigSpec CLIENT_SPEC;
 
     static {
         // WATERFRAMES -> rendering
@@ -263,10 +266,10 @@ public class WFConfig {
         SERVER_SPEC = SERVER.build();
     }
 
-    public static void init() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_SPEC);
+    public static void init(IEventBus bus, ModContainer container) {
+        container.registerConfig(ModConfig.Type.SERVER, SERVER_SPEC);
         if (FMLLoader.getDist().isClient()) // SKIPS TRASH CONFIG FILES ON SERVERS
-            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC);
+            container.registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC);
     }
 
     public static float maxWidth() { return (float) (double) maxWidth.get(); }

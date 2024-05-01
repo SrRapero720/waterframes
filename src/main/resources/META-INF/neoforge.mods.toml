@@ -16,30 +16,43 @@ license="${modlicense}"
 	side="BOTH"
 	description='''${mod_description}'''
 
+[[mixins]]
+	config="$modid.$mixin_file_suffix"
+
+[[accessTransformers]]
+	file="META-INF/accesstransformer.cfg"
+
 [[dependencies.${modid}]]
-	modId="forge"
-	mandatory=true
+	modId="neoforge"
+	type="required"
 	versionRange="${fgrange}"
 	ordering="NONE"
 	side="BOTH"
 
 [[dependencies.${modid}]]
 	modId="creativecore"
-	mandatory=true
+	type="required"
 	ordering="AFTER"
 	side="BOTH"
 	versionRange="${creativecorerange}"
 
 [[dependencies.${modid}]]
 	modId="watermedia"
-	mandatory=true
+	type="required"
 	ordering="AFTER"
 	side="CLIENT"
 	versionRange="${watermediarange}"
 
 [[dependencies.${modid}]]
-	modId="videoplayer"
-	mandatory=false
+	modId="mr_stellarity"
+	type="incompatible"
+	reason="breaks the picture rendering, cropping it and rotating it"
 	ordering="NONE"
 	side="CLIENT"
-	versionRange="${videoplayerrange}"
+
+[[dependencies.${modid}]]
+	modId="stellarity"
+	type="incompatible"
+	reason="breaks the picture rendering, cropping it and rotating it"
+	ordering="NONE"
+	side="CLIENT"

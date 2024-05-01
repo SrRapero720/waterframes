@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.common.block;
 
+import com.mojang.serialization.MapCodec;
 import me.srrapero720.waterframes.common.block.entity.TvTile;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -7,7 +8,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -20,6 +23,16 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 @SuppressWarnings({"deprecated", "null", "unused"})
 @MethodsReturnNonnullByDefault
 public class TvBlock extends DisplayBlock {
+    public static final MapCodec<TvBlock> CODEC = simpleCodec(TvBlock::new);
+
+    public TvBlock() {}
+    public TvBlock(BlockBehaviour.Properties p) {}
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        return CODEC;
+    }
+
     @Override
     public DirectionProperty getFacing() {
         return BlockStateProperties.HORIZONTAL_FACING;
