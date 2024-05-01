@@ -1,9 +1,7 @@
 plugins {
     id 'java'
     id 'idea'
-    id 'net.minecraftforge.gradle' version '6.+'
-    id 'org.spongepowered.mixin' version '0.7.+'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'fabric-loom' version '1.9-SNAPSHOT'
     id "me.modmuss50.mod-publish-plugin" version "0.8.3"
 }
 
@@ -20,61 +18,51 @@ java.toolchain {
 }
 
 println "Java: ${System.getProperty 'java.version'}, Gradle Java: ${JavaVersion.current()}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    mappings channel: mappings_channel, version: "$mappings_version"
-    accessTransformer file('src/main/resources/META-INF/accesstransformer.cfg')
-    copyIdeResources = true
-
-    runs {
-        configureEach {
-            workingDirectory project.file('run')
-            property 'forge.logging.console.level', 'debug'
-            property 'log4j.appender.Console', "org.apache.log4j.ConsoleAppender"
-            property 'terminal.jline', 'true'
-            args '--mixin.config', "$modid.$mixin_file_suffix"
-            arg '--nogui'
-
-            mods {
-                "$modid" {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        client {}
-        server {}
+loom {
+    mixin {
+        defaultRefmapName = "${modid}.${mixin_refmap_suffix}"
     }
-}
 
+    accessWidenerPath = file("src/main/resources/${modid}.accesswidener")
+
+    mods {
+        "${modid}" {
+            sourceSet sourceSets.main
+        }
+    }
+
+}
 sourceSets.main.resources { srcDir 'src/generated/resources' }
-
-mixin {
-    add sourceSets.main, "$modid.$mixin_refmap_suffix"
-    config "$modid.$mixin_file_suffix"
-}
 
 repositories {
     maven { url 'https://maven.minecraftforge.net/' }
     maven { url 'https://repo.spongepowered.org/maven' }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.parchmentmc.org' }
     maven { url 'https://www.cursemaven.com'
         content {includeGroup 'curse.maven' }
     }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:$mcversion-$fgversion"
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    // To change the versions see the gradle.properties file
+    minecraft "com.mojang:minecraft:$mcversion"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-$mcversion:$mappings_version@zip")
+    }
+    modImplementation "net.fabricmc:fabric-loader:$flversion"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:$fabricversion"
 
     //DEPENDENCIES
-    implementation "com.github.WaterMediaTeam:watermedia:$watermediaversion"
-    implementation fg.deobf("curse.maven:creativecore-257814:$creativecoreversion")
-    implementation fg.deobf("curse.maven:watervision-1167473:$watervisionversion")
+    modImplementation "com.github.WaterMediaTeam:watermedia:$watermediaversion"
+    modImplementation "curse.maven:creativecore-257814:$creativecoreversion"
+    modImplementation "curse.maven:watervision-1167473:$watervisionversion"
 }
 
 tasks.processResources.outputs.upToDateWhen { false }
 processResources {
-    filesMatching(['META-INF/*.toml', 'pack.mcmeta', 'resourcepacks/**/pack.mcmeta', "$modid.$mixin_file_suffix".toString()]) {
+    filesMatching(['fabric.mod.json', 'pack.mcmeta', 'resourcepacks/**/pack.mcmeta', "$modid.$mixin_file_suffix".toString()]) {
         expand project.properties
     }
 }
@@ -91,11 +79,11 @@ jar {
         attributes "MixinConfigs"               : "$modid.$mixin_file_suffix"
     }
     exclude('org/valkyrienskies/**')
-    finalizedBy('reobfJar')
+    finalizedBy(remapJar)
 }
 
 publishMods {
-    file = jar.archiveFile
+    file = remapJar.archiveFile
     displayName = "WF-$modloader/mc$mcversion/v$modversion"
     type = STABLE
     changelog = getChangelogText()
@@ -113,14 +101,14 @@ publishMods {
         clientRequired = true
         serverRequired = true
         projectSlug = modid
-        requires("creativecore", "watermedia", "watervision")
+        requires("fabric-api", "creativecore", "watermedia", "watervision")
     }
 
     modrinth {
         accessToken = MT_TOKEN
         projectId = modrinthid
         minecraftVersions.addAll(mcversion)
-        requires("creativecore", "watermedia", "watervision")
+        requires("fabric-api", "creativecore", "watermedia", "watervision")
     }
 }
 

@@ -7,6 +7,8 @@ import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import org.watermedia.api.image.ImageCache;
 import org.watermedia.api.math.MathAPI;
 import org.watermedia.api.player.videolan.VideoPlayer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
@@ -18,7 +20,7 @@ import org.watermedia.videolan4j.player.base.State;
 
 import java.util.function.Function;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class Display {
     private static final Marker IT = MarkerManager.getMarker("Display");
     private static final Int2ObjectOpenHashMap<ResourceLocation> TEXTURES = new Int2ObjectOpenHashMap<>();

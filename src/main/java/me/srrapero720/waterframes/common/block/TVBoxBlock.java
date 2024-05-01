@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.common.block;
 
 import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.common.block.entity.TVBoxTile;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -12,11 +13,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.server.permission.nodes.PermissionNode;
 import org.jetbrains.annotations.Nullable;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
@@ -24,7 +23,8 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 public class TVBoxBlock extends DisplayBlock {
     private static final AlignedBox STATIC_BOX = new AlignedBox();
-    protected static final Properties TV_BOX_PROPERTIES = Properties.of()
+    protected static final Properties TV_BOX_PROPERTIES = FabricBlockSettings.create()
+            .luminance(value -> value.getValue(LIGHT_LEVEL))
             .strength(1f)
             .sound(SoundType.WOOD);
 
@@ -38,7 +38,7 @@ public class TVBoxBlock extends DisplayBlock {
     }
 
     @Override
-    public PermissionNode<Boolean> getPermissionNode() {
+    public String getPermissionNode() {
         return DisplaysRegistry.PERM_DISPLAYS_INTERACT_TV;
     }
 
@@ -93,11 +93,6 @@ public class TVBoxBlock extends DisplayBlock {
     @Override
     public boolean isCollisionShapeFullBlock(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
         return true;
-    }
-
-    @Override
-    public PushReaction getPistonPushReaction(BlockState pState) {
-        return PushReaction.NORMAL;
     }
 
     @Nullable

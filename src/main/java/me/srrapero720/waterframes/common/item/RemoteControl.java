@@ -4,6 +4,8 @@ import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.RemoteControlScreen;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -15,7 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -24,8 +25,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.Nullable;
@@ -130,21 +130,21 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     private void sendSuccess(Player player, MutableComponent component) {
         if (player.level.isClientSide) {
             player.displayClientMessage(component.withStyle(ChatFormatting.AQUA), true);
-            player.playSound(NoteBlockInstrument.BELL.getSoundEvent().get(), 1.0f, 1.25f);
+            player.playSound(NoteBlockInstrument.BELL.getSoundEvent().value(), 1.0f, 1.25f);
         }
     }
 
     private void sendFailed(Player player, MutableComponent component) {
         if (player.level.isClientSide) {
             player.displayClientMessage(component.withStyle(ChatFormatting.RED), true);
-            player.playSound(NoteBlockInstrument.HARP.getSoundEvent().get(), 1.0f, 0.75f);
+            player.playSound(NoteBlockInstrument.HARP.getSoundEvent().value(), 1.0f, 0.75f);
         }
     }
 
     private void sendFatal(Player player, MutableComponent component) {
         if (player.level.isClientSide) {
             player.displayClientMessage(component.withStyle(ChatFormatting.DARK_RED), true);
-            player.playSound(NoteBlockInstrument.HARP.getSoundEvent().get(), 1.0f, 0.5f);
+            player.playSound(NoteBlockInstrument.HARP.getSoundEvent().value(), 1.0f, 0.5f);
         }
     }
 
@@ -179,16 +179,17 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         return new RemoteControlScreen(player, (DisplayTile) player.level.getBlockEntity(blockPos), tag, this);
     }
 
-    @Override
+//    @Override
+    // TODO: please send help
     public Component getHighlightTip(ItemStack item, Component displayName) {
         return Component.literal(displayName.getString()).withStyle(ChatFormatting.AQUA);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void appendHoverText(ItemStack stack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag isAdvanced) {
         Options opts = Minecraft.getInstance().options;
-        pTooltipComponents.add(Component.translatable("waterframes.remote.description.1", opts.keyShift.getKey().getDisplayName(), opts.keyUse.getKey().getDisplayName()));
+        pTooltipComponents.add(Component.translatable("waterframes.remote.description.1", opts.keyShift.key.getDisplayName(), opts.keyUse.key.getDisplayName()));
     }
 
     @Override
@@ -200,10 +201,5 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     @Override
     public boolean canAttackBlock(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
         return false;
-    }
-
-    @Override
-    public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
-        return true;
     }
 }

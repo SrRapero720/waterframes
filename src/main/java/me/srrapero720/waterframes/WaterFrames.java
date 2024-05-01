@@ -1,41 +1,43 @@
 package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.loader.api.FabricLoader;
 import me.srrapero720.waterframes.common.compat.valkyrienskies.VSCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import java.io.File;
 import java.net.URI;
 import java.util.LinkedList;
 import java.util.Objects;
 
-@Mod(WaterFrames.ID)
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class WaterFrames {
+public class WaterFrames implements ModInitializer {
+    // TOOLS
     public static final String ID = "waterframes";
     public static final String NAME = "WATERFrAMES";
     public static final Logger LOGGER = LogManager.getLogger(ID);
+    private static final Marker IT = MarkerManager.getMarker(ID);
     public static final ResourceLocation LOADING_ANIMATION = WaterFrames.asResource("loading_animation");
     public static final long SYNC_TIME = 2000L;
     private static int ticks = 0;
 
-    // BOOTSTRAP
-    public WaterFrames(FMLJavaModLoadingContext context) {
-        DisplaysConfig.init(context);
-        DisplaysRegistry.init(context.getModEventBus());
+    @Override
+    public void onInitialize() {
+        DisplaysConfig.init();
+        DisplaysRegistry.init();
+        DisplayTile.initCommon();
+
+        LOGGER.info(IT, "Running WATERFrAMES v{}", FabricLoader.getInstance().getModContainer(ID).get().getMetadata().getVersion());
     }
 
     public static ResourceLocation asResource(String id) {
@@ -47,7 +49,7 @@ public class WaterFrames {
     }
 
     public static boolean isInstalled(String modId) {
-        return FMLLoader.getLoadingModList().getModFileById(modId) != null;
+        return FabricLoader.getInstance().isModLoaded(modId);
     }
 
     public static URI createURI(String s) {
@@ -87,7 +89,7 @@ public class WaterFrames {
 
     public static boolean isInstalled(String... mods) {
         for (String id: mods) {
-            if (FMLLoader.getLoadingModList().getModFileById(id) != null) {
+            if (FabricLoader.getInstance().isModLoaded(id)) {
                 return true;
             }
         }
@@ -105,24 +107,18 @@ public class WaterFrames {
         return Math.sqrt(pos.distToLowCornerSqr(position.x(), position.y(), position.z()));
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static float deltaFrames() {
         return Minecraft.getInstance().isPaused() ? 1.0F : Minecraft.getInstance().getFrameTime();
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static void tick() {
         if (++ticks == Integer.MAX_VALUE) ticks = 0;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static int getTicks() {
         return ticks;
-    }
-
-    @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
-    public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) tick();
     }
 }

@@ -10,10 +10,10 @@ import me.srrapero720.waterframes.common.network.packets.DataSyncPacket;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
 import org.watermedia.api.image.ImageCache;
 import team.creative.creativecore.common.gui.*;
@@ -209,8 +209,8 @@ public class DisplayScreen extends GuiLayer {
         // URL FIELD
         this.add(new WidgetPairTable(GuiFlow.STACK_Y, 4)
                 .addLeft(url_l)
-                .addLeft(!DisplaysConfig.useExperimentalPlaylistMode.get(), url::setExpandableX)
-                .addLeft(DisplaysConfig.useExperimentalPlaylistMode.get(), () -> new GuiButton("open_uri", mouse ->
+                .addLeft(!DisplaysConfig.MULTIMEDIA.useExperimentalPlaylistMode, url::setExpandableX)
+                .addLeft(DisplaysConfig.MULTIMEDIA.useExperimentalPlaylistMode, () -> new GuiButton("open_uri", mouse ->
                         this.getIntegratedParent().openLayer(new PlayListScreen(this.tile))).setTitle(Component.literal("Select Playlist")
                 ).setExpandableX())
                 .addRight(new WidgetStatusIcon("", IconStyles.STATUS_OK, tile).setDim(30, 30)));
@@ -406,14 +406,14 @@ public class DisplayScreen extends GuiLayer {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) { return ScreenStyles.SCREEN_BACKGROUND; }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) { return ScreenStyles.SCREEN_BORDER; }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public GuiStyle getStyle() { return ScreenStyles.DISPLAYS; }
 }

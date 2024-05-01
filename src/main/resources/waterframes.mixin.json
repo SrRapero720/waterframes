@@ -9,6 +9,8 @@
     "MinecraftMixin"
   ],
   "mixins": [
-    "MinecraftServerMixin"
+    "MinecraftServerMixin",
+    "ArgumentTypeMixin",
+    "RedstoneWireBlockMixin"
   ]
 }

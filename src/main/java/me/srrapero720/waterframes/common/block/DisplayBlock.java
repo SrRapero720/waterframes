@@ -6,6 +6,7 @@ import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
 import net.minecraft.ChatFormatting;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -31,7 +32,6 @@ import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.server.permission.nodes.PermissionNode;
 import org.joml.Vector3f;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
@@ -44,14 +44,17 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
+    public static final IntegerProperty LIGHT_LEVEL = BlockStateProperties.LEVEL;
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
-    protected static final Properties PROPERTIES = Properties.of()
+    protected static final Properties PROPERTIES = FabricBlockSettings.create()
+            .luminance(value -> value.getValue(LIGHT_LEVEL))
             .strength(1f)
             .sound(SoundType.METAL)
             .noOcclusion()
             .forceSolidOff()
             .isSuffocating(Blocks::never)
             .isViewBlocking(Blocks::never)
+            .pushReaction(PushReaction.DESTROY)
             .requiresCorrectToolForDrops();
 
     protected DisplayBlock() {
@@ -64,7 +67,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     public abstract DirectionProperty getFacing();
 
-    public PermissionNode<Boolean> getPermissionNode() {
+    public String getPermissionNode() {
         return DisplaysRegistry.PERM_DISPLAYS_INTERACT;
     }
 
@@ -111,25 +114,27 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return InteractionResult.SUCCESS;
     }
 
-    private double randomNegative(double v) {
-        return Math.random() > 0.5d ? -v : v;
+    public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        return state.getValue(this.getFacing()) == direction;
     }
 
-    @Override public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return state.getValue(this.getFacing()) == direction;
+    private double randomNegative(double v) {
+        return Math.random() > 0.5d ? -v : v;
     }
 
     @Override public void registerDefaultState(BlockState state) {
         super.registerDefaultState(state
                 .setValue(WATERLOGGED, false)
                 .setValue(POWERED, false)
+                .setValue(LIGHT_LEVEL, 0)
         );
     }
 
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(
                 this.getFacing(), ATTACHED_FACE, POWERED, WATERLOGGED
-        ));
+
+        ).add(LIGHT_LEVEL));
     }
 
     @Override public BlockState getStateForPlacement(BlockPlaceContext context) {
@@ -175,10 +180,6 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return level.getBlockEntity(pos) instanceof DisplayTile tile ? tile.getAnalogOutput() : 0;
     }
 
-    @Override public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-        return level.getBlockEntity(pos) instanceof DisplayTile tile ? tile.getLightLevel() : 0;
-    }
-
     @Override public float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
         return 0f;
     }
@@ -188,16 +189,8 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return false;
     }
 
-    @Override public PushReaction getPistonPushReaction(BlockState pState) {
-        return PushReaction.DESTROY;
-    }
-
     @Override public FluidState getFluidState(BlockState state) {
         return state.getValue(WATERLOGGED) ? Fluids.WATER.getSource(true) : super.getFluidState(state);
-    }
-
-    @Override public BlockState rotate(BlockState state, LevelAccessor world, BlockPos pos, Rotation rotation) {
-        return this.rotate(state, rotation);
     }
 
     @Override public BlockState rotate(BlockState state, Rotation rotation) {

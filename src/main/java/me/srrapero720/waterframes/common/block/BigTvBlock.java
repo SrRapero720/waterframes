@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.server.permission.nodes.PermissionNode;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
@@ -28,7 +27,7 @@ public class BigTvBlock extends DisplayBlock {
     }
 
     @Override
-    public PermissionNode<Boolean> getPermissionNode() {
+    public String getPermissionNode() {
         return DisplaysRegistry.PERM_DISPLAYS_INTERACT_TV;
     }
 

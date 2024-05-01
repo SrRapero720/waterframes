@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.server.permission.nodes.PermissionNode;
 import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
@@ -30,7 +29,7 @@ public class FrameBlock extends DisplayBlock {
     }
 
     @Override
-    public PermissionNode<Boolean> getPermissionNode() {
+    public String getPermissionNode() {
         return DisplaysRegistry.PERM_DISPLAYS_INTERACT_FRAME;
     }
 
