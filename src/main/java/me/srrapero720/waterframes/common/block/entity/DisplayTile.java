@@ -45,7 +45,7 @@ public abstract class DisplayTile extends BlockEntity {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public synchronized TextureDisplay requestDisplay() {
+    public TextureDisplay requestDisplay() {
         if (!this.data.active || (this.data.url.isEmpty() && display != null)) {
             this.cleanDisplay();
             return null;
