@@ -3,6 +3,7 @@ package me.srrapero720.waterframes.client.rendering.core;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.core.Vec3i;
 import org.lwjgl.opengl.GL11;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
@@ -15,11 +16,15 @@ public class RenderCore {
     private static final Tesselator tesselator = Tesselator.getInstance();
     private static final BufferBuilder builder = tesselator.getBuilder();
 
+    public static void cleanShader() {
+        ShaderInstance shader = RenderSystem.getShader();
+        shader.apply();
+        shader.clear();
+    }
+
     public static void bufferPrepare() {
-        if (builder.building()) bufferFinish();
-        RenderSystem.getShader().clear();
+        if (builder.building()) bufferEnd();
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-        RenderSystem.getShader().clear();
     }
 
     public static void bufferBegin() {

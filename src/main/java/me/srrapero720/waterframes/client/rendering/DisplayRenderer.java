@@ -12,6 +12,7 @@ import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageRenderer;
 import me.srrapero720.watermedia.api.math.MathAPI;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
@@ -45,6 +46,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
         // STORE AND CLEAN ANY "EARLY" STATE
         RenderCore.bufferPrepare();
+        RenderCore.cleanShader();
         float[] color = RenderSystem.getShaderColor();
 
         // PREPARE RENDERING
@@ -76,7 +78,8 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
         // POST RENDERING
         pose.popPose();
-        RenderSystem.getShader().clear();
+        RenderCore.cleanShader();
+
         RenderSystem.disableBlend();
         RenderSystem.disableDepthTest();
         RenderSystem.bindTexture(0);
