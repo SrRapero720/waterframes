@@ -28,6 +28,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.Nullable;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.GuiCreator;
@@ -35,7 +37,10 @@ import team.creative.creativecore.common.gui.creator.ItemGuiCreator;
 
 import java.util.List;
 
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+
 public class RemoteControl extends Item implements ItemGuiCreator {
+    private static final Marker IT = MarkerManager.getMarker(RemoteControl.class.getSimpleName());
     public RemoteControl(Properties pProperties) {
         super(pProperties.stacksTo(1).setNoRepair().fireResistant().rarity(Rarity.RARE));
     }
@@ -65,8 +70,15 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         }
 
         long[] pos = tag.getLongArray("pos");
+        String dim = tag.getString("dimension");
+        if (pos.length < 3 || dim.isEmpty()) {
+            this.sendFailed(player, new TranslatableComponent("waterframes.remote.code.failed"));
+            LOGGER.error(IT, "NBT data is invalid, ensure your set pos as a long-array and the dimension as a resource location");
+            return InteractionResultHolder.fail(stack);
+        }
+
         var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
-        var dimension = new ResourceLocation(tag.getString("dimension"));
+        var dimension = new ResourceLocation(dim);
 
         if (level.getBlockEntity(blockPos) instanceof DisplayTile) {
             if (!level.dimension().location().equals(dimension) || !Vec3.atCenterOf(blockPos).closerThan(player.position(), WFConfig.maxRcDis())) {

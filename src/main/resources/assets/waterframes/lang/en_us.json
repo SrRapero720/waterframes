@@ -17,6 +17,7 @@
     "waterframes.remote.bound.success": "Bounded successfully",
     "waterframes.remote.unbound.success": "Unbounded successfully",
     "waterframes.remote.bound.failed": "Not bounded",
+    "waterframes.remote.code.failed": "Something goes wrong!",
     "waterframes.remote.distance.failed": "You're out of distance",
     "waterframes.remote.display.failed": "Display is broken, unbounded",
     "waterframes.remote.display.invalid": "Needs to bound it first.",
