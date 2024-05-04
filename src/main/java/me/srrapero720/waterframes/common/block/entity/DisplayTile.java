@@ -250,7 +250,7 @@ public abstract class DisplayTile extends BlockEntity {
             }
 
             int redstoneOutput = 0;
-            if (tile.data.tick != -1 && tile.data.tickMax != -1 && tile.data.active) {
+            if (tile.data.tick != -1 && tile.data.tickMax != -1 && tile.data.tick <= tile.data.tickMax && tile.data.active) {
                 redstoneOutput = Math.round(((float) tile.data.tick / (float) tile.data.tickMax) * (BlockStateProperties.MAX_LEVEL_15 - 1)) + 1;
             }
 
