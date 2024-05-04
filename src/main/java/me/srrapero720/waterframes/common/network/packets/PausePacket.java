@@ -29,7 +29,7 @@ public class PausePacket extends DisplayControlPacket {
 
     @Override
     public void exec(DisplayTile tile) {
-        tile.data.paused = WFConfig.useMasterModeRedstone() && tile.isPowered() || this.paused;
+        tile.data.paused = (WFConfig.useMasterModeRedstone() && tile.isPowered()) || this.paused;
         if (this.tick != -1) tile.data.tick = this.tick;
     }
 

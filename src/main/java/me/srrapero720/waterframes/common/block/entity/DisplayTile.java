@@ -19,6 +19,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -236,7 +237,7 @@ public abstract class DisplayTile extends BlockEntity {
     /* SPECIAL TICKS */
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity be) {
         if (be instanceof DisplayTile tile) {
-            if (tile.isClient()) {
+            if (level.isClientSide) {
                 TextureDisplay display = tile.requestDisplay();
                 if (display != null && display.canTick()) display.tick(pos);
             }
@@ -246,6 +247,15 @@ public abstract class DisplayTile extends BlockEntity {
                 } else {
                     if (tile.data.loop) tile.data.tick = 0;
                 }
+            }
+
+            int redstoneOutput = 0;
+            if (tile.data.tickMax != -1 && tile.data.active) {
+                redstoneOutput = Math.round(((float) tile.data.tick / (float) tile.data.tickMax) * (BlockStateProperties.MAX_LEVEL_15 - 1)) + 1;
+            }
+
+            if (state.getValue(DisplayBlock.POWER) != redstoneOutput) {
+                level.setBlock(pos, state.setValue(DisplayBlock.POWER, redstoneOutput), 3);
             }
 
             if (state.hasProperty(DisplayBlock.VISIBLE) && state.getValue(DisplayBlock.VISIBLE) != tile.data.frameVisibility) {

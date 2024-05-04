@@ -21,10 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BedPart;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.BlockHitResult;
 import team.creative.creativecore.common.gui.GuiLayer;
@@ -39,6 +36,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCreator, SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final IntegerProperty POWER = BlockStateProperties.POWER;
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
     private static final Material MATERIAL = new Material.Builder(MaterialColor.NONE).noCollider().build();
@@ -75,10 +73,18 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         if (!WFConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof DisplayTile tile)) return;
         boolean signal = level.hasNeighborSignal(pos);
 
-        if (!level.isClientSide && state.getValue(POWERED) != signal) {
-            tile.setPause(false, signal);
+        if (state.getValue(POWERED) != signal) {
+            level.setBlock(pos, state.setValue(POWERED, signal), 3);
+            if (!level.isClientSide) tile.setPause(false, signal);
         }
-        state.setValue(POWERED, signal);
+
+//        if (!WFConfig.useRedstone()) return;
+//        boolean signal = level.hasNeighborSignal(pos);
+//
+//        if (state.getValue(POWERED) != signal) {
+//            level.setBlock(pos, state.setValue(POWERED, signal), 3);
+//        }
+
     }
 
     @Override
@@ -88,14 +94,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
-        if (level.getBlockEntity(pos) instanceof DisplayTile tile) {
-            if (tile.data.tickMax == -1) return 0;
-            if (!tile.data.active) return 0;
-
-            return 1 + (Math.round((float) tile.data.tick / tile.data.tickMax) * BlockStateProperties.MAX_LEVEL_15 - 1);
-        }
-
-        return 0;
+        return state.getValue(POWER);
     }
 
     @Override
@@ -113,12 +112,12 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override
     protected void registerDefaultState(BlockState state) {
-        super.registerDefaultState(state.setValue(WATERLOGGED, false).setValue(POWERED, false));
+        super.registerDefaultState(state.setValue(WATERLOGGED, false).setValue(POWERED, false).setValue(POWER, 0));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder.add(getFacing()).add(ATTACHED_FACE).add(POWERED).add(WATERLOGGED));
+        super.createBlockStateDefinition(builder.add(getFacing()).add(ATTACHED_FACE).add(POWERED).add(POWER).add(WATERLOGGED));
     }
 
     @Override
@@ -126,6 +125,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return this.defaultBlockState()
                 .setValue(WATERLOGGED, false)
                 .setValue(POWERED, false)
+                .setValue(POWER, 0)
                 .setValue(ATTACHED_FACE, pContext.getClickedFace());
     }
 
