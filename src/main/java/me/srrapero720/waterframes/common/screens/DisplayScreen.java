@@ -274,7 +274,7 @@ public class DisplayScreen extends GuiLayer {
 
         // SAVE BUTTONS
         this.add(new WidgetPairTable(GuiFlow.STACK_X, Align.RIGHT, 2)
-                .addLeft(this.reload_all.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(50, 10))
+                .addLeft(this.reload_all.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(70, 10))
                 .addRight(this.save.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(60, 10).setEnabled(WFConfig.canSave(getPlayer(), url.getText())))
                 .addRight(this.reload.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(50, 10))
                 .setAlignRight(Align.RIGHT)
