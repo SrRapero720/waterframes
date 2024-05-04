@@ -78,7 +78,8 @@ public class IconStyles {
         return new Icon(location, 16 * chunkX, 16 * chunkY, 16 * chunkXMultiplier, 16 * chunkYMultiplier);
     }
 
-    public static Icon getVolumeIcon(int volume) {
+    public static Icon getVolumeIcon(int volume, boolean muted) {
+        if (muted) return MUTE;
         if (volume > 100) {
             return IconStyles.VOLUME_OVERFLOW;
         } else if (volume >= 90){

@@ -245,7 +245,7 @@ public class DisplayScreen extends GuiLayer {
         // MEDIA SETTINGS
         this.add(media_l);
         final var mediaSettingsTable = new WidgetPairTable(GuiFlow.STACK_X, 2)
-                .addRight(this.vol_i.setIcon(IconStyles.getVolumeIcon(tile.data.volume)), this.volume.setDim(100, 15).setExpandableX())
+                .addRight(this.vol_i.setIcon(IconStyles.getVolumeIcon(tile.data.volume, tile.data.muted)), this.volume.setDim(100, 15).setExpandableX())
                 .addLeft(VPCompat.installed(), () -> this.videoplayer.setDim(16, 12))
                 .setAlignRight(Align.RIGHT)
                 .setVAlignRight(VAlign.CENTER)
@@ -285,7 +285,7 @@ public class DisplayScreen extends GuiLayer {
     public void tick() {
         super.tick();
         if (!isClient()) return;
-        this.vol_i.setIcon(IconStyles.getVolumeIcon((int) volume.getValue()));
+        this.vol_i.setIcon(IconStyles.getVolumeIcon((int) volume.getValue(), tile.data.muted));
         this.playback.setState(tile.data.paused);
         var text = this.url.getText();
         save.setEnabled(WFConfig.canSave(getPlayer(), text));
