@@ -24,6 +24,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.forgespi.locating.IModFile;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -107,7 +108,7 @@ public class WFRegistry {
 
         @SubscribeEvent
         public static void init(FMLClientSetupEvent e) {
-            if (ModList.get().getModFileById("stellarity") != null) {
+            if (FMLLoader.getLoadingModList().getModFileById("mr_stellarity") != null) {
                 throw new UnsupportedModException("stellarity", "breaks picture rendering (idk how but is unfixable)");
             }
         }
