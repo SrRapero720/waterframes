@@ -1,3 +1,14 @@
+# UPDATE 2.0.2
+- 🐛 Fixed changing brightness or transparency causes other stuff getting obscured (view model arm or entities)
+- 🐛 Fixed crashes when data on RC is invalid (now should show "Something goes wrong!")
+- 🐛 Fixed redstone output (comparator) never got updated and always was 1 or 14
+- 🐛 Fixed redstone input never unpauses the display or updates the "powered" block state
+- ✨ Optimized performance on large amount of frames (get display is no longer synchronized)
+- ✨ Added a "mute" icon state on the volume bar when RC mutes display
+- ✨ Updated wording on en_us translation
+- ✨ Updated es_mx translation to 2.0 texts
+- 🛠️ Removed obsolete es_es translation
+
 # UPDATE 2.0.1
 **NON-ENGINNERS HAVE PROBLEM WITH THE 2.0**
 - 🐛 Fixed hard dependency on Create Mod (by accident)
