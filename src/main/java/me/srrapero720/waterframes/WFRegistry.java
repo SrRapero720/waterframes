@@ -109,7 +109,7 @@ public class WFRegistry {
         @SubscribeEvent
         public static void init(FMLClientSetupEvent e) {
             if (FMLLoader.getLoadingModList().getModFileById("mr_stellarity") != null) {
-                throw new UnsupportedModException("stellarity", "breaks picture rendering, overwrites the Minecraft core shaders and i can't do nothing to avoid that");
+                throw new UnsupportedModException("mr_stellarity", "breaks picture rendering, overwrites the Minecraft core shaders and i can't do nothing to avoid that");
             }
         }
 
@@ -134,20 +134,20 @@ public class WFRegistry {
     }
 
     public static class UnsupportedModException extends UnsupportedOperationException {
-        private static final String MSG = "§fMod §6%s §fis not compatible with §e%s§f. please remove it";
-        private static final String MSG_REASON = "§fMod §6%s §fis not compatible with §e%s §fbecause §c%s §fplease remove it";
-        private static final String MSG_REASON_ALT = "§fMod §6%s §fis not compatible with §e%s §fbecause §c%s §fuse §a%s §finstead";
+        private static final String MSG = "§fMod §6'%s' §fis not compatible with §e'%s'§f. please remove it";
+        private static final String MSG_REASON = "§fMod §6'%s' §fis not compatible with §e'%s' §fbecause §c%s §fplease remove it";
+        private static final String MSG_REASON_ALT = "§fMod §6'%s' §fis not compatible with §e'%s' §fbecause §c%s §fuse §a'%s' §finstead";
 
         public UnsupportedModException(String modid) {
-            super(String.format(MSG, modid, ID));
+            super(String.format(MSG, modid, NAME));
         }
 
         public UnsupportedModException(String modid, String reason) {
-            super(String.format(MSG_REASON, modid, ID, reason));
+            super(String.format(MSG_REASON, modid, NAME, reason));
         }
 
         public UnsupportedModException(String modid, String reason, String alternatives) {
-            super(String.format(MSG_REASON_ALT, modid, ID, reason, alternatives));
+            super(String.format(MSG_REASON_ALT, modid, NAME, reason, alternatives));
         }
     }
 
