@@ -109,7 +109,7 @@ public class WFRegistry {
         @SubscribeEvent
         public static void init(FMLClientSetupEvent e) {
             if (FMLLoader.getLoadingModList().getModFileById("mr_stellarity") != null) {
-                throw new UnsupportedModException("stellarity", "breaks picture rendering (idk how but is unfixable)");
+                throw new UnsupportedModException("stellarity", "breaks picture rendering, overwrites the Minecraft core shaders and i can't do nothing to avoid that");
             }
         }
 
