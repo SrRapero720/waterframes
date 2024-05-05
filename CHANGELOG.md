@@ -1,3 +1,10 @@
+# UPDATE 2.0.3
+- 🐛 Fixed crashes loading worlds with older versions of the mod also with images
+- 🐛 Fixed changing brightness or transparency causes other stuff getting obscured (view model arm or entities)
+  (AGAIN)
+- ✨ Reinforce mute state on loading worlds and on pause/resume
+- 🛠️ Added better explanation for 🌌 Stellarity crash
+
 # UPDATE 2.0.2
 - 🐛 Fixed changing brightness or transparency causes other stuff getting obscured (view model arm or entities)
 - 🐛 Fixed crashes when data on RC is invalid (now should show "Something goes wrong!")
