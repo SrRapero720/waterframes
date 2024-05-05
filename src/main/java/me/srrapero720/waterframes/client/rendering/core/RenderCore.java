@@ -66,7 +66,8 @@ public class RenderCore {
     private static void vertex(PoseStack pose, AlignedBox box, BoxFace face, BoxCorner corner, boolean flipX, boolean flipY, int colorARGB) {
         Vec3i normal = face.facing.normal;
         builder.vertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
-                .uv(corner.isFacing(face.getTexU()) != flipX ? 1 : 0, corner.isFacing(face.getTexV()) != flipY ? 1 : 0).color(colorARGB)
+                .uv(corner.isFacing(face.getTexU()) != flipX ? 1 : 0, corner.isFacing(face.getTexV()) != flipY ? 1 : 0)
+                .color(colorARGB)
                 .normal(pose.last().normal(), normal.getX(), normal.getY(), normal.getZ())
                 .endVertex();
     }

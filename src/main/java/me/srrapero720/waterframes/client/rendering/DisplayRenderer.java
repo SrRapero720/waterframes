@@ -45,20 +45,21 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         if (display == null) return;
 
         // STORE AND CLEAN ANY "EARLY" STATE
+        RenderCore.cleanShader();
         RenderCore.bufferPrepare();
         RenderCore.cleanShader();
-        float[] color = RenderSystem.getShaderColor();
 
         // PREPARE RENDERING
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-        RenderSystem.setShaderColor(tile.data.brightness, tile.data.brightness, tile.data.brightness, tile.data.alpha);
 
         // variables
         var direction = this.direction(tile);
         var facing = Facing.get(direction);
         var box = tile.getRenderBox();
+        int bright = (int) (tile.data.brightness * 255);
+        var color = MathAPI.argb((int) (tile.data.alpha * 255), bright, bright, bright);
 
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
@@ -74,7 +75,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         }
 
         // RENDERING
-        this.render(pose, tile, display, box, BoxFace.get(tile.flip3DFace() ? facing.opposite() : facing), -1);
+        this.render(pose, tile, display, box, BoxFace.get(tile.flip3DFace() ? facing.opposite() : facing), color);
 
         // POST RENDERING
         pose.popPose();
@@ -83,7 +84,6 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         RenderSystem.disableBlend();
         RenderSystem.disableDepthTest();
         RenderSystem.bindTexture(0);
-        RenderSystem.setShaderColor(color[0], color[1], color[2], color[3]);
     }
 
     public void render(PoseStack pose, DisplayTile tile, TextureDisplay display, AlignedBox box, BoxFace face, int colorARGB) {
