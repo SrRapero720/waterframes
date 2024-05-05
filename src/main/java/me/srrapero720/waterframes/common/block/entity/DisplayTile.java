@@ -237,29 +237,40 @@ public abstract class DisplayTile extends BlockEntity {
     /* SPECIAL TICKS */
     public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity be) {
         if (be instanceof DisplayTile tile) {
-            if (level.isClientSide) {
-                TextureDisplay display = tile.requestDisplay();
-                if (display != null && display.canTick()) display.tick(pos);
-            }
+            if (tile.data.tickMax == -1 || tile.data.tick < 0) tile.data.tick = 0;
+
             if (!tile.data.paused && tile.data.active) {
-                if ((tile.data.tick <= tile.data.tickMax) || tile.data.tickMax == -1) {
+                if (tile.data.tick <= tile.data.tickMax) {
                     tile.data.tick++;
                 } else {
-                    if (tile.data.loop) tile.data.tick = 0;
+                    if (tile.data.loop || tile.data.tickMax == -1) tile.data.tick = 0;
                 }
             }
 
+            boolean updateBlock = false;
             int redstoneOutput = 0;
-            if (tile.data.tickMax != -1 && tile.data.active) {
+
+            if (tile.data.tickMax > 0 && tile.data.active) {
                 redstoneOutput = Math.round(((float) tile.data.tick / (float) tile.data.tickMax) * (BlockStateProperties.MAX_LEVEL_15 - 1)) + 1;
             }
 
             if (state.getValue(DisplayBlock.POWER) != redstoneOutput) {
-                level.setBlock(pos, state.setValue(DisplayBlock.POWER, redstoneOutput), 3);
+                state.setValue(DisplayBlock.POWER, redstoneOutput);
+                updateBlock = true;
             }
 
             if (state.hasProperty(DisplayBlock.VISIBLE) && state.getValue(DisplayBlock.VISIBLE) != tile.data.frameVisibility) {
-                level.setBlock(pos, state.setValue(DisplayBlock.VISIBLE, tile.data.frameVisibility), 0);
+                state.setValue(DisplayBlock.VISIBLE, tile.data.frameVisibility);
+                updateBlock = true;
+            }
+
+            if (updateBlock) {
+                level.setBlock(pos, state, DisplayBlock.UPDATE_ALL);
+            }
+
+            if (level.isClientSide) {
+                TextureDisplay display = tile.requestDisplay();
+                if (display != null && display.canTick()) display.tick(pos);
             }
         }
     }
