@@ -55,15 +55,14 @@ public class TextureDisplay {
             return;
         }
 
-
-        this.currentVolume = limitVolume(this.blockPos.relative(tile.getDirection(), (int) tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+        this.currentVolume = limitVolume(this.blockPos.relative(this.tile.getDirection(), (int) tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
         // PLAYER CONFIG
         this.mediaPlayer.setVolume(this.currentVolume);
-        this.mediaPlayer.setRepeatMode(tile.data.loop);
-        this.mediaPlayer.setPauseMode(tile.data.paused);
-        this.mediaPlayer.setMuteMode(tile.data.muted);
-        this.mediaPlayer.start(tile.data.url);
+        this.mediaPlayer.setRepeatMode(this.tile.data.loop);
+        this.mediaPlayer.setPauseMode(this.tile.data.paused);
+        this.mediaPlayer.setMuteMode(this.tile.data.muted);
+        this.mediaPlayer.start(this.tile.data.url);
         DisplayControl.add(this);
     }
 
@@ -140,6 +139,7 @@ public class TextureDisplay {
                 if (currentVolume != volume) mediaPlayer.setVolume(currentVolume = volume);
                 if (mediaPlayer.isSafeUse() && mediaPlayer.isValid()) {
                     if (mediaPlayer.getRepeatMode() != tile.data.loop) mediaPlayer.setRepeatMode(tile.data.loop);
+                    if (mediaPlayer.isMuted() != tile.data.muted) mediaPlayer.setMuteMode(tile.data.muted);
                     if (!stream && mediaPlayer.isLive()) stream = true;
 
                     boolean mayPause = tile.data.paused || !tile.data.active || Minecraft.getInstance().isPaused();
@@ -193,6 +193,7 @@ public class TextureDisplay {
             case VIDEO, AUDIO -> {
                 mediaPlayer.seekTo(MathAPI.tickToMs(this.tile.data.tick));
                 mediaPlayer.setPauseMode(pause);
+                mediaPlayer.setMuteMode(this.tile.data.muted);
             }
         }
     }
