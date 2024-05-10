@@ -1,3 +1,11 @@
+# UPDATE 2.0.4
+- 🐛 Fixed redstone and model hiding wasn't working (blockstates aren't updated)
+- 🐛 Fixed wrong twitch url on default config (by [herronjo](https://github.com/SrRapero720/waterframes/pull/62))
+- 🛠️ Renamed `waterframes-client-new.toml` to `waterframes-client.toml`
+  - 🛠️ This was a horrendous mistake
+- 🛠️ Renamed `waterframes-server-new.toml` to `waterframes-server.toml`
+  - 🛠️ This was a horrendous mistake
+
 # UPDATE 2.0.3
 - 🐛 Fixed crashes loading worlds with older versions of the mod also with images
 - 🐛 Fixed changing brightness or transparency causes other stuff getting obscured (view model arm or entities)
