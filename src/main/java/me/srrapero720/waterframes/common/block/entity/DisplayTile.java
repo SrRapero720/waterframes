@@ -255,12 +255,12 @@ public abstract class DisplayTile extends BlockEntity {
             }
 
             if (state.getValue(DisplayBlock.POWER) != redstoneOutput) {
-                state.setValue(DisplayBlock.POWER, redstoneOutput);
+                state = state.setValue(DisplayBlock.POWER, redstoneOutput);
                 updateBlock = true;
             }
 
             if (state.hasProperty(DisplayBlock.VISIBLE) && state.getValue(DisplayBlock.VISIBLE) != tile.data.frameVisibility) {
-                state.setValue(DisplayBlock.VISIBLE, tile.data.frameVisibility);
+                state = state.setValue(DisplayBlock.VISIBLE, tile.data.frameVisibility);
                 updateBlock = true;
             }
 
