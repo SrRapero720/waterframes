@@ -49,7 +49,7 @@ public class WFConfig {
             "ytimg.com",
             "youtube.com",
             "youtu.be",
-            "twitch.com",
+            "twitch.tv",
             "twitter.com",
             "soundcloud.com",
             "kick.com",
