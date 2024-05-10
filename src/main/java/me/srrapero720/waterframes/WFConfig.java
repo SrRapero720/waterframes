@@ -226,9 +226,9 @@ public class WFConfig {
     }
 
     public static void init() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_SPEC, "waterframes-server-new.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_SPEC, "waterframes-server.toml");
         if (FMLLoader.getDist().isClient()) // SKIPS TRASH CONFIG FILES ON SERVERS
-            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC, "waterframes-client-new.toml");
+            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC, "waterframes-client.toml");
     }
 
     public static float maxWidth() { return (float) (double) maxWidth.get(); }
