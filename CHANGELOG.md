@@ -1,3 +1,7 @@
+# UPDATE 2.0.5
+- 🐛 Fixed crashes by the lastest update (caused by making redstone working again)
+- 🛠️ Bumped the minimum watermedia version to 2.0.50
+
 # UPDATE 2.0.4
 - 🐛 Fixed redstone and model hiding wasn't working (blockstates aren't updated)
 - 🐛 Fixed wrong twitch url on default config (by [herronjo](https://github.com/SrRapero720/waterframes/pull/62))
