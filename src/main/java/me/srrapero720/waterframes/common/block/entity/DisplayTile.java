@@ -240,7 +240,7 @@ public abstract class DisplayTile extends BlockEntity {
             if (tile.data.tickMax == -1 || tile.data.tick < 0) tile.data.tick = 0;
 
             if (!tile.data.paused && tile.data.active) {
-                if (tile.data.tick <= tile.data.tickMax) {
+                if (tile.data.tick < tile.data.tickMax) {
                     tile.data.tick++;
                 } else {
                     if (tile.data.loop || tile.data.tickMax == -1) tile.data.tick = 0;
