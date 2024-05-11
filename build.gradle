@@ -80,7 +80,7 @@ dependencies {
     implementation fileTree('libs') { include '*.jar' }
     implementation "com.github.SrRapero720.watermedia:build:$watermediaversion"
     implementation fg.deobf("curse.maven:video-player-645407:$videoplayerversion")
-//    implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
+    implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
 
     // UTIL
     implementation fg.deobf("curse.maven:ferritecore-429235:$ferritecoreversion")
