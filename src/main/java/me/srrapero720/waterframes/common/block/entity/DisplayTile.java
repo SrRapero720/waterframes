@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.common.block.entity;
 
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
@@ -252,6 +253,16 @@ public abstract class DisplayTile extends BlockEntity {
 
             if (tile.data.tickMax > 0 && tile.data.active) {
                 redstoneOutput = Math.round(((float) tile.data.tick / (float) tile.data.tickMax) * (BlockStateProperties.MAX_LEVEL_15 - 1)) + 1;
+            }
+
+            boolean lightOnPlay = WFConfig.useLightOnPlay();
+            boolean lit = state.getValue(DisplayBlock.LIT);
+            if (lightOnPlay && lit == (tile.data.url.isEmpty())) {
+                state = state.setValue(DisplayBlock.LIT, !tile.data.url.isEmpty());
+                updateBlock = true;
+            } else if (!lightOnPlay && lit) {
+                state = state.setValue(DisplayBlock.LIT, false);
+                updateBlock = true;
             }
 
             if (state.getValue(DisplayBlock.POWER) != redstoneOutput) {

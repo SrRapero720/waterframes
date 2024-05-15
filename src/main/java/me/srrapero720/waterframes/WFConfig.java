@@ -69,6 +69,7 @@ public class WFConfig {
     private static final BooleanValue useMultimedia;
     private static final BooleanValue keepRendering;
     // BEHAVIOR
+    private static final BooleanValue useLightsOnPlay;
     private static final BooleanValue useRedstone;
     private static final BooleanValue useMasterModeOnRedsone;
     // REMOTE CONTROL
@@ -136,6 +137,10 @@ public class WFConfig {
         // WATERFRAMES -> block_behavior
         SERVER.comment("Configuration related to interactions with vanilla and modded features");
         SERVER.pop(2).push("block_behavior");
+
+        useLightsOnPlay = SERVER
+                .comment("Enable light feature on frames while is playing")
+                .define("lightOnPlay", true);
 
         SERVER.comment("Redstone interaction options");
         SERVER.push("redstone");
@@ -226,9 +231,9 @@ public class WFConfig {
     }
 
     public static void init() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_SPEC, "waterframes-server.toml");
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_SPEC);
         if (FMLLoader.getDist().isClient()) // SKIPS TRASH CONFIG FILES ON SERVERS
-            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC, "waterframes-client.toml");
+            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC);
     }
 
     public static float maxWidth() { return (float) (double) maxWidth.get(); }
@@ -243,6 +248,7 @@ public class WFConfig {
     public static float maxProjDis(float value) { return Math.min(value, maxProjDis()); }
 
     public static boolean keepsRendering() { return overrideServerConfig.get() ? clientKeepsRendering.get() : keepRendering.get(); }
+    public static boolean useLightOnPlay() { return useLightsOnPlay.get(); }
 
     // MULTIMEDIA
     public static int maxVolDis() { return maxVolumeDistance.get(); }

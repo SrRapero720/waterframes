@@ -37,6 +37,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
     private static final Material MATERIAL = new Material.Builder(MaterialColor.NONE).noCollider().build();
@@ -112,21 +113,27 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override
     protected void registerDefaultState(BlockState state) {
-        super.registerDefaultState(state.setValue(WATERLOGGED, false).setValue(POWERED, false).setValue(POWER, 0));
+        super.registerDefaultState(state
+                .setValue(WATERLOGGED, false)
+                .setValue(POWERED, false)
+                .setValue(POWER, 0)
+                .setValue(LIT, false)
+        );
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder.add(getFacing()).add(ATTACHED_FACE).add(POWERED).add(POWER).add(WATERLOGGED));
+        super.createBlockStateDefinition(builder.add(getFacing()).add(ATTACHED_FACE).add(POWERED).add(POWER).add(WATERLOGGED).add(LIT));
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
         return this.defaultBlockState()
                 .setValue(WATERLOGGED, false)
                 .setValue(POWERED, false)
                 .setValue(POWER, 0)
-                .setValue(ATTACHED_FACE, pContext.getClickedFace());
+                .setValue(ATTACHED_FACE, context.getClickedFace())
+                .setValue(LIT, false);
     }
 
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
@@ -142,15 +149,18 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     }
 
     @Override public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-        return level.getMaxLightLevel();
+        if (state.getValue(LIT)) {
+            return level.getMaxLightLevel();
+            // TODO: this needs be synchronized on data refresh
+//            if (level.getBlockEntity(pos) instanceof DisplayTile tile) {
+//                return (tile.data.brightness / 255) * level.getMaxLightLevel();
+//            }
+        } else {
+            return 0;
+        }
     }
 
-    @Override public int getLightBlock(BlockState state, BlockGetter level, BlockPos pos) {
-        return level.getMaxLightLevel();
-    }
-
-    @Override
-    public PushReaction getPistonPushReaction(BlockState pState) {
+    @Override public PushReaction getPistonPushReaction(BlockState pState) {
         return PushReaction.DESTROY;
     }
 
