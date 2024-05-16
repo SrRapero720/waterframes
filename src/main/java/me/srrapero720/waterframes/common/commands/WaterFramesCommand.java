@@ -83,16 +83,16 @@ public class WaterFramesCommand {
         );
 
         // TRANSPARENCY
-        edit.then(Commands.literal("transparency")
-                .then(Commands.argument("transparency", FloatArgumentType.floatArg(0f, 1f))
-                        .executes(c -> setTransparency(getTile(c), c.getSource(), getFloat(c, "transparency")))
+        edit.then(Commands.literal("alpha")
+                .then(Commands.argument("alpha", IntegerArgumentType.integer(0, 255))
+                        .executes(c -> setAlpha(getTile(c), c.getSource(), getInt(c, "alpha")))
                 )
         );
 
         // BRIGHTNESS
         edit.then(Commands.literal("brightness")
-                .then(Commands.argument("brightness", FloatArgumentType.floatArg(0f, 1f))
-                        .executes(c -> setBrightness(getTile(c), c.getSource(), getFloat(c, "brightness")))
+                .then(Commands.argument("brightness", IntegerArgumentType.integer(0, 255))
+                        .executes(c -> setBrightness(getTile(c), c.getSource(), getInt(c, "brightness")))
                 )
         );
 
@@ -213,17 +213,17 @@ public class WaterFramesCommand {
         return 0;
     }
 
-    public static int setTransparency(DisplayTile tile, CommandSourceStack source, float transparency) {
+    public static int setAlpha(DisplayTile tile, CommandSourceStack source, int transparency) {
         if (tile == null) return 1;
 
         tile.data.alpha = transparency;
 
         tile.setDirty();
-        source.sendSuccess(msgSuccess("waterframes.commands.edit.transparency.success"), true);
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.alpha.success"), true);
         return 0;
     }
 
-    public static int setBrightness(DisplayTile tile, CommandSourceStack source, float brightness) {
+    public static int setBrightness(DisplayTile tile, CommandSourceStack source, int brightness) {
         if (tile == null) return 1;
 
         tile.data.brightness = brightness;

@@ -24,6 +24,7 @@ import team.creative.creativecore.common.gui.parser.LongValueParser;
 import team.creative.creativecore.common.gui.style.ControlFormatting;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
+import team.creative.creativecore.common.util.math.Maths;
 import team.creative.creativecore.common.util.type.Color;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ public class DisplayScreen extends GuiLayer {
 
     // ICONS
     private final GuiIcon rot_i = (GuiIcon) new GuiIcon("r_icon", IconStyles.ROTATION).setTooltip("waterframes.gui.icon.rotation");
-    private final GuiIcon vis_i = (GuiIcon) new GuiIcon("t_icon", IconStyles.TRANSPARENCY).setTooltip("waterframes.gui.icon.transparency");
+    private final GuiIcon vis_i = (GuiIcon) new GuiIcon("t_icon", IconStyles.TRANSPARENCY).setTooltip("waterframes.gui.icon.alpha");
     private final GuiIcon bright_i = (GuiIcon) new GuiIcon("b_icon", IconStyles.BRIGHTNESS).setTooltip("waterframes.gui.icon.brightness");
     private final GuiIcon render_i = (GuiIcon) new GuiIcon("r_icon", IconStyles.DISTANCE).setTooltip("waterframes.gui.icon.render_distance");
     private final GuiIcon project_i = (GuiIcon) new GuiIcon("pd_icon",  IconStyles.PROJECTION_DISTANCE).setTooltip("waterframes.gui.icon.projection_distance");
@@ -59,8 +60,8 @@ public class DisplayScreen extends GuiLayer {
     public final GuiCounterDecimal heightField;
 
     public final GuiSlider rotation;
-    public final GuiSlider visibility;
-    public final GuiSlider brightness;
+    public final GuiSteppedSlider alpha;
+    public final GuiSteppedSlider brightness;
     public final GuiSteppedSlider render_distance;
     public final GuiSlider projection_distance;
 
@@ -134,8 +135,8 @@ public class DisplayScreen extends GuiLayer {
         this.flip_y.setTranslate("waterframes.gui.flip_y");
 
         this.rotation = new GuiSlider(DisplayData.ROTATION, tile.data.rotation, 0, 360, DoubleValueParser.ANGLE);
-        this.visibility = new GuiSlider(DisplayData.ALPHA, tile.data.alpha, 0, 1, DoubleValueParser.PERCENT);
-        this.brightness = new GuiSlider(DisplayData.BRIGHTNESS, tile.data.brightness, 0, 1, DoubleValueParser.PERCENT);
+        this.alpha = new GuiSteppedSlider(DisplayData.ALPHA, tile.data.alpha, 0, 255, (v, max) -> (Math.round(((v != 0 && max != 0 ? (float) v / (float) max : 0) * 100))) + "%");
+        this.brightness = new GuiSteppedSlider(DisplayData.BRIGHTNESS, tile.data.brightness, 0, 255, (v, max) -> Math.round(((v != 0 && max != 0 ? (float) v / (float) max : 0) * 100)) + "%");
         this.render_distance = new GuiSteppedSlider(DisplayData.RENDER_DISTANCE, tile.data.renderDistance, 4, WFConfig.maxRenDis(), IntValueParser.BLOCKS.BLOCKS);
         this.projection_distance = new GuiSlider(DisplayData.PROJECTION_DISTANCE, tile.data.projectionDistance, 4, WFConfig.maxProjDis(), DoubleValueParser.BLOCKS);
         this.audioOffset = new GuiStateButtonIcon(DisplayData.AUDIO_OFFSET, IconStyles.AUDIO_POS_BLOCK, IconStyles.AUDIO_POS_PICTURE, IconStyles.AUDIO_POS_CENTER) {
@@ -232,7 +233,7 @@ public class DisplayScreen extends GuiLayer {
         this.add(tex_l);
         this.add(new WidgetPairTable(GuiFlow.STACK_Y, 2)
                 .addLeft(tile.canResize(), () -> new GuiParent(GuiFlow.STACK_X).add(rot_i).add(rotation.setDim(130, 12)).setVAlign(VAlign.CENTER))
-                .addLeft(new GuiParent(GuiFlow.STACK_X).add(vis_i).add(visibility.setDim(130, 12)).setVAlign(VAlign.CENTER))
+                .addLeft(new GuiParent(GuiFlow.STACK_X).add(vis_i).add(alpha.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).add(bright_i).add(brightness.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).add(render_i).add(render_distance.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(tile.canProject(), () -> new GuiParent(GuiFlow.STACK_X).add(project_i).add(projection_distance.setDim(100, 13)).add(audioOffset.setDim(26, 13)).setVAlign(VAlign.CENTER))

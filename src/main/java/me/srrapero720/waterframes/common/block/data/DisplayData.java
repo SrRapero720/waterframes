@@ -48,20 +48,20 @@ public class DisplayData {
     public static final String PROJECTION_DISTANCE = "projection_distance";
     public static final String AUDIO_OFFSET = "audio_offset";
 
-    public static final short V = 1;
+    public static final short V = 2;
 
     public String url = "";
     public UUID uuid = Util.NIL_UUID;
     public boolean active = true;
-    public final Vec2f min = new Vec2f(0f, 0f);
+    public final Vec2f min = new Vec2f(0f, 0f); // TODO: use vanilla Vec2
     public final Vec2f max = new Vec2f(1f, 1f);
 
     public boolean flipX = false;
     public boolean flipY = false;
 
     public float rotation = 0;
-    public float alpha = 1;
-    public float brightness = 1;
+    public int alpha = 255;
+    public int brightness = 255;
     public int renderDistance = WFConfig.maxRenDis(32);
 
     public int volume = WFConfig.maxVol();
@@ -101,8 +101,8 @@ public class DisplayData {
         nbt.putInt(RENDER_DISTANCE, renderDistance);
         nbt.putBoolean(FLIP_X, flipX);
         nbt.putBoolean(FLIP_Y, flipY);
-        nbt.putFloat(ALPHA, alpha);
-        nbt.putFloat(BRIGHTNESS, brightness);
+        nbt.putInt(ALPHA, alpha);
+        nbt.putInt(BRIGHTNESS, brightness);
         nbt.putInt(VOLUME, volume);
         nbt.putInt(VOL_RANGE_MIN, minVolumeDistance);
         nbt.putInt(VOL_RANGE_MAX, maxVolumeDistance);
@@ -142,8 +142,8 @@ public class DisplayData {
         this.renderDistance = WFConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
         this.flipX = nbt.getBoolean(FLIP_X);
         this.flipY = nbt.getBoolean(FLIP_Y);
-        this.alpha = nbt.contains(ALPHA) ? nbt.getFloat(ALPHA) : this.alpha;
-        this.brightness = nbt.contains(BRIGHTNESS) ? nbt.getFloat(BRIGHTNESS) : this.alpha;
+        this.alpha = nbt.contains(ALPHA) ? nbt.getInt(ALPHA) : this.alpha;
+        this.brightness = nbt.contains(BRIGHTNESS) ? nbt.getInt(BRIGHTNESS) : this.alpha;
         this.volume = nbt.contains(VOLUME) ? WFConfig.maxVol(nbt.getInt(VOLUME)) : this.volume;
         this.maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? WFConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX)) : this.maxVolumeDistance;
         this.minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), this.maxVolumeDistance) : this.minVolumeDistance;
@@ -168,7 +168,8 @@ public class DisplayData {
 
         switch (nbt.getShort(DATA_V)) {
             case 1 -> {
-
+                this.alpha = (int) (nbt.getFloat(ALPHA) * 255);
+                this.brightness = (int) (nbt.getFloat(BRIGHTNESS) * 255);
             }
 
             default -> { // NO EXISTS
@@ -308,8 +309,8 @@ public class DisplayData {
         nbt.putBoolean(FLIP_X, screen.flip_x.value);
         nbt.putBoolean(FLIP_Y, screen.flip_y.value);
 
-        nbt.putFloat(ALPHA, (float) screen.visibility.getValue());
-        nbt.putFloat(BRIGHTNESS, (float) screen.brightness.getValue());
+        nbt.putInt(ALPHA, screen.alpha.getIntValue());
+        nbt.putInt(BRIGHTNESS, screen.brightness.getIntValue());
         nbt.putInt(RENDER_DISTANCE, screen.render_distance.getIntValue());
 
         nbt.putInt(VOLUME, screen.volume.getIntValue());
@@ -356,8 +357,8 @@ public class DisplayData {
 
             block.data.flipX = nbt.getBoolean(FLIP_X);
             block.data.flipY = nbt.getBoolean(FLIP_Y);
-            block.data.alpha = nbt.getFloat(ALPHA);
-            block.data.brightness = nbt.getFloat(BRIGHTNESS);
+            block.data.alpha = nbt.getInt(ALPHA);
+            block.data.brightness = nbt.getInt(BRIGHTNESS);
             block.data.renderDistance = WFConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
             block.data.volume = WFConfig.maxVol(nbt.getInt(VOLUME));
             block.data.maxVolumeDistance = WFConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX));

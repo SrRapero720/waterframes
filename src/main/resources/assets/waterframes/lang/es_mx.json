@@ -31,7 +31,7 @@
     "waterframes.commands.edit.position.success": "Se actualizo la Posicion exitosamente",
     "waterframes.commands.edit.rotation.failed": "No se puede actualizar la Rotacion para este tipo de Display",
     "waterframes.commands.edit.rotation.success": "Se actualizo la Rotacion exitosamente",
-    "waterframes.commands.edit.transparency.success": "Se actualizo la transparencia exitosamente",
+    "waterframes.commands.edit.alpha.success": "Se actualizo el canal alfa exitosamente",
     "waterframes.commands.edit.brightness.success": "Se actualizo el brillo exitosamente",
     "waterframes.commands.edit.render_distance.success": "Se actualizo la Distancia de Render exitosamente",
     "waterframes.commands.edit.projection.failed": "No se puede actualizar la Distancia de Proyeccion en este tipo de Display",
@@ -75,7 +75,7 @@
 
     "waterframes.gui.icon.volume": "Volumen",
     "waterframes.gui.icon.rotation": "Rotation de la imagen",
-    "waterframes.gui.icon.transparency": "Nivel de Transparencia",
+    "waterframes.gui.icon.alpha": "Nivel del canal Alpha",
     "waterframes.gui.icon.brightness": "Nivel de brillo",
     "waterframes.gui.icon.render_distance": "Distancia maxima de Render",
     "waterframes.gui.icon.projection_distance": "Distancia de Proyeccion",

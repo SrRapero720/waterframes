@@ -12,7 +12,6 @@ import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageRenderer;
 import me.srrapero720.watermedia.api.math.MathAPI;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
@@ -58,8 +57,6 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         var direction = this.direction(tile);
         var facing = Facing.get(direction);
         var box = tile.getRenderBox();
-        int bright = (int) (tile.data.brightness * 255);
-        var color = MathAPI.argb((int) (tile.data.alpha * 255), bright, bright, bright);
 
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
@@ -75,7 +72,8 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         }
 
         // RENDERING
-        this.render(pose, tile, display, box, BoxFace.get(tile.flip3DFace() ? facing.opposite() : facing), color);
+        final int brightness = tile.data.brightness;
+        this.render(pose, tile, display, box, BoxFace.get(tile.flip3DFace() ? facing.opposite() : facing), tile.data.alpha, brightness, brightness, brightness);
 
         // POST RENDERING
         pose.popPose();
@@ -86,7 +84,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         RenderSystem.bindTexture(0);
     }
 
-    public void render(PoseStack pose, DisplayTile tile, TextureDisplay display, AlignedBox box, BoxFace face, int colorARGB) {
+    public void render(PoseStack pose, DisplayTile tile, TextureDisplay display, AlignedBox box, BoxFace face, int a, int r, int g, int b) {
         // VAR DECLARE
         final boolean flipX = this.flipX(tile);
         final boolean flipY = this.flipY(tile);
@@ -95,7 +93,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
         if (display.isLoading()) {
             RenderCore.bufferBegin();
-            this.renderLoading(pose, tile, box, face, front, back, flipX, flipY, colorARGB);
+            this.renderLoading(pose, tile, box, face, front, back, flipX, flipY);
             RenderCore.bufferEnd();
             return;
         }
@@ -107,21 +105,21 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
             RenderCore.bufferBegin();
             RenderCore.bindTex(tex);
             if (front)
-                RenderCore.vertexF(pose, box, face, flipX, flipY, colorARGB);
+                RenderCore.vertexF(pose, box, face, flipX, flipY, a, r, g, b);
 
             if (back)
-                RenderCore.vertexB(pose, box, face, flipX, flipY, colorARGB);
+                RenderCore.vertexB(pose, box, face, flipX, flipY, a, r, g, b);
             RenderCore.bufferEnd();
         }
 
         if (display.isBuffering()) {
             RenderCore.bufferBegin();
-            this.renderLoading(pose, tile, box, face, front, back, flipX, flipY, colorARGB);
+            this.renderLoading(pose, tile, box, face, front, back, flipX, flipY);
             RenderCore.bufferEnd();
         }
     }
 
-    public void renderLoading(PoseStack pose, DisplayTile tile, AlignedBox alignedBox, BoxFace face, boolean front, boolean back, boolean flipX, boolean flipY, int colorARGB) {
+    public void renderLoading(PoseStack pose, DisplayTile tile, AlignedBox alignedBox, BoxFace face, boolean front, boolean back, boolean flipX, boolean flipY) {
         RenderCore.bindTex(LOADING_TEX.texture(DisplayControl.getTicks(), MathAPI.tickToMs(WaterFrames.deltaFrames()), true));
 
         AlignedBox box = new AlignedBox(alignedBox);
@@ -156,10 +154,10 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         }
 
         if (front)
-            RenderCore.vertexF(pose, box, face, flipX, flipY, colorARGB);
+            RenderCore.vertexF(pose, box, face, flipX, flipY, 255, 255, 255, 255);
 
         if (back)
-            RenderCore.vertexB(pose, box, face, flipX, flipY, colorARGB);
+            RenderCore.vertexB(pose, box, face, flipX, flipY, 255, 255, 255, 255);
     }
 
     public boolean inFront(DisplayTile tile) {

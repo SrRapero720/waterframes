@@ -51,23 +51,23 @@ public class RenderCore {
         RenderSystem.setShaderTexture(0, 0);
     }
 
-    public static void vertexF(PoseStack pose, AlignedBox box, BoxFace face, boolean flipX, boolean flipY, int colorARGB) {
+    public static void vertexF(PoseStack pose, AlignedBox box, BoxFace face, boolean flipX, boolean flipY, int a, int r, int g, int b) {
         for (int i = 0; i < face.corners.length; i++) {
-            vertex(pose, box, face, face.corners[i], flipX, flipY, colorARGB);
+            vertex(pose, box, face, face.corners[i], flipX, flipY, a, r, g, b);
         }
     }
 
-    public static void vertexB(PoseStack pose, AlignedBox box, BoxFace face, boolean flipX, boolean flipY, int colorARGB) {
+    public static void vertexB(PoseStack pose, AlignedBox box, BoxFace face, boolean flipX, boolean flipY, int a, int r, int g, int b) {
         for (int i = face.corners.length - 1; i >= 0; i--) {
-            vertex(pose, box, face, face.corners[i], flipX, flipY, colorARGB);
+            vertex(pose, box, face, face.corners[i], flipX, flipY, a, r, g, b);
         }
     }
 
-    private static void vertex(PoseStack pose, AlignedBox box, BoxFace face, BoxCorner corner, boolean flipX, boolean flipY, int colorARGB) {
+    private static void vertex(PoseStack pose, AlignedBox box, BoxFace face, BoxCorner corner, boolean flipX, boolean flipY, int a, int r, int g, int b) {
         Vec3i normal = face.facing.normal;
         builder.vertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
                 .uv(corner.isFacing(face.getTexU()) != flipX ? 1 : 0, corner.isFacing(face.getTexV()) != flipY ? 1 : 0)
-                .color(colorARGB)
+                .color(r, g, b, a)
                 .normal(pose.last().normal(), normal.getX(), normal.getY(), normal.getZ())
                 .endVertex();
     }
