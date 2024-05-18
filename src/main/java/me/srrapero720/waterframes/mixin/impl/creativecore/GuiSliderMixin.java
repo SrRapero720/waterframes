@@ -2,6 +2,8 @@ package me.srrapero720.waterframes.mixin.impl.creativecore;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.common.helpers.ScalableText;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,6 +17,7 @@ public class GuiSliderMixin implements ScalableText {
     float wf$scale = 1.0f;
 
     @Redirect(method = "renderContent", at = @At(value = "INVOKE", target = "Lteam/creative/creativecore/client/render/GuiRenderHelper;drawStringCentered(Lcom/mojang/blaze3d/vertex/PoseStack;Ljava/lang/String;FFIZ)V"), remap = false)
+    @OnlyIn(Dist.CLIENT)
     public void redirect$render(PoseStack pose, String text, float width, float height, int color, boolean shadow) {
         pose.pushPose();
         pose.scale(wf$scale, wf$scale, wf$scale);
