@@ -18,8 +18,8 @@ public class CompiledTextMixin implements ScalableText {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", ordinal = 0, shift = At.Shift.AFTER))
     @OnlyIn(Dist.CLIENT)
-    public void render(PoseStack stack, CallbackInfo ci) {
-        stack.scale(wf$scale, wf$scale, wf$scale);
+    public void render(PoseStack pose, CallbackInfo ci) {
+        pose.scale(wf$scale, wf$scale, wf$scale);
     }
 
     @Override

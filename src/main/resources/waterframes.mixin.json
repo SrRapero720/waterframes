@@ -13,6 +13,7 @@
     "LevelMixin",
     "PlayerListMixin",
     "creativecore.CompiledTextMixin",
-    "creativecore.GuiLabelMixin"
+    "creativecore.GuiLabelMixin",
+    "creativecore.GuiSliderMixin"
   ]
 }

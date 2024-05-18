@@ -33,6 +33,8 @@ import java.util.List;
 
 public class DisplayScreen extends GuiLayer {
     protected static final float SCALE = 1F / 16;
+    protected static final int WIDTH = 270;
+    protected static final int HEIGHT = 245;
 
     // IMPORTANT
     public final DisplayTile tile;
@@ -92,7 +94,7 @@ public class DisplayScreen extends GuiLayer {
     public final WidgetClickableArea pos_view;
 
     public DisplayScreen(DisplayTile tile) {
-        super("display_screen", 260, 245);
+        super("display_screen", WIDTH, HEIGHT);
         this.setAlign(Align.STRETCH);
         this.flow = GuiFlow.STACK_Y;
         this.tile = tile;
@@ -198,6 +200,19 @@ public class DisplayScreen extends GuiLayer {
         ((ScalableText) url_l).wf$setScale(0.75f);
         ((ScalableText) tex_l).wf$setScale(0.75f);
         ((ScalableText) media_l).wf$setScale(0.75f);
+
+        ((ScalableText) rotation).wf$setScale(0.90f);
+        ((ScalableText) alpha).wf$setScale(0.90f);
+        ((ScalableText) brightness).wf$setScale(0.90f);
+        ((ScalableText) render_distance).wf$setScale(0.90f);
+        ((ScalableText) projection_distance).wf$setScale(0.90f);
+
+        ((ScalableText) volume_min).wf$setScale(0.90f);
+        ((ScalableText) volume_max).wf$setScale(0.90f);
+
+        if (!tile.canResize()) {
+            this.setDim(WIDTH, HEIGHT - 50);
+        }
     }
 
     @Override
@@ -275,9 +290,9 @@ public class DisplayScreen extends GuiLayer {
 
         // SAVE BUTTONS
         this.add(new WidgetPairTable(GuiFlow.STACK_X, Align.RIGHT, 2)
-                .addLeft(this.reload_all.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(70, 10))
-                .addRight(this.save.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(60, 10).setEnabled(WFConfig.canSave(getPlayer(), url.getText())))
-                .addRight(this.reload.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(50, 10))
+                .addLeft(this.reload_all.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(90, 10))
+                .addRight(this.save.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(70, 10).setEnabled(WFConfig.canSave(getPlayer(), url.getText())))
+                .addRight(this.reload.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(70, 10))
                 .setAlignRight(Align.RIGHT)
         );
     }
