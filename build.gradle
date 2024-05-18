@@ -15,6 +15,13 @@ base {
     version = mcversion + "-" +  modversion
 }
 
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
+
 java.toolchain {
     languageVersion = JavaLanguageVersion.of(17)
 }
