@@ -1,3 +1,11 @@
+# UPDATE 2.0.6
+- 🐛 Fixed wrong 0.0 to 1.0 value on brightness and alpha, (now is range of 0 to 255)
+  - 🛠️ Command, Gui and Data is updated
+- 🐛 Fixed KeepRendering config wasn't working
+- ✨ Blocklight is disabled when Displays have no URL
+  - 🛠️ Light can be completely disabled on config
+- 🛠️ TV GUI uses less height (feel it less empty)
+
 # UPDATE 2.0.5
 - 🐛 Fixed crashes by the lastest update (caused by making redstone working again)
 - 🛠️ Bumped the minimum watermedia version to 2.0.50
