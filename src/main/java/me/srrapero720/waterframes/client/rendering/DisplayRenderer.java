@@ -3,6 +3,7 @@ package me.srrapero720.waterframes.client.rendering;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.DisplayControl;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
@@ -41,7 +42,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     @Override
     public void render(DisplayTile tile, float partialTicks, PoseStack pose, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         var display = tile.requestDisplay();
-        if (display == null) return;
+        if (display == null || !WFConfig.keepsRendering()) return;
 
         // STORE AND CLEAN ANY "EARLY" STATE
         RenderCore.cleanShader();
