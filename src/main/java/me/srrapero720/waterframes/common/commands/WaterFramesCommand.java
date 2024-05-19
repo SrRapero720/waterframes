@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WFRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
@@ -28,11 +29,19 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.server.command.EnumArgument;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import java.util.Collections;
 import java.util.List;
 
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+
 public class WaterFramesCommand {
+    private static final Marker IT = MarkerManager.getMarker("Commands");
+    public static final Component ACTIVATED = new TranslatableComponent("waterframes.common.activated");
+    public static final Component DEACTIVATED = new TranslatableComponent("waterframes.common.deactivated");
+
     public static ItemInput[] DEFAULT_INPUTS = new ItemInput[0];
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var waterframes = Commands.literal("waterframes").requires(WaterFramesCommand::hasPermissions);
@@ -162,6 +171,20 @@ public class WaterFramesCommand {
                 .executes(c -> giveSelfKit(c.getSource()))
                 .then(Commands.argument("targets", EntityArgument.players())
                         .executes(c -> giveKit(c.getSource(), (List<ServerPlayer>) EntityArgument.getPlayers(c, "targets"))))
+        );
+
+        waterframes.then(Commands.literal("whitelist")
+                .then(Commands.literal("add")
+                        .then(Commands.argument("url", StringArgumentType.string())
+                                .executes(c -> whitelist$add(c.getSource(), getStr(c, "url"))))
+                )
+                .then(Commands.literal("remove")
+                        .then(Commands.argument("url", StringArgumentType.string())
+                                .executes(c -> whitelist$remove(c.getSource(), getStr(c, "url"))))
+                )
+                .then(Commands.literal("toggle")
+                        .executes(c -> whitelist$toggle(c.getSource()))
+                )
         );
 
         DEFAULT_INPUTS = new ItemInput[] {
@@ -347,6 +370,26 @@ public class WaterFramesCommand {
         }
 
         return players.size();
+    }
+
+    public static int whitelist$toggle(CommandSourceStack source) {
+        source.sendSuccess(msgSuccess("waterframes.commands.whitelist.toggle", WFConfig.toggleWhitelist() ? ACTIVATED : DEACTIVATED), true);
+        return 0;
+    }
+
+    public static int whitelist$remove(CommandSourceStack source, String value) {
+        boolean removed = WFConfig.removeOnWhitelist(value);
+        if (removed)
+            source.sendSuccess(msgSuccess("waterframes.commands.whitelist.remove", value), true);
+        else
+            source.sendFailure(msgFailed("waterframes.commands.whitelist.remove.failed"));
+        return 0;
+    }
+
+    public static int whitelist$add(CommandSourceStack source, String value) {
+        WFConfig.addOnWhitelist(value);
+        source.sendSuccess(msgSuccess("waterframes.commands.whitelist.add", value), true);
+        return 0;
     }
 
     public static <E extends Enum<E>> E getEnum(CommandContext<CommandSourceStack> context, String name, Class<E> enumClass) {

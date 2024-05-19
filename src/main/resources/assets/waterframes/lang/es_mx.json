@@ -8,6 +8,8 @@
 
     "waterframes.common.true": "activado",
     "waterframes.common.false": "desactivado",
+    "waterframes.common.activated": "activada",
+    "waterframes.common.deactivated": "desactivada",
     "waterframes.common.width": "Ancho",
     "waterframes.common.height": "Alto",
     "waterframes.common.soon": "Proximamente!",
@@ -24,6 +26,10 @@
 
     "waterframes.commands.give.single": "%s Recibio el set de Displays",
     "waterframes.commands.give.multiple": "%s jugadores recibieron el set de Displays",
+    "waterframes.commands.whitelist.toggle": "La whitelist se encuentra %s",
+    "waterframes.commands.whitelist.add": "Se agrego \"%s\" a la whitelist",
+    "waterframes.commands.whitelist.remove": "Se elimino \"%s\" de la whitelist",
+    "waterframes.commands.whitelist.remove.failed": "No se pudo eliminar la URL; no existe",
     "waterframes.commands.invalid_block": "El bloque no es un display valido",
     "waterframes.commands.edit.url.success": "Se actualizo la URL exitosamente",
     "waterframes.commands.edit.url.failed": "No se pudo actualizar la URL de este Display",

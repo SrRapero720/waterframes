@@ -11,6 +11,7 @@ import net.minecraftforge.common.ForgeConfigSpec.*;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
+import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
@@ -83,7 +84,7 @@ public class WFConfig {
     private static final ConfigValue<List<String>> whitelist;
 
     // OVERRIDES (client)
-    private final static ForgeConfigSpec.BooleanValue overrideServerConfig;
+    private final static BooleanValue overrideServerConfig;
     private static final BooleanValue clientUseMultimedia;
     private static final BooleanValue clientKeepsRendering;
 
@@ -269,6 +270,32 @@ public class WFConfig {
     public static boolean useInSurv() { return useInSurvival.get(); }
     public static boolean useForAnyone() { return useForAnyone.get(); }
     public static boolean useWhitelist() { return useWhitelist.get(); }
+    public static void useWhitelist(boolean state) {
+        useWhitelist.set(state);
+        useWhitelist.save();
+    }
+    public static boolean toggleWhitelist() {
+        useWhitelist(!useWhitelist());
+        return useWhitelist();
+    }
+    public static void addOnWhitelist(String url) {
+        var w = Lists.newArrayList(whitelist.get().iterator());
+        w.add(url);
+        whitelist.set(w);
+        whitelist.save();
+    }
+    public static boolean removeOnWhitelist(String url) {
+        var w = Lists.newArrayList(whitelist.get().iterator());
+        boolean removed = false;
+        try {
+            return removed = w.remove(url);
+        } finally {
+            if (removed) {
+                whitelist.set(w);
+                whitelist.save();
+            }
+        }
+    }
 
     public static boolean isWhiteListed(@NotNull String url) {
         if (!useWhitelist()) return true;

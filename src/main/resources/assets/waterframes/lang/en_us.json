@@ -8,6 +8,8 @@
 
     "waterframes.common.true": "enabled",
     "waterframes.common.false": "disabled",
+    "waterframes.common.activated": "activated",
+    "waterframes.common.deactivated": "deactivated",
     "waterframes.common.width": "width",
     "waterframes.common.height": "height",
     "waterframes.common.soon": "soon!",
@@ -24,6 +26,10 @@
 
     "waterframes.commands.give.single": "Gave Displays set to %s",
     "waterframes.commands.give.multiple": "Gave Displays set to %s players",
+    "waterframes.commands.whitelist.toggle": "Whitelist is now %s",
+    "waterframes.commands.whitelist.add": "Added new entry \"%s\" on the whitelist",
+    "waterframes.commands.whitelist.remove": "Removed entry \"%s\" from the whitelist",
+    "waterframes.commands.whitelist.remove.failed": "Failed to remove entry; it doesn't exists",
     "waterframes.commands.invalid_block": "Block was not a valid display",
     "waterframes.commands.edit.url.success": "URL updated successfully",
     "waterframes.commands.edit.url.failed": "Cannot update the URL for this Display",
