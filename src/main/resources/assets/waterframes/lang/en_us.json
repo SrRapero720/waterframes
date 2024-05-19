@@ -22,6 +22,8 @@
     "waterframes.remote.display.failed": "Display is broken, unbounded",
     "waterframes.remote.display.invalid": "Needs to bound it first.",
 
+    "waterframes.commands.give.single": "Gave Displays set to %s",
+    "waterframes.commands.give.multiple": "Gave Displays set to %s players",
     "waterframes.commands.invalid_block": "Block was not a valid display",
     "waterframes.commands.edit.url.success": "URL updated successfully",
     "waterframes.commands.edit.url.failed": "Cannot update the URL for this Display",

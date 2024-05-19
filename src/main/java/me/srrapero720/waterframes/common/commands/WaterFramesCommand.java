@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import me.srrapero720.waterframes.WFRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
@@ -14,14 +15,25 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
+import net.minecraft.commands.arguments.item.ItemInput;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.server.command.EnumArgument;
 
+import java.util.Collections;
+import java.util.List;
+
 public class WaterFramesCommand {
+    public static ItemInput[] DEFAULT_INPUTS = new ItemInput[0];
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         var waterframes = Commands.literal("waterframes").requires(WaterFramesCommand::hasPermissions);
 
@@ -146,6 +158,19 @@ public class WaterFramesCommand {
 //                        .executes(c -> auditFramesRange(c.getSource().getPlayerOrException(), c.getSource()))
 //                )
         );
+        waterframes.then(Commands.literal("give")
+                .executes(c -> giveSelfKit(c.getSource()))
+                .then(Commands.argument("targets", EntityArgument.players())
+                        .executes(c -> giveKit(c.getSource(), (List<ServerPlayer>) EntityArgument.getPlayers(c, "targets"))))
+        );
+
+        DEFAULT_INPUTS = new ItemInput[] {
+                new ItemInput(WFRegistry.REMOTE_ITEM.get(), null),
+                new ItemInput(WFRegistry.FRAME_ITEM.get(), null),
+                new ItemInput(WFRegistry.PROJECTOR_ITEM.get(), null),
+                new ItemInput(WFRegistry.TV_ITEM.get(), null),
+                new ItemInput(WFRegistry.BIG_TV_ITEM.get(), null),
+        };
 
         dispatcher.register(waterframes);
     }
@@ -286,6 +311,44 @@ public class WaterFramesCommand {
         return 0;
     }
 
+    public static int giveSelfKit(CommandSourceStack source) throws CommandSyntaxException {
+        return giveKit(source, Collections.singletonList(source.getPlayerOrException()));
+    }
+
+    public static int giveKit(CommandSourceStack source, List<ServerPlayer> players) throws CommandSyntaxException {
+        for(ServerPlayer serverplayer : players) {
+            for (ItemInput input: DEFAULT_INPUTS) {
+                ItemStack itemstack = input.createItemStack(1, false);
+                boolean flag = serverplayer.getInventory().add(itemstack);
+                if (flag && itemstack.isEmpty()) {
+                    itemstack.setCount(1);
+                    ItemEntity itementity1 = serverplayer.drop(itemstack, false);
+                    if (itementity1 != null) {
+                        itementity1.makeFakeItem();
+                    }
+
+                    serverplayer.level.playSound(null, serverplayer.getX(), serverplayer.getY(), serverplayer.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.2F, ((serverplayer.getRandom().nextFloat() - serverplayer.getRandom().nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                    serverplayer.containerMenu.broadcastChanges();
+                } else {
+                    ItemEntity itementity = serverplayer.drop(itemstack, false);
+                    if (itementity != null) {
+                        itementity.setNoPickUpDelay();
+                        itementity.setOwner(serverplayer.getUUID());
+                    }
+                }
+            }
+        }
+
+        if (players.size() == 1) {
+
+            source.sendSuccess(msgSuccess("waterframes.commands.give.single", players.get(0).getDisplayName()), true);
+        } else {
+            source.sendSuccess(msgSuccess("waterframes.commands.give.multiple", players.size() + ""), true);
+        }
+
+        return players.size();
+    }
+
     public static <E extends Enum<E>> E getEnum(CommandContext<CommandSourceStack> context, String name, Class<E> enumClass) {
         return context.getArgument(name, enumClass);
     }
@@ -347,6 +410,10 @@ public class WaterFramesCommand {
 
     private static Component msgSuccess(String t, Component c) {
         return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN).append(c));
+    }
+
+    private static Component msgSuccess(String t, String... a) {
+        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
     }
 
     public static boolean hasPermissions(CommandSourceStack sourceStack) {

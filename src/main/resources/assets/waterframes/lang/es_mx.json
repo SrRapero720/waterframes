@@ -22,6 +22,8 @@
     "waterframes.remote.display.failed": "El display se rompio, desvinculado",
     "waterframes.remote.display.invalid": "Necesitas vincularlo primero",
 
+    "waterframes.commands.give.single": "%s Recibio el set de Displays",
+    "waterframes.commands.give.multiple": "%s jugadores recibieron el set de Displays",
     "waterframes.commands.invalid_block": "El bloque no es un display valido",
     "waterframes.commands.edit.url.success": "Se actualizo la URL exitosamente",
     "waterframes.commands.edit.url.failed": "No se pudo actualizar la URL de este Display",
