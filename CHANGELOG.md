@@ -1,3 +1,15 @@
+# UPDATE 2.0.7
+- ✨ Added `/waterframes give`
+  - 🛠️ Can specify an player selection or nothing (to give you)
+  - 🛠️ Reminder: `/waterframes` command is restricted in general just to op players (and the owner of the mod)
+- ✨ Added `/waterframes whitelist`
+  - 🛠️ Can toggle, add, and remove urls
+  - 🛠️ Due to some Forge skill issues, users need to leave and join the server to refresh
+- 🐛 Fixed wrong value type on RC
+  - 🛠️ Type was change from long to int
+  - 🛠️ Added a data fixer for old value type (logs a warning)
+- 🛠️ Tweaked some GUI textures
+
 # UPDATE 2.0.6
 - 🐛 Fixed wrong 0.0 to 1.0 value on brightness and alpha, (now is range of 0 to 255)
   - 🛠️ Command, Gui and Data is updated
