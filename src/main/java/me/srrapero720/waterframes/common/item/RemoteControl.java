@@ -69,7 +69,15 @@ public class RemoteControl extends Item implements ItemGuiCreator {
             return InteractionResultHolder.success(stack);
         }
 
-        long[] pos = tag.getLongArray("pos");
+        // DATA FIXER
+        if (tag.contains("pos")) {
+            if (!level.isClientSide()) LOGGER.warn(IT, "NBT contains an old position data, correcting...");
+            long[] longPos = tag.getLongArray("pos");
+            tag.putIntArray("position", new int[] { (int) longPos[0], (int) longPos[1], (int) longPos[2] });
+            tag.remove("pos");
+        }
+
+        int[] pos = tag.getIntArray("position");
         String dim = tag.getString("dimension");
         if (pos.length < 3 || dim.isEmpty()) {
             this.sendFailed(player, new TranslatableComponent("waterframes.remote.code.failed"));
@@ -115,7 +123,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
             var item = context.getItemInHand();
             var tag = item.getOrCreateTag();
 
-            tag.putLongArray("pos", new long[] { pos.getX(), pos.getY(), pos.getZ() });
+            tag.putIntArray("position", new int[] { pos.getX(), pos.getY(), pos.getZ() });
             tag.putString("dimension", level.dimension().location().toString());
 
             this.sendSuccess(player, new TranslatableComponent("waterframes.remote.bound.success"));
@@ -140,7 +148,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
 
     @Override
     public GuiLayer create(CompoundTag tag, Player player) {
-        long[] pos = tag.getLongArray("pos");
+        int[] pos = tag.getIntArray("position");
         var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
         return new RemoteControlScreen(player, (DisplayTile) player.level.getBlockEntity(blockPos), tag, this);
     }
@@ -161,7 +169,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     @Override
     public boolean isFoil(ItemStack pStack) {
         var tag = pStack.getTag();
-        return tag != null && !tag.isEmpty() && tag.contains("pos") && tag.contains("dimension");
+        return tag != null && !tag.isEmpty() && (tag.contains("position") || tag.contains("pos")) && tag.contains("dimension");
     }
 
     @Override
