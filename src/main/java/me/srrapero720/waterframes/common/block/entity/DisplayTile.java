@@ -88,6 +88,11 @@ public abstract class DisplayTile extends BlockEntity {
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
+    public void flushDisplay() {
+        if (this.display != null) display.flush();
+    }
+
     @Override
     public void saveAdditional(CompoundTag nbt) {
         this.data.save(nbt, this);
