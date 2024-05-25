@@ -1,3 +1,11 @@
+# UPDATE 2.0.8
+- ✨ Enhanced GPU memory usage for single-use images
+  - 🛠️ This changes releases GPU memory (VRAM) and stores back to RAM 
+  - 🛠️ Due to limitations on WATERMeDIA (planned to solve on v3) WF can only optimize pictures with only one usage (1 display for 1 URL)
+- ✨ Image position selection box is now drag and drop
+  - 🛠️ Now you can click and slide your mouse as a madman to everywhere
+- 🛠️ Bumped the minimal version required of WATERMeDIA required to 2.0.54
+
 # UPDATE 2.0.7
 - ✨ Added `/waterframes give`
   - 🛠️ Can specify an player selection or nothing (to give you)
