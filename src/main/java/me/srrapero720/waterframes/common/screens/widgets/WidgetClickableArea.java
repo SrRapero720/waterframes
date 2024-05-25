@@ -20,6 +20,7 @@ import java.util.List;
 public class WidgetClickableArea extends GuiIcon {
     private PositionHorizontal x;
     private PositionVertical y;
+    private boolean selected = false;
     public WidgetClickableArea(String name, PositionHorizontal x, PositionVertical y) {
         super(name, IconStyles.POS_BASE);
         this.x = x;
@@ -34,19 +35,19 @@ public class WidgetClickableArea extends GuiIcon {
 
     protected void renderSelector(PoseStack pose, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
         var icon = IconStyles.POS_ICON;
-        int width = control.getContentWidth() / 3;
-        int height = control.getContentHeight() / 3;
+        int width = Math.round(control.getContentWidth() / 3f);
+        int height = Math.round(control.getContentHeight() / 3f);
 
         int offsetX = switch (x) {
             case LEFT -> 0;
-            case CENTER -> width + 1;
-            case RIGHT -> (width * 2) + 2;
+            case CENTER -> width;
+            case RIGHT -> Math.round(width * 2f) - 1;
         };
 
         int offsetY = switch (y) {
             case TOP -> 0;
-            case CENTER -> height + 1;
-            case BOTTOM -> (height * 2) + 2;
+            case CENTER -> height;
+            case BOTTOM -> Math.round(height * 2f) - 1;
         };
 
         pose.pushPose();
@@ -65,23 +66,39 @@ public class WidgetClickableArea extends GuiIcon {
     @Override
     public boolean mouseClicked(Rect rect, double mouseX, double mouseY, int button) {
         playSound(SoundEvents.UI_BUTTON_CLICK);
-        int areaX = (int) ((mouseX / rect.getWidth()) * 3);
-        int areaY = (int) ((mouseY / rect.getHeight()) * 3);
-
-        this.x = switch (areaX) {
-            case 0 -> PositionHorizontal.LEFT;
-            case 1 -> PositionHorizontal.CENTER;
-            case 2, 3 -> PositionHorizontal.RIGHT;
-            default -> throw new IllegalStateException("Invalid area");
-        };
-
-        this.y = switch (areaY) {
-            case 0 -> PositionVertical.TOP;
-            case 1 -> PositionVertical.CENTER;
-            case 2, 3 -> PositionVertical.BOTTOM;
-            default -> throw new IllegalStateException("Invalid area");
-        };
+        this.selected = true;
+        this.mouseMoved(rect, mouseX, mouseY);
         return true;
+    }
+
+    @Override
+    public void mouseMoved(Rect rect, double mouseX, double mouseY) {
+        super.mouseMoved(rect, mouseX, mouseY);
+        if (selected) {
+            int areaX = (int) ((mouseX / rect.getWidth()) * 3);
+            int areaY = (int) ((mouseY / rect.getHeight()) * 3);
+
+            this.x = switch (areaX) {
+                case 0 -> PositionHorizontal.LEFT;
+                case 1 -> PositionHorizontal.CENTER;
+                case 2, 3 -> PositionHorizontal.RIGHT;
+                default -> areaX > 3 ? PositionHorizontal.RIGHT : PositionHorizontal.LEFT;
+            };
+
+            this.y = switch (areaY) {
+                case 0 -> PositionVertical.TOP;
+                case 1 -> PositionVertical.CENTER;
+                case 2, 3 -> PositionVertical.BOTTOM;
+                default -> areaY > 3 ? PositionVertical.BOTTOM : PositionVertical.TOP;
+            };
+
+        }
+    }
+
+    @Override
+    public void mouseReleased(Rect rect, double x, double y, int button) {
+        this.selected = false;
+        super.mouseReleased(rect, x, y, button);
     }
 
     @Override
