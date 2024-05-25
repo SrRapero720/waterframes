@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.common.block;
 
 import me.srrapero720.waterframes.common.block.entity.BigTvTile;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -20,6 +21,11 @@ import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@SuppressWarnings("deprecation")
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class BigTvBlock extends DisplayBlock {
     @Override
     public DirectionProperty getFacing() {
