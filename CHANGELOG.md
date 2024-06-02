@@ -1,3 +1,15 @@
+# UPDATE 2.0.9
+- ✨ Increased max limit of some config fields (`waterframes-server.toml`)
+  - 📐 Max width: 128.0 -> 256.0
+  - 📐 Max height: 128.0 -> 256.0
+  - 👁️ Max render distance: 128 -> 512
+  - 📽️ Max projection distance: 128 -> 256
+  - 🔊 Max audio distance: 256 -> 512
+- 🛠️ Delete NBT entry for model visibility in favor of the blockstate
+- 🛠️ Added ``DisplayCaps`` to specify the renderBox and the capabilities of the display
+  - 🛠️ This removes all abstract methods on BlockEntity classes
+- 🐛 Fixed crashes by the GPU memory usage optimization (backToRAM)
+
 # UPDATE 2.0.8
 - ✨ Enhanced GPU memory usage for single-use images
   - 🛠️ This changes releases GPU memory (VRAM) and stores back to RAM 
