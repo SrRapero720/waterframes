@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.common.block.data;
 
 import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.types.AudioPosition;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
@@ -41,7 +42,6 @@ public class DisplayData {
     public static final String DATA_V = "data_v";
 
     // FRAME KEYS
-    public static final String VISIBLE_FRAME = "frame_visibility";
     public static final String RENDER_BOTH_SIDES = "render_both";
 
     // PROJECTOR
@@ -74,8 +74,6 @@ public class DisplayData {
     public long tick = 0;
     public long tickMax = -1;
 
-    // FRAME VALUES
-    public boolean frameVisibility = true;
     public boolean renderBothSides = false;
 
     // PROJECTOR VALUES
@@ -87,11 +85,11 @@ public class DisplayData {
     public float getWidth() { return this.max.x - this.min.x; }
     public float getHeight() { return this.max.y - this.min.y; }
 
-    public void save(CompoundTag nbt, DisplayTile displayTile) {
+    public void save(CompoundTag nbt, DisplayTile tile) {
         nbt.putString(URL, url);
         nbt.putUUID(PLAYER_UUID, uuid);
         nbt.putBoolean(ACTIVE, active);
-        if (displayTile.canResize()) {
+        if (tile.caps.resizes()) {
             nbt.putFloat(MIN_X, min.x);
             nbt.putFloat(MIN_Y, min.y);
             nbt.putFloat(MAX_X, max.x);
@@ -112,15 +110,11 @@ public class DisplayData {
         nbt.putLong(TICK_MAX, tickMax);
         nbt.putBoolean(LOOP, loop);
 
-        if (displayTile.canRenderBackside()) {
+        if (tile.caps.renderBehind()) {
             nbt.putBoolean(RENDER_BOTH_SIDES, renderBothSides);
         }
 
-        if (displayTile.canHideModel()) {
-            nbt.putBoolean(VISIBLE_FRAME, frameVisibility);
-        }
-
-        if (displayTile.canProject()) {
+        if (tile.caps.projects()) {
             nbt.putFloat(PROJECTION_DISTANCE, projectionDistance);
             nbt.putFloat(AUDIO_OFFSET, audioOffset);
         }
@@ -128,11 +122,11 @@ public class DisplayData {
         nbt.putShort(DATA_V, V);
     }
 
-    public void load(CompoundTag nbt, DisplayTile displayTile) {
+    public void load(CompoundTag nbt, DisplayTile tile) {
         this.url = nbt.getString(URL);
         this.uuid = nbt.contains(PLAYER_UUID) ? nbt.getUUID(PLAYER_UUID) : this.uuid;
         this.active = nbt.contains(ACTIVE) ? nbt.getBoolean(ACTIVE) : this.active;
-        if (displayTile.canResize()) {
+        if (tile.caps.resizes()) {
             this.min.x = nbt.getFloat(MIN_X);
             this.min.y = nbt.getFloat(MIN_Y);
             this.max.x = nbt.getFloat(MAX_X);
@@ -153,15 +147,11 @@ public class DisplayData {
         this.tickMax = nbt.contains(TICK_MAX) ? nbt.getLong(TICK_MAX) : this.tickMax;
         this.loop = nbt.getBoolean(LOOP);
 
-        if (displayTile.canHideModel()) {
-            this.frameVisibility = nbt.getBoolean(VISIBLE_FRAME);
-        }
-
-        if (displayTile.canRenderBackside()) {
+        if (tile.caps.renderBehind()) {
             this.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
         }
 
-        if (displayTile.canProject()) {
+        if (tile.caps.projects()) {
             this.projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? WFConfig.maxProjDis(nbt.getInt(PROJECTION_DISTANCE)) : this.projectionDistance;
             this.audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : this.audioOffset;
         }
@@ -187,11 +177,11 @@ public class DisplayData {
 
                 this.renderDistance = nbt.getInt("render");
 
-                if (displayTile.canHideModel()) {
-                    this.frameVisibility = nbt.getBoolean("visibleFrame");
+                if (tile.canHideModel()) {
+                    tile.setVisibility(nbt.getBoolean("visibleFrame"));
                 }
 
-                if (displayTile.canRenderBackside()) {
+                if (tile.caps.renderBehind()) {
                     this.renderBothSides = nbt.getBoolean("bothSides");
                 }
             }
@@ -271,6 +261,11 @@ public class DisplayData {
         }
     }
 
+    public DisplayData setProjectionDistance(float projectionDistance) {
+        this.projectionDistance = projectionDistance;
+        return this;
+    }
+
     private void restrictHeight() {
         float maxHeight = WFConfig.maxHeight();
         if (getHeight() > maxHeight) {
@@ -298,7 +293,7 @@ public class DisplayData {
         nbt.putString(URL, screen.url.getText());
         nbt.putBoolean(ACTIVE, true); // reset
 
-        if (tile.canResize()) {
+        if (tile.caps.resizes()) {
             nbt.putFloat("width", Math.max(0.1F, (float) screen.widthField.getValue()));
             nbt.putFloat("height", Math.max(0.1F, (float) screen.heightField.getValue()));
             nbt.putInt("pos_x",  screen.pos_view.getX().ordinal());
@@ -317,15 +312,15 @@ public class DisplayData {
         nbt.putInt(VOL_RANGE_MIN, screen.volume_min.getIntValue());
         nbt.putInt(VOL_RANGE_MAX, screen.volume_max.getIntValue());
 
-        if (tile.canHideModel()) {
-            nbt.putBoolean(VISIBLE_FRAME, screen.show_model.value);
+        if (tile.getBlockState().hasProperty(DisplayBlock.VISIBLE)) {
+            nbt.putBoolean("visible", screen.show_model.value);
         }
 
-        if (tile.canRenderBackside()) {
+        if (tile.caps.renderBehind()) {
             nbt.putBoolean(RENDER_BOTH_SIDES, screen.render_behind.value);
         }
 
-        if (tile.canProject()) {
+        if (tile.caps.projects()) {
             nbt.putFloat(PROJECTION_DISTANCE, (float) screen.projection_distance.getValue());
             nbt.putInt(AUDIO_OFFSET, screen.audioOffset.getState());
         }
@@ -333,55 +328,55 @@ public class DisplayData {
         return nbt;
     }
 
-    public static void sync(DisplayTile block, Player player, CompoundTag nbt) {
+    public static void sync(DisplayTile tile, Player player, CompoundTag nbt) {
         String url = nbt.getString(URL);
         if (WFConfig.canSave(player, url)) {
-            if (!block.data.url.equals(url)) {
-                block.data.tick = 0;
-                block.data.tickMax = -1;
+            if (!tile.data.url.equals(url)) {
+                tile.data.tick = 0;
+                tile.data.tickMax = -1;
             }
-            block.data.url = url;
-            block.data.uuid = !block.data.url.isEmpty() ? player.getUUID() : Util.NIL_UUID;
-            block.data.active = nbt.getBoolean(ACTIVE);
+            tile.data.url = url;
+            tile.data.uuid = !tile.data.url.isEmpty() ? player.getUUID() : Util.NIL_UUID;
+            tile.data.active = nbt.getBoolean(ACTIVE);
 
-            if (block.canResize()) {
+            if (tile.caps.resizes()) {
                 float width = WFConfig.maxWidth(nbt.getFloat("width"));
                 float height = WFConfig.maxHeight(nbt.getFloat("height"));
                 int posX = nbt.getInt("pos_x");
                 int posY = nbt.getInt("pos_y");
 
-                block.data.setWidth(PositionHorizontal.VALUES[posX], width);
-                block.data.setHeight(PositionVertical.VALUES[posY], height);
-                block.data.rotation = nbt.getFloat(ROTATION);
+                tile.data.setWidth(PositionHorizontal.VALUES[posX], width);
+                tile.data.setHeight(PositionVertical.VALUES[posY], height);
+                tile.data.rotation = nbt.getFloat(ROTATION);
             }
 
-            block.data.flipX = nbt.getBoolean(FLIP_X);
-            block.data.flipY = nbt.getBoolean(FLIP_Y);
-            block.data.alpha = nbt.getInt(ALPHA);
-            block.data.brightness = nbt.getInt(BRIGHTNESS);
-            block.data.renderDistance = WFConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
-            block.data.volume = WFConfig.maxVol(nbt.getInt(VOLUME));
-            block.data.maxVolumeDistance = WFConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX));
-            block.data.minVolumeDistance = Math.min(nbt.getInt(VOL_RANGE_MIN), block.data.maxVolumeDistance);
-            if (block.data.minVolumeDistance > block.data.maxVolumeDistance)
-                block.data.maxVolumeDistance = block.data.minVolumeDistance;
+            tile.data.flipX = nbt.getBoolean(FLIP_X);
+            tile.data.flipY = nbt.getBoolean(FLIP_Y);
+            tile.data.alpha = nbt.getInt(ALPHA);
+            tile.data.brightness = nbt.getInt(BRIGHTNESS);
+            tile.data.renderDistance = WFConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
+            tile.data.volume = WFConfig.maxVol(nbt.getInt(VOLUME));
+            tile.data.maxVolumeDistance = WFConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX));
+            tile.data.minVolumeDistance = Math.min(nbt.getInt(VOL_RANGE_MIN), tile.data.maxVolumeDistance);
+            if (tile.data.minVolumeDistance > tile.data.maxVolumeDistance)
+                tile.data.maxVolumeDistance = tile.data.minVolumeDistance;
 
-            if (block.canHideModel()) {
-                block.data.frameVisibility = nbt.getBoolean(VISIBLE_FRAME);
+            if (tile.canHideModel()) {
+                tile.setVisibility(nbt.getBoolean("visible"));
             }
 
-            if (block.canRenderBackside()) {
-                block.data.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
+            if (tile.caps.renderBehind()) {
+                tile.data.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
             }
 
-            if (block.canProject()) {
+            if (tile.caps.projects()) {
                 int mode = nbt.getInt(AUDIO_OFFSET);
 
-                block.data.projectionDistance = WFConfig.maxProjDis(nbt.getFloat(PROJECTION_DISTANCE));
-                block.data.setAudioPosition(AudioPosition.VALUES[mode]);
+                tile.data.projectionDistance = WFConfig.maxProjDis(nbt.getFloat(PROJECTION_DISTANCE));
+                tile.data.setAudioPosition(AudioPosition.VALUES[mode]);
             }
         }
 
-        block.setDirty();
+        tile.setDirty();
     }
 }

@@ -2,6 +2,7 @@ package me.srrapero720.waterframes;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BeaconBeamBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.ModList;
@@ -27,8 +28,7 @@ public class WaterFrames {
     }
 
     public static boolean isInstalled(String modId) {
-        ModList list;
-        return (list = ModList.get()) != null ? list.isLoaded(modId) : FMLLoader.getLoadingModList().getModFileById(modId) != null;
+        return FMLLoader.getLoadingModList().getModFileById(modId) != null;
     }
 
     public static int getServerOpPermissionLevel(Level level) {

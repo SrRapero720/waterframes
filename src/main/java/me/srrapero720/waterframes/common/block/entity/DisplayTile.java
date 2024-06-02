@@ -3,6 +3,7 @@ package me.srrapero720.waterframes.common.block.entity;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
+import me.srrapero720.waterframes.common.block.data.DisplayCaps;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.*;
@@ -16,7 +17,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,26 +24,23 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
-public abstract class DisplayTile extends BlockEntity {
+public class DisplayTile extends BlockEntity {
     public final DisplayData data;
+    public final DisplayCaps caps;
     @OnlyIn(Dist.CLIENT) public ImageCache imageCache;
     @OnlyIn(Dist.CLIENT) public TextureDisplay display;
     @OnlyIn(Dist.CLIENT) private boolean isReleased;
 
-    public abstract boolean canHideModel();
-    public abstract boolean canRenderBackside();
-    public abstract boolean canProject();
-    public abstract boolean canResize();
-    public DisplayTile(DisplayData data, BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
-        super(pType, pPos, pBlockState);
+    public DisplayTile(DisplayData data, DisplayCaps caps, BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
+        super(type, pos, blockState);
         this.data = data;
+        this.caps = caps;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -121,52 +118,7 @@ public abstract class DisplayTile extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
     public AlignedBox getRenderBox() {
-        final var facing = Facing.get(getDirection());
-        final var box = new AlignedBox();
-
-        if (facing.positive) box.setMax(facing.axis, this.data.projectionDistance);
-        else box.setMin(facing.axis, 1 - this.data.projectionDistance);
-
-        Axis one = facing.one();
-        Axis two = facing.two();
-
-        if (facing.axis != Axis.Z) {
-            one = facing.two();
-            two = facing.one();
-        }
-
-        box.setMin(one, this.data.min.x);
-        box.setMax(one, this.data.max.x);
-
-        box.setMin(two, this.data.min.y);
-        box.setMax(two, this.data.max.y);
-
-        if (canProject() && (facing.toVanilla() == Direction.NORTH || facing.toVanilla() == Direction.EAST)) {
-            switch (this.data.getPosX()) {
-                case LEFT -> {
-                    box.setMin(one, 1 - this.data.getWidth());
-                    box.setMax(one, 1);
-                }
-                case RIGHT -> {
-                    box.setMax(one, this.data.getWidth());
-                    box.setMin(one, 0f);
-                }
-            }
-        }
-
-        if (!canProject() && (facing.toVanilla() == Direction.WEST || facing.toVanilla() == Direction.SOUTH)) {
-            switch (this.data.getPosX()) {
-                case LEFT -> {
-                    box.setMin(one, 1 - this.data.getWidth());
-                    box.setMax(one, 1);
-                }
-                case RIGHT -> {
-                    box.setMax(one, this.data.getWidth());
-                    box.setMin(one, 0f);
-                }
-            }
-        }
-        return box;
+        return this.caps.getBox(this, getDirection(), getAttachedFace(), true);
     }
 
     @Override
@@ -174,9 +126,6 @@ public abstract class DisplayTile extends BlockEntity {
     public AABB getRenderBoundingBox() {
         return this.getRenderBox().getBB(this.getBlockPos());
     }
-
-    public abstract boolean flip3DFace();
-    public abstract float growSize();
 
     @Override
     public void setRemoved() {
@@ -240,54 +189,46 @@ public abstract class DisplayTile extends BlockEntity {
         else            DisplayNetwork.sendClient(new LoopPacket(this.worldPosition, loop, true), this);
     }
 
-    /* SPECIAL TICKS */
-    public static void tick(Level level, BlockPos pos, BlockState state, BlockEntity be) {
-        if (be instanceof DisplayTile tile) {
-            if (tile.data.tickMax == -1 || tile.data.tick < 0) tile.data.tick = 0;
+    public void tick(BlockPos pos, BlockState state) {
+        if (this.data.tickMax == -1 || this.data.tick < 0) this.data.tick = 0;
 
-            if (!tile.data.paused && tile.data.active) {
-                if (tile.data.tick < tile.data.tickMax) {
-                    tile.data.tick++;
-                } else {
-                    if (tile.data.loop || tile.data.tickMax == -1) tile.data.tick = 0;
-                }
+        if (!this.data.paused && this.data.active) {
+            if (this.data.tick < this.data.tickMax) {
+                this.data.tick++;
+            } else {
+                if (this.data.loop || this.data.tickMax == -1) this.data.tick = 0;
             }
+        }
 
-            boolean updateBlock = false;
-            int redstoneOutput = 0;
+        boolean updateBlock = false;
+        int redstoneOutput = 0;
 
-            if (tile.data.tickMax > 0 && tile.data.active) {
-                redstoneOutput = Math.round(((float) tile.data.tick / (float) tile.data.tickMax) * (BlockStateProperties.MAX_LEVEL_15 - 1)) + 1;
-            }
+        if (this.data.tickMax > 0 && this.data.active) {
+            redstoneOutput = Math.round(((float) this.data.tick / (float) this.data.tickMax) * (BlockStateProperties.MAX_LEVEL_15 - 1)) + 1;
+        }
 
-            boolean lightOnPlay = WFConfig.useLightOnPlay();
-            boolean lit = state.getValue(DisplayBlock.LIT);
-            if (lightOnPlay && lit == (tile.data.url.isEmpty())) {
-                state = state.setValue(DisplayBlock.LIT, !tile.data.url.isEmpty());
-                updateBlock = true;
-            } else if (!lightOnPlay && lit) {
-                state = state.setValue(DisplayBlock.LIT, false);
-                updateBlock = true;
-            }
+        boolean lightOnPlay = WFConfig.useLightOnPlay();
+        boolean lit = state.getValue(DisplayBlock.LIT);
+        if (lightOnPlay && lit == (this.data.url.isEmpty())) {
+            state = state.setValue(DisplayBlock.LIT, !this.data.url.isEmpty());
+            updateBlock = true;
+        } else if (!lightOnPlay && lit) {
+            state = state.setValue(DisplayBlock.LIT, false);
+            updateBlock = true;
+        }
 
-            if (state.getValue(DisplayBlock.POWER) != redstoneOutput) {
-                state = state.setValue(DisplayBlock.POWER, redstoneOutput);
-                updateBlock = true;
-            }
+        if (state.getValue(DisplayBlock.POWER) != redstoneOutput) {
+            state = state.setValue(DisplayBlock.POWER, redstoneOutput);
+            updateBlock = true;
+        }
 
-            if (state.hasProperty(DisplayBlock.VISIBLE) && state.getValue(DisplayBlock.VISIBLE) != tile.data.frameVisibility) {
-                state = state.setValue(DisplayBlock.VISIBLE, tile.data.frameVisibility);
-                updateBlock = true;
-            }
+        if (updateBlock) {
+            level.setBlock(pos, state, DisplayBlock.UPDATE_ALL);
+        }
 
-            if (updateBlock) {
-                level.setBlock(pos, state, DisplayBlock.UPDATE_ALL);
-            }
-
-            if (level.isClientSide) {
-                TextureDisplay display = tile.requestDisplay();
-                if (display != null && display.canTick()) display.tick(pos);
-            }
+        if (this.isClient()) {
+            TextureDisplay display = this.requestDisplay();
+            if (display != null && display.canTick()) display.tick(pos);
         }
     }
 
@@ -301,6 +242,22 @@ public abstract class DisplayTile extends BlockEntity {
 
     public Direction getDirection() {
         return this.getBlockState().getValue(this.getDisplayBlock().getFacing());
+    }
+
+    public Direction getAttachedFace() {
+        return this.getBlockState().getValue(DisplayBlock.ATTACHED_FACE);
+    }
+
+    public boolean canHideModel() {
+        return this.getBlockState().hasProperty(DisplayBlock.VISIBLE);
+    }
+
+    public boolean isVisible() {
+        return this.getBlockState().getValue(DisplayBlock.VISIBLE);
+    }
+
+    public void setVisibility(boolean visible) {
+        this.level.setBlock(worldPosition, this.getBlockState().setValue(DisplayBlock.VISIBLE, visible), DisplayBlock.UPDATE_CLIENTS);
     }
 
     public DisplayBlock getDisplayBlock() {
@@ -317,6 +274,16 @@ public abstract class DisplayTile extends BlockEntity {
         this.setDirty();
     }
 
+    @Override
+    public CompoundTag getUpdateTag() {
+        return this.saveWithFullMetadata();
+    }
+
+    @Override
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
     public void setDirty() {
         if (this.level != null) {
             this.level.blockEntityChanged(this.worldPosition);
@@ -326,6 +293,52 @@ public abstract class DisplayTile extends BlockEntity {
         }
     }
 
-    @Override public @NotNull CompoundTag getUpdateTag() { return this.saveWithFullMetadata(); }
-    @Override public Packet<ClientGamePacketListener> getUpdatePacket() { return ClientboundBlockEntityDataPacket.create(this); }
+    public static AlignedBox getBasicBox(DisplayTile tile) {
+        final var facing = Facing.get(tile.getDirection());
+        final var box = new AlignedBox();
+
+        if (facing.positive) box.setMax(facing.axis, tile.data.projectionDistance);
+        else box.setMin(facing.axis, 1 - tile.data.projectionDistance);
+
+        Axis one = facing.one();
+        Axis two = facing.two();
+
+        if (facing.axis != Axis.Z) {
+            one = facing.two();
+            two = facing.one();
+        }
+
+        box.setMin(one, tile.data.min.x);
+        box.setMax(one, tile.data.max.x);
+
+        box.setMin(two, tile.data.min.y);
+        box.setMax(two, tile.data.max.y);
+
+        if (tile.caps.projects() && (facing.toVanilla() == Direction.NORTH || facing.toVanilla() == Direction.EAST)) {
+            switch (tile.data.getPosX()) {
+                case LEFT -> {
+                    box.setMin(one, 1 - tile.data.getWidth());
+                    box.setMax(one, 1);
+                }
+                case RIGHT -> {
+                    box.setMax(one, tile.data.getWidth());
+                    box.setMin(one, 0f);
+                }
+            }
+        }
+
+        if (!tile.caps.projects() && (facing.toVanilla() == Direction.WEST || facing.toVanilla() == Direction.SOUTH)) {
+            switch (tile.data.getPosX()) {
+                case LEFT -> {
+                    box.setMin(one, 1 - tile.data.getWidth());
+                    box.setMax(one, 1);
+                }
+                case RIGHT -> {
+                    box.setMax(one, tile.data.getWidth());
+                    box.setMin(one, 0f);
+                }
+            }
+        }
+        return box;
+    }
 }

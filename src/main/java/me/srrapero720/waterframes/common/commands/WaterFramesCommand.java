@@ -35,8 +35,6 @@ import org.apache.logging.log4j.MarkerManager;
 import java.util.Collections;
 import java.util.List;
 
-import static me.srrapero720.waterframes.WaterFrames.LOGGER;
-
 public class WaterFramesCommand {
     private static final Marker IT = MarkerManager.getMarker("Commands");
     public static final Component ACTIVATED = new TranslatableComponent("waterframes.common.activated");
@@ -217,7 +215,7 @@ public class WaterFramesCommand {
     public static int setSize(DisplayTile tile, CommandSourceStack source, float width, float height) {
         if (tile == null) return 1;
 
-        if (!tile.canResize()) {
+        if (!tile.caps.resizes()) {
             source.sendFailure(msgFailed("waterframes.commands.edit.size.failed"));
             return 2;
         }
@@ -233,7 +231,7 @@ public class WaterFramesCommand {
     public static int setPosition(DisplayTile tile, CommandSourceStack source, PositionVertical vertical, PositionHorizontal horizontal) {
         if (tile == null) return 1;
 
-        if (!tile.canResize()) {
+        if (!tile.caps.resizes()) {
             source.sendFailure(msgFailed("waterframes.commands.edit.position.failed"));
             return 2;
         }
@@ -249,7 +247,7 @@ public class WaterFramesCommand {
     public static int setRotation(DisplayTile tile, CommandSourceStack source, float volume) {
         if (tile == null) return 1;
 
-        if (!tile.canResize()) {
+        if (!tile.caps.resizes()) {
             source.sendFailure(msgFailed("waterframes.commands.edit.rotation.failed"));
             return 2;
         }
@@ -294,7 +292,7 @@ public class WaterFramesCommand {
     public static int setProjectionDistance(DisplayTile tile, CommandSourceStack source, int projectionDistance) {
         if (tile == null) return 1;
 
-        if (!tile.canProject()) {
+        if (!tile.caps.projects()) {
             source.sendFailure(msgFailed("waterframes.commands.edit.projection.failed"));
             return 2;
         }

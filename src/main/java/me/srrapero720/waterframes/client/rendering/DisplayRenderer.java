@@ -69,16 +69,16 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         pose.translate(-0.5, -0.5, -0.5);
 
         if (facing.positive) {
-            if (!tile.flip3DFace()) box.setMax(facing.axis, box.getMax(facing.axis) + tile.growSize());
-            else box.setMin(facing.axis, box.getMin(facing.axis) - tile.growSize());
+            if (!tile.caps.invertedFace(tile)) box.setMax(facing.axis, box.getMax(facing.axis) + tile.caps.growSize());
+            else box.setMin(facing.axis, box.getMin(facing.axis) - tile.caps.growSize());
         } else {
-            if (!tile.flip3DFace()) box.setMin(facing.axis, box.getMin(facing.axis) - tile.growSize());
-            else box.setMax(facing.axis, box.getMax(facing.axis) + tile.growSize());
+            if (!tile.caps.invertedFace(tile)) box.setMin(facing.axis, box.getMin(facing.axis) - tile.caps.growSize());
+            else box.setMax(facing.axis, box.getMax(facing.axis) + tile.caps.growSize());
         }
 
         // RENDERING
         final int brightness = tile.data.brightness;
-        this.render(pose, tile, display, box, BoxFace.get(tile.flip3DFace() ? facing.opposite() : facing), tile.data.alpha, brightness, brightness, brightness);
+        this.render(pose, tile, display, box, BoxFace.get(tile.caps.invertedFace(tile) ? facing.opposite() : facing), tile.data.alpha, brightness, brightness, brightness);
 
         // POST RENDERING
         pose.popPose();
@@ -153,9 +153,9 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         }
 
         if (facing.positive) {
-            box.setMax(face.getFacing().axis, alignedBox.getMax(facing.axis) + (tile.canProject() ? -0.001f : 0.001f));
+            box.setMax(face.getFacing().axis, alignedBox.getMax(facing.axis) + (tile.caps.projects() ? -0.001f : 0.001f));
         } else {
-            box.setMin(facing.axis, alignedBox.getMin(facing.axis) - (tile.canProject() ? -0.001f : 0.001f));
+            box.setMin(facing.axis, alignedBox.getMin(facing.axis) - (tile.caps.projects() ? -0.001f : 0.001f));
         }
 
         if (front)
@@ -166,15 +166,15 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     }
 
     public boolean inFront(DisplayTile tile) {
-        return !tile.canProject() || tile.data.renderBothSides;
+        return !tile.caps.projects() || tile.data.renderBothSides;
     }
 
     public boolean inBack(DisplayTile tile) {
-        return tile.canProject() || tile.data.renderBothSides;
+        return tile.caps.projects() || tile.data.renderBothSides;
     }
 
     public boolean flipX(DisplayTile tile) {
-        return tile.canProject() != tile.data.flipX;
+        return tile.caps.projects() != tile.data.flipX;
     }
 
     public boolean flipY(DisplayTile tile) {

@@ -24,7 +24,6 @@ import team.creative.creativecore.common.gui.parser.LongValueParser;
 import team.creative.creativecore.common.gui.style.ControlFormatting;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
-import team.creative.creativecore.common.util.math.Maths;
 import team.creative.creativecore.common.util.type.Color;
 
 import java.util.ArrayList;
@@ -154,7 +153,7 @@ public class DisplayScreen extends GuiLayer {
         }.setControlFormatting(ControlFormatting.CLICKABLE_NO_PADDING).setState(tile.data.getAudioPosition().ordinal());
         this.audioOffset.setShadow(Color.NONE);
 
-        this.show_model = new GuiCheckBox(DisplayData.VISIBLE_FRAME, tile.data.frameVisibility);
+        this.show_model = new GuiCheckBox("visible", false);
         this.render_behind = new GuiCheckBox(DisplayData.RENDER_BOTH_SIDES, tile.data.renderBothSides);
         this.show_model.setTranslate("waterframes.gui.show_model");
         this.render_behind.setTranslate("waterframes.gui.render_behind");
@@ -210,7 +209,7 @@ public class DisplayScreen extends GuiLayer {
         ((ScalableText) volume_min).wf$setScale(0.90f);
         ((ScalableText) volume_max).wf$setScale(0.90f);
 
-        if (!tile.canResize()) {
+        if (!tile.caps.resizes()) {
             this.setDim(WIDTH, HEIGHT - 50);
         }
     }
@@ -228,7 +227,7 @@ public class DisplayScreen extends GuiLayer {
 
         // IMAGE SIZE
         var sizeTable = new GuiParent("", GuiFlow.STACK_X, Align.STRETCH).setSpacing(4);
-        if (tile.canResize()) {
+        if (tile.caps.resizes()) {
             sizeTable.add(this.widthField.setExpandableX())
                     .add(this.heightField.setExpandableX())
                     .add(new GuiParent(GuiFlow.STACK_Y)
@@ -240,20 +239,23 @@ public class DisplayScreen extends GuiLayer {
 
         // PICTURE PROPERTIES
         final var basicOptions = new GuiParent("", GuiFlow.STACK_X, Align.STRETCH).setSpacing(1)
-                .add(tile.canHideModel(), () -> show_model)
-                .add(tile.canRenderBackside(), () -> render_behind)
-                .add(!tile.canResize(), () -> flip_x)
-                .add(!tile.canResize(), () -> flip_y);
+                .add(tile.canHideModel(), () -> {
+                    show_model.set(tile.isVisible());
+                    return show_model;
+                })
+                .add(tile.caps.renderBehind(), () -> render_behind)
+                .add(!tile.caps.resizes(), () -> flip_x)
+                .add(!tile.caps.resizes(), () -> flip_y);
 
         this.add(tex_l);
         this.add(new WidgetPairTable(GuiFlow.STACK_Y, 2)
-                .addLeft(tile.canResize(), () -> new GuiParent(GuiFlow.STACK_X).add(rot_i).add(rotation.setDim(130, 12)).setVAlign(VAlign.CENTER))
+                .addLeft(tile.caps.resizes(), () -> new GuiParent(GuiFlow.STACK_X).add(rot_i).add(rotation.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).add(vis_i).add(alpha.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).add(bright_i).add(brightness.setDim(130, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(new GuiParent(GuiFlow.STACK_X).add(render_i).add(render_distance.setDim(130, 12)).setVAlign(VAlign.CENTER))
-                .addLeft(tile.canProject(), () -> new GuiParent(GuiFlow.STACK_X).add(project_i).add(projection_distance.setDim(100, 13)).add(audioOffset.setDim(26, 13)).setVAlign(VAlign.CENTER))
+                .addLeft(tile.caps.projects(), () -> new GuiParent(GuiFlow.STACK_X).add(project_i).add(projection_distance.setDim(100, 13)).add(audioOffset.setDim(26, 13)).setVAlign(VAlign.CENTER))
                 .addLeft(!basicOptions.isEmpty(), () -> basicOptions)
-                .addRight(tile.canResize(), () -> pos_view.setDim(80, 80))
+                .addRight(tile.caps.resizes(), () -> pos_view.setDim(80, 80))
                 .setAlignRight(Align.CENTER)
                 .setExpandableY()
         );
