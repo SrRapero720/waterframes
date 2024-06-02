@@ -207,12 +207,6 @@ public class TextureDisplay {
         }
     }
 
-    public void flush() {
-        if (imageCache != null) {
-            imageCache.flush();
-        }
-    }
-
     public void release() {
         switch (displayMode) {
             case PICTURE -> {

@@ -36,11 +36,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     }
     @Override
     public boolean shouldRender(DisplayTile tile, @NotNull Vec3 cameraPos) {
-        Vec3 vec3 = Vec3.atCenterOf(tile.getBlockPos());
-        if (!vec3.closerThan(cameraPos, tile.data.renderDistance + 10f)) {
-            tile.flushDisplay();
-        }
-        return vec3.closerThan(cameraPos, tile.data.renderDistance);
+        return Vec3.atCenterOf(tile.getBlockPos()).closerThan(cameraPos, tile.data.renderDistance);
     }
 
     @Override
