@@ -98,19 +98,19 @@ public class WFConfig {
 
         maxWidth = SERVER
                 .comment("Width limit of displays in blocks")
-                .defineInRange("maxWidth", 40d, 1d, 128d);
+                .defineInRange("maxWidth", 40d, 1d, 256d);
 
         maxHeight = SERVER
                 .comment("Height limit of displays in blocks")
-                .defineInRange("maxHeight", 40d, 1d, 128d);
+                .defineInRange("maxHeight", 40d, 1d, 256d);
 
         maxRenderDistance = SERVER
                 .comment("Max Radius of rendering distance in blocks")
-                .defineInRange("maxRenderDistance", 64, 4, 128);
+                .defineInRange("maxRenderDistance", 64, 4, 512);
 
         maxProjectionDistance = SERVER
                 .comment("Max distance of projections in blocks")
-                .defineInRange("maxProjectionDistance", 64d, 4d, 128d);
+                .defineInRange("maxProjectionDistance", 64d, 4d, 512d);
 
         keepRendering = SERVER
                 .comment("Enables media processing and rendering, disabling it will not render nothing, you can still hear videos")
@@ -122,7 +122,7 @@ public class WFConfig {
 
         maxVolumeDistance = SERVER
                 .comment("Max volume distance radius")
-                .defineInRange("maxVolumeDistance", 64, 8, 256);
+                .defineInRange("maxVolumeDistance", 64, 8, 512);
 
         maxVolume = SERVER
                 .comment("Max volume value", "values over 100 uses VLC überVolume")
@@ -162,7 +162,7 @@ public class WFConfig {
 
         remoteDistance = SERVER
                 .comment("Distance in blocks of RC range")
-                .defineInRange("distance", 32, 4, 128);
+                .defineInRange("distance", 32, 4, 256);
 
         // WATERFRAMES -> permissions
         SERVER.comment("Configurations related to permissions");
