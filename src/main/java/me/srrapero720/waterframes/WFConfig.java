@@ -11,11 +11,11 @@ import net.minecraftforge.common.ForgeConfigSpec.*;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
-import org.apache.commons.compress.utils.Lists;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class WFConfig {
@@ -279,13 +279,13 @@ public class WFConfig {
         return useWhitelist();
     }
     public static void addOnWhitelist(String url) {
-        var w = Lists.newArrayList(whitelist.get().iterator());
+        var w = mutableList(whitelist.get().iterator());
         w.add(url);
         whitelist.set(w);
         whitelist.save();
     }
     public static boolean removeOnWhitelist(String url) {
-        var w = Lists.newArrayList(whitelist.get().iterator());
+        var w = mutableList(whitelist.get().iterator());
         boolean removed = false;
         try {
             return removed = w.remove(url);
@@ -297,7 +297,7 @@ public class WFConfig {
         }
     }
 
-    public static boolean isWhiteListed(@NotNull String url) {
+    public static boolean isWhiteListed(String url) {
         if (!useWhitelist()) return true;
 
         if (url.startsWith("local://")
@@ -315,6 +315,13 @@ public class WFConfig {
             }
         } catch (Exception ignored) {}
         return false;
+    }
+    public static <T> List<T> mutableList(Iterator<T> it) {
+        var list = new ArrayList<T>();
+        while (it.hasNext()) {
+            list.add(it.next());
+        }
+        return list;
     }
 
     public static boolean canSave(Player player, String url) {
