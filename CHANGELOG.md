@@ -1,3 +1,6 @@
+# UPDATE 2.0.10
+- 🐛 Fixed crash on server-side using `/waterframes whitelist` 
+
 # UPDATE 2.0.9
 - ✨ Increased max limit of some config fields (`waterframes-server.toml`)
   - 📐 Max width: 128.0 -> 256.0
