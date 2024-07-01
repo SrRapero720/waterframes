@@ -213,7 +213,7 @@ public class DisplayTile extends BlockEntity {
         if (!this.data.paused && this.data.active) {
             if (this.data.tick < this.data.tickMax) {
                 this.data.tick++;
-                if (this.isServer()) {
+                if (lagTickTime != 0 && this.isServer()) {
                     this.data.tick += (lagTickTime / 50L);
                     this.setDirty();
                 }
