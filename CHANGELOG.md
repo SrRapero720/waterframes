@@ -1,3 +1,8 @@
+# UPDATE 2.0.11
+- 🐛 Fixed when server is lagging media playing rollbacks in time
+- 🐛 Fixed pause is triggered too late when game is paused
+- 🛠️ Moved all packets sending into one channel
+
 # UPDATE 2.0.10
 - 🐛 Fixed crash on server-side using `/waterframes whitelist` 
 
