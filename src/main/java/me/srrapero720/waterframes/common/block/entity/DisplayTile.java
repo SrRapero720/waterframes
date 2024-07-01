@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.common.block.entity;
 
 import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.TextureDisplay;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayCaps;
@@ -24,13 +25,19 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
 
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
+@Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class DisplayTile extends BlockEntity {
+    static long lagTickTime;
+
     public final DisplayData data;
     public final DisplayCaps caps;
     @OnlyIn(Dist.CLIENT) public ImageCache imageCache;
@@ -41,6 +48,22 @@ public class DisplayTile extends BlockEntity {
         super(type, pos, blockState);
         this.data = data;
         this.caps = caps;
+    }
+
+    public static void setLagTickTime(long ltt) {
+        LOGGER.debug("Server seems overloading, jumping {}ms or {} ticks", ltt, ltt / 50L);
+        lagTickTime = ltt;
+    }
+
+    public static void clearLagTickTime() {
+        lagTickTime = 0;
+    }
+
+    @SubscribeEvent
+    public static void onTickLast(TickEvent.ServerTickEvent e) {
+        if (e.phase == TickEvent.Phase.END) {
+            clearLagTickTime();
+        }
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -190,6 +213,10 @@ public class DisplayTile extends BlockEntity {
         if (!this.data.paused && this.data.active) {
             if (this.data.tick < this.data.tickMax) {
                 this.data.tick++;
+                if (this.isServer()) {
+                    this.data.tick += (lagTickTime / 50L);
+                    this.setDirty();
+                }
             } else {
                 if (this.data.loop || this.data.tickMax == -1) this.data.tick = 0;
             }
@@ -282,7 +309,7 @@ public class DisplayTile extends BlockEntity {
     public void setDirty() {
         if (this.level != null) {
             this.level.blockEntityChanged(this.worldPosition);
-            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), DisplayBlock.UPDATE_ALL);
         } else {
             LOGGER.warn("Cannot be stored block data, level is NULL");
         }
