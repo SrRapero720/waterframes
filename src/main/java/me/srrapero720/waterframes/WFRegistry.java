@@ -93,17 +93,15 @@ public class WFRegistry {
         @SubscribeEvent
         public static void init(FMLCommonSetupEvent event) {
             // DATA
-            DATA.registerType(DataSyncPacket.class, DataSyncPacket::new);
-            DATA.registerType(PermLevelPacket.class, PermLevelPacket::new); // neoteam sucks
-
-            // CONTROLS
-            CONTROL.registerType(ActivePacket.class, ActivePacket::new);
-            CONTROL.registerType(LoopPacket.class, LoopPacket::new);
-            CONTROL.registerType(MutePacket.class, MutePacket::new);
-            CONTROL.registerType(PausePacket.class, PausePacket::new);
-            CONTROL.registerType(TimePacket.class, TimePacket::new);
-            CONTROL.registerType(VolumePacket.class, VolumePacket::new);
-            CONTROL.registerType(VolumeRangePacket.class, VolumeRangePacket::new);
+            NET.registerType(DataSyncPacket.class, DataSyncPacket::new);
+            NET.registerType(PermLevelPacket.class, PermLevelPacket::new);
+            NET.registerType(ActivePacket.class, ActivePacket::new);
+            NET.registerType(LoopPacket.class, LoopPacket::new);
+            NET.registerType(MutePacket.class, MutePacket::new);
+            NET.registerType(PausePacket.class, PausePacket::new);
+            NET.registerType(TimePacket.class, TimePacket::new);
+            NET.registerType(VolumePacket.class, VolumePacket::new);
+            NET.registerType(VolumeRangePacket.class, VolumeRangePacket::new);
         }
 
         @SubscribeEvent

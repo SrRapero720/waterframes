@@ -16,7 +16,7 @@ import org.apache.logging.log4j.MarkerManager;
 public class DisplayControl {
     private static final Marker IT = MarkerManager.getMarker("DisplayControl");
     public static final Integer DEFAULT_SIZE = 32;
-    public static final int SYNC_TIME = 1500;
+    public static final int SYNC_TIME = 1000;
 
     private static volatile TextureDisplay[] displays = new TextureDisplay[DEFAULT_SIZE];
     private static int position = 0;

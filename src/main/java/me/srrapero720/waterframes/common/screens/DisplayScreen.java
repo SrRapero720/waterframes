@@ -193,8 +193,8 @@ public class DisplayScreen extends GuiLayer {
         }
 
         this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax, LongValueParser.TIME_DURATION_TICK)
-                .setOnTimeUpdate(v -> tile.data.tick = (int) v)
-                .setOnLastTimeUpdate(v -> tile.syncTime(true, (int) v, tile.data.tickMax));
+                .setOnTimeUpdate(v -> tile.data.tick = v)
+                .setOnLastTimeUpdate(v -> tile.syncTime(true, v, tile.data.tickMax));
 
         ((ScalableText) url_l).wf$setScale(0.75f);
         ((ScalableText) tex_l).wf$setScale(0.75f);
