@@ -12,7 +12,7 @@ plugins {
 
 base {
     archivesName = modid
-    version = mcversion + "-" +  modversion
+    version = "$modloader-mc$mcversion-v$modversion"
 }
 
 java.toolchain {
@@ -22,7 +22,7 @@ java.toolchain {
 println "Gradle Java: ${JavaVersion.current()}"
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
-    mappings channel: mappingsch, version: "$mappings_version-$mcversion"
+    mappings channel: mappings_channel, version: "$mappings_version"
     accessTransformer file('src/main/resources/META-INF/accesstransformer.cfg')
     copyIdeResources = true
 
@@ -32,8 +32,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
             property 'log4j.appender.Console', "org.apache.log4j.ConsoleAppender"
             property 'terminal.jline', 'true'
-            arg '--mixin.config'
-            arg "$modid.$mixin_file_suffix"
+            args '--mixin.config', "$modid.$mixin_file_suffix"
 
             mods {
                 "$modid" {
@@ -42,9 +41,7 @@ minecraft {
             }
         }
 
-        client {
-            arg '--username=dev2'
-        }
+        client {}
         server {}
     }
 }
@@ -58,17 +55,13 @@ mixin {
 
 repositories {
     mavenCentral()
-    maven { url "https://repo.spongepowered.org/maven" }
-    maven { url "https://maven.tterrag.com/" }
+    maven { url 'https://repo.spongepowered.org/maven' }
+    maven { url 'https://jitpack.io' }
     maven {
         url 'https://www.cursemaven.com'
         content {
             includeGroup "curse.maven"
         }
-    }
-    maven { url 'https://jitpack.io' }
-    flatDir {
-        dirs 'libs'
     }
 }
 
@@ -78,71 +71,66 @@ dependencies {
 
     //DEPENDENCIES
     implementation fileTree('libs') { include '*.jar' }
-    implementation "com.github.SrRapero720.watermedia:build:$watermediaversion"
+    implementation "com.github.WaterMediaTeam.watermedia:build:$watermediaversion"
     implementation fg.deobf("curse.maven:video-player-645407:$videoplayerversion")
     implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
-
-    // UTIL
-    implementation fg.deobf("curse.maven:ferritecore-429235:$ferritecoreversion")
-    implementation fg.deobf("curse.maven:fastload-630620:$fastloadversion")
-    implementation fg.deobf("curse.maven:lazy-dfu-forge-460819:$lazyversion")
-    implementation fg.deobf("curse.maven:spark-361579:$sparkversion")
-    implementation fg.deobf("curse.maven:embeddium-908741:$embeddiumversion")
-    implementation fg.deobf("curse.maven:worldedit-225608:$weversion")
-//    implementation fg.deobf("curse.maven:oculus-581495:${oculusversion}")
-    implementation fg.deobf("curse.maven:jei-238222:$jeiversion")
-
-    // MOD SUPPORT
-    implementation fg.deobf("com.simibubi.create:create-$mcversion:$createversion:slim") { transitive = false }
-    implementation fg.deobf("com.jozufozu.flywheel:flywheel-forge-$mcversion:$flywheelversion")
-    implementation fg.deobf("com.tterrag.registrate:Registrate:$registrateversion")
 }
 
 tasks.processResources.outputs.upToDateWhen { false }
 processResources {
-    filesMatching(['META-INF/mods.toml', 'pack.mcmeta', 'resourcepacks/**/pack.mcmeta', "$modid.$mixin_file_suffix".toString()]) {
+    filesMatching(['META-INF/*.toml', 'pack.mcmeta', 'resourcepacks/**/pack.mcmeta', "$modid.$mixin_file_suffix".toString()]) {
         expand project.properties
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = 'UTF-8'
-}
-
 jar {
     manifest {
-        attributes([
-            "Specification-Title": modname,
-            "Specification-Vendor": modauthor,
-            "Specification-Version": modversion,
-            "Implementation-Title": modname,
-            "Implementation-Version"  : modversion,
-            "Implementation-Vendor": modauthor,
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-            "MixinConfigs": "$modid.$mixin_file_suffix"
-        ])
+        attributes "Specification-Title"        : modid
+        attributes "Specification-Vendor"       : modauthor
+        attributes "Specification-Version"      : version
+        attributes "Implementation-Title"       : modname
+        attributes "Implementation-Version"     : version
+        attributes "Implementation-Vendor"      : modauthor
+        attributes "Implementation-Timestamp"   : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        attributes "MixinConfigs"               : "$modid.$mixin_file_suffix"
     }
     finalizedBy('reobfJar')
 }
 
 task upload(type: GradleBuild) {
-    description 'Uploads new version to modrinth and curseforge.'
+    enabled = System.getenv("MODRINTH_TOKEN") != null && System.getenv("CURSEFORGE_TOKEN") != null
+    description 'Uploads new version to CurseForge and Modrinth'
     group = 'publishing'
-    tasks = [ 'curseforge', 'modrinth']
+    tasks = [ 'curseforge', 'modrinth' ]
 }
 
-tasks.modrinth.enabled = System.getenv("MODRINTH_TOKEN") != null
-tasks.modrinth.group = 'publishing'
+task curseforge(type: TaskPublishCurseForge) {
+    disableVersionDetection()
+    apiToken = System.getenv("CURSEFORGE_TOKEN")
+
+    def mainFile = upload(curseforgeid, jar)
+    mainFile.displayName = "$modbrandname/${modloader.toLowerCase().capitalize()}/mc$mcversion/v$modversion"
+    mainFile.addModLoader(modloader.toLowerCase().capitalize())
+    mainFile.addGameVersion(mcversion, "server", "client")
+    mainFile.addRequirement("creativecore", "watermedia")
+    mainFile.addIncompatibility("stellarity")
+    mainFile.changelog = getChangelogText(false)
+    mainFile.changelogType = "markdown"
+    mainFile.releaseType = versiontype
+
+}
+
 modrinth {
     token = System.getenv("MODRINTH_TOKEN")
-    versionName = modnamebig + "/" + mcversion + "/" + modversion
     projectId = modrinthid
-    versionNumber = mcversion + "-" + modversion
-    versionType = versiontype
+
     uploadFile = jar
+    versionName = "$modbrandname/${modloader.toLowerCase().capitalize()}/mc$mcversion/v$modversion"
+    versionNumber = version.toString()
+    versionType = versiontype
     gameVersions = [ mcversion ]
     changelog = getChangelogText(true)
-    loaders = [ "forge", /*"neoforge"*/ ]
+    loaders = [ "forge" ]
     dependencies {
         required.project "creativecore"
         required.project "watermedia"
@@ -150,33 +138,10 @@ modrinth {
     }
 }
 
-task curseforge(type: TaskPublishCurseForge) {
-    disableVersionDetection()
-
-    apiToken = System.getenv("CURSEFORGE_TOKEN") != null ? System.getenv("CURSEFORGE_TOKEN") : "empty"
-
-    // MAIN FILE
-    def mainFile = upload(curseforgeid, jar)
-    mainFile.displayName = modnamebig + "/" + mcversion + "/" + modversion
-    mainFile.changelog = getChangelogText(false)
-    mainFile.changelogType = "markdown"
-    mainFile.addModLoader("Forge")
-    // mainFile.addModLoader("NeoForge")
-    mainFile.addGameVersion(mcversion, "server", "client")
-    mainFile.addRequirement("creativecore", "watermedia")
-    mainFile.addIncompatibility("fancyvideo-api", "stellarity")
-    mainFile.releaseType = versiontype
-}
-
 String getChangelogText(boolean latest) {
     String result = ''
-    List<String> lines = file('CHANGELOG.md').readLines('UTF-8')
-
-    for (String line: lines) {
-        if (latest && line.isEmpty()) {
-            return result
-        }
-
+    for (String line: file('CHANGELOG.md').readLines('UTF-8')) {
+        if (latest && line.isEmpty()) return result
         result += line + "\n"
     }
     return result

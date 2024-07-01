@@ -1,19 +1,9 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        mavenCentral()
+        maven { url 'https://maven.minecraftforge.net/' }
         maven { url 'https://repo.spongepowered.org/maven' }
         maven { url 'https://maven.parchmentmc.org' }
-        maven { url 'https://maven.tterrag.com/' }
-        maven { url 'https://jitpack.io' }
-        maven {
-            url 'https://www.cursemaven.com'
-            content { includeGroup "curse.maven" }
-        }
-        maven {
-            name = 'MinecraftForge'
-            url = 'https://maven.minecraftforge.net/'
-        }
     }
 }
 
