@@ -18,6 +18,6 @@ public abstract class MinecraftMixin {
 
     @Inject(method = "runTick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;pause:Z", opcode = Opcodes.PUTFIELD, shift = At.Shift.AFTER))
     public void injectRunTick(boolean pRenderLevel, CallbackInfo ci) {
-        if (pause) DisplayControl.pause();
+        DisplayControl.onClientPause(pause);
     }
 }

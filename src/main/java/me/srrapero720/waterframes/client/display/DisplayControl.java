@@ -22,6 +22,7 @@ public class DisplayControl {
     private static int position = 0;
     private static boolean checkSize = false;
     private static long ticks = 0;
+    private static boolean paused;
 
     public static void add(TextureDisplay display) {
         if (checkSize) {
@@ -40,16 +41,21 @@ public class DisplayControl {
             checkSize = true;
         }
 
+        // pause the display when the pause event is fired even if was too late
+        if (paused) display.setPauseMode(true);
+
         displays[position++] = display;
     }
 
     public static void pause() {
+        paused = true;
         for (int i = 0; i < position; i++) {
             if (displays[i] != null) displays[i].setPauseMode(true);
         }
     }
 
     public static void resume() {
+        paused = false;
         for (int i = 0; i < position; i++) {
             if (displays[i] != null) displays[i].setPauseMode(false);
         }
@@ -108,5 +114,11 @@ public class DisplayControl {
     @SubscribeEvent
     public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.END) DisplayControl.tick();
+    }
+
+    // @SubscribeEvent
+    public static void onClientPause(/*ClientPauseChangeEvent.Post event*/boolean paused) {
+        if (/*event.isPaused()*/paused) DisplayControl.pause();
+        else DisplayControl.resume();
     }
 }
