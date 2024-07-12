@@ -92,7 +92,6 @@ public class WFRegistry {
     public static class ModEvents {
         @SubscribeEvent
         public static void init(FMLCommonSetupEvent event) {
-            // DATA
             NET.registerType(DataSyncPacket.class, DataSyncPacket::new);
             NET.registerType(PermLevelPacket.class, PermLevelPacket::new);
             NET.registerType(ActivePacket.class, ActivePacket::new);
@@ -106,7 +105,7 @@ public class WFRegistry {
 
         @SubscribeEvent
         public static void init(FMLClientSetupEvent e) {
-            if (FMLLoader.getLoadingModList().getModFileById("mr_stellarity") != null) {
+            if (WaterFrames.isInstalled("mr_stellarity") && (WFConfig.isDevMode())) {
                 throw new UnsupportedModException("mr_stellarity", "breaks picture rendering, overwrites the Minecraft core shaders and i can't do nothing to avoid that");
             }
         }

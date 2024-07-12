@@ -87,6 +87,7 @@ public class WFConfig {
     private final static BooleanValue overrideServerConfig;
     private static final BooleanValue clientUseMultimedia;
     private static final BooleanValue clientKeepsRendering;
+    private static final BooleanValue forceDevMode;
 
     private static final ForgeConfigSpec SERVER_SPEC;
     private static final ForgeConfigSpec CLIENT_SPEC;
@@ -221,6 +222,15 @@ public class WFConfig {
                         "Enables media processing and rendering, disabling it will not render nothing, you can still hear videos"
                 )
                 .define("keepRendering", false);
+
+        forceDevMode = CLIENT
+                .comment(
+                        "WARNING: DO NOT CHANGE IT EXCEPT IF YOU KNOW WHAT ARE YOU DOING, TOGGLING IT ON MAY CAUSE CORRUPTIONS, UNEXPECTED BEHAVIORS OR WORLD DESTRUCTION",
+                        "forces WATERMeDIA and WATERFrAMES to run in developer mode",
+                        "This is was done for developers who has mods that causes compatibilities with waterframes (or watermedia)",
+                        "Let those modders test waterframes x incompatible mods (i see you stellarity owner)"
+                )
+                .define("forceDevMode", false);
 
         CLIENT.pop();
 
@@ -370,5 +380,9 @@ public class WFConfig {
         } else {
             return player.hasPermissions(player.getServer().getOperatorUserPermissionLevel());
         }
+    }
+
+    public static boolean isDevMode() {
+        return !FMLLoader.isProduction() || forceDevMode.get();
     }
 }

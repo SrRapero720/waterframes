@@ -29,6 +29,15 @@ public class WaterFrames {
         return FMLLoader.getLoadingModList().getModFileById(modId) != null;
     }
 
+    public static boolean isInstalled(String... mods) {
+        for (String id: mods) {
+            if (FMLLoader.getLoadingModList().getModFileById(id) == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static int getServerOpPermissionLevel(Level level) {
         if (level != null && !level.isClientSide) {
             SERVER_OP_LEVEL = level.getServer().getOperatorUserPermissionLevel();
