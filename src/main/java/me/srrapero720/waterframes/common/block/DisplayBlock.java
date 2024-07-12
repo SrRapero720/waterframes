@@ -124,7 +124,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
         return (l, pos, state, be) -> {
             if (be instanceof DisplayTile tile) {
-                tile.tick(pos, state);
+                tile.tick(tile.getBlockPos(), state);
             }
         };
     }
