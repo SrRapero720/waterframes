@@ -1,6 +1,9 @@
 # UPDATE 2.0.11
 - 🐛 Fixed when server is lagging media playing rollbacks in time
 - 🐛 Fixed pause is triggered too late when game is paused
+- 🐛 [1.21] Fixed recipes aren't working
+- 🐛 [1.21] Fixed `/waterframes` is not working
+- 🛠️ Get blockpos from block instead of ticker (may solves VS Eureka compat issues) 
 - 🛠️ Moved all packets sending into one channel
 
 # UPDATE 2.0.10
