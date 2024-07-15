@@ -1,3 +1,6 @@
+# UPDATE 2.0.12
+- 🍾 Added russian translations (by the translator Heimdallr-1)
+
 # UPDATE 2.0.11
 - 🐛 Fixed when server is lagging media playing rollbacks in time
 - 🐛 Fixed pause is triggered too late when game is paused
