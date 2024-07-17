@@ -1,4 +1,5 @@
 # UPDATE 2.0.12
+- 🐛 Fixed server lag tick correction crashes redstone
 - 🍾 Added russian translations (by the translator Heimdallr-1)
 
 # UPDATE 2.0.11
