@@ -1,4 +1,4 @@
-# UPDATE 2.0.13
+# UPDATE 2.0.14
 - ✨ Added config for toggle tick time correction
 - ✨ Added Valkyrien Skies compat for audio playing (they are very damn slow)
 - 🐛 Fixed lag tick time correction speedups the playback and logspams your server (for real this time)
