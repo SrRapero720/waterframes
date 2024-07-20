@@ -302,6 +302,10 @@ public class DisplayScreen extends GuiLayer {
     @Override
     public void tick() {
         super.tick();
+        if (tile.isRemoved()) {
+            closeTopLayer();
+            return;
+        }
         if (!isClient()) return;
         this.vol_i.setIcon(IconStyles.getVolumeIcon((int) volume.getValue(), tile.data.muted));
         this.playback.setState(tile.data.paused);
