@@ -17,10 +17,10 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String target, String mixin) {
-        if (target.endsWith("vp.VideoPlayerMixin")) {
+        if (mixin.endsWith("vp.VideoPlayerMixin")) {
             return FMLLoader.getLoadingModList().getModFileById("videoplayer") != null;
         }
-        if (target.endsWith("self.VSCompat")) {
+        if (mixin.endsWith("self.VSCompat")) {
             return FMLLoader.getLoadingModList().getModFileById("valkyrienskies") != null;
         }
         return true;
