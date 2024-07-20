@@ -36,7 +36,7 @@ import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class DisplayTile extends BlockEntity {
-    static long lagTickTime;
+    private static long lagTickTime;
 
     public final DisplayData data;
     public final DisplayCaps caps;
@@ -51,7 +51,11 @@ public class DisplayTile extends BlockEntity {
     }
 
     public static void setLagTickTime(long ltt) {
-        lagTickTime = ltt / 50L;
+        if (ltt < 60000) {
+            lagTickTime = ltt / 50L;
+        } else {
+            LOGGER.warn("Rejected tick correction of {}ms, overpass watchdog time", ltt);
+        }
     }
 
     public static void clearLagTickTime() {
@@ -63,6 +67,11 @@ public class DisplayTile extends BlockEntity {
         if (e.phase == TickEvent.Phase.END) {
             clearLagTickTime();
         }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public TextureDisplay activeDisplay() {
+        return display;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -157,53 +166,53 @@ public class DisplayTile extends BlockEntity {
     }
 
     public void setActive(boolean clientSide, boolean mode) {
-        if (clientSide) DisplayNetwork.sendServer(new ActivePacket(this.worldPosition, mode, true));
-        else            DisplayNetwork.sendClient(new ActivePacket(this.worldPosition, mode, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new ActivePacket(this.getBlockPos(), mode, true));
+        else            DisplayNetwork.sendClient(new ActivePacket(this.getBlockPos(), mode, true), this);
     }
 
     public void setMute(boolean clientSide, boolean mode) {
-        if (clientSide) DisplayNetwork.sendServer(new MutePacket(this.worldPosition, mode, true));
-        else            DisplayNetwork.sendClient(new MutePacket(this.worldPosition, mode, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new MutePacket(this.getBlockPos(), mode, true));
+        else            DisplayNetwork.sendClient(new MutePacket(this.getBlockPos(), mode, true), this);
     }
 
     public void setPause(boolean clientSide, boolean pause) {
-        if (clientSide) DisplayNetwork.sendServer(new PausePacket(this.worldPosition, pause, this.data.tick, true));
-        else            DisplayNetwork.sendClient(new PausePacket(this.worldPosition, pause, this.data.tick, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new PausePacket(this.getBlockPos(), pause, this.data.tick, true));
+        else            DisplayNetwork.sendClient(new PausePacket(this.getBlockPos(), pause, this.data.tick, true), this);
     }
 
     public void setStop(boolean clientSide) {
-        if (clientSide) DisplayNetwork.sendServer(new PausePacket(this.worldPosition, true, 0, true));
-        else            DisplayNetwork.sendClient(new PausePacket(this.worldPosition, true, 0, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new PausePacket(this.getBlockPos(), true, 0, true));
+        else            DisplayNetwork.sendClient(new PausePacket(this.getBlockPos(), true, 0, true), this);
     }
 
     public void volumeUp(boolean clientSide) {
-        if (clientSide) DisplayNetwork.sendServer(new VolumePacket(this.worldPosition, this.data.volume + 5, true));
-        else            DisplayNetwork.sendClient(new VolumePacket(this.worldPosition, this.data.volume + 5, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new VolumePacket(this.getBlockPos(), this.data.volume + 5, true));
+        else            DisplayNetwork.sendClient(new VolumePacket(this.getBlockPos(), this.data.volume + 5, true), this);
     }
 
     public void volumeDown(boolean clientSide) {
-        if (clientSide) DisplayNetwork.sendServer(new VolumePacket(this.worldPosition, this.data.volume - 5, true));
-        else            DisplayNetwork.sendClient(new VolumePacket(this.worldPosition, this.data.volume - 5, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new VolumePacket(this.getBlockPos(), this.data.volume - 5, true));
+        else            DisplayNetwork.sendClient(new VolumePacket(this.getBlockPos(), this.data.volume - 5, true), this);
     }
 
     public void fastFoward(boolean clientSide) {
-        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.worldPosition, Math.min(data.tick + MathAPI.msToTick(5000), this.data.tickMax), this.data.tickMax, true));
-        else            DisplayNetwork.sendClient(new TimePacket(this.worldPosition, Math.min(data.tick + (5000 / 50), this.data.tickMax), this.data.tickMax, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), Math.min(data.tick + MathAPI.msToTick(5000), this.data.tickMax), this.data.tickMax, true));
+        else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), Math.min(data.tick + (5000 / 50), this.data.tickMax), this.data.tickMax, true), this);
     }
 
     public void rewind(boolean clientSide) {
-        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.worldPosition, Math.max(data.tick - MathAPI.msToTick(5000), 0), this.data.tickMax, true));
-        else            DisplayNetwork.sendClient(new TimePacket(this.worldPosition, Math.max(data.tick - (5000 / 50), 0), this.data.tickMax, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), Math.max(data.tick - MathAPI.msToTick(5000), 0), this.data.tickMax, true));
+        else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), Math.max(data.tick - (5000 / 50), 0), this.data.tickMax, true), this);
     }
 
     public void syncTime(boolean clientSide, long tick, long maxTick) {
-        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.worldPosition, tick, maxTick, true));
-        else            DisplayNetwork.sendClient(new TimePacket(this.worldPosition, tick, maxTick, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), tick, maxTick, true));
+        else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), tick, maxTick, true), this);
     }
 
     public void loop(boolean clientSide, boolean loop) {
-        if (clientSide) DisplayNetwork.sendServer(new LoopPacket(this.worldPosition, loop, true));
-        else            DisplayNetwork.sendClient(new LoopPacket(this.worldPosition, loop, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new LoopPacket(this.getBlockPos(), loop, true));
+        else            DisplayNetwork.sendClient(new LoopPacket(this.getBlockPos(), loop, true), this);
     }
 
     public void tick(BlockPos pos, BlockState state) {
@@ -213,14 +222,11 @@ public class DisplayTile extends BlockEntity {
             if (this.data.tick < this.data.tickMax) {
                 this.data.tick++;
                 if (lagTickTime != 0 && this.isServer()) {
-                    this.data.tick += (lagTickTime);
-                    while (this.data.tick > this.data.tickMax) {
-                        this.data.tick -= this.data.tickMax;
+                    long ticks = this.data.tick + lagTickTime;
+                    while (ticks > this.data.tickMax) {
+                        ticks -= this.data.tickMax;
                     }
-                    // Prevent odd shit
-                    if (this.data.tick < 0) {
-                        this.data.tick = 0;
-                    }
+                    this.data.tick = ticks;
                     this.setDirty();
                 }
             } else {
@@ -256,7 +262,7 @@ public class DisplayTile extends BlockEntity {
 
         if (this.isClient()) {
             TextureDisplay display = this.requestDisplay();
-            if (display != null && display.canTick()) display.tick(pos);
+            if (display != null && display.canTick()) display.tick();
         }
     }
 
@@ -285,7 +291,7 @@ public class DisplayTile extends BlockEntity {
     }
 
     public void setVisibility(boolean visible) {
-        this.level.setBlock(worldPosition, this.getBlockState().setValue(DisplayBlock.VISIBLE, visible), DisplayBlock.UPDATE_CLIENTS);
+        this.level.setBlock(this.getBlockPos(), this.getBlockState().setValue(DisplayBlock.VISIBLE, visible), DisplayBlock.UPDATE_CLIENTS);
     }
 
     public DisplayBlock getDisplayBlock() {
@@ -314,8 +320,8 @@ public class DisplayTile extends BlockEntity {
 
     public void setDirty() {
         if (this.level != null) {
-            this.level.blockEntityChanged(this.worldPosition);
-            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), DisplayBlock.UPDATE_ALL);
+            this.level.blockEntityChanged(this.getBlockPos());
+            this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), DisplayBlock.UPDATE_ALL);
         } else {
             LOGGER.warn("Cannot be stored block data, level is NULL");
         }

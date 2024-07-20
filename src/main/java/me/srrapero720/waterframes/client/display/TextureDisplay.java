@@ -22,17 +22,15 @@ public class TextureDisplay {
     private final DisplayTile tile;
 
     // CONFIG
-    private BlockPos blockPos;
     private int currentVolume = 0;
-    private final AtomicLong currentLastTime = new AtomicLong(Long.MIN_VALUE);
+    private long currentLastTime = Long.MIN_VALUE;
     private Mode displayMode = Mode.PICTURE;
     private boolean stream = false;
     private boolean synced = false;
 
     public TextureDisplay(DisplayTile tile) {
-        this.imageCache = tile.imageCache;
-        this.blockPos = tile.getBlockPos();
         this.tile = tile;
+        this.imageCache = tile.imageCache;
         if (this.imageCache.isVideo()) this.switchVideoMode();
     }
 
@@ -55,7 +53,7 @@ public class TextureDisplay {
             return;
         }
 
-        this.currentVolume = limitVolume(this.blockPos.relative(this.tile.getDirection(), (int) tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+        this.currentVolume = rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
         // PLAYER CONFIG
         this.mediaPlayer.setVolume(this.currentVolume);
@@ -123,8 +121,7 @@ public class TextureDisplay {
         tile.syncTime(true, tile.data.tick, durationInTicks());
     }
 
-    public void tick(BlockPos pos) {
-        this.blockPos = pos;
+    public void tick() {
         if (!synced && canRender()) {
             syncDuration();
             synced = true;
@@ -134,7 +131,7 @@ public class TextureDisplay {
                 if (imageCache.isVideo()) switchVideoMode();
             }
             case VIDEO, AUDIO -> {
-                int volume = limitVolume(this.blockPos.relative(tile.getDirection(), (int) this.tile.data.audioOffset), this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+                int volume = rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
                 if (currentVolume != volume) mediaPlayer.setVolume(currentVolume = volume);
                 if (mediaPlayer.isSafeUse() && mediaPlayer.isValid()) {
@@ -152,8 +149,8 @@ public class TextureDisplay {
                             time = (time == 0 || mediaDuration == 0) ? 0 : Math.floorMod(time, mediaPlayer.getMediaInfoDuration());
                         }
 
-                        if (Math.abs(time - mediaPlayer.getTime()) > WaterFrames.SYNC_TIME && Math.abs(time - currentLastTime.get()) > WaterFrames.SYNC_TIME) {
-                            currentLastTime.set(time);
+                        if (Math.abs(time - mediaPlayer.getTime()) > WaterFrames.SYNC_TIME && Math.abs(time - currentLastTime) > WaterFrames.SYNC_TIME) {
+                            currentLastTime = time;
                             mediaPlayer.seekTo(time);
                         }
                     }
@@ -201,13 +198,12 @@ public class TextureDisplay {
     public void setMuteMode(boolean mute) {
         switch (displayMode) {
             case PICTURE -> {}
-            case VIDEO, AUDIO -> {
-                mediaPlayer.setMuteMode(mute);
-            }
+            case VIDEO, AUDIO -> mediaPlayer.setMuteMode(mute);
         }
     }
 
     public void release() {
+        this.released = true;
         switch (displayMode) {
             case PICTURE -> {
                 if (imageCache != null) imageCache.deuse();
@@ -219,10 +215,9 @@ public class TextureDisplay {
         }
     }
 
-    public static int limitVolume(BlockPos pos, int volume, int min, int max) {
-        assert Minecraft.getInstance().player != null;
-        Position position = Minecraft.getInstance().player.getPosition(WaterFrames.deltaFrames());
-        double distance = Math.sqrt(pos.distToLowCornerSqr(position.x(), position.y(), position.z()));
+    public int rangedVol(int volume, int min, int max) { // Min and Max distances
+        Player player = Minecraft.getInstance().player;
+        double distance = Math.sqrt(tile.getBlockPos().relative(tile.getDirection(), (int) tile.data.audioOffset).distToCenterSqr(player.getPosition(WaterFrames.deltaFrames())));
         if (min > max) {
             int temp = max;
             max = min;
