@@ -14,6 +14,7 @@ import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 @Mixin(MinecraftServer.class)
 public class MinecraftServerMixin {
+    @Unique private static long wf$lastWarnTime = 0;
     @Unique private static long wf$lastMillisTime = 0;
     @Unique private static long wf$timeStack = 0;
 
@@ -32,7 +33,10 @@ public class MinecraftServerMixin {
 
         if (wf$timeStack > WaterFrames.SYNC_TIME) {
             DisplayTile.setLagTickTime(wf$timeStack);
-            LOGGER.warn("Server seems overloading, jumping {}ms or {} ticks", wf$timeStack, wf$timeStack / 50L);
+            if (millis - wf$lastWarnTime > 15000) {
+                LOGGER.warn("Server seems overloading, jumping {}ms or {} ticks", wf$timeStack, wf$timeStack / 50L);
+                wf$lastWarnTime = millis;
+            }
             wf$timeStack %= WaterFrames.SYNC_TIME;
         }
 
