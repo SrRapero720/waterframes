@@ -1,3 +1,11 @@
+# UPDATE 2.0.13
+- ✨ Added config for toggle tick time correction
+- ✨ Added Valkyrien Skies compat for audio playing (they are very damn slow)
+- 🐛 Fixed lag tick time correction speedups the playback and logspams your server (for real this time)
+- 🛠️ Super minor performance improvement on client-side having a lot of frames
+- 🛠️ Volume distances are now calculated by the center of the block instead of the corners
+- 🛠️ Gui is now closed when display is broken by external forces (another player)
+
 # UPDATE 2.0.12
 - 🐛 Fixed server lag tick correction crashes redstone
 - 🍾 Added russian translations (by the translator Heimdallr-1)
