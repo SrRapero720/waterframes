@@ -147,7 +147,7 @@ public class WFConfig {
 
         useLagTickCorrection = SERVER
                 .comment("Enable lag tick time correction", "Helps when server is too laggy and playback is regressing in time", "Disable if causes problems")
-                .define("lightOnPlay", true);
+                .define("lagTickCorrection", true);
 
         SERVER.comment("Redstone interaction options");
         SERVER.push("redstone");
