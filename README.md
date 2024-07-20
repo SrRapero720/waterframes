@@ -21,8 +21,8 @@ and the big difference with LittleFrames is **WATERFrAMES is fully designed to w
 - ⏱️ Easy to use and compatible with every mod
 
 ## 🧩 DEPENDENCIES
-- [CreativeCore](https://beta.curseforge.com/minecraft/mc-mods/creativecore/files/4394989): GuiAPI and Networking
-- [WATERMeDIA](https://beta.curseforge.com/minecraft/mc-mods/watermedia): Multimedia Support
+- [CreativeCore](https://www.curseforge.com/minecraft/mc-mods/creativecore): GuiAPI and Networking
+- [WATERMeDIA](https://wwww.curseforge.com/minecraft/mc-mods/watermedia): Multimedia Support
 
 ## 🖥️ VIDEO DEMOSTRATION
 <iframe src="https://www.youtube.com/embed/ns2u-24qcuI" width="560" height="314"></iframe>
@@ -44,10 +44,14 @@ odd things with the mod or do fancy suggestion to improve in the mod
 - [**CreativeMD**](https://github.com/CreativeMD): For making LittleFrames inspiriting me. 
 Having me patience on the PRs and begin a nice dude.
 
+# 🌐 TRANSLATORS
+- English (SrRapero720)
+- Mexican Spanish (SrRapero720)
+- Russian (Heimdallr-1)
+
 # ⁉️ FAQ
-- No ports to Fabric
-- No backports to 1.16.5 (sorry, but it isn't possible)
-- WATERMeDIA and CreativeCore are required dependencies
+- If it appears an error playing videos, try installing VLC
+- No backports to 1.16.5 (is not possible)
 
 ## ©️ COPYRIGHT AND PERMISSIONS
 Copyright SrRapero720—All rights reserved
