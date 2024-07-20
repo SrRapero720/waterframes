@@ -25,13 +25,13 @@ public class MinecraftServerMixin {
     public long redirect$runServer$getMillisWhile() {
         long millis = Util.getMillis();
         long time = millis - wf$lastMillisTime;
-        if (time > 50) // 50ms is 1 tick
+        if (time > 100) // 50ms is 1 tick
             wf$timeStack += time;
 
         if (wf$timeStack > WaterFrames.SYNC_TIME) {
             DisplayTile.setLagTickTime(wf$timeStack);
             LOGGER.warn("Server seems overloading, jumping {}ms or {} ticks", wf$timeStack, wf$timeStack / 50L);
-            wf$timeStack -= WaterFrames.SYNC_TIME;
+            wf$timeStack %= WaterFrames.SYNC_TIME;
         }
 
         return wf$lastMillisTime = Util.getMillis();
