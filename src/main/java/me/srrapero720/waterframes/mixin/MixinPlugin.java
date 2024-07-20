@@ -20,6 +20,9 @@ public class MixinPlugin implements IMixinConfigPlugin {
         if (target.endsWith("vp.VideoPlayerMixin")) {
             return FMLLoader.getLoadingModList().getModFileById("videoplayer") != null;
         }
+        if (target.endsWith("self.VSCompat")) {
+            return FMLLoader.getLoadingModList().getModFileById("valkyrienskies") != null;
+        }
         return true;
     }
 
