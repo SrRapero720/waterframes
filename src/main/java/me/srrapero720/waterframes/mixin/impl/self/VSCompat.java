@@ -15,7 +15,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 @Mixin(TextureDisplay.class)
 @Pseudo
 public class VSCompat {
-    @Shadow @Final private DisplayTile tile;
+    @Shadow(remap = false) @Final private DisplayTile tile;
 
     @Redirect(method = "rangedVol", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;distToCenterSqr(Lnet/minecraft/core/Position;)D"))
     private double redirect$rangedVol(BlockPos instance, Position position) {
