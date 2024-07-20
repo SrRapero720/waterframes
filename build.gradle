@@ -19,8 +19,7 @@ java.toolchain {
     languageVersion = JavaLanguageVersion.of(17)
 }
 
-println "Gradle Java: ${JavaVersion.current()}"
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
+println "Java: ${System.getProperty 'java.version'}, Gradle Java: ${JavaVersion.current()}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
     mappings channel: mappings_channel, version: "$mappings_version"
     accessTransformer file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -33,6 +32,7 @@ minecraft {
             property 'log4j.appender.Console', "org.apache.log4j.ConsoleAppender"
             property 'terminal.jline', 'true'
             args '--mixin.config', "$modid.$mixin_file_suffix"
+            arg '--nogui'
 
             mods {
                 "$modid" {
@@ -54,7 +54,6 @@ mixin {
 }
 
 repositories {
-    mavenCentral()
     maven { url 'https://repo.spongepowered.org/maven' }
     maven { url 'https://jitpack.io' }
     maven {
@@ -70,7 +69,6 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     //DEPENDENCIES
-    implementation fileTree('libs') { include '*.jar' }
     implementation "com.github.WaterMediaTeam.watermedia:build:$watermediaversion"
     implementation fg.deobf("curse.maven:video-player-645407:$videoplayerversion")
     implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
