@@ -71,8 +71,9 @@ public class WFConfig {
     private static final BooleanValue keepRendering;
     // BEHAVIOR
     private static final BooleanValue useLightsOnPlay;
+    private static final BooleanValue useLagTickCorrection;
     private static final BooleanValue useRedstone;
-    private static final BooleanValue useMasterModeOnRedsone;
+    private static final BooleanValue useMasterModeOnRedstone;
     // REMOTE CONTROL
     private static final IntValue remoteDistance;
 
@@ -144,6 +145,10 @@ public class WFConfig {
                 .comment("Enable light feature on frames while is playing")
                 .define("lightOnPlay", true);
 
+        useLagTickCorrection = SERVER
+                .comment("Enable lag tick time correction", "Helps when server is too laggy and playback is regressing in time", "Disable if causes problems")
+                .define("lightOnPlay", true);
+
         SERVER.comment("Redstone interaction options");
         SERVER.push("redstone");
 
@@ -151,7 +156,7 @@ public class WFConfig {
                 .comment("Enable the feature")
                 .define("enable", true);
 
-        useMasterModeOnRedsone = SERVER
+        useMasterModeOnRedstone = SERVER
                 .comment("Redstone inputs forces paused playback and ignores any other control sources")
                 .define("masterMode", false);
 
@@ -260,6 +265,7 @@ public class WFConfig {
 
     public static boolean keepsRendering() { return overrideServerConfig.get() ? clientKeepsRendering.get() : keepRendering.get(); }
     public static boolean useLightOnPlay() { return useLightsOnPlay.get(); }
+    public static boolean useLagTickCorrection() { return useLagTickCorrection.get(); }
 
     // MULTIMEDIA
     public static int maxVolDis() { return maxVolumeDistance.get(); }
@@ -272,7 +278,7 @@ public class WFConfig {
 
     // BEHAVIOR
     public static boolean useRedstone() { return useRedstone.get(); }
-    public static boolean useMasterModeRedstone() { return useRedstone() && useMasterModeOnRedsone.get(); }
+    public static boolean useMasterModeRedstone() { return useRedstone() && useMasterModeOnRedstone.get(); }
     public static int maxRcDis() { return remoteDistance.get(); }
 
     // PERMISSIONS
