@@ -8,10 +8,7 @@ import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
 import me.srrapero720.watermedia.api.player.SyncVideoPlayer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Position;
-
-import java.util.concurrent.atomic.AtomicLong;
+import net.minecraft.world.entity.player.Player;
 
 public class TextureDisplay {
     private static final ImageCache VLC_NOT_FOUND = new ImageCache(ImageAPI.failedVLC());
@@ -27,6 +24,7 @@ public class TextureDisplay {
     private Mode displayMode = Mode.PICTURE;
     private boolean stream = false;
     private boolean synced = false;
+    private boolean released = false;
 
     public TextureDisplay(DisplayTile tile) {
         this.tile = tile;
@@ -159,10 +157,13 @@ public class TextureDisplay {
         }
     }
 
-    public State getPlayerStateIfExists() {
+    public boolean isReady() {
+        if (this.imageCache.getStatus() != ImageCache.Status.READY) {
+            return false;
+        }
         return switch (displayMode) {
-            case PICTURE -> State.NOTHING_SPECIAL;
-            case VIDEO, AUDIO -> mediaPlayer.getRawPlayerState();
+            case PICTURE -> true;
+            case VIDEO, AUDIO -> this.imageCache.getStatus() == ImageCache.Status.READY && this.mediaPlayer.isReady();
         };
     }
 
@@ -174,6 +175,9 @@ public class TextureDisplay {
     }
 
     public boolean isBroken() {
+        if (this.imageCache.getStatus() == ImageCache.Status.FAILED)
+            return true;
+
         return switch (displayMode) {
             case PICTURE -> false;
             case VIDEO, AUDIO -> this.mediaPlayer.isBroken();
@@ -181,7 +185,17 @@ public class TextureDisplay {
     }
 
     public boolean isLoading() {
-        return imageCache.getStatus() == ImageCache.Status.LOADING;
+        if (imageCache.getStatus() == ImageCache.Status.LOADING)
+            return true;
+
+        return switch (displayMode) {
+            case PICTURE -> false;
+            case VIDEO, AUDIO -> this.mediaPlayer.getRawPlayerState() == State.OPENING;
+        };
+    }
+
+    public boolean isReleased() {
+        return released;
     }
 
     public void setPauseMode(boolean pause) {

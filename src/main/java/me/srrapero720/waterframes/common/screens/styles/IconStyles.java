@@ -43,6 +43,7 @@ public class IconStyles {
     public static final Icon STATUS_AFFECTED = create(2, 6);
     public static final Icon STATUS_CASSETE_MODE = create(2, 7);
     public static final Icon STATUS_OFF = create(2, 8);
+    public static final Icon STATUS_MEDIA_ERROR = create(2, 9);
 
     // POSITION ICONS (chunk 3)
     // POS ICON
