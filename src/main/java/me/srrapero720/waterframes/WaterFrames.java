@@ -17,6 +17,7 @@ public class WaterFrames {
     public static final String NAME = "WATERFrAMES";
     public static final String PREFIX = "§6§l[§r§bWATERF§3r§bAMES§6§l]: §r";
     public static final Logger LOGGER = LogManager.getLogger(ID);
+    public static final long SYNC_TIME = 1000L;
     private static int SERVER_OP_LEVEL = -1;
 
     // BOOTSTRAP

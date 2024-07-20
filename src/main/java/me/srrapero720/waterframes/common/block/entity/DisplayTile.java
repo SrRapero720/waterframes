@@ -51,8 +51,7 @@ public class DisplayTile extends BlockEntity {
     }
 
     public static void setLagTickTime(long ltt) {
-        LOGGER.warn("Server seems overloading, jumping {}ms or {} ticks", ltt, ltt / 50L);
-        lagTickTime = ltt;
+        lagTickTime = ltt / 50L;
     }
 
     public static void clearLagTickTime() {
@@ -214,8 +213,8 @@ public class DisplayTile extends BlockEntity {
             if (this.data.tick < this.data.tickMax) {
                 this.data.tick++;
                 if (lagTickTime != 0 && this.isServer()) {
-                    this.data.tick += (lagTickTime / 50L);
-                    if (this.data.tick > this.data.tickMax) {
+                    this.data.tick += (lagTickTime);
+                    while (this.data.tick > this.data.tickMax) {
                         this.data.tick -= this.data.tickMax;
                     }
                     // Prevent odd shit

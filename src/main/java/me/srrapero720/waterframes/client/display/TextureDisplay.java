@@ -152,7 +152,7 @@ public class TextureDisplay {
                             time = (time == 0 || mediaDuration == 0) ? 0 : Math.floorMod(time, mediaPlayer.getMediaInfoDuration());
                         }
 
-                        if (Math.abs(time - mediaPlayer.getTime()) > DisplayControl.SYNC_TIME && Math.abs(time - currentLastTime.get()) > DisplayControl.SYNC_TIME) {
+                        if (Math.abs(time - mediaPlayer.getTime()) > WaterFrames.SYNC_TIME && Math.abs(time - currentLastTime.get()) > WaterFrames.SYNC_TIME) {
                             currentLastTime.set(time);
                             mediaPlayer.seekTo(time);
                         }
