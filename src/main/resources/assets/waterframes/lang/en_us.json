@@ -24,6 +24,7 @@
     "waterframes.remote.display.failed": "Display is broken, unbounded",
     "waterframes.remote.display.invalid": "Needs to bound it first.",
 
+    "waterframes.commands.prefix": "§6§l[§r§bWATERF§3r§bAMES§6§l]: ",
     "waterframes.commands.give.single": "Gave Displays set to %s",
     "waterframes.commands.give.multiple": "Gave Displays set to %s players",
     "waterframes.commands.whitelist.toggle": "Whitelist is now %s",

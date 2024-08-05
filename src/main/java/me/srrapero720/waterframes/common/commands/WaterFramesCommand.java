@@ -438,23 +438,23 @@ public class WaterFramesCommand {
     }
 
     private static Component msgFailed(String t) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.RED));
+        return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t).withStyle(ChatFormatting.RED));
     }
 
     private static Component msgFailed(String t, String t2) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t, t2).withStyle(ChatFormatting.RED));
+        return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t, t2).withStyle(ChatFormatting.RED));
     }
 
     private static Component msgSuccess(String t) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN));
+        return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN));
     }
 
     private static Component msgSuccess(String t, Component c) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN).append(c));
+        return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN).append(c));
     }
 
     private static Component msgSuccess(String t, String... a) {
-        return new TextComponent(WaterFrames.PREFIX).append(new TranslatableComponent(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
+        return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
     }
 
     public static boolean hasPermissions(CommandSourceStack sourceStack) {
