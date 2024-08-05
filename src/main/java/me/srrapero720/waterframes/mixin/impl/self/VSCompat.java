@@ -17,7 +17,7 @@ import org.valkyrienskies.mod.common.VSGameUtilsKt;
 public class VSCompat {
     @Shadow(remap = false) @Final private DisplayTile tile;
 
-    @Redirect(method = "rangedVol", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;distToCenterSqr(Lnet/minecraft/core/Position;)D"))
+    @Redirect(method = "rangedVol", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;distToCenterSqr(Lnet/minecraft/core/Position;)D"), require = 0)
     private double redirect$rangedVol(BlockPos instance, Position position) {
         return VSGameUtilsKt.squaredDistanceBetweenInclShips(tile.level, instance.getX(), instance.getY(), instance.getZ(), position.x(), position.y(), position.z());
     }
