@@ -257,7 +257,7 @@ public class DisplayTile extends BlockEntity {
         }
 
         if (updateBlock) {
-            level.setBlock(pos, state, DisplayBlock.UPDATE_ALL);
+            this.level.setBlock(pos, state, DisplayBlock.UPDATE_ALL);
         }
 
         if (this.isClient()) {
@@ -271,7 +271,7 @@ public class DisplayTile extends BlockEntity {
     }
 
     public boolean isServer() {
-        return !isClient();
+        return this.level != null && !this.level.isClientSide;
     }
 
     public Direction getDirection() {
@@ -322,8 +322,6 @@ public class DisplayTile extends BlockEntity {
         if (this.level != null) {
             this.level.blockEntityChanged(this.getBlockPos());
             this.level.sendBlockUpdated(this.getBlockPos(), this.getBlockState(), this.getBlockState(), DisplayBlock.UPDATE_ALL);
-        } else {
-            LOGGER.warn("Cannot be stored block data, level is NULL");
         }
     }
 
