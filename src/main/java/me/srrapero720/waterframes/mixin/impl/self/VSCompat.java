@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.mixin.impl.self;
 
-import me.srrapero720.waterframes.client.display.TextureDisplay;
+import me.srrapero720.waterframes.client.display.Display;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Position;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
-@Mixin(TextureDisplay.class)
+@Mixin(Display.class)
 @Pseudo
 public class VSCompat {
     @Shadow(remap = false) @Final private DisplayTile tile;

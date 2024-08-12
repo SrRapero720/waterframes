@@ -1,24 +1,30 @@
 package me.srrapero720.waterframes.client.display;
 
-import me.lib720.caprica.vlcj.player.base.State;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import me.srrapero720.waterframes.*;
+import me.srrapero720.waterframes.client.rendering.TextureWrapper;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.watermedia.api.image.ImageAPI;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
 import me.srrapero720.watermedia.api.player.SyncVideoPlayer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
+
+import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
-public class TextureDisplay {
-    private static final ImageCache VLC_NOT_FOUND = new ImageCache(ImageAPI.failedVLC());
+public class Display {
+    private static final Marker IT = MarkerManager.getMarker("Display");
+    private static final Int2ObjectOpenHashMap<ResourceLocation> TEXTURES = new Int2ObjectOpenHashMap<>();
 
     // MEDIA AND DATA
     private SyncVideoPlayer mediaPlayer;
-    private ImageCache imageCache;
+    private final ImageCache imageCache;
     private final DisplayTile tile;
 
     // CONFIG
@@ -29,16 +35,20 @@ public class TextureDisplay {
     private boolean synced = false;
     private boolean released = false;
 
-    public TextureDisplay(DisplayTile tile) {
+    public Display(DisplayTile tile) {
         this.tile = tile;
         this.imageCache = tile.imageCache;
         if (this.imageCache.isVideo()) this.switchVideoMode();
+        else this.imageCache.addOnReleaseListener(renderer -> {
+            for (int tex: renderer.textures) {
+                WFRegistry.unregisterTexture(TEXTURES.remove(tex));
+            }
+        });
     }
 
     private void switchVideoMode() {
         // DO NOT USE VIDEOLAN IF I DONT WANT
         if (!WFConfig.useMultimedia()) {
-            this.imageCache = VLC_NOT_FOUND;
             this.displayMode = Mode.PICTURE;
             return;
         }
@@ -49,7 +59,6 @@ public class TextureDisplay {
 
         // CHECK IF VLC CAN BE USED
         if (mediaPlayer.isBroken()) {
-            this.imageCache = VLC_NOT_FOUND;
             this.displayMode = Mode.PICTURE;
             return;
         }
@@ -61,8 +70,8 @@ public class TextureDisplay {
         this.mediaPlayer.setRepeatMode(this.tile.data.loop);
         this.mediaPlayer.setPauseMode(this.tile.data.paused);
         this.mediaPlayer.setMuteMode(this.tile.data.muted);
-        this.mediaPlayer.start(this.tile.data.url);
-        DisplayControl.add(this);
+        this.mediaPlayer.start(this.tile.data.url, new String[] { ":network-caching=5000" });
+        DisplayList.add(this);
     }
 
     public int width() {
@@ -85,8 +94,20 @@ public class TextureDisplay {
         return switch (displayMode) {
             case PICTURE -> this.imageCache.getRenderer().texture(tile.data.tick, (!tile.data.paused ? MathAPI.tickToMs(WaterFrames.deltaFrames()) : 0), tile.data.loop);
             case VIDEO -> this.mediaPlayer.getGlTexture();
-            case AUDIO -> -1;
+            case AUDIO -> 0;
         };
+    }
+
+    public ResourceLocation getTextureId() {
+        int texture = texture();
+        if (texture != -1) {
+            return TEXTURES.computeIfAbsent(texture, (Function<Integer, ResourceLocation>) integer -> {
+                var id = WaterFrames.genId(texture);
+                WFRegistry.registerTexture(id, new TextureWrapper(texture));
+                return id;
+            });
+        }
+        return null;
     }
 
     public int durationInTicks() {
@@ -111,7 +132,7 @@ public class TextureDisplay {
 
     public boolean canRender() {
         return switch (displayMode) {
-            case PICTURE -> this.imageCache.getRenderer() != null && tile.data.active;
+            case PICTURE -> this.imageCache.getStatus() == ImageCache.Status.READY && !this.imageCache.isVideo() && tile.data.active;
             case VIDEO -> this.mediaPlayer.isValid() && tile.data.active;
             case AUDIO -> false;
         };
@@ -123,40 +144,40 @@ public class TextureDisplay {
     }
 
     public void tick() {
-        if (!synced && canRender()) {
-            syncDuration();
-            synced = true;
-        }
-        switch (displayMode) {
+        switch (this.displayMode) {
             case PICTURE -> {
-                if (imageCache.isVideo()) switchVideoMode();
+                if (this.imageCache.isVideo()) switchVideoMode();
             }
             case VIDEO, AUDIO -> {
                 int volume = rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
-                if (currentVolume != volume) mediaPlayer.setVolume(currentVolume = volume);
-                if (mediaPlayer.isSafeUse() && mediaPlayer.isValid()) {
-                    if (mediaPlayer.getRepeatMode() != tile.data.loop) mediaPlayer.setRepeatMode(tile.data.loop);
-                    if (mediaPlayer.isMuted() != tile.data.muted) mediaPlayer.setMuteMode(tile.data.muted);
-                    if (!stream && mediaPlayer.isLive()) stream = true;
+                if (this.currentVolume != volume) this.mediaPlayer.setVolume(this.currentVolume = volume);
+                if (this.mediaPlayer.isSafeUse() && this.mediaPlayer.isValid()) {
+                    if (this.mediaPlayer.getRepeatMode() != tile.data.loop) this.mediaPlayer.setRepeatMode(tile.data.loop);
+                    if (this.mediaPlayer.isMuted() != tile.data.muted) this.mediaPlayer.setMuteMode(tile.data.muted);
+                    if (!this.stream && this.mediaPlayer.isLive()) this.stream = true;
 
                     boolean mayPause = tile.data.paused || !tile.data.active || Minecraft.getInstance().isPaused();
 
-                    if (mediaPlayer.isPaused() != mayPause) mediaPlayer.setPauseMode(mayPause);
-                    if (!stream && mediaPlayer.isSeekAble()) {
+                    if (this.mediaPlayer.isPaused() != mayPause) this.mediaPlayer.setPauseMode(mayPause);
+                    if (!this.stream && this.mediaPlayer.isSeekAble()) {
                         long time = MathAPI.tickToMs(tile.data.tick) + (!mayPause ? MathAPI.tickToMs(WaterFrames.deltaFrames()) : 0);
                         if (time > mediaPlayer.getTime() && tile.data.loop) {
                             long mediaDuration = mediaPlayer.getMediaInfoDuration();
-                            time = (time == 0 || mediaDuration == 0) ? 0 : Math.floorMod(time, mediaPlayer.getMediaInfoDuration());
+                            time = (time == 0 || mediaDuration == 0) ? 0 : Math.floorMod(time, this.mediaPlayer.getMediaInfoDuration());
                         }
 
                         if (Math.abs(time - mediaPlayer.getTime()) > WaterFrames.SYNC_TIME && Math.abs(time - currentLastTime) > WaterFrames.SYNC_TIME) {
-                            currentLastTime = time;
-                            mediaPlayer.seekTo(time);
+                            this.currentLastTime = time;
+                            this.mediaPlayer.seekTo(time);
                         }
                     }
                 }
             }
+        }
+        if (!this.synced && this.canRender()) {
+            this.syncDuration();
+            this.synced = true;
         }
     }
 
@@ -173,7 +194,7 @@ public class TextureDisplay {
     public boolean isBuffering() {
         return switch (displayMode) {
             case PICTURE -> false;
-            case VIDEO, AUDIO -> this.mediaPlayer.isBuffering() || this.mediaPlayer.getRawPlayerState() == State.OPENING;
+            case VIDEO, AUDIO -> this.mediaPlayer.isBuffering() || this.mediaPlayer.isLoading();
         };
     }
 
@@ -193,7 +214,7 @@ public class TextureDisplay {
 
         return switch (displayMode) {
             case PICTURE -> false;
-            case VIDEO, AUDIO -> this.mediaPlayer.getRawPlayerState() == State.OPENING;
+            case VIDEO, AUDIO -> this.mediaPlayer.isLoading();
         };
     }
 
@@ -220,14 +241,15 @@ public class TextureDisplay {
     }
 
     public void release() {
+        if (this.isReleased()) return;
         this.released = true;
+        imageCache.deuse();
         switch (displayMode) {
-            case PICTURE -> {
-                if (imageCache != null) imageCache.deuse();
-            }
+            case PICTURE -> {}
             case VIDEO, AUDIO -> {
                 mediaPlayer.release();
-                DisplayControl.remove(this);
+                TEXTURES.remove(mediaPlayer.getTexture());
+                DisplayList.remove(this);
             }
         }
     }

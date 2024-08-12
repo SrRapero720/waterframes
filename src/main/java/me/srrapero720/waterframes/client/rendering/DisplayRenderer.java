@@ -1,39 +1,43 @@
 package me.srrapero720.waterframes.client.rendering;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.*;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.client.display.DisplayControl;
-import me.srrapero720.waterframes.client.display.TextureDisplay;
-import me.srrapero720.waterframes.client.rendering.core.RenderCore;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.watermedia.api.image.ImageAPI;
-import me.srrapero720.watermedia.api.image.ImageRenderer;
-import me.srrapero720.watermedia.api.math.MathAPI;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.Util;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.core.Direction;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
+import team.creative.creativecore.common.util.math.box.BoxCorner;
 import team.creative.creativecore.common.util.math.box.BoxFace;
 
+import java.util.function.Function;
+
 public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
-    public static final ImageRenderer LOADING_TEX = ImageAPI.loadingGif(WaterFrames.ID);
 
+    private static final Function<ResourceLocation, RenderType> BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE = Util.memoize((p_173198_) -> {
+        RenderType.CompositeState rendertype$compositestate = RenderType.CompositeState.builder().setShaderState(RenderType.RENDERTYPE_TRANSLUCENT_SHADER).setTextureState(new RenderStateShard.TextureStateShard(p_173198_, false, false)).setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY).setLightmapState(RenderType.LIGHTMAP).setOverlayState(RenderType.NO_OVERLAY).createCompositeState(false);
+        return RenderType.create("block_translucent_cull_custom_texture", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 256, true, true, rendertype$compositestate);
+    });
+
+    private final BlockEntityRendererProvider.Context context;
     public DisplayRenderer(BlockEntityRendererProvider.Context context) {
-
+        this.context = context;
     }
 
     @Override
     public boolean shouldRenderOffScreen(DisplayTile tile) {
         return tile.data.getWidth() > 8 || tile.data.getHeight() > 8;
     }
+
     @Override
     public boolean shouldRender(DisplayTile tile, @NotNull Vec3 cameraPos) {
         return Vec3.atCenterOf(tile.getBlockPos()).closerThan(cameraPos, tile.data.renderDistance);
@@ -41,90 +45,86 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
     @Override
     public void render(DisplayTile tile, float partialTicks, PoseStack pose, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        var display = tile.requestDisplay();
+        var display = tile.activeDisplay();
         if (display == null || !WFConfig.keepsRendering()) return;
 
-        // STORE AND CLEAN ANY "EARLY" STATE
-        RenderCore.cleanShader();
-        RenderCore.bufferPrepare();
-        RenderCore.cleanShader();
-
-        // PREPARE RENDERING
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
-        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-
-        // variables
-        var direction = this.direction(tile);
-        var facing = Facing.get(direction);
+        var direction = tile.getDirection();
         var box = tile.getRenderBox();
+        var boxFace = BoxFace.get(Facing.get(tile.caps.invertedFace(tile) ? direction.getOpposite() : direction));
+        var facing = boxFace.facing;
+        packedLight = LightTexture.pack(15, 15);
+
+        boolean front = !tile.caps.projects() || tile.data.renderBothSides;
+        boolean back = tile.caps.projects() || tile.data.renderBothSides;
+        boolean flipX = tile.caps.projects() != tile.data.flipX;
+        boolean flipY = tile.data.flipY;
+        int r, b, g;
+        r = g = b= tile.data.brightness;
+        int a = tile.data.alpha;
 
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
         pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-tile.data.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
 
-        if (facing.positive) {
-            if (!tile.caps.invertedFace(tile)) box.setMax(facing.axis, box.getMax(facing.axis) + tile.caps.growSize());
-            else box.setMin(facing.axis, box.getMin(facing.axis) - tile.caps.growSize());
+        // TWEAK FOR "EXTRA-RESIZING"
+        if (facing.positive != tile.caps.invertedFace(tile)) {
+            box.setMax(facing.axis,box.getMax(facing.axis) + tile.caps.growSize());
         } else {
-            if (!tile.caps.invertedFace(tile)) box.setMin(facing.axis, box.getMin(facing.axis) - tile.caps.growSize());
-            else box.setMax(facing.axis, box.getMax(facing.axis) + tile.caps.growSize());
+            box.setMin(facing.axis, box.getMin(facing.axis) - tile.caps.growSize());
         }
 
         // RENDERING
-        final int brightness = tile.data.brightness;
-        this.render(pose, tile, display, box, BoxFace.get(tile.caps.invertedFace(tile) ? facing.opposite() : facing), tile.data.alpha, brightness, brightness, brightness);
-
-        // POST RENDERING
-        pose.popPose();
-        RenderCore.cleanShader();
-
-        RenderSystem.disableBlend();
-        RenderSystem.disableDepthTest();
-        RenderSystem.bindTexture(0);
-    }
-
-    public void render(PoseStack pose, DisplayTile tile, TextureDisplay display, AlignedBox box, BoxFace face, int a, int r, int g, int b) {
-        // VAR DECLARE
-        final boolean flipX = this.flipX(tile);
-        final boolean flipY = this.flipY(tile);
-        final boolean front = this.inFront(tile);
-        final boolean back = this.inBack(tile);
-
         if (display.isLoading()) {
-            RenderCore.bufferBegin();
-            this.renderLoading(pose, tile, box, face, front, back, flipX, flipY);
-            RenderCore.bufferEnd();
-            return;
+            this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing, packedLight, packedOverlay,
+                    front, back, flipX, flipY, r, g, b, a, WaterFrames.LOADING_ANIMATION);
+        } else if (display.canRender()) {
+            int tex = display.texture();
+            if (tex != -1) {
+                this.vertex(pose, bufferSource, box, boxFace, facing, packedLight, packedOverlay,
+                        front, back, flipX, flipY, r, g, b, a, display.getTextureId());
+            }
+
+            if (display.isBuffering()) {
+                this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing, packedLight, packedOverlay,
+                        front, back, flipX, flipY, r, g, b, a, WaterFrames.LOADING_ANIMATION);
+            }
         }
 
-        if (!display.canRender()) return;
+        pose.popPose();
+    }
 
-        int tex = display.texture();
-        if (tex != -1) {
-            RenderCore.bufferBegin();
-            RenderCore.bindTex(tex);
-            if (front)
-                RenderCore.vertexF(pose, box, face, flipX, flipY, a, r, g, b);
+    public void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing, int packedLight, int packedOverlay,
+                       boolean front, boolean back, boolean flipX, boolean flipY, int r, int g, int b, int a, ResourceLocation texture) {
 
-            if (back)
-                RenderCore.vertexB(pose, box, face, flipX, flipY, a, r, g, b);
-            RenderCore.bufferEnd();
+        VertexConsumer builder = source.getBuffer(BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE.apply(texture));
+        if (front) {
+            for (int i = 0; i < boxface.corners.length; i++) {
+                BoxCorner corner = boxface.corners[i];
+                this.vertex(pose, builder, box, boxface, corner, facing, packedLight, packedOverlay, flipX, flipY, r, g, b, a);
+            }
         }
-
-        if (display.isBuffering()) {
-            RenderCore.bufferBegin();
-            this.renderLoading(pose, tile, box, face, front, back, flipX, flipY);
-            RenderCore.bufferEnd();
+        if (back) {
+            for (int i = boxface.corners.length - 1; i >= 0; i--) {
+                BoxCorner corner = boxface.corners[i];
+                this.vertex(pose, builder, box, boxface, corner, facing, packedLight, packedOverlay, flipX, flipY, r, g, b, a);
+            }
         }
     }
 
-    public void renderLoading(PoseStack pose, DisplayTile tile, AlignedBox alignedBox, BoxFace face, boolean front, boolean back, boolean flipX, boolean flipY) {
-        RenderCore.bindTex(LOADING_TEX.texture(DisplayControl.getTicks(), MathAPI.tickToMs(WaterFrames.deltaFrames()), true));
+    public void vertex(PoseStack pose, VertexConsumer builder, AlignedBox box, BoxFace boxface, BoxCorner corner, Facing facing, int packedLight, int packedOverlay, boolean flipX, boolean flipY, int r, int g, int b, int a) {
+        Vec3i normal = facing.normal;
+        builder.vertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
+                .color(r, g, b, a)
+                .uv(corner.isFacing(boxface.getTexU()) != flipX ? 1f : 0f, corner.isFacing(boxface.getTexV()) != flipY ? 1f : 0f)
+                .uv2(packedLight)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .normal(pose.last().normal(), normal.getX(), normal.getY(), normal.getZ())
+                .endVertex();
+    }
 
-        AlignedBox box = new AlignedBox(alignedBox);
-        Facing facing = face.getFacing();
+    public AlignedBox getLoadingBox(DisplayTile tile, AlignedBox parent, Facing facing) {
+        AlignedBox box = new AlignedBox(parent);
 
         Axis one = facing.one();
         Axis two = facing.two();
@@ -149,35 +149,11 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         }
 
         if (facing.positive) {
-            box.setMax(face.getFacing().axis, alignedBox.getMax(facing.axis) + (tile.caps.projects() ? -0.001f : 0.001f));
+            box.setMax(facing.axis, parent.getMax(facing.axis) + (tile.caps.projects() ? -0.001f : 0.001f));
         } else {
-            box.setMin(facing.axis, alignedBox.getMin(facing.axis) - (tile.caps.projects() ? -0.001f : 0.001f));
+            box.setMin(facing.axis, parent.getMin(facing.axis) - (tile.caps.projects() ? -0.001f : 0.001f));
         }
 
-        if (front)
-            RenderCore.vertexF(pose, box, face, flipX, flipY, 255, 255, 255, 255);
-
-        if (back)
-            RenderCore.vertexB(pose, box, face, flipX, flipY, 255, 255, 255, 255);
-    }
-
-    public boolean inFront(DisplayTile tile) {
-        return !tile.caps.projects() || tile.data.renderBothSides;
-    }
-
-    public boolean inBack(DisplayTile tile) {
-        return tile.caps.projects() || tile.data.renderBothSides;
-    }
-
-    public boolean flipX(DisplayTile tile) {
-        return tile.caps.projects() != tile.data.flipX;
-    }
-
-    public boolean flipY(DisplayTile tile) {
-        return tile.data.flipY;
-    }
-
-    public Direction direction(DisplayTile tile) {
-        return tile.getDirection();
+        return box;
     }
 }

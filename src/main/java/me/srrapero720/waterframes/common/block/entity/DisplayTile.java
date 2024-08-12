@@ -2,7 +2,7 @@ package me.srrapero720.waterframes.common.block.entity;
 
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.client.display.TextureDisplay;
+import me.srrapero720.waterframes.client.display.Display;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayCaps;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
@@ -41,7 +41,7 @@ public class DisplayTile extends BlockEntity {
     public final DisplayData data;
     public final DisplayCaps caps;
     @OnlyIn(Dist.CLIENT) public ImageCache imageCache;
-    @OnlyIn(Dist.CLIENT) public TextureDisplay display;
+    @OnlyIn(Dist.CLIENT) public Display display;
     @OnlyIn(Dist.CLIENT) private boolean isReleased;
 
     public DisplayTile(DisplayData data, DisplayCaps caps, BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
@@ -70,12 +70,12 @@ public class DisplayTile extends BlockEntity {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public TextureDisplay activeDisplay() {
+    public Display activeDisplay() {
         return display;
     }
 
     @OnlyIn(Dist.CLIENT)
-    public TextureDisplay requestDisplay() {
+    public Display requestDisplay() {
         if (!this.data.active || (this.data.url.isEmpty() && display != null)) {
             this.cleanDisplay();
             return null;
@@ -94,7 +94,7 @@ public class DisplayTile extends BlockEntity {
         switch (imageCache.getStatus()) {
             case LOADING, FAILED, READY -> {
                 if (this.display != null) return this.display;
-                return this.display = new TextureDisplay(this);
+                return this.display = new Display(this);
             }
 
             case WAITING -> {
@@ -261,7 +261,7 @@ public class DisplayTile extends BlockEntity {
         }
 
         if (this.isClient()) {
-            TextureDisplay display = this.requestDisplay();
+            Display display = this.requestDisplay();
             if (display != null && display.canTick()) display.tick();
         }
     }

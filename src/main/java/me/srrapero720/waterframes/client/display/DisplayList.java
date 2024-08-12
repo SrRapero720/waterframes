@@ -4,29 +4,24 @@ import me.srrapero720.waterframes.WaterFrames;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 @OnlyIn(Dist.CLIENT)
-public class DisplayControl {
-    private static final Marker IT = MarkerManager.getMarker("DisplayControl");
+public class DisplayList {
     public static final Integer DEFAULT_SIZE = 32;
 
-    private static volatile TextureDisplay[] displays = new TextureDisplay[DEFAULT_SIZE];
+    private static volatile Display[] displays = new Display[DEFAULT_SIZE];
     private static int position = 0;
     private static boolean checkSize = false;
-    private static long ticks = 0;
     private static boolean paused;
 
-    public static void add(TextureDisplay display) {
+    public static void add(Display display) {
         if (checkSize) {
             if (((float) position / displays.length) <= 0.25f) {
-                TextureDisplay[] freshMeal = new TextureDisplay[displays.length / 2]; // free unused memory
+                Display[] freshMeal = new Display[displays.length / 2]; // free unused memory
                 System.arraycopy(displays, 0, freshMeal, 0, position);
                 displays = freshMeal;
             }
@@ -34,7 +29,7 @@ public class DisplayControl {
         }
 
         if (position >= displays.length) { // position never should be major than length
-            TextureDisplay[] freshMeal = new TextureDisplay[displays.length * 2];
+            Display[] freshMeal = new Display[displays.length * 2];
             position = copyData$resetPosition(displays, freshMeal);
             displays = freshMeal;
             checkSize = true;
@@ -65,7 +60,7 @@ public class DisplayControl {
         displays[i] = null;
     }
 
-    public static void remove(TextureDisplay obj) {
+    public static void remove(Display obj) {
         if (obj == null) return; // null cannot be removed, duh
         for (int i = 0; i < position; i++) {
             if (obj == displays[i]) {
@@ -83,11 +78,11 @@ public class DisplayControl {
             }
         }
 
-        displays = new TextureDisplay[DEFAULT_SIZE];
+        displays = new Display[DEFAULT_SIZE];
         position = 0;
     }
 
-    private static int copyData$resetPosition(TextureDisplay[] current, TextureDisplay[] target) {
+    private static int copyData$resetPosition(Display[] current, Display[] target) {
         int freshPosition = 0;
         for (int i = 0; i < current.length; i++) { // tries to ignore all null pos to stack all instanced objects, spend less memory
             if (current[i] != null) {
@@ -98,26 +93,15 @@ public class DisplayControl {
         return freshPosition;
     }
 
-    public static void tick() {
-        if (++ticks == Long.MAX_VALUE) ticks = 0;
-    }
-
-    public static long getTicks() { return ticks; }
-
     @SubscribeEvent
     public static void onUnloadingLevel(WorldEvent.Unload event) {
         LevelAccessor level = event.getWorld();
-        if (level != null && level.isClientSide()) DisplayControl.release();
-    }
-
-    @SubscribeEvent
-    public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) DisplayControl.tick();
+        if (level != null && level.isClientSide()) DisplayList.release();
     }
 
     // @SubscribeEvent
     public static void onClientPause(/*ClientPauseChangeEvent.Post event*/boolean paused) {
-        if (/*event.isPaused()*/paused) DisplayControl.pause();
-        else DisplayControl.resume();
+        if (/*event.isPaused()*/paused) DisplayList.pause();
+        else DisplayList.resume();
     }
 }

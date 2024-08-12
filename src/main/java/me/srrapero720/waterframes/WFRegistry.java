@@ -1,12 +1,17 @@
 package me.srrapero720.waterframes;
 
+import me.srrapero720.waterframes.client.rendering.TextureWrapper;
 import me.srrapero720.waterframes.client.rendering.DisplayRenderer;
 import me.srrapero720.waterframes.common.block.*;
 import me.srrapero720.waterframes.common.block.entity.*;
 import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.network.packets.*;
+import me.srrapero720.watermedia.api.image.ImageAPI;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -24,7 +29,6 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.forgespi.locating.IModFile;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -88,6 +92,16 @@ public class WFRegistry {
         WaterFramesCommand.register(event.getDispatcher());
     }
 
+    @OnlyIn(Dist.CLIENT)
+    public static void registerTexture(ResourceLocation location, AbstractTexture texture) {
+        Minecraft.getInstance().getTextureManager().register(location, texture);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void unregisterTexture(ResourceLocation location) {
+        Minecraft.getInstance().getTextureManager().release(location);
+    }
+
     @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ModEvents {
         @SubscribeEvent
@@ -127,6 +141,7 @@ public class WFRegistry {
             BlockEntityRenderers.register(TILE_PROJECTOR.get(), DisplayRenderer::new);
             BlockEntityRenderers.register(TILE_TV.get(), DisplayRenderer::new);
             BlockEntityRenderers.register(TILE_BIG_TV.get(), DisplayRenderer::new);
+            registerTexture(LOADING_ANIMATION, new TextureWrapper.Renderer(ImageAPI.loadingGif(WaterFrames.ID)));
         }
     }
 
