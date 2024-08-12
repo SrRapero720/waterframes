@@ -6,8 +6,8 @@
     "block.waterframes.big_tv": "Big Television",
     "item.waterframes.remote": "Remote Control",
 
-    "waterframes.common.true": "enabled",
-    "waterframes.common.false": "disabled",
+    "waterframes.common.true": "Enabled",
+    "waterframes.common.false": "Disabled",
     "waterframes.common.activated": "activated",
     "waterframes.common.deactivated": "deactivated",
     "waterframes.common.width": "width",
@@ -99,6 +99,9 @@
     "waterframes.gui.position.right": "Right",
     "waterframes.gui.position.top": "Top",
     "waterframes.gui.position.bottom": "Bottom",
+
+    "waterframes.gui.mirror.1": "Mirror image from behind",
+    "waterframes.gui.mirror.2": "Status: %s",
 
     "waterframes.gui.videoplayer": "Open in VideoPlayer",
 

@@ -9,7 +9,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.LogicalSide;
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.GuiParent;
@@ -62,7 +61,7 @@ public class RemoteControlScreen extends GuiLayer {
             }
         };
 
-        this.muted = new GuiButtonIcon("muted_toggle", IconStyles.MUTE, button -> tile.setMute(true, !tile.data.muted)) {
+        this.muted = new GuiButtonIcon("muted_toggle", IconStyles.VOLUME_MUTE, button -> tile.setMute(true, !tile.data.muted)) {
             @Override
             @OnlyIn(Dist.CLIENT)
             public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {

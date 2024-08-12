@@ -16,6 +16,7 @@ public class IconStyles {
     public static final Icon VOLUME_OVERFLOW = create(0, 5);
     public static final Icon VOLUME_RANGE_MIN = create(0, 6);
     public static final Icon VOLUME_RANGE_MAX = create(0, 7);
+    public static final Icon VOLUME_MUTE = create(0, 8);
     public static final Icon AUDIO_POS_BLOCK = create(0, 13, 2);
     public static final Icon AUDIO_POS_CENTER = create(0, 14, 2);
     public static final Icon AUDIO_POS_PICTURE = create(0, 15, 2);
@@ -44,6 +45,9 @@ public class IconStyles {
     public static final Icon STATUS_CASSETE_MODE = create(2, 7);
     public static final Icon STATUS_OFF = create(2, 8);
     public static final Icon STATUS_MEDIA_ERROR = create(2, 9);
+    public static final Icon MIRROR_ON = create(2, 14, 2);
+    public static final Icon MIRROR_OFF = create(2, 15, 2);
+
 
     // POSITION ICONS (chunk 3)
     // POS ICON
@@ -60,12 +64,11 @@ public class IconStyles {
     public static final Icon BACK_MEDIA = create(15, 6);
     public static final Icon ADD = create(15, 7);
     public static final Icon OFF_ON = create(15, 8);
-    public static final Icon MUTE = create(15, 9);
-    public static final Icon RELOAD = create(15, 10);
-    public static final Icon VOLUME_DOWN = create(15, 11);
-    public static final Icon VOLUME_UP = create(15, 12);
-    public static final Icon CHANNEL_UP = create(15, 13);
-    public static final Icon CHANNEL_DOWN = create(15, 14);
+    public static final Icon RELOAD = create(15, 9);
+    public static final Icon VOLUME_DOWN = create(15, 10);
+    public static final Icon VOLUME_UP = create(15, 11);
+    public static final Icon CHANNEL_UP = create(15, 12);
+    public static final Icon CHANNEL_DOWN = create(15, 13);
 
     private static Icon create(int chunkX, int chunkY) {
         return new Icon(location, 16 * chunkX, 16 * chunkY, 16, 16);
@@ -80,7 +83,7 @@ public class IconStyles {
     }
 
     public static Icon getVolumeIcon(int volume, boolean muted) {
-        if (muted) return MUTE;
+        if (muted) return VOLUME_MUTE;
         if (volume > 100) {
             return IconStyles.VOLUME_OVERFLOW;
         } else if (volume >= 90){

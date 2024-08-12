@@ -6,8 +6,8 @@
     "block.waterframes.big_tv": "Television Grande",
     "item.waterframes.remote": "Control",
 
-    "waterframes.common.true": "activado",
-    "waterframes.common.false": "desactivado",
+    "waterframes.common.true": "Activado",
+    "waterframes.common.false": "Desactivado",
     "waterframes.common.activated": "activada",
     "waterframes.common.deactivated": "desactivada",
     "waterframes.common.width": "Ancho",
@@ -98,6 +98,9 @@
     "waterframes.gui.position.right": "Izquierda",
     "waterframes.gui.position.top": "Arriba",
     "waterframes.gui.position.bottom": "Abajo",
+
+    "waterframes.gui.mirror.1": "Reflejar imagen por detras",
+    "waterframes.gui.mirror.2": "Estado: %s",
 
     "waterframes.gui.videoplayer": "Ver en VideoPlayer",
 

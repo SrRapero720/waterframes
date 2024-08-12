@@ -99,6 +99,9 @@
     "waterframes.gui.position.top": "Вверху",
     "waterframes.gui.position.bottom": "Внизу",
 
+    "waterframes.gui.mirror.1": "Mirror image from behind",
+    "waterframes.gui.mirror.2": "Status: %s",
+
     "waterframes.gui.videoplayer": "Открыть в VideoPlayer",
 
     "waterframes.gui.audio_pos.1": "Исходное положение аудио",

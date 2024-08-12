@@ -11,6 +11,7 @@ import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
 import me.srrapero720.waterframes.common.helpers.ScalableText;
 import me.srrapero720.watermedia.api.image.ImageAPI;
+import me.srrapero720.watermedia.api.image.ImageCache;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
@@ -32,8 +33,8 @@ import java.util.List;
 
 public class DisplayScreen extends GuiLayer {
     protected static final float SCALE = 1F / 16;
-    protected static final int WIDTH = 270;
-    protected static final int HEIGHT = 245;
+    protected static final int WIDTH = 235;
+    protected static final int HEIGHT = 220;
 
     // IMPORTANT
     public final DisplayTile tile;
@@ -67,7 +68,7 @@ public class DisplayScreen extends GuiLayer {
     public final GuiSlider projection_distance;
 
     public final GuiCheckBox show_model;
-    public final GuiCheckBox render_behind;
+    public final GuiCheckButtonIcon render_behind;
     public final GuiCheckButtonIcon loop;
 
     public final GuiCheckButtonIcon playback;
@@ -138,7 +139,7 @@ public class DisplayScreen extends GuiLayer {
         this.rotation = new GuiSlider(DisplayData.ROTATION, tile.data.rotation, 0, 360, DoubleValueParser.ANGLE);
         this.alpha = new GuiSteppedSlider(DisplayData.ALPHA, tile.data.alpha, 0, 255, (v, max) -> (Math.round(((v != 0 && max != 0 ? (float) v / (float) max : 0) * 100))) + "%");
         this.brightness = new GuiSteppedSlider(DisplayData.BRIGHTNESS, tile.data.brightness, 0, 255, (v, max) -> Math.round(((v != 0 && max != 0 ? (float) v / (float) max : 0) * 100)) + "%");
-        this.render_distance = new GuiSteppedSlider(DisplayData.RENDER_DISTANCE, tile.data.renderDistance, 4, WFConfig.maxRenDis(), IntValueParser.BLOCKS.BLOCKS);
+        this.render_distance = new GuiSteppedSlider(DisplayData.RENDER_DISTANCE, tile.data.renderDistance, 4, WFConfig.maxRenDis(), IntValueParser.BLOCKS);
         this.projection_distance = new GuiSlider(DisplayData.PROJECTION_DISTANCE, tile.data.projectionDistance, 4, WFConfig.maxProjDis(), DoubleValueParser.BLOCKS);
         this.audioOffset = new GuiStateButtonIcon(DisplayData.AUDIO_OFFSET, IconStyles.AUDIO_POS_BLOCK, IconStyles.AUDIO_POS_PICTURE, IconStyles.AUDIO_POS_CENTER) {
             @Override
@@ -154,9 +155,19 @@ public class DisplayScreen extends GuiLayer {
         this.audioOffset.setShadow(Color.NONE);
 
         this.show_model = new GuiCheckBox("visible", false);
-        this.render_behind = new GuiCheckBox(DisplayData.RENDER_BOTH_SIDES, tile.data.renderBothSides);
+        this.render_behind = new GuiCheckButtonIcon(DisplayData.RENDER_BOTH_SIDES, IconStyles.MIRROR_ON, IconStyles.MIRROR_OFF, tile.data.renderBothSides) {
+            @Override
+            public List<Component> getTooltip() {
+                List<Component> tooltip = new ArrayList<>();
+                tooltip.add(translatable("waterframes.gui.mirror.1"));
+                tooltip.add(translatable("waterframes.gui.mirror.2",
+                        (this.value ? ChatFormatting.GREEN : ChatFormatting.RED) + translate("waterframes.common." + this.value)
+                ));
+                return tooltip;
+            }
+        };
         this.show_model.setTranslate("waterframes.gui.show_model");
-        this.render_behind.setTranslate("waterframes.gui.render_behind");
+        this.render_behind.setControlFormatting(ControlFormatting.CLICKABLE_NO_PADDING).setShadow(Color.NONE);
 
         this.pos_view = new WidgetClickableArea("pos_area", tile.data.getPosX(), tile.data.getPosY());
 
@@ -243,16 +254,15 @@ public class DisplayScreen extends GuiLayer {
                     show_model.set(tile.isVisible());
                     return show_model;
                 })
-                .add(tile.caps.renderBehind(), () -> render_behind)
                 .add(!tile.caps.resizes(), () -> flip_x)
                 .add(!tile.caps.resizes(), () -> flip_y);
 
-        this.add(tex_l);
+        this.add(new GuiParent().setDim(-1, 4));
         this.add(new WidgetPairTable(GuiFlow.STACK_Y, 2)
+                .addLeft(new GuiParent(GuiFlow.STACK_X).add(vis_i).add(alpha.setDim(56, 12)).add(bright_i).add(brightness.setDim(56, 12)).setVAlign(VAlign.CENTER))
                 .addLeft(tile.caps.resizes(), () -> new GuiParent(GuiFlow.STACK_X).add(rot_i).add(rotation.setDim(130, 12)).setVAlign(VAlign.CENTER))
-                .addLeft(new GuiParent(GuiFlow.STACK_X).add(vis_i).add(alpha.setDim(130, 12)).setVAlign(VAlign.CENTER))
-                .addLeft(new GuiParent(GuiFlow.STACK_X).add(bright_i).add(brightness.setDim(130, 12)).setVAlign(VAlign.CENTER))
-                .addLeft(new GuiParent(GuiFlow.STACK_X).add(render_i).add(render_distance.setDim(130, 12)).setVAlign(VAlign.CENTER))
+                .addLeft(!tile.caps.renderBehind(), () -> new GuiParent(GuiFlow.STACK_X).add(render_i).add(render_distance.setDim(130, 12)).setVAlign(VAlign.CENTER))
+                .addLeft(tile.caps.renderBehind(), () -> new GuiParent(GuiFlow.STACK_X).add(render_i).add(render_distance.setDim(100, 13)).add(render_behind.setDim(26, 13)).setVAlign(VAlign.CENTER))
                 .addLeft(tile.caps.projects(), () -> new GuiParent(GuiFlow.STACK_X).add(project_i).add(projection_distance.setDim(100, 13)).add(audioOffset.setDim(26, 13)).setVAlign(VAlign.CENTER))
                 .addLeft(!basicOptions.isEmpty(), () -> basicOptions)
                 .addRight(tile.caps.resizes(), () -> pos_view.setDim(80, 80))
@@ -261,10 +271,9 @@ public class DisplayScreen extends GuiLayer {
         );
 
         // MEDIA SETTINGS
-        this.add(media_l);
         final var mediaSettingsTable = new WidgetPairTable(GuiFlow.STACK_X, 2)
-                .addRight(this.vol_i.setIcon(IconStyles.getVolumeIcon(tile.data.volume, tile.data.muted)), this.volume.setDim(100, 15).setExpandableX())
                 .addLeft(VPCompat.installed(), () -> this.videoplayer.setDim(16, 12))
+                .addRight(this.vol_i.setIcon(IconStyles.getVolumeIcon(tile.data.volume, tile.data.muted)), this.volume.setDim(130, 15))
                 .setAlignRight(Align.RIGHT)
                 .setVAlignRight(VAlign.CENTER)
                 .setLeftExpandableX()
@@ -292,9 +301,9 @@ public class DisplayScreen extends GuiLayer {
 
         // SAVE BUTTONS
         this.add(new WidgetPairTable(GuiFlow.STACK_X, Align.RIGHT, 2)
-                .addLeft(this.reload_all.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(90, 10))
-                .addRight(this.save.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(70, 10).setEnabled(WFConfig.canSave(getPlayer(), url.getText())))
-                .addRight(this.reload.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(70, 10))
+                .addLeft(this.reload_all.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(-1, 9))
+                .addRight(this.save.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(-1, 9).setEnabled(WFConfig.canSave(getPlayer(), url.getText())))
+                .addRight(this.reload.setAlign(Align.CENTER).setVAlign(VAlign.CENTER).setDim(-1, 9))
                 .setAlignRight(Align.RIGHT)
         );
     }
@@ -310,6 +319,9 @@ public class DisplayScreen extends GuiLayer {
         this.vol_i.setIcon(IconStyles.getVolumeIcon((int) volume.getValue(), tile.data.muted));
         this.playback.setState(tile.data.paused);
         var text = this.url.getText();
+        if (videoplayer != null) {
+            videoplayer.setEnabled(!tile.data.url.isEmpty() && tile.imageCache != null && tile.imageCache.getStatus() == ImageCache.Status.READY);
+        }
         save.setEnabled(WFConfig.canSave(getPlayer(), text));
         reload.setEnabled(tile.imageCache != null && !text.isEmpty() && !tile.data.url.isEmpty() && text.equals(tile.data.url));
     }
