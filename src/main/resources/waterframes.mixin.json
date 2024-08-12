@@ -8,8 +8,7 @@
   "client": [
     "MinecraftMixin",
     "TextureManagerMixin",
-    "self.VSCompat",
-    "vp.VideoPlayerMixin"
+    "videoplayer.VideoPlayerMixin"
   ],
   "mixins": [
     "LevelMixin",

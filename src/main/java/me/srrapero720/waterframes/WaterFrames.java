@@ -21,6 +21,7 @@ public class WaterFrames {
     public static final ResourceLocation LOADING_ANIMATION = WaterFrames.genId("loading_animation");
     public static final Logger LOGGER = LogManager.getLogger(ID);
     public static final long SYNC_TIME = 1000L;
+    public static final boolean VS_MODE = isInstalled("valkyrienskies");
     private static long ticks = 0;
 
     // BOOTSTRAP

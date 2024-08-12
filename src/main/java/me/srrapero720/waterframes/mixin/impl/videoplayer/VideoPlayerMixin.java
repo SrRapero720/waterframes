@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.mixin.impl.vp;
+package me.srrapero720.waterframes.mixin.impl.videoplayer;
 
 import com.github.NGoedix.watchvideo.block.entity.custom.TVBlockEntity;
 import com.github.NGoedix.watchvideo.util.displayers.IDisplay;

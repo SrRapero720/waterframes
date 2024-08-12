@@ -8,12 +8,14 @@ import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
 import me.srrapero720.watermedia.api.player.SyncVideoPlayer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.function.Function;
 
@@ -255,8 +257,15 @@ public class Display {
     }
 
     public int rangedVol(int volume, int min, int max) { // Min and Max distances
-        Player player = Minecraft.getInstance().player;
-        double distance = Math.sqrt(tile.getBlockPos().relative(tile.getDirection(), (int) tile.data.audioOffset).distToCenterSqr(player.getPosition(WaterFrames.deltaFrames())));
+        Position playerPos = Minecraft.getInstance().player.getPosition(WaterFrames.deltaFrames());
+        BlockPos blockPos = tile.getBlockPos().relative(tile.getDirection(), (int) tile.data.audioOffset);
+        double distance;
+        if (WaterFrames.VS_MODE) {
+            distance = VSGameUtilsKt.squaredDistanceBetweenInclShips(tile.level, blockPos.getX(), blockPos.getY(), blockPos.getZ(), playerPos.x(), playerPos.y(), playerPos.z());
+        } else {
+            distance = Math.sqrt(blockPos.distToCenterSqr(playerPos));
+        }
+
         if (min > max) {
             int temp = max;
             max = min;
