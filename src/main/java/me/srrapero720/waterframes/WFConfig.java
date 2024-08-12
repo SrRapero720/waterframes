@@ -381,10 +381,10 @@ public class WFConfig {
             if (integrated != null) {
                 return integrated.isSingleplayerOwner(player.getGameProfile()) || player.hasPermissions(integrated.getOperatorUserPermissionLevel());
             } else { // is a guest, check perms
-                return player.hasPermissions(WaterFrames.getServerOpPermissionLevel(level));
+                return player.hasPermissions(4);
             }
         } else {
-            return player.hasPermissions(player.getServer().getOperatorUserPermissionLevel());
+            return player.hasPermissions(4);
         }
     }
 

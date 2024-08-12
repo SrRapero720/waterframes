@@ -2,7 +2,6 @@ package me.srrapero720.waterframes;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
@@ -22,7 +21,6 @@ public class WaterFrames {
     public static final ResourceLocation LOADING_ANIMATION = WaterFrames.genId("loading_animation");
     public static final Logger LOGGER = LogManager.getLogger(ID);
     public static final long SYNC_TIME = 1000L;
-    private static int SERVER_OP_LEVEL = -1;
     private static long ticks = 0;
 
     // BOOTSTRAP
@@ -50,17 +48,6 @@ public class WaterFrames {
             }
         }
         return true;
-    }
-
-    public static int getServerOpPermissionLevel(Level level) {
-        if (level != null && !level.isClientSide) {
-            SERVER_OP_LEVEL = level.getServer().getOperatorUserPermissionLevel();
-        }
-        return SERVER_OP_LEVEL;
-    }
-
-    public static void setOpPermissionLevel(int level) {
-        SERVER_OP_LEVEL = level;
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -14,7 +14,6 @@
   "mixins": [
     "LevelMixin",
     "MinecraftServerMixin",
-    "PlayerListMixin",
     "creativecore.CompiledTextMixin",
     "creativecore.GuiLabelMixin",
     "creativecore.GuiSliderMixin"

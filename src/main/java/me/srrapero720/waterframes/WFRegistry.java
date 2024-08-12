@@ -107,7 +107,6 @@ public class WFRegistry {
         @SubscribeEvent
         public static void init(FMLCommonSetupEvent event) {
             NET.registerType(DataSyncPacket.class, DataSyncPacket::new);
-            NET.registerType(PermLevelPacket.class, PermLevelPacket::new);
             NET.registerType(ActivePacket.class, ActivePacket::new);
             NET.registerType(LoopPacket.class, LoopPacket::new);
             NET.registerType(MutePacket.class, MutePacket::new);

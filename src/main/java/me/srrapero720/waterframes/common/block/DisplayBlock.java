@@ -2,8 +2,6 @@ package me.srrapero720.waterframes.common.block;
 
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.network.DisplayNetwork;
-import me.srrapero720.waterframes.common.network.packets.PermLevelPacket;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -59,9 +57,6 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override
     public GuiLayer create(CompoundTag tag, Level level, BlockPos blockPos, BlockState blockState, Player player) {
-        if (!level.isClientSide) {
-            DisplayNetwork.sendClient(new PermLevelPacket(level.getServer()), level, blockPos);
-        }
         return level.getBlockEntity(blockPos) instanceof DisplayTile tile ? new DisplayScreen(tile) : null;
     }
 
