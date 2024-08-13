@@ -133,6 +133,12 @@ public class WFRegistry {
             }
         }
 
+        @SubscribeEvent
+        @OnlyIn(Dist.CLIENT)
+        public static void registerOtherStuff(FMLClientSetupEvent e) {
+            registerTexture(LOADING_ANIMATION, new TextureWrapper.Renderer(ImageAPI.loadingGif(WaterFrames.ID)));
+        }
+
         @OnlyIn(Dist.CLIENT)
         @SubscribeEvent
         public static void registerTileRenderer(EntityRenderersEvent.RegisterRenderers e) {
@@ -140,7 +146,6 @@ public class WFRegistry {
             BlockEntityRenderers.register(TILE_PROJECTOR.get(), DisplayRenderer::new);
             BlockEntityRenderers.register(TILE_TV.get(), DisplayRenderer::new);
             BlockEntityRenderers.register(TILE_BIG_TV.get(), DisplayRenderer::new);
-            registerTexture(LOADING_ANIMATION, new TextureWrapper.Renderer(ImageAPI.loadingGif(WaterFrames.ID)));
         }
     }
 
