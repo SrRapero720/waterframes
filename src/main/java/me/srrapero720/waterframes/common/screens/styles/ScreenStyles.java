@@ -8,7 +8,6 @@ import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 
 @OnlyIn(Dist.CLIENT)
 public class ScreenStyles {
-
     public static final StyleDisplay BLUE_BORDER = new DisplayColor(color(72), color(220), color(219), 1.0F);
     public static final StyleDisplay BLUE_BACKGROUND = new DisplayColor(color(47), color(137), color(137), 1.0F);
     public static final StyleDisplay DARK_BLUE_BACKGROUND = new DisplayColor(color(27), color(36), color(52), 1);
@@ -24,16 +23,5 @@ public class ScreenStyles {
 
     public static float color(int value) {
         return Math.min(((float) (1d / 255d) * value), 1.0f);
-    }
-
-    public static final GuiStyle DEFAULT_STYLE = new GuiStyle();
-
-    static {
-        DEFAULT_STYLE.disabled = DARK_BLUE_BACKGROUND_DISABLED;
-        DEFAULT_STYLE.clickable = DARK_BLUE_BACKGROUND;
-        DEFAULT_STYLE.background = DARK_BLUE_BACKGROUND;
-        DEFAULT_STYLE.border = BLUE_BORDER;
-
-        DEFAULT_STYLE.clickableHighlight = DARK_BLUE_HIGHLIGHT;
     }
 }
