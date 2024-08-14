@@ -49,12 +49,24 @@ public class IconStyles {
     public static final Icon MIRROR_OFF = create(2, 15, 2);
 
 
-    // POSITION ICONS (chunk 3)
-    // POS ICON
+    // POSITION AND SIGNAL ICONS (chunk 3)
+    public static final Icon SIGNAL_4 = create(3, 0);
+    public static final Icon SIGNAL_3 = create(3, 1);
+    public static final Icon SIGNAL_2 = create(3, 2);
+    public static final Icon SIGNAL_1 = create(3, 3);
+    public static final Icon SIGNAL_0 = create(3, 4);
     public static final Icon POS_ICON = create(4, 12);
     public static final Icon POS_BASE = create(4, 13, 3, 3);
 
-    // ACTION COLUM (chunk 15)
+    // ACTION COLUM 2 (chunk 14)
+    public static final Icon ARROW_UP = create(14, 0);
+    public static final Icon ARROW_DOWN = create(14, 1);
+    public static final Icon ARROW_LEFT = create(14, 2);
+    public static final Icon ARROW_RIGHT = create(14, 3);
+    public static final Icon ARROW_CENTER = create(14, 4);
+
+
+    // ACTION COLUM 1 (chunk 15)
     public static final Icon PLAY = create(15, 0);
     public static final Icon PAUSE = create(15, 1);
     public static final Icon STOP = create(15, 2);

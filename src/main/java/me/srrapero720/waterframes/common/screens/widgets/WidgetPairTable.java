@@ -11,10 +11,12 @@ import team.creative.creativecore.common.gui.flow.GuiFlow;
 import java.util.function.Supplier;
 
 public class WidgetPairTable extends GuiTable {
-    private GuiColumn left;
-    private GuiColumn right;
+    protected GuiColumn left;
+    protected GuiColumn right;
 
-    private final GuiFlow columFlow;
+    protected boolean spaceBetween;
+
+    private final GuiFlow defaultFlow;
     public WidgetPairTable(GuiFlow columGuiFlow) {
         this(columGuiFlow, 0);
     }
@@ -23,24 +25,39 @@ public class WidgetPairTable extends GuiTable {
         this(columGuiFlow, Align.LEFT, spacing);
     }
 
-    public WidgetPairTable(GuiFlow columGuiFlow, Align align, int spacing) {
-        this.columFlow = columGuiFlow;
+    public WidgetPairTable(GuiFlow defaultFlow, Align align, int spacing) {
+        this.defaultFlow = defaultFlow;
         this.spacing = spacing;
         this.align = align;
         this.createRow();
     }
 
     public WidgetPairTable createRow() {
-        return createRow(columFlow);
+        return createRow(defaultFlow);
+    }
+
+    public WidgetPairTable spaceBetween() {
+        this.spaceBetween = true;
+        this.left.align = Align.LEFT;
+        this.right.align = Align.RIGHT;
+        return this;
     }
 
     public WidgetPairTable createRow(GuiFlow flow) {
-        this.addRow(new GuiRow(left = new GuiColumn(), right = new GuiColumn()));
+        this.addRow(row());
         if (flow != null) {
             left.flow = flow;
             right.flow = flow;
         }
+        if (this.spaceBetween) {
+            this.left.align = Align.LEFT;
+            this.right.align = Align.RIGHT;
+        }
         return this;
+    }
+
+    protected GuiRow row() {
+        return new GuiRow(left = new GuiColumn(), right = new GuiColumn());
     }
 
     public WidgetPairTable addLeft(GuiControl... guiControls) {
@@ -131,13 +148,15 @@ public class WidgetPairTable extends GuiTable {
         return this;
     }
 
-    public WidgetPairTable expandX() {
-        this.setExpandableX();
+    public WidgetPairTable setAllExpandableX() {
+        this.setLeftExpandableX();
+        this.setRightExpandableX();
         return this;
     }
 
-    public WidgetPairTable expandY() {
-        this.setExpandableY();
+    public WidgetPairTable setAllExpandableY() {
+        this.setLeftExpandableY();
+        this.setRightExpandableY();
         return this;
     }
 
@@ -147,15 +166,5 @@ public class WidgetPairTable extends GuiTable {
 
     public GuiColumn right() {
         return right;
-    }
-
-    public WidgetPairTable left(GuiColumn guiChildControls) {
-        left = guiChildControls;
-        return this;
-    }
-
-    public WidgetPairTable right(GuiColumn guiChildControls) {
-        right = guiChildControls;
-        return this;
     }
 }

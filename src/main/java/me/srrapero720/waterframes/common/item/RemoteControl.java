@@ -81,7 +81,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         String dim = tag.getString("dimension");
         if (pos.length < 3 || dim.isEmpty()) {
             this.sendFailed(player, new TranslatableComponent("waterframes.remote.code.failed"));
-            LOGGER.error(IT, "NBT data is invalid, ensure your set pos as a long-array and the dimension as a resource location");
+            LOGGER.error(IT, "NBT data is invalid, ensure your set pos as a long-int and the dimension as a resource location");
             return InteractionResultHolder.fail(stack);
         }
 
