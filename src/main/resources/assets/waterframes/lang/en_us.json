@@ -119,6 +119,7 @@
     "waterframes.gui.audio_pos.states.2": "Center",
 
     "waterframes.gui.show_model": "model",
+    "waterframes.gui.lit": "emit light",
 
     "waterframes.gui.reload": "Reload",
     "waterframes.gui.save": "Save"

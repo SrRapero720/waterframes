@@ -71,6 +71,7 @@ public class WFConfig {
     private static final BooleanValue keepRendering;
     // BEHAVIOR
     private static final BooleanValue useLightsOnPlay;
+    private static final BooleanValue forceLightsOnPlay;
     private static final BooleanValue useLagTickCorrection;
     private static final BooleanValue useRedstone;
     private static final BooleanValue useMasterModeOnRedstone;
@@ -144,6 +145,10 @@ public class WFConfig {
         useLightsOnPlay = SERVER
                 .comment("Enable light feature on frames while is playing")
                 .define("lightOnPlay", true);
+
+        forceLightsOnPlay = SERVER
+                .comment("Forces light feature on frames while is playing", "Requires lightOnPlay be true")
+                .define("forceLightOnPlay", false);
 
         useLagTickCorrection = SERVER
                 .comment("Enable lag tick time correction", "Helps when server is too laggy and playback is regressing in time", "Disable if causes problems")
@@ -265,6 +270,7 @@ public class WFConfig {
 
     public static boolean keepsRendering() { return overrideServerConfig.get() ? clientKeepsRendering.get() : keepRendering.get(); }
     public static boolean useLightOnPlay() { return useLightsOnPlay.get(); }
+    public static boolean forceLightOnPlay() { return forceLightsOnPlay.get(); }
     public static boolean useLagTickCorrection() { return useLagTickCorrection.get(); }
 
     // MULTIMEDIA

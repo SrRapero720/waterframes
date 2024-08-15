@@ -71,6 +71,7 @@ public class DisplayScreen extends GuiLayer {
     public final GuiSlider projection_distance;
 
     public final GuiCheckBox show_model;
+    public final GuiCheckBox lit;
     public final GuiCheckButtonIcon mirror;
     public final GuiCheckButtonIcon loop;
 
@@ -142,6 +143,9 @@ public class DisplayScreen extends GuiLayer {
         this.show_model = new GuiCheckBox("show_model", tile.canHideModel() && tile.isVisible());
         this.show_model.setTranslate("waterframes.gui.show_model");
 
+        this.lit = new GuiCheckBox("lit", tile.canHideModel() && tile.isVisible());
+        this.lit.setTranslate("waterframes.gui.lit");
+
         this.pos_view = new WidgetClickableArea("pos_view", tile.data.getPosX(), tile.data.getPosY());
 
         this.playback = new GuiCheckButtonIcon("playback", IconStyles.PLAY, IconStyles.PAUSE, tile.data.paused, button -> tile.setPause(true, !tile.data.paused));
@@ -187,7 +191,7 @@ public class DisplayScreen extends GuiLayer {
         IScalableText.setScale(volume_max, 0.90f);
 
         if (!tile.caps.resizes()) {
-            this.setDim(WIDTH - 25, HEIGHT - 75);
+            this.setDim(WIDTH - 10, HEIGHT - 60);
         }
     }
 
@@ -240,11 +244,15 @@ public class DisplayScreen extends GuiLayer {
                         .setVAlign(VAlign.CENTER)
                 )
                 .addLeft(new GuiParent(GuiFlow.STACK_X)
-                        .setSpacing(2)
                         .add(tile.canHideModel(), () -> {
                             show_model.set(tile.isVisible());
                             return show_model;
                         })
+                        .add(!WFConfig.forceLightOnPlay(), () -> {
+                            lit.set(tile.data.lit);
+                            return lit;
+                        })
+                        .setSpacing(6)
                 )
                 .applyOnLeft(column -> {
                     column.setSpacing(2);

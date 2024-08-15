@@ -39,6 +39,7 @@ public class DisplayData {
     public static final String MUTED = "muted";
     public static final String TICK = "tick";
     public static final String TICK_MAX = "tick_max";
+    public static final String LIT = "lit";
     public static final String DATA_V = "data_v";
 
     // FRAME KEYS
@@ -71,6 +72,7 @@ public class DisplayData {
     public boolean loop = true;
     public boolean paused = false;
     public boolean muted = false;
+    public boolean lit = true;
     public long tick = 0;
     public long tickMax = -1;
 
@@ -106,6 +108,7 @@ public class DisplayData {
         nbt.putInt(VOL_RANGE_MAX, maxVolumeDistance);
         nbt.putBoolean(PAUSED, paused);
         nbt.putBoolean(MUTED, muted);
+        nbt.putBoolean(LIT, lit);
         nbt.putLong(TICK, tick);
         nbt.putLong(TICK_MAX, tickMax);
         nbt.putBoolean(LOOP, loop);
@@ -143,6 +146,7 @@ public class DisplayData {
         this.minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), this.maxVolumeDistance) : this.minVolumeDistance;
         this.paused = nbt.getBoolean(PAUSED);
         this.muted = nbt.getBoolean(MUTED);
+        this.lit = !nbt.contains(LIT) || nbt.getBoolean(LIT);
         this.tick = nbt.getLong(TICK);
         this.tickMax = nbt.contains(TICK_MAX) ? nbt.getLong(TICK_MAX) : this.tickMax;
         this.loop = nbt.getBoolean(LOOP);
@@ -316,6 +320,8 @@ public class DisplayData {
             nbt.putBoolean("visible", screen.show_model.value);
         }
 
+        nbt.putBoolean(LIT, screen.lit.value);
+
         if (tile.caps.renderBehind()) {
             nbt.putBoolean(RENDER_BOTH_SIDES, screen.mirror.value);
         }
@@ -364,6 +370,8 @@ public class DisplayData {
             if (tile.canHideModel()) {
                 tile.setVisibility(nbt.getBoolean("visible"));
             }
+
+            tile.data.lit = nbt.getBoolean(LIT);
 
             if (tile.caps.renderBehind()) {
                 tile.data.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);

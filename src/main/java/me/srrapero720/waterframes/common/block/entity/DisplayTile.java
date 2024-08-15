@@ -241,7 +241,7 @@ public class DisplayTile extends BlockEntity {
             redstoneOutput = Math.round(((float) this.data.tick / (float) this.data.tickMax) * (BlockStateProperties.MAX_LEVEL_15 - 1)) + 1;
         }
 
-        boolean lightOnPlay = WFConfig.useLightOnPlay();
+        boolean lightOnPlay = WFConfig.useLightOnPlay() && (WFConfig.forceLightOnPlay() || this.data.lit);
         boolean lit = state.getValue(DisplayBlock.LIT);
         if (lightOnPlay && lit == (this.data.url.isEmpty())) {
             state = state.setValue(DisplayBlock.LIT, !this.data.url.isEmpty());
