@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.common.item;
 
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.compat.valkyrienskies.VSCompat;
 import me.srrapero720.waterframes.common.screens.RemoteControlScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -89,7 +90,15 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         var dimension = new ResourceLocation(dim);
 
         if (level.getBlockEntity(blockPos) instanceof DisplayTile) {
-            if (!level.dimension().location().equals(dimension) || !Vec3.atCenterOf(blockPos).closerThan(player.position(), WFConfig.maxRcDis())) {
+            double distance;
+            double maxDistance = WFConfig.maxRcDis();
+            if (VSCompat.installed()) {
+                distance = VSCompat.getSquaredDistance(level, blockPos, player.position());
+            } else {
+                distance = blockPos.distToCenterSqr(player.position());
+            }
+
+            if (!level.dimension().location().equals(dimension) || distance < maxDistance * maxDistance) {
                 this.sendFailed(player, new TranslatableComponent("waterframes.remote.distance.failed"));
                 return InteractionResultHolder.fail(stack);
             } else {
@@ -160,9 +169,8 @@ public class RemoteControl extends Item implements ItemGuiCreator {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+    public void appendHoverText(ItemStack stack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag isAdvanced) {
         Options opts = Minecraft.getInstance().options;
-
         pTooltipComponents.add(new TranslatableComponent("waterframes.remote.description.1", opts.keyShift.getKey().getDisplayName(), opts.keyUse.getKey().getDisplayName()));
     }
 

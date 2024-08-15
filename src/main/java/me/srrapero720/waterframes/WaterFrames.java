@@ -15,13 +15,11 @@ import org.apache.logging.log4j.Logger;
 @Mod(WaterFrames.ID)
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WaterFrames {
-    // TOOLS
     public static final String ID = "waterframes";
     public static final String NAME = "WATERFrAMES";
-    public static final ResourceLocation LOADING_ANIMATION = WaterFrames.genId("loading_animation");
     public static final Logger LOGGER = LogManager.getLogger(ID);
+    public static final ResourceLocation LOADING_ANIMATION = WaterFrames.genId("loading_animation");
     public static final long SYNC_TIME = 1000L;
-    public static final boolean VS_MODE = isInstalled("valkyrienskies");
     private static long ticks = 0;
 
     // BOOTSTRAP
