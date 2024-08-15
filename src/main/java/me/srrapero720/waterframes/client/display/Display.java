@@ -4,20 +4,15 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import me.srrapero720.waterframes.*;
 import me.srrapero720.waterframes.client.rendering.TextureWrapper;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.compat.valkyrienskies.VSCompat;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import me.srrapero720.watermedia.api.math.MathAPI;
 import me.srrapero720.watermedia.api.player.SyncVideoPlayer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
 import java.util.function.Function;
 
@@ -259,14 +254,11 @@ public class Display {
     }
 
     public int rangedVol(int volume, int min, int max) { // Min and Max distances
-        Position playerPos = Minecraft.getInstance().player.getPosition(WaterFrames.deltaFrames());
-        BlockPos blockPos = tile.getBlockPos().relative(tile.getDirection(), (int) tile.data.audioOffset);
-        double distance;
-        if (VSCompat.installed()) {
-            distance = VSCompat.getSquaredDistance(tile.level, blockPos, playerPos);
-        } else {
-            distance = Math.sqrt(blockPos.distToCenterSqr(playerPos));
-        }
+        double distance = WaterFrames.getDistance(
+                tile.level,
+                tile.getBlockPos().relative(tile.getDirection(), (int) tile.data.audioOffset),
+                Minecraft.getInstance().player.getPosition(WaterFrames.deltaFrames())
+        );
 
         if (min > max) {
             int temp = max;

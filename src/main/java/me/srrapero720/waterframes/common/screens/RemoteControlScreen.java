@@ -1,30 +1,23 @@
 package me.srrapero720.waterframes.common.screens;
 
 import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
-import me.srrapero720.waterframes.common.screens.widgets.WidgetPairTable;
 import me.srrapero720.waterframes.common.screens.widgets.WidgetTripleTable;
-import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.gui.GuiUtils;
 import team.creative.creativecore.common.gui.*;
-import team.creative.creativecore.common.gui.controls.parent.GuiTable;
 import team.creative.creativecore.common.gui.controls.simple.GuiButtonIcon;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
-import team.creative.creativecore.common.gui.flow.GuiSizeRule;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 
-import javax.swing.plaf.PanelUI;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
@@ -203,23 +196,10 @@ public class RemoteControlScreen extends GuiLayer {
         if (tile.isRemoved()) {
             this.closeTopLayer();
         }
-
         if (!isClient()) return;
 
-        double distance = Vec3.atCenterOf(tile.getBlockPos()).distanceToSqr(player.position());
-        int max = WFConfig.maxRcDis();
-        max *= max;
-        if (distance > max) {
-            this.signal.setIcon(IconStyles.SIGNAL_0);
-            if (allEnabled) {
-                this.allEnabled = false;
-                hyperIterate(this.iterator(), c -> {
-                    if (c.getClass() != GuiIcon.class) {
-                        c.setEnabled(allEnabled);
-                    }
-                });
-            }
-        } else {
+        double distance = WaterFrames.getDistance(tile, player.position());
+        if (distance < WFConfig.maxRcDis()) {
             if (!allEnabled) {
                 this.allEnabled = true;
                 hyperIterate(this.iterator(), c -> {
@@ -231,16 +211,26 @@ public class RemoteControlScreen extends GuiLayer {
             if (distance == 0) {
                 this.signal.setIcon(IconStyles.SIGNAL_4);
             } else {
-                int diff = (int) ((distance / max) * 100);
-                if (diff < 20) {
+                int diff = (int) ((distance / WFConfig.maxRcDis()) * 100); // 100 - far | 0 - closer
+                if (diff < 25) {
                     this.signal.setIcon(IconStyles.SIGNAL_4);
-                } else if (diff < 40) {
+                } else if (diff < 50) {
                     this.signal.setIcon(IconStyles.SIGNAL_3);
-                } else if (diff < 60) {
+                } else if (diff < 75) {
                     this.signal.setIcon(IconStyles.SIGNAL_2);
-                } else if (diff > 80) {
+                } else if (diff < 100) {
                     this.signal.setIcon(IconStyles.SIGNAL_1);
                 }
+            }
+        } else {
+            this.signal.setIcon(IconStyles.SIGNAL_0);
+            if (allEnabled) {
+                this.allEnabled = false;
+                hyperIterate(this.iterator(), c -> {
+                    if (c.getClass() != GuiIcon.class) {
+                        c.setEnabled(allEnabled);
+                    }
+                });
             }
         }
     }

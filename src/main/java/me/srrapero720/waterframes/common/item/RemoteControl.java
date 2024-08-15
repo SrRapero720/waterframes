@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.common.item;
 
 import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.compat.valkyrienskies.VSCompat;
 import me.srrapero720.waterframes.common.screens.RemoteControlScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -82,22 +82,15 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
         var dimension = new ResourceLocation(dim);
 
-        if (level.getBlockEntity(blockPos) instanceof DisplayTile) {
-            double distance;
-            double maxDistance = WFConfig.maxRcDis();
-            if (VSCompat.installed()) {
-                distance = VSCompat.getSquaredDistance(level, blockPos, player.position());
-            } else {
-                distance = blockPos.distToCenterSqr(player.position());
-            }
-
-            if (!level.dimension().location().equals(dimension) || distance < maxDistance * maxDistance) {
-                this.sendFailed(player, new TranslatableComponent("waterframes.remote.distance.failed"));
-                return InteractionResultHolder.fail(stack);
-            } else {
+        if (level.getBlockEntity(blockPos) instanceof DisplayTile tile) {
+            double distance = WaterFrames.getDistance(tile, player.position());
+            if (level.dimension().location().equals(dimension) && distance < WFConfig.maxRcDis()) {
                 GuiCreator.ITEM_OPENER.open(player.getItemInHand(hand).getOrCreateTag(), player, hand);
                 return InteractionResultHolder.success(stack);
             }
+
+            this.sendFailed(player, new TranslatableComponent("waterframes.remote.distance.failed"));
+            return InteractionResultHolder.fail(stack);
         }
 
         // FALLBACK UNBIND

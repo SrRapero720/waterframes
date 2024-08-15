@@ -1,7 +1,12 @@
 package me.srrapero720.waterframes;
 
+import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.compat.valkyrienskies.VSCompat;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.TickEvent;
@@ -47,6 +52,17 @@ public class WaterFrames {
             }
         }
         return true;
+    }
+
+    public static double getDistance(DisplayTile tile, Position playerPos) {
+        return getDistance(tile.level, tile.getBlockPos(), playerPos);
+    }
+
+    public static double getDistance(Level level, BlockPos pos, Position position) {
+        if (VSCompat.installed()) {
+            return Math.sqrt(VSCompat.getSquaredDistance(level, pos, position));
+        }
+        return Math.sqrt(pos.distToLowCornerSqr(position.x(), position.y(), position.z()));
     }
 
     @OnlyIn(Dist.CLIENT)
