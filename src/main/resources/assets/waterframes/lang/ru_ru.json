@@ -118,7 +118,6 @@
     "waterframes.gui.audio_pos.states.2": "По центру",
 
     "waterframes.gui.show_model": "показать модель",
-    "waterframes.gui.render_behind": "отображать сзади",
 
     "waterframes.gui.reload": "перезагрузить",
     "waterframes.gui.save": "сохранить"

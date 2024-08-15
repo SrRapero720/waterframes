@@ -118,8 +118,7 @@
     "waterframes.gui.audio_pos.states.1": "Projection",
     "waterframes.gui.audio_pos.states.2": "Center",
 
-    "waterframes.gui.show_model": "show model",
-    "waterframes.gui.render_behind": "render behind",
+    "waterframes.gui.show_model": "model",
 
     "waterframes.gui.reload": "Reload",
     "waterframes.gui.save": "Save"

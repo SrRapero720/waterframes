@@ -118,7 +118,6 @@
     "waterframes.gui.audio_pos.states.2": "Entre ambos",
 
     "waterframes.gui.show_model": "bloque",
-    "waterframes.gui.render_behind": "render detras",
 
     "waterframes.gui.reload": "Recargar",
     "waterframes.gui.save": "Guardar"
