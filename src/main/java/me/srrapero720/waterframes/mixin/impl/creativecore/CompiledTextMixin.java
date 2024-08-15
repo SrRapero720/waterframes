@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.mixin.impl.creativecore;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.srrapero720.waterframes.common.helpers.ScalableText;
+import me.srrapero720.waterframes.common.helpers.IScalableText;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import team.creative.creativecore.client.render.text.CompiledText;
 
 @Mixin(CompiledText.class)
-public class CompiledTextMixin implements ScalableText {
+public class CompiledTextMixin implements IScalableText {
     @Unique
     float wf$scale = 1.0f;
 
@@ -23,9 +23,8 @@ public class CompiledTextMixin implements ScalableText {
     }
 
     @Override
-    public ScalableText wf$setScale(float scale) {
+    public void wf$setScale(float scale) {
         wf$scale = scale;
-        return this;
     }
 
     @Override

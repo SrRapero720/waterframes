@@ -9,6 +9,7 @@ import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 @OnlyIn(Dist.CLIENT)
 public class ScreenStyles {
     public static final GuiStyle REMOTE_CONTROL = new GuiStyle();
+    public static final GuiStyle DISPLAYS = new GuiStyle();
 
     public static final StyleDisplay BLUE_BORDER = new DisplayColor(color(72), color(220), color(219), 1.0F);
     public static final StyleDisplay BLUE_BACKGROUND = new DisplayColor(color(47), color(137), color(137), 1.0F);
@@ -25,7 +26,7 @@ public class ScreenStyles {
 
     static {
         REMOTE_CONTROL.borderThickWidth = 6;
-
+        DISPLAYS.borderThickWidth = 6;
     }
 
     public static float color(int value) {

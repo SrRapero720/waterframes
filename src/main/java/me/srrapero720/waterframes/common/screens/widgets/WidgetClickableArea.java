@@ -1,14 +1,19 @@
 package me.srrapero720.waterframes.common.screens.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.gui.GuiUtils;
 import team.creative.creativecore.client.render.GuiRenderHelper;
 import team.creative.creativecore.common.gui.GuiChildControl;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
@@ -16,6 +21,7 @@ import team.creative.creativecore.common.util.math.geo.Rect;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class WidgetClickableArea extends GuiIcon {
     private PositionHorizontal x;
@@ -35,19 +41,19 @@ public class WidgetClickableArea extends GuiIcon {
 
     protected void renderSelector(PoseStack pose, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
         var icon = IconStyles.POS_ICON;
-        int width = Math.round(control.getContentWidth() / 3f);
-        int height = Math.round(control.getContentHeight() / 3f);
+        float width = ((float) rect.getWidth()) / 3f;
+        float height = ((float) rect.getWidth()) / 3f;
 
-        int offsetX = switch (x) {
+        float offsetX = switch (x) {
             case LEFT -> 0;
             case CENTER -> width;
-            case RIGHT -> Math.round(width * 2f) - 1;
+            case RIGHT -> (float) (width * 2d);
         };
 
-        int offsetY = switch (y) {
+        float offsetY = switch (y) {
             case TOP -> 0;
             case CENTER -> height;
-            case BOTTOM -> Math.round(height * 2f) - 1;
+            case BOTTOM -> (float) (height * 2d);
         };
 
         pose.pushPose();
@@ -58,7 +64,29 @@ public class WidgetClickableArea extends GuiIcon {
         RenderSystem.setShaderTexture(0, icon.location());
 
         this.color.glColor();
-        GuiRenderHelper.textureRect(pose, offsetX, offsetY, width, height, (float) icon.minX(), (float) icon.minY(), (float)(icon.minX() + icon.width()), (float)(icon.minY() + icon.height()));
+        Matrix4f matrix = pose.last().pose();
+
+        float x, x2, y, y2;
+        x = offsetX;
+        x2= offsetX + width;
+        y = offsetY;
+        y2= offsetY + height;
+
+        float u, v, u2, v2;
+        u = icon.minX() / 256f;
+        v = icon.minY() / 256f;
+        u2 = (icon.minX() + icon.width()) / 256f;
+        v2 = (icon.minY() + icon.height()) / 256f;
+
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        BufferBuilder bufferbuilder = Tesselator.getInstance().getBuilder();
+        bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        bufferbuilder.vertex(matrix, x, y2, 0).uv(u, v2).endVertex();
+        bufferbuilder.vertex(matrix, x2, y2, 0).uv(u2, v2).endVertex();
+        bufferbuilder.vertex(matrix, x2, y, 0).uv(u2, v).endVertex();
+        bufferbuilder.vertex(matrix, x, y, 0).uv(u, v).endVertex();
+        Tesselator.getInstance().end();
+
         RenderSystem.disableBlend();
         pose.popPose();
     }
@@ -75,8 +103,8 @@ public class WidgetClickableArea extends GuiIcon {
     public void mouseMoved(Rect rect, double mouseX, double mouseY) {
         super.mouseMoved(rect, mouseX, mouseY);
         if (selected) {
-            int areaX = (int) ((mouseX / rect.getWidth()) * 3);
-            int areaY = (int) ((mouseY / rect.getHeight()) * 3);
+            int areaX = (int) (mouseX / rect.getWidth() * 3d);
+            int areaY = (int) (mouseY / rect.getHeight() * 3d);
 
             this.x = switch (areaX) {
                 case 0 -> PositionHorizontal.LEFT;

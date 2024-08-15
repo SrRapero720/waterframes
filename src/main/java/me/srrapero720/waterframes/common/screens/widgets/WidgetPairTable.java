@@ -8,6 +8,7 @@ import team.creative.creativecore.common.gui.controls.parent.GuiRow;
 import team.creative.creativecore.common.gui.controls.parent.GuiTable;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class WidgetPairTable extends GuiTable {
@@ -30,6 +31,21 @@ public class WidgetPairTable extends GuiTable {
         this.spacing = spacing;
         this.align = align;
         this.createRow();
+    }
+
+    public WidgetPairTable applySelf(Consumer<WidgetPairTable> consumer) {
+        consumer.accept(this);
+        return this;
+    }
+
+    public WidgetPairTable applyOnLeft(Consumer<GuiColumn> consumer) {
+        consumer.accept(this.left);
+        return this;
+    }
+
+    public WidgetPairTable applyOnRight(Consumer<GuiColumn> consumer) {
+        consumer.accept(this.right);
+        return this;
     }
 
     public WidgetPairTable createRow() {
@@ -109,6 +125,12 @@ public class WidgetPairTable extends GuiTable {
     }
 
     public WidgetPairTable setVAlignRight(VAlign align) {
+        this.right.setVAlign(align);
+        return this;
+    }
+
+    public WidgetPairTable setVAlignAll(VAlign align) {
+        this.left.setVAlign(align);
         this.right.setVAlign(align);
         return this;
     }

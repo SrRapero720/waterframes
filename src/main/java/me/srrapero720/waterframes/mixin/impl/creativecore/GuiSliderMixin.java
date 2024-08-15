@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.mixin.impl.creativecore;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.srrapero720.waterframes.common.helpers.ScalableText;
+import me.srrapero720.waterframes.common.helpers.IScalableText;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Mixin;
@@ -12,7 +12,7 @@ import team.creative.creativecore.client.render.GuiRenderHelper;
 import team.creative.creativecore.common.gui.controls.simple.GuiSlider;
 
 @Mixin(GuiSlider.class)
-public class GuiSliderMixin implements ScalableText {
+public class GuiSliderMixin implements IScalableText {
     @Unique
     float wf$scale = 1.0f;
 
@@ -27,9 +27,8 @@ public class GuiSliderMixin implements ScalableText {
     }
 
     @Override
-    public ScalableText wf$setScale(float scale) {
+    public void wf$setScale(float scale) {
         wf$scale = scale;
-        return this;
     }
 
     @Override

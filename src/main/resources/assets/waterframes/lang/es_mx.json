@@ -8,10 +8,13 @@
 
     "waterframes.common.true": "Activado",
     "waterframes.common.false": "Desactivado",
+    "waterframes.common.paused": "Pausado",
+    "waterframes.common.playing": "Reproduciendo",
     "waterframes.common.activated": "activada",
     "waterframes.common.deactivated": "desactivada",
     "waterframes.common.width": "Ancho",
     "waterframes.common.height": "Alto",
+    "waterframes.common.unavailable": "Not available",
     "waterframes.common.soon": "Proximamente!",
     "waterframes.common.access.denied": "Accesso denegadp",
 
@@ -76,10 +79,13 @@
     "waterframes.gui.flip_x": "invertir X",
     "waterframes.gui.flip_y": "invertir Y",
 
-    "waterframes.gui.resize_y": "Cambia el tamaño en Y siguiendo la relacion de aspecto",
-    "waterframes.gui.resize_x": "Cambia el tamaño en X siguiendo la relacion de aspecto",
+    "waterframes.gui.resize.y": "Cambia el tamaño en Y siguiendo la relacion de aspecto",
+    "waterframes.gui.resize.x": "Cambia el tamaño en X siguiendo la relacion de aspecto",
+    "waterframes.gui.resize.size": "Tamaño calculado: %s bloques",
+    "waterframes.gui.resize.no_size": "¡No calculable! No hay medios activos",
 
     "waterframes.gui.loop": "Repetir: %s",
+    "waterframes.gui.playback": "Playback: %s",
 
     "waterframes.gui.icon.volume": "Volumen",
     "waterframes.gui.icon.rotation": "Rotation de la imagen",
@@ -113,8 +119,6 @@
     "waterframes.gui.show_model": "bloque",
     "waterframes.gui.render_behind": "render detras",
 
-    "waterframes.gui.reload": "recargar",
-    "waterframes.gui.reload.all": "recargar todo",
-    "waterframes.gui.reload.all.warning": "WARNING: causara mucho lag (a ti)",
-    "waterframes.gui.save": "guardar"
+    "waterframes.gui.reload": "Recargar",
+    "waterframes.gui.save": "Guardar"
 }

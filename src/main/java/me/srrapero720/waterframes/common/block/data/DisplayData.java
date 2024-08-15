@@ -317,12 +317,12 @@ public class DisplayData {
         }
 
         if (tile.caps.renderBehind()) {
-            nbt.putBoolean(RENDER_BOTH_SIDES, screen.render_behind.value);
+            nbt.putBoolean(RENDER_BOTH_SIDES, screen.mirror.value);
         }
 
         if (tile.caps.projects()) {
             nbt.putFloat(PROJECTION_DISTANCE, (float) screen.projection_distance.getValue());
-            nbt.putInt(AUDIO_OFFSET, screen.audioOffset.getState());
+            nbt.putInt(AUDIO_OFFSET, screen.audio_offset.getState());
         }
 
         return nbt;

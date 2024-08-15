@@ -32,7 +32,8 @@ public class IconStyles {
     public static final Icon REPEAT_OFF = create(1, 6);
     public static final Icon DISTANCE = create(1, 7);
     public static final Icon PROJECTION_DISTANCE = create(1, 8);
-    public static final Icon VIDEOPLAYER_PLAY = create(1, 9);
+    public static final Icon SAVE = create(1, 9);
+    public static final Icon VIDEOPLAYER_PLAY = create(1, 12);
 
     // STATUS ICONS (chunk 2)
     public static final Icon STATUS_OK = create(2, 0);

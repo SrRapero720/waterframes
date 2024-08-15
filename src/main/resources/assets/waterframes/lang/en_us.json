@@ -8,11 +8,14 @@
 
     "waterframes.common.true": "Enabled",
     "waterframes.common.false": "Disabled",
+    "waterframes.common.paused": "Paused",
+    "waterframes.common.playing": "Playing",
     "waterframes.common.activated": "activated",
     "waterframes.common.deactivated": "deactivated",
-    "waterframes.common.width": "width",
-    "waterframes.common.height": "height",
+    "waterframes.common.width": "Width",
+    "waterframes.common.height": "Height",
     "waterframes.common.soon": "soon!",
+    "waterframes.common.unavailable": "Not available",
     "waterframes.common.access.denied": "Access denied",
 
     "waterframes.remote.description.1": "§8[%s§8]§8 + [%s§8] to bound and unbound",
@@ -77,10 +80,13 @@
     "waterframes.gui.flip_x": "flip X",
     "waterframes.gui.flip_y": "flip Y",
 
-    "waterframes.gui.resize_y": "Change Y size to follow image aspect ratio",
-    "waterframes.gui.resize_x": "Change X size to follow image aspect ratio",
+    "waterframes.gui.resize.y": "Change Y size to follow image aspect ratio",
+    "waterframes.gui.resize.x": "Change X size to follow image aspect ratio",
+    "waterframes.gui.resize.size": "Calculated size: %s blocks",
+    "waterframes.gui.resize.no_size": "Not size yet! Missing media",
 
     "waterframes.gui.loop": "Loop: %s",
+    "waterframes.gui.playback": "Playback: %s",
 
     "waterframes.gui.icon.volume": "Volume",
     "waterframes.gui.icon.rotation": "Image rotation",
@@ -103,7 +109,7 @@
     "waterframes.gui.mirror.1": "Mirror image from behind",
     "waterframes.gui.mirror.2": "Status: %s",
 
-    "waterframes.gui.videoplayer": "Open in VideoPlayer",
+    "waterframes.gui.videoplayer": "Watch in VideoPlayer",
 
     "waterframes.gui.audio_pos.1": "Audio origin position",
     "waterframes.gui.audio_pos.2": "Mode: %s as source",
@@ -114,8 +120,6 @@
     "waterframes.gui.show_model": "show model",
     "waterframes.gui.render_behind": "render behind",
 
-    "waterframes.gui.reload": "reload",
-    "waterframes.gui.reload.all": "reload all",
-    "waterframes.gui.reload.all.warning": "WARNING: causes much lag (to you)",
-    "waterframes.gui.save": "save"
+    "waterframes.gui.reload": "Reload",
+    "waterframes.gui.save": "Save"
 }
