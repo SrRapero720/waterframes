@@ -67,6 +67,7 @@ public class WFConfig {
     // MULTIMEDIA
     private static final IntValue maxVolumeDistance;
     private static final IntValue maxVolume;
+    private static final BooleanValue useMasterVolume;
     private static final BooleanValue useMultimedia;
     private static final BooleanValue keepRendering;
     // BEHAVIOR
@@ -130,6 +131,10 @@ public class WFConfig {
         maxVolume = SERVER
                 .comment("Max volume value", "values over 100 uses VLC überVolume")
                 .defineInRange("maxVolume", 100, 10, 120);
+
+        useMasterVolume = SERVER
+                .comment("Makes Minecraft master volume affects waterframes volume")
+                .define("masterVolume", false);
 
         // WATERFRAMES -> multimedia -> watermedia
         SERVER.push("watermedia");
@@ -276,6 +281,7 @@ public class WFConfig {
     // MULTIMEDIA
     public static int maxVolDis() { return maxVolumeDistance.get(); }
     public static int maxVolDis(int value) { return Math.min(value, maxVolDis()); }
+    public static boolean useMasterVolume() { return useMasterVolume.get(); }
 
     public static int maxVol() { return maxVolume.get(); }
     public static int maxVol(int value) { return Math.max(Math.min(value, maxVol()), 0); }
