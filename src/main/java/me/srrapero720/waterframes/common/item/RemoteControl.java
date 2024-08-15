@@ -26,7 +26,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Marker;
@@ -41,6 +40,8 @@ import java.util.List;
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 public class RemoteControl extends Item implements ItemGuiCreator {
+    private static final String POSITION = "position";
+    private static final String DIMENSION = "dimension";
     private static final Marker IT = MarkerManager.getMarker(RemoteControl.class.getSimpleName());
     public RemoteControl(Properties pProperties) {
         super(pProperties.stacksTo(1).setNoRepair().fireResistant().rarity(Rarity.RARE));
@@ -70,16 +71,8 @@ public class RemoteControl extends Item implements ItemGuiCreator {
             return InteractionResultHolder.success(stack);
         }
 
-        // DATA FIXER
-        if (tag.contains("pos")) {
-            if (!level.isClientSide()) LOGGER.warn(IT, "NBT contains an old position data, correcting...");
-            long[] longPos = tag.getLongArray("pos");
-            tag.putIntArray("position", new int[] { (int) longPos[0], (int) longPos[1], (int) longPos[2] });
-            tag.remove("pos");
-        }
-
-        int[] pos = tag.getIntArray("position");
-        String dim = tag.getString("dimension");
+        int[] pos = this.getPosition(tag);
+        String dim = this.getDimension(tag);
         if (pos.length < 3 || dim.isEmpty()) {
             this.sendFailed(player, new TranslatableComponent("waterframes.remote.code.failed"));
             LOGGER.error(IT, "NBT data is invalid, ensure your set pos as a long-int and the dimension as a resource location");
@@ -132,8 +125,8 @@ public class RemoteControl extends Item implements ItemGuiCreator {
             var item = context.getItemInHand();
             var tag = item.getOrCreateTag();
 
-            tag.putIntArray("position", new int[] { pos.getX(), pos.getY(), pos.getZ() });
-            tag.putString("dimension", level.dimension().location().toString());
+            this.setPosition(tag, pos);
+            this.setDimension(tag, level);
 
             this.sendSuccess(player, new TranslatableComponent("waterframes.remote.bound.success"));
             return InteractionResult.SUCCESS;
@@ -155,9 +148,33 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         if (player.level.isClientSide) player.displayClientMessage(component.withStyle(ChatFormatting.DARK_RED), true);
     }
 
+    public boolean hasPosition(CompoundTag tag) {
+        return tag.contains(POSITION);
+    }
+
+    public boolean hasDimension(CompoundTag tag) {
+        return tag.contains(DIMENSION);
+    }
+
+    public int[] getPosition(CompoundTag tag) {
+        return tag.getIntArray(POSITION);
+    }
+
+    public String getDimension(CompoundTag tag) {
+        return tag.getString(DIMENSION);
+    }
+
+    public void setPosition(CompoundTag tag, BlockPos pos) {
+        tag.putIntArray(POSITION, new int[] { pos.getX(), pos.getY(), pos.getZ() });
+    }
+
+    public void setDimension(CompoundTag tag, Level level) {
+        tag.putString(DIMENSION, level.dimension().location().toString());
+    }
+
     @Override
     public GuiLayer create(CompoundTag tag, Player player) {
-        int[] pos = tag.getIntArray("position");
+        int[] pos = this.getPosition(tag);
         var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
         return new RemoteControlScreen(player, (DisplayTile) player.level.getBlockEntity(blockPos), tag, this);
     }

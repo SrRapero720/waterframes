@@ -1,16 +1,21 @@
 package me.srrapero720.waterframes.common.block;
 
+import com.mojang.math.Vector3f;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
+import net.minecraft.ChatFormatting;
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -24,6 +29,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.*;
 import net.minecraft.world.level.material.*;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import team.creative.creativecore.common.gui.GuiLayer;
 import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
@@ -69,8 +75,35 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     }
 
     @Override public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.getItem() instanceof RemoteControl control) {
+            boolean matchDim = control.getDimension(stack.getOrCreateTag()).equals(level.dimension().location().toString());
+            int[] position = control.getPosition(stack.getOrCreateTag());
+            boolean matchPos = new BlockPos(position[0], position[1], position[2]).equals(pos);
+
+            if (matchDim && matchPos && level.getBlockEntity(pos) instanceof DisplayTile tile) {
+                if (level.isClientSide) {
+                    tile.setPause(true, !tile.data.paused);
+                }
+                Vec3 vec = Vec3.atCenterOf(pos);
+                var opts = new DustParticleOptions(new Vector3f(Vec3.fromRGB24(ChatFormatting.AQUA.getColor())), 1.3f);
+
+                int i = 0;
+                do {
+                    level.addParticle(opts, vec.x + randomNegative(Math.random()) / 4, vec.y, vec.z + randomNegative(Math.random()) / 4,
+                            randomNegative(Math.random()), Math.random() * 3, randomNegative(Math.random()));
+                    i++;
+                } while (i < 4);
+                return InteractionResult.SUCCESS;
+            }
+        }
+
         if (!level.isClientSide && WFConfig.canInteractBlock(player)) GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
+    }
+
+    private double randomNegative(double v) {
+        return Math.random() > 0.5d ? -v : v;
     }
 
     @Override public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
