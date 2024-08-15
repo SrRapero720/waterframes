@@ -125,8 +125,8 @@ public class WFRegistry {
 
         @SubscribeEvent
         public static void init(FMLClientSetupEvent e) {
-            if (WaterFrames.isInstalled("mr_stellarity") && (WFConfig.isDevMode())) {
-                throw new UnsupportedModException("mr_stellarity", "breaks picture rendering, overwrites the Minecraft core shaders and i can't do nothing to avoid that");
+            if (WaterFrames.isInstalled("mr_stellarity", "stellarity") && (WFConfig.isDevMode())) {
+                throw new UnsupportedModException("mr_stellarity (Stellarity)", "breaks picture rendering, overwrites Minecraft core shaders and isn't possible work around that");
             }
         }
 
