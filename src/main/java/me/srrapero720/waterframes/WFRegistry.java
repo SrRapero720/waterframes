@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -90,6 +91,12 @@ public class WFRegistry {
     @SubscribeEvent
     public static void registerCommands(RegisterCommandsEvent event) {
         WaterFramesCommand.register(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    @OnlyIn(Dist.CLIENT)
+    public static void registerCommands(RegisterClientCommandsEvent event) {
+        WaterFramesCommand.registerClient(event.getDispatcher());
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -12,6 +12,7 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.watermedia.api.image.ImageAPI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -28,6 +29,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.server.command.EnumArgument;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -193,6 +196,15 @@ public class WaterFramesCommand {
                 new ItemInput(WFRegistry.BIG_TV_ITEM.get(), null),
         };
 
+        dispatcher.register(waterframes);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void registerClient(CommandDispatcher<CommandSourceStack> dispatcher) {
+        var waterframes = Commands.literal("waterframes");
+        waterframes.then(Commands.literal("reload_all")
+                .executes(c -> watermedia$reloadAll(c.getSource()))
+        );
         dispatcher.register(waterframes);
     }
 
@@ -387,6 +399,13 @@ public class WaterFramesCommand {
     public static int whitelist$add(CommandSourceStack source, String value) {
         WFConfig.addOnWhitelist(value);
         source.sendSuccess(msgSuccess("waterframes.commands.whitelist.add", value), true);
+        return 0;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static int watermedia$reloadAll(CommandSourceStack source) {
+        ImageAPI.reloadCache();
+        source.sendSuccess(msgSuccess("waterframes.commands.reload_all.success"), true);
         return 0;
     }
 

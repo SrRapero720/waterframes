@@ -51,6 +51,7 @@
     "waterframes.commands.audit.author": "El author de esta URL es: ",
     "waterframes.commands.audit.author.failed": "No se encontro el jugador con UUID [%s]",
     "waterframes.commands.audit.author.console": "El autor de esta URL es: [console]",
+    "waterframes.commands.reload_all.success": "Se recargo todos los displays",
 
     "waterframes.status": "Estado: %s",
     "waterframes.status.off": "Apagado",

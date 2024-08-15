@@ -51,6 +51,7 @@
     "waterframes.commands.audit.author": "Автор URL-адреса: ",
     "waterframes.commands.audit.author.failed": "Игрок с УУИД [%s] не может быть найден.",
     "waterframes.commands.audit.author.console": "Автор URL-адреса: [console]",
+    "waterframes.commands.reload_all.success": "All media reloaded successfully",
 
     "waterframes.status": "Статус: %s",
     "waterframes.status.off": "Выключен",

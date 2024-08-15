@@ -52,6 +52,7 @@
     "waterframes.commands.audit.author": "The author of this URL is: ",
     "waterframes.commands.audit.author.failed": "Player with UUID [%s] cannot be founded",
     "waterframes.commands.audit.author.console": "The author of this URL is: [console]",
+    "waterframes.commands.reload_all.success": "All media reloaded successfully",
 
     "waterframes.status": "Status: %s",
     "waterframes.status.off": "Off",
