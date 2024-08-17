@@ -215,7 +215,7 @@ public class DisplayTile extends BlockEntity {
         else            DisplayNetwork.sendClient(new LoopPacket(this.getBlockPos(), loop, true), this);
     }
 
-    public void tick(BlockPos pos, BlockState state) {
+    public void tick(BlockState state) {
         if (this.data.tickMax == -1 || this.data.tick < 0) this.data.tick = 0;
 
         if (!this.data.paused && this.data.active) {
@@ -242,12 +242,11 @@ public class DisplayTile extends BlockEntity {
         }
 
         boolean lightOnPlay = WFConfig.useLightOnPlay() && (WFConfig.forceLightOnPlay() || this.data.lit);
-        boolean lit = state.getValue(DisplayBlock.LIT);
-        if (lightOnPlay && lit == (this.data.url.isEmpty())) {
-            state = state.setValue(DisplayBlock.LIT, !this.data.url.isEmpty());
-            updateBlock = true;
-        } else if (!lightOnPlay && lit) {
-            state = state.setValue(DisplayBlock.LIT, false);
+        int currentLight = state.getValue(DisplayBlock.LIGHT_LEVEL);
+        int calculatedLight = this.data.url.isEmpty() ? 0 : (int) (((float) this.data.brightness / 255f) * level.getMaxLightLevel());
+
+        if (lightOnPlay && currentLight != calculatedLight) {
+            state = state.setValue(DisplayBlock.LIGHT_LEVEL, calculatedLight);
             updateBlock = true;
         }
 
@@ -256,8 +255,8 @@ public class DisplayTile extends BlockEntity {
             updateBlock = true;
         }
 
-        if (updateBlock) {
-            this.level.setBlock(pos, state, DisplayBlock.UPDATE_ALL);
+        if (updateBlock && this.isServer()) {
+            this.level.setBlock(this.getBlockPos(), state, DisplayBlock.UPDATE_ALL);
         }
 
         if (this.isClient()) {

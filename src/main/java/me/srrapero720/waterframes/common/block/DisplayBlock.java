@@ -42,7 +42,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
-    public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final IntegerProperty LIGHT_LEVEL = BlockStateProperties.LEVEL;
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
 
@@ -115,30 +115,27 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
                 .setValue(WATERLOGGED, false)
                 .setValue(POWERED, false)
                 .setValue(POWER, 0)
-                .setValue(LIT, false)
+                .setValue(LIGHT_LEVEL, 0)
         );
     }
 
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder
-                .add(getFacing())
+                .add(this.getFacing())
                 .add(ATTACHED_FACE)
                 .add(POWERED)
                 .add(POWER)
                 .add(WATERLOGGED)
-                .add(LIT)
+                .add(LIGHT_LEVEL)
         );
     }
 
     @Override public BlockState getStateForPlacement(BlockPlaceContext context) {
         Direction current = context.getHorizontalDirection();
+        Player player = context.getPlayer();
         return this.defaultBlockState()
-                .setValue(WATERLOGGED, false)
-                .setValue(POWERED, false)
-                .setValue(POWER, 0)
                 .setValue(ATTACHED_FACE, context.getClickedFace())
-                .setValue(getFacing(), context.getPlayer().isCrouching() ? current.getOpposite() : current)
-                .setValue(LIT, false);
+                .setValue(this.getFacing(), player != null && player.isCrouching() ? current.getOpposite() : current);
     }
 
     @Override public RenderShape getRenderShape(BlockState state) {
@@ -152,7 +149,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     @Override public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState blockState, BlockEntityType<T> type) {
         return (l, pos, state, be) -> {
             if (be instanceof DisplayTile tile) {
-                tile.tick(tile.getBlockPos(), state);
+                tile.tick(state);
             }
         };
     }
@@ -177,15 +174,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     }
 
     @Override public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-        if (state.getValue(LIT)) {
-            return level.getMaxLightLevel();
-            // TODO: this needs be synchronized on data refresh
-//            if (level.getBlockEntity(pos) instanceof DisplayTile tile) {
-//                return (tile.data.brightness / 255) * level.getMaxLightLevel();
-//            }
-        } else {
-            return 0;
-        }
+        return state.getValue(LIGHT_LEVEL);
     }
 
     @Override public float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {
