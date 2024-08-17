@@ -52,6 +52,10 @@
     "waterframes.commands.audit.author": "The author of this URL is: ",
     "waterframes.commands.audit.author.failed": "Player with UUID [%s] cannot be founded",
     "waterframes.commands.audit.author.console": "The author of this URL is: [console]",
+    "waterframes.commands.audit.in_range.success": "Founded %s, teleport to them clicking on the index number",
+    "waterframes.commands.audit.in_range.author": "URL Author: §8%s",
+    "waterframes.commands.audit.in_range.tooltip.position": "Teleport to §c%s §a%s §9%s",
+    "waterframes.commands.audit.in_range.failed": "No display founded in range",
     "waterframes.commands.reload_all.success": "All media reloaded successfully",
 
     "waterframes.status": "Status: %s",

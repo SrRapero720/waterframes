@@ -8,7 +8,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WFRegistry;
-import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
@@ -20,23 +19,23 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.commands.arguments.item.ItemInput;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.server.command.EnumArgument;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class WaterFramesCommand {
     private static final Marker IT = MarkerManager.getMarker("Commands");
@@ -151,23 +150,20 @@ public class WaterFramesCommand {
                 )
         );
 
-        var audit = Commands.argument("blockpos", BlockPosArgument.blockPos());
-
-        // AUDIT AUTHOR
-        audit.then(Commands.literal("audit")
+        waterframes.then(Commands.literal("edit").then(edit));
+        waterframes.then(Commands.literal("audit")
                 .then(Commands.literal("author")
-                        .executes(c -> auditURLAuthor(getTile(c), c.getSource()))
+                        .then(Commands.argument("blockpos", BlockPosArgument.blockPos())
+                                .executes(c -> auditURLAuthor(getTile(c), c.getSource()))
+                        )
+                )
+                .then(Commands.literal("in_range")
+                        .then(Commands.argument("chunkrange", IntegerArgumentType.integer(0))
+                                .executes(c -> auditFramesRange(c.getSource(), c.getSource().getPlayerOrException(), IntegerArgumentType.getInteger(c, "chunkrange")))
+                        )
                 )
         );
 
-
-        waterframes.then(Commands.literal("edit").then(edit));
-        waterframes.then(Commands.literal("audit")
-                .then(audit)
-//                .then(Commands.literal("in_range")
-//                        .executes(c -> auditFramesRange(c.getSource().getPlayerOrException(), c.getSource()))
-//                )
-        );
         waterframes.then(Commands.literal("give")
                 .executes(c -> giveSelfKit(c.getSource()))
                 .then(Commands.argument("targets", EntityArgument.players())
@@ -332,6 +328,61 @@ public class WaterFramesCommand {
         return 0;
     }
 
+    public static int auditFramesRange(CommandSourceStack source, ServerPlayer player, int chunkRange) {
+        int chunkX = player.getBlockX() >> 4;
+        int chunkZ = player.getBlockZ() >> 4;
+
+        Set<DisplayTile> displayTiles = new HashSet<>();
+
+        for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
+            for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
+                Map<BlockPos, BlockEntity> chunk = player.level.getChunk(x, z).getBlockEntities();
+                chunk.forEach((pos1, blockEntity) -> {
+                    if (blockEntity instanceof DisplayTile tile) {
+                        displayTiles.add(tile);
+                    }
+                });
+            }
+        }
+
+        if (displayTiles.isEmpty()) {
+            source.sendFailure(msgFailed("waterframes.commands.audit.in_range.failed"));
+            return 1;
+        }
+
+        MutableComponent response = msgSuccess("waterframes.commands.audit.in_range.success", displayTiles.size() + "");
+        int i = 1;
+        response.append("\n");
+        for (var tile: displayTiles) {
+            BlockPos pos = tile.getBlockPos();
+            Component index = new TextComponent("- [" + i + "] ").withStyle(ChatFormatting.GOLD)
+                    .withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("/teleport %s %s %s %s", player.getGameProfile().getName(), pos.getX(), pos.getY(), pos.getZ()))))
+                    .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("waterframes.commands.audit.in_range.tooltip.position", pos.getX(), pos.getY(), pos.getZ()))));
+            Component x = new TextComponent("X: " + pos.getX()).withStyle(ChatFormatting.RED);
+            Component y = new TextComponent("Y: " + pos.getY()).withStyle(ChatFormatting.GREEN);
+            Component z = new TextComponent("Z: " + pos.getZ()).withStyle(ChatFormatting.AQUA);
+
+            String playerAuthor;
+            if (tile.data.uuid == Util.NIL_UUID) {
+                playerAuthor = "console/unknown";
+            } else {
+                var profiler = source.getServer().getProfileCache().get(tile.data.uuid);
+                playerAuthor =  profiler.isEmpty() ? "unknown" : profiler.get().getName();
+            }
+            Component author = new TranslatableComponent("waterframes.commands.audit.in_range.author", playerAuthor)
+                    .withStyle(ChatFormatting.DARK_GRAY)
+                    .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("UUID: " + tile.data.uuid.toString()))));
+
+            response.append(index).append(x).append(" ").append(y).append(" ").append(z).append(" || ").append(author);
+            if (i != displayTiles.size()) {
+                response.append("\n");
+            }
+            i++;
+        }
+        source.sendSuccess(response, true);
+        return 0;
+    }
+
     public static int setVolume(DisplayTile tile, CommandSourceStack source, int volume, int min, int max) {
         if (tile == null) return 1;
 
@@ -456,23 +507,23 @@ public class WaterFramesCommand {
         return null;
     }
 
-    private static Component msgFailed(String t) {
+    private static MutableComponent msgFailed(String t) {
         return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t).withStyle(ChatFormatting.RED));
     }
 
-    private static Component msgFailed(String t, String t2) {
+    private static MutableComponent msgFailed(String t, String t2) {
         return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t, t2).withStyle(ChatFormatting.RED));
     }
 
-    private static Component msgSuccess(String t) {
+    private static MutableComponent msgSuccess(String t) {
         return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN));
     }
 
-    private static Component msgSuccess(String t, Component c) {
+    private static MutableComponent msgSuccess(String t, Component c) {
         return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN).append(c));
     }
 
-    private static Component msgSuccess(String t, String... a) {
+    private static MutableComponent msgSuccess(String t, String... a) {
         return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
     }
 

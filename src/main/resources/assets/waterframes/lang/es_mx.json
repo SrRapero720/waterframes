@@ -27,6 +27,7 @@
     "waterframes.remote.display.failed": "El display se rompio, desvinculado",
     "waterframes.remote.display.invalid": "Necesitas vincularlo primero",
 
+    "waterframes.commands.prefix": "§6§l[§r§bWATERF§3r§bAMES§6§l]: ",
     "waterframes.commands.give.single": "%s Recibio el set de Displays",
     "waterframes.commands.give.multiple": "%s jugadores recibieron el set de Displays",
     "waterframes.commands.whitelist.toggle": "La whitelist se encuentra %s",
@@ -51,6 +52,10 @@
     "waterframes.commands.audit.author": "El author de esta URL es: ",
     "waterframes.commands.audit.author.failed": "No se encontro el jugador con UUID [%s]",
     "waterframes.commands.audit.author.console": "El autor de esta URL es: [console]",
+    "waterframes.commands.audit.in_range.success": "Encontrados %s, para teletransportarte has click en el numero",
+    "waterframes.commands.audit.in_range.author": "Autor de la URL: §8%s",
+    "waterframes.commands.audit.in_range.tooltip.position": "Teletransportate a §c%s §a%s §9%s",
+    "waterframes.commands.audit.in_range.failed": "No se encontraron display en rango",
     "waterframes.commands.reload_all.success": "Se recargo todos los displays",
 
     "waterframes.status": "Estado: %s",

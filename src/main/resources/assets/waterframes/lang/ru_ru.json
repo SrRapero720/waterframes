@@ -27,6 +27,7 @@
     "waterframes.remote.display.failed": "Экран повреждён, отвязано.",
     "waterframes.remote.display.invalid": "Сперва его нужно связать.",
 
+    "waterframes.commands.prefix": "§6§l[§r§bWATERF§3r§bAMES§6§l]: ",
     "waterframes.commands.give.single": "Gave Displays set to %s",
     "waterframes.commands.give.multiple": "Gave Displays set %s players.",
     "waterframes.commands.whitelist.toggle": "Белый список теперь %s",
@@ -51,6 +52,10 @@
     "waterframes.commands.audit.author": "Автор URL-адреса: ",
     "waterframes.commands.audit.author.failed": "Игрок с УУИД [%s] не может быть найден.",
     "waterframes.commands.audit.author.console": "Автор URL-адреса: [console]",
+    "waterframes.commands.audit.in_range.success": "Founded %s, teleport to them clicking on the index number",
+    "waterframes.commands.audit.in_range.author": "URL Author: §8%s",
+    "waterframes.commands.audit.in_range.tooltip.position": "Teleport to §c%s §a%s §9%s",
+    "waterframes.commands.audit.in_range.failed": "No display founded in range",
     "waterframes.commands.reload_all.success": "All media reloaded successfully",
 
     "waterframes.status": "Статус: %s",
