@@ -9,10 +9,9 @@ import me.srrapero720.waterframes.common.network.packets.DataSyncPacket;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
-import me.srrapero720.waterframes.common.helpers.IScalableText;
+import me.srrapero720.waterframes.common.compat.creativecore.IScalableText;
 import me.srrapero720.watermedia.api.image.ImageCache;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
@@ -25,14 +24,10 @@ import team.creative.creativecore.common.gui.parser.LongValueParser;
 import team.creative.creativecore.common.gui.style.ControlFormatting;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
-import team.creative.creativecore.common.util.text.LinebreakComponent;
-import team.creative.creativecore.common.util.text.TextBuilder;
 import team.creative.creativecore.common.util.type.Color;
 
-import java.awt.event.MouseEvent;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 

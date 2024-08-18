@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.mixin.impl.creativecore;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import me.srrapero720.waterframes.common.helpers.IScalableText;
+import me.srrapero720.waterframes.common.compat.creativecore.IScalableText;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Mixin;
