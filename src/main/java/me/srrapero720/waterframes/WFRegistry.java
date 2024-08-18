@@ -24,6 +24,7 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -58,6 +59,7 @@ public class WFRegistry {
             PROJECTOR = BLOCKS.register("projector", ProjectorBlock::new),
             TV = BLOCKS.register("tv", TvBlock::new),
             BIG_TV = BLOCKS.register("big_tv", BigTvBlock::new);
+//            GOLDEN_PROJECTOR = BLOCKS.register("golden_projector", ProjectorBlock::new);
 
     /* ITEMS */
     public static final RegistryObject<Item>
@@ -66,6 +68,7 @@ public class WFRegistry {
             PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), prop())),
             TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), prop())),
             BIG_TV_ITEM = ITEMS.register("big_tv", () -> new BlockItem(BIG_TV.get(), prop()));
+//            GOLDEN_PROJECTOR_ITEM = ITEMS.register("golden_projector", () -> new BlockItem(GOLDEN_PROJECTOR.get(), prop().tab(null)));
 
     /* TILES */
     public static final RegistryObject<BlockEntityType<DisplayTile>>
@@ -73,6 +76,7 @@ public class WFRegistry {
             TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR),
             TILE_TV = tile("tv", TvTile::new, TV),
             TILE_BIG_TV = tile("big_tv", BigTvTile::new, BIG_TV);
+//            TILE_GOLDEN_PROJECTOR = tile("golden_projector", ProjectorTile::new, GOLDEN_PROJECTOR);
 
     private static RegistryObject<BlockEntityType<DisplayTile>> tile(String name, BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
         return TILES.register(name, () -> BlockEntityType.Builder.of(creator, block.get()).build(null));
@@ -98,6 +102,14 @@ public class WFRegistry {
     public static void registerCommands(RegisterClientCommandsEvent event) {
         WaterFramesCommand.registerClient(event.getDispatcher());
     }
+
+//    @SubscribeEvent
+//    public static void onPlayerConnects(PlayerEvent.PlayerLoggedInEvent event) {
+//        var playername = event.getPlayer().getGameProfile().getName();
+//        if (playername.equals("Dev")) { // Maximus3blog
+//            event.getPlayer().giv
+//        }
+//    }
 
     @OnlyIn(Dist.CLIENT)
     public static void registerTexture(ResourceLocation location, AbstractTexture texture) {
