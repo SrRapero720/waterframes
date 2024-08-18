@@ -4,6 +4,8 @@ import me.srrapero720.waterframes.common.block.entity.BigTvTile;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,7 +26,7 @@ public class BigTvBlock extends DisplayBlock {
     }
 
     public static AlignedBox box(Direction direction, boolean renderMode) {
-        Facing facing = Facing.get(direction);
+        Facing facing = Facing.get(direction.getOpposite());
         var box = new AlignedBox();
 
         float renderMargin = renderMode ? 1f : 0;
@@ -60,6 +62,14 @@ public class BigTvBlock extends DisplayBlock {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return BigTvBlock.box(state.getValue(getFacing()), false).voxelShape();
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Direction current = context.getHorizontalDirection();
+        Player player = context.getPlayer();
+        return super.getStateForPlacement(context)
+                .setValue(this.getFacing(), player != null && player.isCrouching() ? current : current.getOpposite());
     }
 
     @Override

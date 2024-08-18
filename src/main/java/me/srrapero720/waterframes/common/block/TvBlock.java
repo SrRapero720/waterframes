@@ -4,6 +4,8 @@ import me.srrapero720.waterframes.common.block.entity.TvTile;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,13 +26,13 @@ public class TvBlock extends DisplayBlock {
     }
 
     public static AlignedBox box(Direction direction, Direction attachedBlockFace, boolean renderMode) {
-        Facing facing = Facing.get(direction);
+        Facing facing = Facing.get(direction.getOpposite());
         Facing wide = Facing.get(attachedBlockFace);
         AlignedBox box = new AlignedBox();
 
         // SETUP PROFUNDITY
         float renderMargin = renderMode ? 1f : 0;
-        if (attachedBlockFace.getOpposite() == direction) {
+        if (attachedBlockFace == direction) {
             if (facing.positive) {
                 box.setMax(facing.axis, 1f - (4f / 16.0f));
                 box.setMin(facing.axis, 1f - (6f / 16.0f));
@@ -38,10 +40,10 @@ public class TvBlock extends DisplayBlock {
                 box.setMax(facing.axis, (6f / 16.0f));
                 box.setMin(facing.axis, (4f / 16.0f));
             }
-        } else if (attachedBlockFace == direction) {
+        } else if (attachedBlockFace.getOpposite() == direction) {
             if (facing.positive) {
-                box.setMax(facing.axis, 1f - (2f / 16.0f));
-                box.setMin(facing.axis, 1f - (4f / 16.0f));
+                box.setMax(facing.axis, 1f - (1f / 16.0f));
+                box.setMin(facing.axis, 1f - (3f / 16.0f));
             } else {
                 box.setMax(facing.axis, (3f / 16.0f));
                 box.setMin(facing.axis, (1f / 16.0f));
@@ -111,6 +113,14 @@ public class TvBlock extends DisplayBlock {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return TvBlock.box(state.getValue(getFacing()), state.getValue(ATTACHED_FACE), false).voxelShape();
+    }
+
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        Direction current = context.getHorizontalDirection();
+        Player player = context.getPlayer();
+        return super.getStateForPlacement(context)
+                .setValue(this.getFacing(), player != null && player.isCrouching() ? current : current.getOpposite());
     }
 
     @Override

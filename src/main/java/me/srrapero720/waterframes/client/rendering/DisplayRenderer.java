@@ -50,7 +50,8 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
         var direction = tile.getDirection();
         var box = tile.getRenderBox();
-        var boxFace = BoxFace.get(Facing.get(tile.caps.invertedFace(tile) ? direction.getOpposite() : direction));
+        var invertedFace = tile.caps.invertedFace(tile);
+        var boxFace = BoxFace.get(Facing.get(invertedFace ? direction.getOpposite() : direction));
         var facing = boxFace.facing;
         packedLight = LightTexture.pack(15, 15);
 
@@ -68,7 +69,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         pose.translate(-0.5, -0.5, -0.5);
 
         // TWEAK FOR "EXTRA-RESIZING"
-        if (facing.positive != tile.caps.invertedFace(tile)) {
+        if (tile.caps.growMax(tile, facing, invertedFace)) {
             box.setMax(facing.axis,box.getMax(facing.axis) + tile.caps.growSize());
         } else {
             box.setMin(facing.axis, box.getMin(facing.axis) - tile.caps.growSize());

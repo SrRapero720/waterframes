@@ -1,17 +1,17 @@
 {
     "variants": {
-        "frame=true,facing=north": {"model": "waterframes:block/frame"},
-        "frame=true,facing=south": { "model": "waterframes:block/frame", "y": 180},
-        "frame=true,facing=west": {"model": "waterframes:block/frame", "y": -90},
-        "frame=true,facing=east": {"model": "waterframes:block/frame", "y": -270},
-        "frame=true,facing=up": {"model": "waterframes:block/frame","x": -90 },
-        "frame=true,facing=down": {"model": "waterframes:block/frame", "x": 90 },
+        "facing=north,frame=true": {"model": "waterframes:block/frame","y": 0},
+        "facing=south,frame=true": { "model": "waterframes:block/frame", "y": 180},
+        "facing=west,frame=true": {"model": "waterframes:block/frame", "y": -90},
+        "facing=east,frame=true": {"model": "waterframes:block/frame", "y": -270},
+        "facing=up,frame=true": {"model": "waterframes:block/frame","x": -90 },
+        "facing=down,frame=true": {"model": "waterframes:block/frame", "x": 90 },
 
-        "frame=false,facing=north": {"model": "waterframes:block/frame"},
-        "frame=false,facing=south": { "model": "waterframes:block/frame", "y": 180},
-        "frame=false,facing=west": {"model": "waterframes:block/frame", "y": -90},
-        "frame=false,facing=east": {"model": "waterframes:block/frame", "y": -270},
-        "frame=false,facing=up": {"model": "waterframes:block/frame","x": -90 },
-        "frame=false,facing=down": {"model": "waterframes:block/frame", "x": 90 }
+        "facing=north,frame=false": {"model": "waterframes:block/frame", "y": 0},
+        "facing=south,frame=false": { "model": "waterframes:block/frame", "y": 180},
+        "facing=west,frame=false": {"model": "waterframes:block/frame", "y": -90},
+        "facing=east,frame=false": {"model": "waterframes:block/frame", "y": -270},
+        "facing=up,frame=false": {"model": "waterframes:block/frame","x": -90 },
+        "facing=down,frame=false": {"model": "waterframes:block/frame", "x": 90 }
     }
 }
