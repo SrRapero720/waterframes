@@ -79,6 +79,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         if (stack.getItem() instanceof RemoteControl control) {
             boolean matchDim = control.getDimension(stack.getOrCreateTag()).equals(level.dimension().location().toString());
             int[] position = control.getPosition(stack.getOrCreateTag());
+            if (position.length == 0) return InteractionResult.FAIL;
             boolean matchPos = new BlockPos(position[0], position[1], position[2]).equals(pos);
 
             if (matchDim && matchPos && level.getBlockEntity(pos) instanceof DisplayTile tile) {
