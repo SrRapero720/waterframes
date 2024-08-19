@@ -190,6 +190,7 @@ public class WaterFramesCommand {
                 new ItemInput(WFRegistry.PROJECTOR_ITEM.get(), null),
                 new ItemInput(WFRegistry.TV_ITEM.get(), null),
                 new ItemInput(WFRegistry.BIG_TV_ITEM.get(), null),
+                new ItemInput(WFRegistry.TV_BOX_ITEM.get(), null),
         };
 
         dispatcher.register(waterframes);

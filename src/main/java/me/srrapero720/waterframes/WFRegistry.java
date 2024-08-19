@@ -58,7 +58,8 @@ public class WFRegistry {
             FRAME = BLOCKS.register("frame", FrameBlock::new),
             PROJECTOR = BLOCKS.register("projector", ProjectorBlock::new),
             TV = BLOCKS.register("tv", TvBlock::new),
-            BIG_TV = BLOCKS.register("big_tv", BigTvBlock::new);
+            BIG_TV = BLOCKS.register("big_tv", BigTvBlock::new),
+            TV_BOX = BLOCKS.register("tv_box", TVBoxBlock::new);
 //            GOLDEN_PROJECTOR = BLOCKS.register("golden_projector", ProjectorBlock::new);
 
     /* ITEMS */
@@ -67,7 +68,8 @@ public class WFRegistry {
             FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), prop())),
             PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), prop())),
             TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), prop())),
-            BIG_TV_ITEM = ITEMS.register("big_tv", () -> new BlockItem(BIG_TV.get(), prop()));
+            BIG_TV_ITEM = ITEMS.register("big_tv", () -> new BlockItem(BIG_TV.get(), prop())),
+            TV_BOX_ITEM = ITEMS.register("tv_box", () -> new BlockItem(TV_BOX.get(), prop()));
 //            GOLDEN_PROJECTOR_ITEM = ITEMS.register("golden_projector", () -> new BlockItem(GOLDEN_PROJECTOR.get(), prop().tab(null)));
 
     /* TILES */
@@ -75,7 +77,8 @@ public class WFRegistry {
             TILE_FRAME = tile("frame", FrameTile::new, FRAME),
             TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR),
             TILE_TV = tile("tv", TvTile::new, TV),
-            TILE_BIG_TV = tile("big_tv", BigTvTile::new, BIG_TV);
+            TILE_BIG_TV = tile("big_tv", BigTvTile::new, BIG_TV),
+            TILE_TV_BOX = tile("tv_box", TVBoxTile::new, TV_BOX);
 //            TILE_GOLDEN_PROJECTOR = tile("golden_projector", ProjectorTile::new, GOLDEN_PROJECTOR);
 
     private static RegistryObject<BlockEntityType<DisplayTile>> tile(String name, BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
@@ -165,6 +168,7 @@ public class WFRegistry {
             BlockEntityRenderers.register(TILE_PROJECTOR.get(), DisplayRenderer::new);
             BlockEntityRenderers.register(TILE_TV.get(), DisplayRenderer::new);
             BlockEntityRenderers.register(TILE_BIG_TV.get(), DisplayRenderer::new);
+            BlockEntityRenderers.register(TILE_TV_BOX.get(), DisplayRenderer::new);
         }
     }
 

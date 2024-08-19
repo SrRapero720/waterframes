@@ -4,6 +4,7 @@
     "block.waterframes.projector": "Проектор",
     "block.waterframes.tv": "Телевизор",
     "block.waterframes.big_tv": "Большой телевизор",
+    "block.waterframes.tv_box": "Television de caja",
     "item.waterframes.remote": "Пульт",
 
     "waterframes.common.true": "включить",

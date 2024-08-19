@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.common.block.data;
 
 import me.srrapero720.waterframes.common.block.BigTvBlock;
+import me.srrapero720.waterframes.common.block.TVBoxBlock;
 import me.srrapero720.waterframes.common.block.TvBlock;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.core.Direction;
@@ -22,7 +23,8 @@ public record DisplayCaps(boolean renderBehind, boolean projects, boolean resize
             FRAME       = new DisplayCaps(true, false, true, 0.001F, (t, d, a, r) -> DisplayTile.getBasicBox(t)),
             PROJECTOR   = new DisplayCaps(false, true, true, 0.999F, (t, d, a, r) -> DisplayTile.getBasicBox(t)),
             TV          = new DisplayCaps(false, false, false, 0.001f, (tile, facing, invertedFace) -> (facing.positive == invertedFace) == (tile.getAttachedFace().getOpposite() == tile.getDirection()), tile -> tile.getAttachedFace().getOpposite() == tile.getDirection(), (t, d, a, r) -> TvBlock.box(d, a, r)),
-            BIG_TV      = new DisplayCaps(false, false, false, 0.001F, (t, d, a, r) -> BigTvBlock.box(d, a, r));
+            BIG_TV      = new DisplayCaps(false, false, false, 0.001F, (t, d, a, r) -> BigTvBlock.box(d, a, r)),
+            TV_BOX      = new DisplayCaps(false, false, false, 0.001F, (t, d, a, r) -> TVBoxBlock.box(d, r));
 
     public boolean invertedFace(DisplayTile tile) {
         return invertedFace.get(tile);

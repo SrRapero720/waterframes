@@ -4,6 +4,7 @@
     "block.waterframes.projector": "Projector",
     "block.waterframes.tv": "Television",
     "block.waterframes.big_tv": "Big Television",
+    "block.waterframes.tv_box": "Box Television",
     "item.waterframes.remote": "Remote Control",
 
     "waterframes.common.true": "Enabled",
