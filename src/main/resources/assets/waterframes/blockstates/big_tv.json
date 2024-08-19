@@ -1,8 +1,33 @@
 {
   "variants": {
-    "facing=north": {"model": "waterframes:block/big_tv", "y": 0},
-    "facing=south": {"model": "waterframes:block/big_tv", "y": 180},
-    "facing=west": {"model": "waterframes:block/big_tv", "y": -90},
-    "facing=east": {"model": "waterframes:block/big_tv", "y": -270}
+    "facing=north,attached_face=down": {"model": "waterframes:block/big_tv", "y": 0},
+    "facing=south,attached_face=down": {"model": "waterframes:block/big_tv", "y": 180},
+    "facing=west,attached_face=down": {"model": "waterframes:block/big_tv", "y": -90},
+    "facing=east,attached_face=down": {"model": "waterframes:block/big_tv", "y": -270},
+
+    "facing=north,attached_face=up": {"model": "waterframes:block/big_tv", "y": 0},
+    "facing=south,attached_face=up": {"model": "waterframes:block/big_tv", "y": 180},
+    "facing=west,attached_face=up": {"model": "waterframes:block/big_tv", "y": -90},
+    "facing=east,attached_face=up": {"model": "waterframes:block/big_tv", "y": -270},
+
+    "facing=north,attached_face=north": {"model": "waterframes:block/big_tv_back", "y": 0},
+    "facing=south,attached_face=north": {"model": "waterframes:block/big_tv_back", "y": 180},
+    "facing=west,attached_face=north": {"model": "waterframes:block/big_tv_back", "y": -90},
+    "facing=east,attached_face=north": {"model": "waterframes:block/big_tv_back", "y": -270},
+
+    "facing=north,attached_face=south": {"model": "waterframes:block/big_tv_back", "y": 0},
+    "facing=south,attached_face=south": {"model": "waterframes:block/big_tv_back", "y": 180},
+    "facing=west,attached_face=south": {"model": "waterframes:block/big_tv_back", "y": -90},
+    "facing=east,attached_face=south": {"model": "waterframes:block/big_tv_back", "y": -270},
+
+    "facing=north,attached_face=west": {"model": "waterframes:block/big_tv_back", "y": 0},
+    "facing=south,attached_face=west": {"model": "waterframes:block/big_tv_back", "y": 180},
+    "facing=west,attached_face=west": {"model": "waterframes:block/big_tv_back", "y": -90},
+    "facing=east,attached_face=west": {"model": "waterframes:block/big_tv_back", "y": -270},
+
+    "facing=north,attached_face=east": {"model": "waterframes:block/big_tv_back", "y": 0},
+    "facing=south,attached_face=east": {"model": "waterframes:block/big_tv_back", "y": 180},
+    "facing=west,attached_face=east": {"model": "waterframes:block/big_tv_back", "y": -90},
+    "facing=east,attached_face=east": {"model": "waterframes:block/big_tv_back", "y": -270}
   }
 }

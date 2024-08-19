@@ -25,7 +25,7 @@ public class BigTvBlock extends DisplayBlock {
         return BlockStateProperties.HORIZONTAL_FACING;
     }
 
-    public static AlignedBox box(Direction direction, boolean renderMode) {
+    public static AlignedBox box(Direction direction, Direction attachedFace, boolean renderMode) {
         Facing facing = Facing.get(direction.getOpposite());
         var box = new AlignedBox();
 
@@ -49,8 +49,13 @@ public class BigTvBlock extends DisplayBlock {
         }
 
         // fit height
-        box.setMin(two, (2f + renderMargin) / 16f);
-        box.setMax(two, 2 - (renderMargin / 16f));
+        if (direction == attachedFace) {
+            box.setMin(two, (renderMargin) / 16f);
+            box.setMax(two, 2 - (2f / 16f) - (renderMargin / 16f));
+        } else {
+            box.setMin(two, (2f + renderMargin) / 16f);
+            box.setMax(two, 2 - (renderMargin / 16f));
+        }
 
         // fit width
         box.setMin(one, (-14f + renderMargin) / 16f);
@@ -61,7 +66,7 @@ public class BigTvBlock extends DisplayBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return BigTvBlock.box(state.getValue(getFacing()), false).voxelShape();
+        return BigTvBlock.box(state.getValue(getFacing()), state.getValue(ATTACHED_FACE), false).voxelShape();
     }
 
     @Override

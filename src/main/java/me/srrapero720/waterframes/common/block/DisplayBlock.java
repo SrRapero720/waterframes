@@ -181,6 +181,11 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return 0f;
     }
 
+    @Override
+    public boolean isCollisionShapeFullBlock(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+        return false;
+    }
+
     @Override public PushReaction getPistonPushReaction(BlockState pState) {
         return PushReaction.DESTROY;
     }
