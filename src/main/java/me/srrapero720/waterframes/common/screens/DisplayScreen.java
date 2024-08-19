@@ -158,7 +158,6 @@ public class DisplayScreen extends GuiLayer {
 
         this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, x -> tile.imageCache.reload());
         this.reload.setTooltip("waterframes.gui.reload");
-        this.reload.setEnabled(enableReload());
         this.save = new GuiButtonIcon("save", IconStyles.SAVE, click -> DisplayNetwork.sendServer(new DataSyncPacket(tile.getBlockPos(), DisplayData.build(this, tile))));
         this.save.setTooltip("waterframes.gui.save");
 
@@ -168,7 +167,6 @@ public class DisplayScreen extends GuiLayer {
                 tile.setPause(true, true);
             });
             this.videoplayer.setTooltip("waterframes.gui.videoplayer");
-            this.videoplayer.setEnabled(enableVideoPlayer());
         } else {
             this.videoplayer = null;
         }
@@ -188,6 +186,13 @@ public class DisplayScreen extends GuiLayer {
         if (!tile.caps.resizes()) {
             this.setDim(WIDTH - 10, HEIGHT - 60);
         }
+
+        this.tick();
+    }
+
+    @Override
+    public boolean isClient() {
+        return tile.isClient();
     }
 
     @Override
@@ -378,10 +383,12 @@ public class DisplayScreen extends GuiLayer {
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
     public boolean enableVideoPlayer() {
         return !tile.data.url.isEmpty() && tile.imageCache != null && tile.imageCache.getStatus() == ImageCache.Status.READY;
     }
 
+    @OnlyIn(Dist.CLIENT)
     public boolean enableReload() {
         return tile.imageCache != null && !this.url.getText().isEmpty() && !tile.data.url.isEmpty() && this.url.getText().equals(tile.data.url);
     }
