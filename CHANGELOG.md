@@ -20,6 +20,8 @@ It Will be a small update, I said... No many code changes will have, I said
     - 🛠️ Compatibility crash will stay in favor of [VideoPlayer](https://www.curseforge.com/minecraft/mc-mods/video-player) and [LittleFrames](https://www.curseforge.com/minecraft/mc-mods/video-player) which yet still breaks them
 - ✨ RemoteControl now works when display is on a ValkirienSkyes ship
 - ✨ Block light is now adjustable based on brightness level
+- 🌐 Updated translations
+  - 🍜 Added simplified chinese (by yichifauzi): was done for 2.0.14 so it might be outdated.
 
 ## 🐛 BUG FIXES
 - 🐛 MINECRAFT FIX: Fixed releases the texture directly without call releaseId on AbstractTexture
