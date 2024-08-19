@@ -248,7 +248,7 @@ public class Display {
             case PICTURE -> {}
             case VIDEO, AUDIO -> {
                 mediaPlayer.release();
-                TEXTURES.remove(mediaPlayer.getTexture());
+                WFRegistry.unregisterTexture(TEXTURES.remove(mediaPlayer.getTexture()));
                 DisplayList.remove(this);
             }
         }
