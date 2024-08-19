@@ -158,7 +158,9 @@ public class DisplayScreen extends GuiLayer {
 
         this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, x -> tile.imageCache.reload());
         this.reload.setTooltip("waterframes.gui.reload");
-        this.reload.setEnabled(enableReload());
+        if (isClient()){
+            this.reload.setEnabled(enableReload());
+        }
         this.save = new GuiButtonIcon("save", IconStyles.SAVE, click -> DisplayNetwork.sendServer(new DataSyncPacket(tile.getBlockPos(), DisplayData.build(this, tile))));
         this.save.setTooltip("waterframes.gui.save");
 
@@ -168,7 +170,9 @@ public class DisplayScreen extends GuiLayer {
                 tile.setPause(true, true);
             });
             this.videoplayer.setTooltip("waterframes.gui.videoplayer");
-            this.videoplayer.setEnabled(enableVideoPlayer());
+            if (isClient()) {
+                this.videoplayer.setEnabled(enableVideoPlayer());
+            }
         } else {
             this.videoplayer = null;
         }
@@ -188,6 +192,11 @@ public class DisplayScreen extends GuiLayer {
         if (!tile.caps.resizes()) {
             this.setDim(WIDTH - 10, HEIGHT - 60);
         }
+    }
+
+    @Override
+    public boolean isClient() {
+        return tile.isClient();
     }
 
     @Override
