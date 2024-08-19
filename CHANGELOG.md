@@ -1,3 +1,6 @@
+# UPDATE 2.1.2
+- 🐛 Fixed crashes... on both sides this time.
+
 # UPDATE 2.1.1
 - 🐛 Fixed crashes on server opening a display screen
 - 🐛 Fixed changelog on modrinth
