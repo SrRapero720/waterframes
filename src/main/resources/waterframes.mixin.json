@@ -7,8 +7,7 @@
   "minVersion": "0.8.5",
   "client": [
     "MinecraftMixin",
-    "TextureManagerMixin",
-    "videoplayer.VideoPlayerMixin"
+    "TextureManagerMixin"
   ],
   "mixins": [
     "LevelMixin",
