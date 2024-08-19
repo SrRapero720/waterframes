@@ -1,3 +1,8 @@
+# UPDATE 2.1.1
+- 🐛 Fixed crashes on server opening a display screen
+- 🐛 Fixed changelog on modrinth
+- 🛠️ Removed VideoPlayer fix mixins (the new update fixes the issue)
+
 # UPDATE 2.1.0
 It Will be a small update, I said... No many code changes will have, I said
 ## ✨ ENHANCEMENTS
