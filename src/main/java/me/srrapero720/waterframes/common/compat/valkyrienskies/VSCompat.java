@@ -19,6 +19,6 @@ public class VSCompat {
     }
 
     public static double getSquaredDistance(Level level, Vec3 pos, Position pos2) {
-        return VSGameUtilsKt.squaredDistanceBetweenInclShips(level, pos.x, pos.y, pos.y, pos2.x(), pos2.y(), pos2.z());
+        return VSGameUtilsKt.squaredDistanceBetweenInclShips(level, pos.x, pos.y, pos.z, pos2.x(), pos2.y(), pos2.z());
     }
 }
