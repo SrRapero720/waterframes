@@ -35,7 +35,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
     @Override
     public boolean shouldRenderOffScreen(DisplayTile tile) {
-        return tile.data.getWidth() > 8 || tile.data.getHeight() > 8;
+        return tile.data.getWidth() > 16 || tile.data.getHeight() > 16;
     }
 
     @Override
