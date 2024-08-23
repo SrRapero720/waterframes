@@ -68,6 +68,7 @@ public class WFConfig {
     private static final IntValue maxVolumeDistance;
     private static final IntValue maxVolume;
     private static final BooleanValue useMasterVolume;
+    private static final BooleanValue useVSEurekaCompat;
     private static final BooleanValue useMultimedia;
     private static final BooleanValue keepRendering;
     // BEHAVIOR
@@ -135,6 +136,15 @@ public class WFConfig {
         useMasterVolume = SERVER
                 .comment("Makes Minecraft master volume affects waterframes volume")
                 .define("masterVolume", false);
+
+        useVSEurekaCompat = SERVER
+                .comment(
+                        "Enables compatibility with VSEureka",
+                        "In case VS breaks something on their side, this option should stop client/server crashing",
+                        "Or if the audio isn't working, disable this option should help",
+                        "(This option is called VSEureka because valkirienskies is too long, and VS may be misleading)"
+                )
+                .define("vsEurekaCompat", true);
 
         // WATERFRAMES -> multimedia -> watermedia
         SERVER.push("watermedia");
@@ -282,6 +292,7 @@ public class WFConfig {
     public static int maxVolDis() { return maxVolumeDistance.get(); }
     public static int maxVolDis(int value) { return Math.min(value, maxVolDis()); }
     public static boolean useMasterVolume() { return useMasterVolume.get(); }
+    public static boolean vsEurekaCompat() { return useVSEurekaCompat.get(); }
 
     public static int maxVol() { return maxVolume.get(); }
     public static int maxVol(int value) { return Math.max(Math.min(value, maxVol()), 0); }

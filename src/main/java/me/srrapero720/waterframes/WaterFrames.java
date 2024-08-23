@@ -59,7 +59,7 @@ public class WaterFrames {
     }
 
     public static double getDistance(Level level, BlockPos pos, Position position) {
-        if (VSCompat.installed()) {
+        if (VSCompat.installed() && WFConfig.vsEurekaCompat()) {
             return Math.sqrt(VSCompat.getSquaredDistance(level, pos, position));
         }
         return Math.sqrt(pos.distToLowCornerSqr(position.x(), position.y(), position.z()));
