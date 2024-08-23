@@ -13,10 +13,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class WFConfig {
     private static final Builder SERVER = new Builder();
@@ -309,28 +306,28 @@ public class WFConfig {
     public static boolean useInSurv() { return useInSurvival.get(); }
     public static boolean useForAnyone() { return useForAnyone.get(); }
     public static boolean useWhitelist() { return useWhitelist.get(); }
-    public static void useWhitelist(boolean state) {
+    public static boolean useWhitelist(boolean state) {
         useWhitelist.set(state);
         useWhitelist.save();
+        return state;
     }
     public static boolean toggleWhitelist() {
-        useWhitelist(!useWhitelist());
-        return useWhitelist();
+        return useWhitelist(!useWhitelist());
     }
     public static void addOnWhitelist(String url) {
-        var w = mutableList(whitelist.get().iterator());
+        var w = mutableSet(whitelist.get().iterator());
         w.add(url);
-        whitelist.set(w);
+        whitelist.set(new ArrayList<>(w));
         whitelist.save();
     }
     public static boolean removeOnWhitelist(String url) {
-        var w = mutableList(whitelist.get().iterator());
+        var w = mutableSet(whitelist.get().iterator());
         boolean removed = false;
         try {
             return removed = w.remove(url);
         } finally {
             if (removed) {
-                whitelist.set(w);
+                whitelist.set(new ArrayList<>(w));
                 whitelist.save();
             }
         }
@@ -355,8 +352,8 @@ public class WFConfig {
         } catch (Exception ignored) {}
         return false;
     }
-    public static <T> List<T> mutableList(Iterator<T> it) {
-        var list = new ArrayList<T>();
+    public static <T> Set<T> mutableSet(Iterator<T> it) {
+        var list = new HashSet<T>();
         while (it.hasNext()) {
             list.add(it.next());
         }
