@@ -1,3 +1,15 @@
+# UPDATE 2.1.3
+- ✨ Click on a display using a remote (binded on that display) will pause it instead of open the Screen
+  - ✨ This was added for since 2.1.0, but I forgot to add it on the changelog
+- ✨ Updated compatibility for VideoPlayer 3.x
+- 🐛 Fixed a small memoryleak on video textures (the small things always count)
+- 🐛 Fixed displays have no sound when VSEureka is installed (my bad)
+- 🐛 [1.20.1] Fixed items don't appear in creative tab
+- 🛠️ Added a config option to disable VSEureka compatibility (in case of future breaking changes on VSEureka side)
+- 🛠️ Removed Voxeloper texture pack
+- 🛠️ Increased min size of off-screen rendering from 8 to 16
+- 🛠️ Prevent duplicated entries on whitelist
+
 # UPDATE 2.1.2
 - 🐛 Fixed crashes... on both sides this time.
 
