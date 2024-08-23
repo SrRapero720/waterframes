@@ -102,7 +102,7 @@ public class Display {
         int texture = texture();
         if (texture != -1) {
             return TEXTURES.computeIfAbsent(texture, (Function<Integer, ResourceLocation>) integer -> {
-                var id = WaterFrames.genId(texture);
+                var id = WaterFrames.asResource(texture);
                 WFRegistry.registerTexture(id, new TextureWrapper(texture));
                 return id;
             });

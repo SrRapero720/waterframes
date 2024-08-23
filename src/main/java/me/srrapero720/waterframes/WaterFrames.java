@@ -23,7 +23,7 @@ public class WaterFrames {
     public static final String ID = "waterframes";
     public static final String NAME = "WATERFrAMES";
     public static final Logger LOGGER = LogManager.getLogger(ID);
-    public static final ResourceLocation LOADING_ANIMATION = WaterFrames.genId("loading_animation");
+    public static final ResourceLocation LOADING_ANIMATION = WaterFrames.asResource("loading_animation");
     public static final long SYNC_TIME = 1000L;
     private static long ticks = 0;
 
@@ -33,12 +33,12 @@ public class WaterFrames {
         WFRegistry.init(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
-    public static ResourceLocation genId(String id) {
+    public static ResourceLocation asResource(String id) {
         return new ResourceLocation(ID, id);
     }
 
-    public static ResourceLocation genId(int texture) {
-        return new ResourceLocation(ID, "texture_" + texture);
+    public static ResourceLocation asResource(int texture) {
+        return new ResourceLocation(ID, "dynamic_texture_" + texture);
     }
 
     public static boolean isInstalled(String modId) {

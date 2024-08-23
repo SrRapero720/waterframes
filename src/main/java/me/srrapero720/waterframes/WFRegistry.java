@@ -26,14 +26,10 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.forgespi.locating.IModFile;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import net.minecraftforge.resource.PathResourcePack;
-import org.jetbrains.annotations.NotNull;
 
-import java.nio.file.Path;
 import java.util.function.Supplier;
 
 import static me.srrapero720.waterframes.common.network.DisplayNetwork.*;
@@ -135,6 +131,7 @@ public class WFRegistry {
         }
 
         @SubscribeEvent
+        @OnlyIn(Dist.CLIENT)
         public static void init(FMLClientSetupEvent e) {
             LOGGER.info(IT, "Running WATERFrAMES v{}", ModList.get().getModFileById(ID).versionString());
             if (WaterFrames.isInstalled("mr_stellarity", "stellarity") && (WFConfig.isDevMode())) {
@@ -148,8 +145,8 @@ public class WFRegistry {
             registerTexture(LOADING_ANIMATION, new TextureWrapper.Renderer(ImageAPI.loadingGif(WaterFrames.ID)));
         }
 
-        @OnlyIn(Dist.CLIENT)
         @SubscribeEvent
+        @OnlyIn(Dist.CLIENT)
         public static void registerTileRenderer(EntityRenderersEvent.RegisterRenderers e) {
             BlockEntityRenderers.register(TILE_FRAME.get(), DisplayRenderer::new);
             BlockEntityRenderers.register(TILE_PROJECTOR.get(), DisplayRenderer::new);
@@ -176,24 +173,4 @@ public class WFRegistry {
             super(String.format(MSG_REASON_ALT, modid, NAME, reason, alternatives));
         }
     }
-
-    public static class ModPackResources extends PathResourcePack {
-        protected final IModFile modFile;
-        protected final String sourcePath;
-
-        public ModPackResources(String name, IModFile modFile, String sourcePath) {
-            super(name, modFile.findResource(sourcePath));
-            this.modFile = modFile;
-            this.sourcePath = sourcePath;
-        }
-
-        @NotNull
-        protected Path resolve(String... paths) {
-            String[] allPaths = new String[paths.length + 1];
-            allPaths[0] = this.sourcePath;
-            System.arraycopy(paths, 0, allPaths, 1, paths.length);
-            return this.modFile.findResource(allPaths);
-        }
-    }
-
 }
