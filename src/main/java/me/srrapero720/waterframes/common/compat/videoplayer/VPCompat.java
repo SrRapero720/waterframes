@@ -10,9 +10,9 @@ public class VPCompat {
         return VP_MODE;
     }
 
-    public static void playVideo(String url, int volume, boolean controls) {
+    public static void playVideo(String url, int volume, boolean blockControls, boolean canSkip) {
         if (!installed()) return;
 
-        ClientHandler.openVideo(url, volume, controls);
+        ClientHandler.openVideo(url, volume, blockControls, canSkip);
     }
 }

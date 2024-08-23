@@ -166,7 +166,7 @@ public class DisplayScreen extends GuiLayer {
 
         if (VPCompat.installed()) {
             this.videoplayer = new GuiButtonIcon("", IconStyles.VIDEOPLAYER_PLAY, button -> {
-                VPCompat.playVideo(tile.data.url, tile.data.volume, true);
+                VPCompat.playVideo(tile.data.url, tile.data.volume, false, true);
                 tile.setPause(true, true);
             });
             this.videoplayer.setTooltip("waterframes.gui.videoplayer");
