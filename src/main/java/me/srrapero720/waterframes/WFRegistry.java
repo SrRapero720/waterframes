@@ -12,9 +12,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -22,9 +19,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -144,16 +139,6 @@ public class WFRegistry {
             LOGGER.info(IT, "Running WATERFrAMES v{}", ModList.get().getModFileById(ID).versionString());
             if (WaterFrames.isInstalled("mr_stellarity", "stellarity") && (WFConfig.isDevMode())) {
                 throw new UnsupportedModException("mr_stellarity (Stellarity)", "breaks picture rendering, overwrites Minecraft core shaders and isn't possible work around that");
-            }
-        }
-
-        @SubscribeEvent
-        public static void registerResourcePacks(AddPackFindersEvent e) {
-            if (e.getPackType() == PackType.CLIENT_RESOURCES) {
-                IModFile modFile = ModList.get().getModFileById(ID).getFile();
-                e.addRepositorySource((consumer, constructor) ->
-                        consumer.accept(Pack.create(ID + "/voxeloper", false, () -> new ModPackResources("WaterFrames: Voxeloper", modFile, "resourcepacks/wf_voxeloper"), constructor, Pack.Position.TOP, PackSource.DEFAULT))
-                );
             }
         }
 
