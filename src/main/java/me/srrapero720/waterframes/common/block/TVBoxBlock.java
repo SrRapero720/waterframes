@@ -27,8 +27,7 @@ public class TVBoxBlock extends DisplayBlock {
     protected static final Material TV_BOX_MATERIAL = new Material.Builder(MaterialColor.NONE).build();
     protected static final Properties TV_BOX_PROPERTIES = Properties.of(TV_BOX_MATERIAL)
             .strength(1f)
-            .sound(SoundType.WOOD)
-            .requiresCorrectToolForDrops();
+            .sound(SoundType.WOOD);
 
     public TVBoxBlock() {
         super(TV_BOX_PROPERTIES);
