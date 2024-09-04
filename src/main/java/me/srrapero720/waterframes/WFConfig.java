@@ -213,7 +213,7 @@ public class WFConfig {
                 )
                 .define("enable", true);
 
-        whitelist = SERVER.define("urls", () -> Arrays.asList(WHITELIST), o -> false);
+        whitelist = SERVER.define("urls", () -> Arrays.asList(WHITELIST), o -> true);
 
         SERVER.pop();
 
