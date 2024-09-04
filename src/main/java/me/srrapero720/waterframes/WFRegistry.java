@@ -38,10 +38,10 @@ import static me.srrapero720.watermedia.WaterMedia.IT;
 
 @Mod.EventBusSubscriber(modid = ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WFRegistry {
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
-    public static final DeferredRegister<Block> BLOCKS =  DeferredRegister.create(ForgeRegistries.BLOCKS, ID);
-    public static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, ID);
-    public static final CreativeModeTab TAB = new CreativeModeTab(ID) {
+    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
+    private static final DeferredRegister<Block> BLOCKS =  DeferredRegister.create(ForgeRegistries.BLOCKS, ID);
+    private static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, ID);
+    private static final CreativeModeTab TAB = new CreativeModeTab(ID) {
         @Override public ItemStack makeIcon() { return new ItemStack(FRAME_ITEM.get()); }
     };
 
@@ -56,7 +56,7 @@ public class WFRegistry {
 
     /* ITEMS */
     public static final RegistryObject<Item>
-            REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(new Item.Properties().tab(TAB))),
+            REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(remoteProp())),
             FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), prop())),
             PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), prop())),
             TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), prop())),
@@ -77,8 +77,12 @@ public class WFRegistry {
         return TILES.register(name, () -> BlockEntityType.Builder.of(creator, block.get()).build(null));
     }
 
+    private static Item.Properties remoteProp() {
+        return new Item.Properties().stacksTo(1).tab(TAB).rarity(Rarity.RARE).setNoRepair().fireResistant();
+    }
+
     private static Item.Properties prop() {
-        return new Item.Properties().stacksTo(16).tab(TAB).rarity(Rarity.EPIC);
+        return new Item.Properties().stacksTo(16).tab(TAB).rarity(Rarity.RARE);
     }
 
     public static void init(IEventBus bus) {
@@ -157,20 +161,10 @@ public class WFRegistry {
     }
 
     public static class UnsupportedModException extends UnsupportedOperationException {
-        private static final String MSG = "§fMod §6'%s' §fis not compatible with §e'%s'§f. please remove it";
         private static final String MSG_REASON = "§fMod §6'%s' §fis not compatible with §e'%s' §fbecause §c%s §fplease remove it";
-        private static final String MSG_REASON_ALT = "§fMod §6'%s' §fis not compatible with §e'%s' §fbecause §c%s §fuse §a'%s' §finstead";
-
-        public UnsupportedModException(String modid) {
-            super(String.format(MSG, modid, NAME));
-        }
 
         public UnsupportedModException(String modid, String reason) {
             super(String.format(MSG_REASON, modid, NAME, reason));
-        }
-
-        public UnsupportedModException(String modid, String reason, String alternatives) {
-            super(String.format(MSG_REASON_ALT, modid, NAME, reason, alternatives));
         }
     }
 }

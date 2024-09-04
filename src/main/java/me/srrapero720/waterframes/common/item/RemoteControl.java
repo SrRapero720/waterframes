@@ -44,7 +44,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     private static final String DIMENSION = "dimension";
     private static final Marker IT = MarkerManager.getMarker(RemoteControl.class.getSimpleName());
     public RemoteControl(Properties pProperties) {
-        super(pProperties.stacksTo(1).setNoRepair().fireResistant().rarity(Rarity.RARE));
+        super(pProperties);
     }
 
     @Override
