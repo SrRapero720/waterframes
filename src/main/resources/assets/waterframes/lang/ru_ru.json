@@ -4,19 +4,19 @@
     "block.waterframes.projector": "Проектор",
     "block.waterframes.tv": "Телевизор",
     "block.waterframes.big_tv": "Большой телевизор",
-    "block.waterframes.tv_box": "Television de caja",
+    "block.waterframes.tv_box": "Телевизор коробка",
     "item.waterframes.remote": "Пульт",
 
     "waterframes.common.true": "включить",
     "waterframes.common.false": "выключить",
-    "waterframes.common.paused": "Paused",
-    "waterframes.common.playing": "Playing",
+    "waterframes.common.paused": "приостановлено",
+    "waterframes.common.playing": "воспроизводится",
     "waterframes.common.activated": "активирован",
     "waterframes.common.deactivated": "отключён",
     "waterframes.common.width": "ширина",
     "waterframes.common.height": "высота",
     "waterframes.common.soon": "в скорейшее время!",
-    "waterframes.common.unavailable": "Not available",
+    "waterframes.common.unavailable": "Недоступно",
     "waterframes.common.access.denied": "Отказ в доступе",
 
     "waterframes.remote.description.1": "§8[%s§8]§8 + [%s§8] — связать или отвязать.",
@@ -29,13 +29,13 @@
     "waterframes.remote.display.invalid": "Сперва его нужно связать.",
 
     "waterframes.commands.prefix": "§6§l[§r§bWATERF§3r§bAMES§6§l]: ",
-    "waterframes.commands.give.single": "Gave Displays set to %s",
-    "waterframes.commands.give.multiple": "Gave Displays set %s players.",
+    "waterframes.commands.give.single": "Выдано дисплеев: %s",
+    "waterframes.commands.give.multiple": "Выдано дисплеев: %s игрокам.",
     "waterframes.commands.whitelist.toggle": "Белый список теперь %s",
     "waterframes.commands.whitelist.add": "Добавлена новая запись \"%s\" в белый список.",
     "waterframes.commands.whitelist.remove": "Запись \"%s\" удалена из белого списка.",
     "waterframes.commands.whitelist.remove.failed": "Не удалось удалить запись; её не существует.",
-    "waterframes.commands.invalid_block": "Block was not a valid display",
+    "waterframes.commands.invalid_block": "Блок не является допустимым дисплеем",
     "waterframes.commands.edit.url.success": "URL-адрес успешно изменён.",
     "waterframes.commands.edit.url.failed": "Невозможно изменить URL-адрес для этого Экрана.",
     "waterframes.commands.edit.size.success": "Размер успешно изменён.",
@@ -43,7 +43,7 @@
     "waterframes.commands.edit.position.failed": "Невозможно изменить Положение для такого типа Экрана.",
     "waterframes.commands.edit.position.success": "Положение успешно изменено.",
     "waterframes.commands.edit.rotation.failed": "Невозможно изменить Положение для такого типа Экрана.",
-    "waterframes.commands.edit.rotation.success": "Поворот успешно изменен.",
+    "waterframes.commands.edit.rotation.success": "Поворот успешно изменён.",
     "waterframes.commands.edit.alpha.success": "8-битовый канал успешно изменён.",
     "waterframes.commands.edit.brightness.success": "Яркость успешно изменена.",
     "waterframes.commands.edit.render_distance.success": "Расстояние отрисовки успешно изменено.",
@@ -53,11 +53,11 @@
     "waterframes.commands.audit.author": "Автор URL-адреса: ",
     "waterframes.commands.audit.author.failed": "Игрок с УУИД [%s] не может быть найден.",
     "waterframes.commands.audit.author.console": "Автор URL-адреса: [console]",
-    "waterframes.commands.audit.in_range.success": "Founded %s, teleport to them clicking on the index number",
-    "waterframes.commands.audit.in_range.author": "Url Author: §8%s",
-    "waterframes.commands.audit.in_range.tooltip.position": "Teleport to §c%s §a%s §9%s",
-    "waterframes.commands.audit.in_range.failed": "No display founded in range",
-    "waterframes.commands.reload_all.success": "All media reloaded successfully",
+    "waterframes.commands.audit.in_range.success": "Найдено %s, телепортируйтесь к ним, нажав на номер индекса",
+    "waterframes.commands.audit.in_range.author": "Автор URL-адреса: §8%s",
+    "waterframes.commands.audit.in_range.tooltip.position": "Телепортироваться к §c%s §a%s §9%s",
+    "waterframes.commands.audit.in_range.failed": "Дисплей не найден в диапазоне",
+    "waterframes.commands.reload_all.success": "Все медиа успешно перезагружены",
 
     "waterframes.status": "Статус: %s",
     "waterframes.status.off": "Выключен",
@@ -88,11 +88,11 @@
 
     "waterframes.gui.resize.y": "Изменить размер по Y для соответствия формата изображения.",
     "waterframes.gui.resize.x": "Изменить размер по X для соответствия формата изображения.",
-    "waterframes.gui.resize.size": "Calculated size: %s blocks",
-    "waterframes.gui.resize.no_size": "Not size yet! Missing media",
+    "waterframes.gui.resize.size": "Рассчитанный размер: %s блоков",
+    "waterframes.gui.resize.no_size": "Размер ещё не установлен! Отсутствует медиа",
 
     "waterframes.gui.loop": "зациклить: %s",
-    "waterframes.gui.playback": "Playback: %s",
+    "waterframes.gui.playback": "воспроизведение: %s",
 
     "waterframes.gui.icon.volume": "Громкость",
     "waterframes.gui.icon.rotation": "Поворот изображения",
@@ -112,8 +112,8 @@
     "waterframes.gui.position.top": "Вверху",
     "waterframes.gui.position.bottom": "Внизу",
 
-    "waterframes.gui.mirror.1": "Mirror image from behind",
-    "waterframes.gui.mirror.2": "Status: %s",
+    "waterframes.gui.mirror.1": "Отразить изображение сзади",
+    "waterframes.gui.mirror.2": "Статус: %s",
 
     "waterframes.gui.videoplayer": "Открыть в VideoPlayer",
 
@@ -124,7 +124,7 @@
     "waterframes.gui.audio_pos.states.2": "По центру",
 
     "waterframes.gui.show_model": "показать модель",
-    "waterframes.gui.lit": "emit light",
+    "waterframes.gui.lit": "излучать свет",
 
     "waterframes.gui.reload": "перезагрузить",
     "waterframes.gui.save": "сохранить"
