@@ -26,6 +26,7 @@ public class Display {
     private SyncVideoPlayer mediaPlayer;
     private final ImageCache imageCache;
     private final DisplayTile tile;
+    private boolean notVideo;
 
     // CONFIG
     private int currentVolume = 0;
@@ -53,6 +54,11 @@ public class Display {
             return;
         }
 
+        if (this.notVideo) {
+            this.displayMode = Mode.PICTURE;
+            return;
+        }
+
         // START
         this.displayMode = Mode.VIDEO;
         this.mediaPlayer = new SyncVideoPlayer(Minecraft.getInstance());
@@ -60,6 +66,7 @@ public class Display {
         // CHECK IF VLC CAN BE USED
         if (mediaPlayer.isBroken()) {
             this.displayMode = Mode.PICTURE;
+            this.notVideo = true;
             return;
         }
 
@@ -146,7 +153,7 @@ public class Display {
     public void tick() {
         switch (this.displayMode) {
             case PICTURE -> {
-                if (this.imageCache.isVideo()) switchVideoMode();
+                if (this.imageCache.isVideo() && !this.notVideo) switchVideoMode();
             }
             case VIDEO, AUDIO -> {
                 int volume = rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
@@ -198,7 +205,7 @@ public class Display {
         };
     }
 
-    public boolean isBroken() {
+    public boolean isNotVideo() {
         if (this.imageCache.getStatus() == ImageCache.Status.FAILED)
             return true;
 
