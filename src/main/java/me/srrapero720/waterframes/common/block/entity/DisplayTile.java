@@ -44,6 +44,10 @@ public class DisplayTile extends BlockEntity {
     @OnlyIn(Dist.CLIENT) public Display display;
     @OnlyIn(Dist.CLIENT) private boolean isReleased;
 
+    // this is more a runtime-block calculation variables, doesn't fix on DisplayData
+    private int lightLevel = 0;
+    private int analogRedstoneLevel = 0;
+
     public DisplayTile(DisplayData data, DisplayCaps caps, BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
         this.data = data;
@@ -165,6 +169,26 @@ public class DisplayTile extends BlockEntity {
         super.onChunkUnloaded();
     }
 
+    public int getLightLevel() {
+        return lightLevel;
+    }
+
+    public int getAnalogOutput() {
+        return analogRedstoneLevel;
+    }
+
+    private int getLightLevel$internal() {
+        return  this.data.url.isEmpty() ? 0 : (int) (((float) this.data.brightness / 255f) * level.getMaxLightLevel());
+    }
+
+    private int getAnalogOutput$internal() {
+        if (this.data.tickMax > 0 && this.data.active) {
+            return Math.round(((float) this.data.tick / (float) this.data.tickMax) * (BlockStateProperties.MAX_LEVEL_15 - 1)) + 1;
+        } else {
+            return 0;
+        }
+    }
+
     public void setActive(boolean clientSide, boolean mode) {
         if (clientSide) DisplayNetwork.sendServer(new ActivePacket(this.getBlockPos(), mode, true));
         else            DisplayNetwork.sendClient(new ActivePacket(this.getBlockPos(), mode, true), this);
@@ -234,29 +258,27 @@ public class DisplayTile extends BlockEntity {
             }
         }
 
-        boolean updateBlock = false;
-        int redstoneOutput = 0;
+        boolean refresh = false;
 
-        if (this.data.tickMax > 0 && this.data.active) {
-            redstoneOutput = Math.round(((float) this.data.tick / (float) this.data.tickMax) * (BlockStateProperties.MAX_LEVEL_15 - 1)) + 1;
+        // REDSTONE
+        int redstoneLevel = getAnalogOutput$internal();
+        if (this.analogRedstoneLevel != redstoneLevel) {
+            this.analogRedstoneLevel = redstoneLevel;
+            refresh = true;
         }
 
+        // LIGHT
         boolean lightOnPlay = WFConfig.useLightOnPlay() && (WFConfig.forceLightOnPlay() || this.data.lit);
-        int currentLight = state.getValue(DisplayBlock.LIGHT_LEVEL);
-        int calculatedLight = this.data.url.isEmpty() ? 0 : (int) (((float) this.data.brightness / 255f) * level.getMaxLightLevel());
-
-        if (lightOnPlay && currentLight != calculatedLight) {
-            state = state.setValue(DisplayBlock.LIGHT_LEVEL, calculatedLight);
-            updateBlock = true;
+        int calculatedLight = getLightLevel$internal();
+        if (lightOnPlay && this.lightLevel != calculatedLight) {
+            lightLevel = calculatedLight;
+            refresh = true;
         }
 
-        if (state.getValue(DisplayBlock.POWER) != redstoneOutput) {
-            state = state.setValue(DisplayBlock.POWER, redstoneOutput);
-            updateBlock = true;
-        }
-
-        if (updateBlock && this.isServer()) {
-            this.level.setBlock(this.getBlockPos(), state, DisplayBlock.UPDATE_ALL);
+        // DO NOT SPAM BLOCKSTATES AND CHUNK UPDATES WHEN ISN'T NEEDED
+        if (refresh) {
+            this.level.getChunkSource().getLightEngine().checkBlock(this.getBlockPos());
+            this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
         }
 
         if (this.isClient()) {
