@@ -63,7 +63,6 @@ public class RemoteControlScreen extends GuiLayer {
         this.nbt = nbt;
         this.item = item;
 
-        this.style = ScreenStyles.REMOTE_CONTROL;
         this.align = Align.STRETCH;
         this.flow = GuiFlow.STACK_Y;
         this.tile = tile;
@@ -235,6 +234,11 @@ public class RemoteControlScreen extends GuiLayer {
         }
     }
 
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public GuiStyle getStyle() {
+        return ScreenStyles.REMOTE_CONTROL;
+    }
 
     @Override
     @OnlyIn(Dist.CLIENT)
