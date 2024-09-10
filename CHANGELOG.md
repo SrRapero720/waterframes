@@ -1,3 +1,10 @@
+# UPDATE 2.1.5
+- 🐛 Fixed default config regression
+- 🌐 Updated translations (since 2.1.4)
+  - 🍾 Russian updated by cutiegin
+  - 🍾 Ukrainian created by cutiegin
+  - 🍜 Japanese created by argentum-2503
+
 # UPDATE 2.1.4
 THIS UPDATE DROPS 1.18.2 AND 1.19.2 MAINTENANCE
 - 🐛 Fixed wrong config validation
