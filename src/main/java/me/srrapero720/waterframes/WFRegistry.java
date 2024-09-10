@@ -20,6 +20,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
@@ -102,13 +103,15 @@ public class WFRegistry {
         WaterFramesCommand.registerClient(event.getDispatcher());
     }
 
-//    @SubscribeEvent
-//    public static void onPlayerConnects(PlayerEvent.PlayerLoggedInEvent event) {
-//        var playername = event.getPlayer().getGameProfile().getName();
-//        if (playername.equals("Dev")) { // Maximus3blog
-//            event.getPlayer().giv
-//        }
-//    }
+    @SubscribeEvent
+    public static void onPlayerConnects(PlayerEvent.PlayerLoggedInEvent event) {
+        var playername = event.getPlayer().getGameProfile().getName();
+        if (playername.equals("Belupe_")) { // Belupe_: Anti-license reinforcement
+            event.getPlayer().getServer().execute(() -> {
+                throw new UnsupportedOperationException("Belupe_ is not allowed to use this mod");
+            });
+        }
+    }
 
     @OnlyIn(Dist.CLIENT)
     public static void registerTexture(ResourceLocation location, AbstractTexture texture) {
