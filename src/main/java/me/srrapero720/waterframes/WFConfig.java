@@ -82,7 +82,7 @@ public class WFConfig {
     private static final BooleanValue useInSurvival;
     private static final BooleanValue useForAnyone;
     private static final BooleanValue useWhitelist;
-    private static final ConfigValue<List<String>> whitelist;
+    private static final ConfigValue<List<? extends String>> whitelist;
 
     // OVERRIDES (client)
     private final static BooleanValue overrideServerConfig;
@@ -213,7 +213,7 @@ public class WFConfig {
                 )
                 .define("enable", true);
 
-        whitelist = SERVER.define("urls", () -> Arrays.asList(WHITELIST), o -> true);
+        whitelist = SERVER.defineList("urls", Arrays.asList(WHITELIST), o -> true);
 
         SERVER.pop();
 
@@ -315,7 +315,8 @@ public class WFConfig {
         return useWhitelist(!useWhitelist());
     }
     public static void addOnWhitelist(String url) {
-        var w = mutableSet(whitelist.get().iterator());
+        @SuppressWarnings("unchecked")
+        var w = (Set<String>) mutableSet(whitelist.get().iterator());
         w.add(url);
         whitelist.set(new ArrayList<>(w));
         whitelist.save();
