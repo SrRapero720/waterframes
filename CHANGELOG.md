@@ -1,3 +1,16 @@
+# UPDATE 2.1.4
+THIS UPDATE DROPS 1.18.2 AND 1.19.2 MAINTENANCE
+- 🐛 Fixed wrong config validation
+- 🐛 Fixed remote doesn't work on dedicated servers
+- 🐛 Fixed long server boot times when WF is installed
+  - 🛠️ This removes POWER and LEVEL blockstates in favor of runtime-tile calculation
+  - 🛠️ Saves memory when WorldEdit is installed
+- 🛠️ Breaking the TV Box with hand now gives you the TV Box
+- 🛠️ **[FABRIC]** Improved stability
+- 🌐 Updated translations
+  - 🍜 Added simplified chinese by SanQianQVQ
+  - 🍜 Traditional license was done by yichifauzi but last changelog says "simplified"
+
 # UPDATE 2.1.3
 - ✨ Click on a display using a remote (binded on that display) will pause it instead of open the Screen
   - ✨ This was added for since 2.1.0, but I forgot to add it on the changelog
