@@ -24,9 +24,6 @@ and the big difference with LittleFrames is **WATERFrAMES is fully designed to w
 - [CreativeCore](https://www.curseforge.com/minecraft/mc-mods/creativecore): GuiAPI and Networking
 - [WATERMeDIA](https://wwww.curseforge.com/minecraft/mc-mods/watermedia): Multimedia Support
 
-## 🖥️ VIDEO DEMOSTRATION
-<iframe src="https://www.youtube.com/embed/ns2u-24qcuI" width="560" height="314"></iframe>
-
 ## 🕹️ WANT A SERVER?
 **Get a server at just 1$ to get a 15% discount and make a theater with your friends**
 [![KineticHosting sponsor code WATERMoDS](https://i.imgur.com/2WFmJzc.png)](https://www.kinetichosting.net/)
@@ -48,6 +45,10 @@ Having me patience on the PRs and begin a nice dude.
 - English (SrRapero720)
 - Mexican Spanish (SrRapero720)
 - Russian (Heimdallr-1)
+- Simplified Chinese (SanQianQVQ)
+- Russian (cutiegin)
+- Ukrainian (cutiegin)
+- Japanese (argentum-2503)
 
 # ⁉️ FAQ
 - If it appears an error playing videos, try installing VLC
