@@ -45,6 +45,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     public static final BooleanProperty VISIBLE = new BooleanProperty("frame"){};
+    public static final IntegerProperty LIGHT_LEVEL = BlockStateProperties.LEVEL;
     public static final DirectionProperty ATTACHED_FACE = DirectionProperty.create("attached_face", Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST, Direction.UP, Direction.DOWN);
     protected static final Properties PROPERTIES = FabricBlockSettings.create()
             .luminance(value -> value.getValue(LIGHT_LEVEL))
@@ -121,6 +122,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         super.registerDefaultState(state
                 .setValue(WATERLOGGED, false)
                 .setValue(POWERED, false)
+                .setValue(LIGHT_LEVEL, 0)
         );
     }
 
@@ -130,6 +132,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
                 .add(ATTACHED_FACE)
                 .add(POWERED)
                 .add(WATERLOGGED)
+                .add(LIGHT_LEVEL)
         );
     }
 
@@ -174,10 +177,6 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return level.getBlockEntity(pos) instanceof DisplayTile tile ? tile.getAnalogOutput() : 0;
-    }
-
-    @Override public int getLightEmission(BlockState state, BlockGetter level, BlockPos pos) {
-        return level.getBlockEntity(pos) instanceof DisplayTile tile ? tile.getLightLevel() : 0;
     }
 
     @Override public float getShadeBrightness(BlockState state, BlockGetter level, BlockPos pos) {

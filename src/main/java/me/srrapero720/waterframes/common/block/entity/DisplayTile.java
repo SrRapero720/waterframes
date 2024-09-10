@@ -21,6 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,7 +43,6 @@ public class DisplayTile extends BlockEntity {
     @Environment(EnvType.CLIENT) private boolean isReleased;
 
     // this is more a runtime-block calculation variables, doesn't fix on DisplayData
-    private int lightLevel = 0;
     private int analogRedstoneLevel = 0;
 
     public DisplayTile(DisplayData data, DisplayCaps caps, BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
@@ -154,15 +154,9 @@ public class DisplayTile extends BlockEntity {
         super.setRemoved();
     }
 
-    @Override
-    public void onChunkUnloaded() {
-        if (this.isClient()) this.release();
-        super.onChunkUnloaded();
-    }
-
-    public int getLightLevel() {
-        return lightLevel;
-    }
+//    public int getLightLevel() {
+//        return lightLevel;
+//    }
 
     public int getAnalogOutput() {
         return analogRedstoneLevel;
@@ -261,14 +255,15 @@ public class DisplayTile extends BlockEntity {
         // LIGHT
         boolean lightOnPlay = WFConfig.useLightOnPlay() && (WFConfig.forceLightOnPlay() || this.data.lit);
         int calculatedLight = getLightLevel$internal();
-        if (lightOnPlay && this.lightLevel != calculatedLight) {
-            lightLevel = calculatedLight;
+        int currentLight = state.getValue(DisplayBlock.LIGHT_LEVEL);
+        if (lightOnPlay && currentLight != calculatedLight) {
+            state = state.setValue(DisplayBlock.LIGHT_LEVEL, calculatedLight);
             refresh = true;
         }
 
         // DO NOT SPAM BLOCKSTATES AND CHUNK UPDATES WHEN ISN'T NEEDED
         if (refresh) {
-            this.level.getChunkSource().getLightEngine().checkBlock(this.getBlockPos());
+            this.level.setBlock(this.getBlockPos(), state, Block.UPDATE_ALL);
             this.level.updateNeighborsAt(this.getBlockPos(), this.getBlockState().getBlock());
         }
 
