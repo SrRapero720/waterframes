@@ -15,9 +15,9 @@
     "waterframes.common.deactivated": "desactivada",
     "waterframes.common.width": "Ancho",
     "waterframes.common.height": "Alto",
-    "waterframes.common.unavailable": "Not available",
+    "waterframes.common.unavailable": "No disponible",
     "waterframes.common.soon": "Proximamente!",
-    "waterframes.common.access.denied": "Accesso denegadp",
+    "waterframes.common.access.denied": "Accesso denegado",
 
     "waterframes.remote.description.1": "§8[%s§8]§8 + [%s§8] para vincular y desvincular",
     "waterframes.remote.bound.success": "Vinculado exitosamente",
