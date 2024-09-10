@@ -44,9 +44,8 @@ Having me patience on the PRs and begin a nice dude.
 # 🌐 TRANSLATORS
 - English (SrRapero720)
 - Mexican Spanish (SrRapero720)
-- Russian (Heimdallr-1)
+- Russian (Heimdallr-1, cutiegin)
 - Simplified Chinese (SanQianQVQ)
-- Russian (cutiegin)
 - Ukrainian (cutiegin)
 - Japanese (argentum-2503)
 
