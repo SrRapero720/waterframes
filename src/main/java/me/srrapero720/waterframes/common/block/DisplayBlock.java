@@ -84,9 +84,10 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     }
 
     @Override public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (stack.getItem() instanceof RemoteControl control) {
-            boolean matchDim = control.getDimension(stack.get(WFRegistry.REMOTE_DATA)).equals(level.dimension().location().toString());
-            int[] position = control.getPosition(stack.get(WFRegistry.REMOTE_DATA));
+        var data = stack.get(WFRegistry.REMOTE_DATA);
+        if (stack.getItem() instanceof RemoteControl control && data != null) {
+            boolean matchDim = control.getDimension(data).equals(level.dimension().location().toString());
+            int[] position = control.getPosition(data);
             if (position.length == 0) return ItemInteractionResult.FAIL;
             boolean matchPos = new BlockPos(position[0], position[1], position[2]).equals(pos);
 
