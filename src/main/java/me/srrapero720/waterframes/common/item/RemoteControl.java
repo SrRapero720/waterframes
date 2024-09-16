@@ -149,11 +149,11 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     }
 
     public int[] getPosition(RemoteData data) {
-        return data != null ? data.getPos() : new int[0];
+        return data.getPos();
     }
 
     public String getDimension(RemoteData data) {
-        return data != null ? data.dimension() : null;
+        return data.dimension();
     }
 
     public void setPosition(CompoundTag tag, BlockPos pos) {
