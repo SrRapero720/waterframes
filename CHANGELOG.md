@@ -1,3 +1,6 @@
+# UPDATE 2.1.6
+- 🐛 Fixed crashes on newer versions of CreativeCore 
+
 # UPDATE 2.1.5
 - 🐛 Fixed default config regression
 - 🌐 Updated translations (since 2.1.4)
