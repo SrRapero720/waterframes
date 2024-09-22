@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.mixin.impl.creativecore;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import me.srrapero720.waterframes.common.compat.creativecore.IScalableText;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,8 +18,8 @@ public class CompiledTextMixin implements IScalableText {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;pushPose()V", ordinal = 0, shift = At.Shift.AFTER))
     @OnlyIn(Dist.CLIENT)
-    public void render(PoseStack pose, CallbackInfo ci) {
-        pose.scale(wf$scale, wf$scale, wf$scale);
+    public void render(GuiGraphics graphics, CallbackInfo ci) {
+        graphics.pose().scale(wf$scale, wf$scale, wf$scale);
     }
 
     @Override
