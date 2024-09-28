@@ -13,7 +13,6 @@
     "ArgumentTypeMixin",
     "MinecraftServerMixin",
     "RedstoneWireBlockMixin",
-    "RedstoneWireBlockMixin",
     "creativecore.CompiledTextMixin",
     "creativecore.GuiLabelMixin",
     "creativecore.GuiSliderMixin"
