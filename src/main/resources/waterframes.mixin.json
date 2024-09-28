@@ -7,6 +7,9 @@
   "client": [],
   "mixins": [
     "MinecraftServerMixin",
+    "RedstoneWireBlockMixin",
+    "creativecore.CompiledTextMixin",
+    "creativecore.GuiLabelMixin",
     "creativecore.GuiSliderMixin"
   ]
 }
