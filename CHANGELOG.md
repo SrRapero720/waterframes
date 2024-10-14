@@ -1,3 +1,7 @@
+# UPDATE 2.1.6a
+- 🐛 Fixed errors on AXE tag
+- 🐛 Fixed crashes with unbounded remotes when you click displays
+
 # UPDATE 2.1.6
 - 🐛 Fixed crashes on newer versions of CreativeCore 
 
