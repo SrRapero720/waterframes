@@ -7,7 +7,7 @@ import me.srrapero720.waterframes.common.block.entity.*;
 import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.network.packets.*;
-import me.srrapero720.watermedia.api.image.ImageAPI;
+import org.watermedia.api.image.ImageAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 
 import static me.srrapero720.waterframes.common.network.DisplayNetwork.*;
 import static me.srrapero720.waterframes.WaterFrames.*;
-import static me.srrapero720.watermedia.WaterMedia.IT;
+import static org.watermedia.WaterMedia.IT;
 
 @Mod.EventBusSubscriber(modid = ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WFRegistry {

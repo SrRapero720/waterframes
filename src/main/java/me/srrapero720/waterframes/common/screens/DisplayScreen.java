@@ -10,7 +10,7 @@ import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
 import me.srrapero720.waterframes.common.compat.creativecore.IScalableText;
-import me.srrapero720.watermedia.api.image.ImageCache;
+import org.watermedia.api.image.ImageCache;
 import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
