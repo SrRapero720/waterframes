@@ -6,11 +6,11 @@ import net.minecraft.core.BlockPos;
 import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 public class TimePacket extends DisplayControlPacket {
-    public long tick;
-    public long tickMax;
+    public int tick;
+    public int tickMax;
 
     public TimePacket(){}
-    public TimePacket(BlockPos pos, long tick, long tickMax, boolean bounce) {
+    public TimePacket(BlockPos pos, int tick, int tickMax, boolean bounce) {
         super(pos, bounce);
         this.tick = tick;
         this.tickMax = tickMax;

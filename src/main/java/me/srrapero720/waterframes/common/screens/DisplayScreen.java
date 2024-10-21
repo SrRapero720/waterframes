@@ -153,8 +153,8 @@ public class DisplayScreen extends GuiLayer {
         this.volume_max.setMinSlider(this.volume_min);
 
         this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax, LongValueParser.TIME_DURATION_TICK)
-                .setOnTimeUpdate(v -> tile.data.tick = v)
-                .setOnLastTimeUpdate(v -> tile.syncTime(true, v, tile.data.tickMax));
+                .setOnTimeUpdate(v -> tile.data.tick = (int) v)
+                .setOnLastTimeUpdate(v -> tile.syncTime(true, (int) v, tile.data.tickMax));
 
         this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, x -> tile.imageCache.reload());
         this.reload.setTooltip("waterframes.gui.reload");

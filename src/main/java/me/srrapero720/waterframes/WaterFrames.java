@@ -25,7 +25,7 @@ public class WaterFrames {
     public static final Logger LOGGER = LogManager.getLogger(ID);
     public static final ResourceLocation LOADING_ANIMATION = WaterFrames.asResource("loading_animation");
     public static final long SYNC_TIME = 1000L;
-    private static long ticks = 0;
+    private static int ticks = 0;
 
     // BOOTSTRAP
     public WaterFrames() {
@@ -72,11 +72,11 @@ public class WaterFrames {
 
     @OnlyIn(Dist.CLIENT)
     public static void tick() {
-        if (++ticks == Long.MAX_VALUE) ticks = 0;
+        if (++ticks == Integer.MAX_VALUE) ticks = 0;
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static long getTicks() {
+    public static int getTicks() {
         return ticks;
     }
 

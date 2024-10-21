@@ -7,10 +7,10 @@ import net.minecraft.core.BlockPos;
 
 public class PausePacket extends DisplayControlPacket {
     public boolean paused;
-    public long tick;
+    public int tick;
 
     public PausePacket(){}
-    public PausePacket(BlockPos pos, boolean paused, long tick, boolean bounce) {
+    public PausePacket(BlockPos pos, boolean paused, int tick, boolean bounce) {
         super(pos, bounce);
         this.paused = paused;
         this.tick = tick;

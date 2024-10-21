@@ -47,6 +47,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     public void render(DisplayTile tile, float partialTicks, PoseStack pose, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         var display = tile.activeDisplay();
         if (display == null || !WFConfig.keepsRendering()) return;
+        display.preRender();
 
         var direction = tile.getDirection();
         var box = tile.getRenderBox();

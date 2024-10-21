@@ -73,8 +73,8 @@ public class DisplayData {
     public boolean paused = false;
     public boolean muted = false;
     public boolean lit = true;
-    public long tick = 0;
-    public long tickMax = -1;
+    public int tick = 0;
+    public int tickMax = -1;
 
     public boolean renderBothSides = false;
 
@@ -147,8 +147,8 @@ public class DisplayData {
         this.paused = nbt.getBoolean(PAUSED);
         this.muted = nbt.getBoolean(MUTED);
         this.lit = !nbt.contains(LIT) || nbt.getBoolean(LIT);
-        this.tick = nbt.getLong(TICK);
-        this.tickMax = nbt.contains(TICK_MAX) ? nbt.getLong(TICK_MAX) : this.tickMax;
+        this.tick = nbt.getInt(TICK);
+        this.tickMax = nbt.contains(TICK_MAX) ? nbt.getInt(TICK_MAX) : this.tickMax;
         this.loop = nbt.getBoolean(LOOP);
 
         if (tile.caps.renderBehind()) {

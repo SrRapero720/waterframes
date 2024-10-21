@@ -83,7 +83,7 @@ dependencies {
 
     //DEPENDENCIES
     implementation "com.github.WaterMediaTeam.watermedia:build:$watermediaversion"
-    implementation fg.deobf("maven.modrinth:video-player:$videoplayerversion")
+    compileOnly fg.deobf("maven.modrinth:video-player:$videoplayerversion")
     implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
 }
 
