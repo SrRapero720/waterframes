@@ -341,7 +341,7 @@ public class DisplayData {
         String url = nbt.getString(URL);
         if (WFConfig.canSave(player, url)) {
             final URI uri = WaterFrames.createURI(url);
-            if (tile.data.uri != null && tile.data.uri.equals(uri)) {
+            if (tile.data.uri == null || tile.data.uri.equals(uri)) {
                 tile.data.tick = 0;
                 tile.data.tickMax = -1;
             }
