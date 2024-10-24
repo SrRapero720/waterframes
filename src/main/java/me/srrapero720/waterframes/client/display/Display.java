@@ -42,7 +42,7 @@ public class Display {
         this.tile = tile;
         this.imageCache = tile.imageCache;
         if (this.imageCache.isVideo()) this.switchVideoMode();
-        else this.imageCache.addOnReleaseListener(renderer -> {
+        else this.imageCache.addReleaseCallback(renderer -> {
             for (int tex: renderer.textures) {
                 WFRegistry.unregisterTexture(TEXTURES.remove(tex));
             }
@@ -74,19 +74,12 @@ public class Display {
 
         this.currentVolume = rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
 
-        URI uri;
-        try {
-            uri = NetworkAPI.parseURI(this.tile.data.url);
-        } catch (Exception e) {
-            uri = null;
-        }
-
         // PLAYER CONFIG
         this.mediaPlayer.setVolume(this.currentVolume);
         this.mediaPlayer.setRepeatMode(this.tile.data.loop);
         this.mediaPlayer.setPauseMode(this.tile.data.paused);
         this.mediaPlayer.setMuteMode(this.tile.data.muted);
-        this.mediaPlayer.start(uri);
+        this.mediaPlayer.start(this.tile.data.uri);
         DisplayList.add(this);
     }
 

@@ -17,6 +17,8 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.net.URI;
+
 @Mod(WaterFrames.ID)
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WaterFrames {
@@ -43,6 +45,14 @@ public class WaterFrames {
 
     public static boolean isInstalled(String modId) {
         return FMLLoader.getLoadingModList().getModFileById(modId) != null;
+    }
+
+    public static URI createURI(String uri) {
+        try {
+            return new URI(uri);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static boolean isInstalled(String... mods) {

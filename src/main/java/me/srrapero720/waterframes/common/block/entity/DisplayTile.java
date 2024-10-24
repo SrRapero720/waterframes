@@ -80,7 +80,7 @@ public class DisplayTile extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
     public Display requestDisplay() {
-        if (!this.data.active || (this.data.url.isEmpty() && display != null)) {
+        if (!this.data.active || (this.data.uri == null && display != null)) {
             this.cleanDisplay();
             return null;
         }
@@ -90,8 +90,8 @@ public class DisplayTile extends BlockEntity {
             return null;
         }
 
-        if (this.imageCache == null || !this.imageCache.url.equals(this.data.url)) {
-            this.imageCache = ImageAPI.getCache(this.data.url, Minecraft.getInstance());
+        if (this.imageCache == null || !this.imageCache.uri.equals(this.data.uri)) {
+            this.imageCache = ImageAPI.getCache(this.data.uri, Minecraft.getInstance());
             this.cleanDisplay();
         }
 
@@ -178,7 +178,7 @@ public class DisplayTile extends BlockEntity {
     }
 
     private int getLightLevel$internal() {
-        return  this.data.url.isEmpty() ? 0 : (int) (((float) this.data.brightness / 255f) * level.getMaxLightLevel());
+        return  this.data.uri == null ? 0 : (int) (((float) this.data.brightness / 255f) * level.getMaxLightLevel());
     }
 
     private int getAnalogOutput$internal() {

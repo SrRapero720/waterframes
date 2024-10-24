@@ -67,6 +67,7 @@
     "waterframes.status.idle": "En espera",
     "waterframes.status.failed": "Fallo al cargar",
     "waterframes.status.not_working": "Algo muy malo paso",
+    "waterframes.status.cache": "Cargado de la cache",
 
     "waterframes.download.exception.forbidden": "403 - Acceso Denegado",
     "waterframes.download.exception.notfound": "404 - No encontrado",

@@ -102,6 +102,6 @@ public class DisplayList {
     // @SubscribeEvent
     public static void onClientPause(/*ClientPauseChangeEvent.Post event*/boolean paused) {
         if (/*event.isPaused()*/paused) DisplayList.pause();
-        else DisplayList.resume();
+        // else DisplayList.resume();
     }
 }

@@ -8,6 +8,7 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WFRegistry;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
@@ -35,10 +36,8 @@ import net.minecraftforge.server.command.EnumArgument;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
+import java.net.URI;
 import java.util.*;
-import java.util.regex.Pattern;
-
-import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 import java.util.function.Supplier;
 
@@ -213,12 +212,14 @@ public class WaterFramesCommand {
     public static int setUrl(DisplayTile tile, CommandSourceStack source, String url) {
         if (tile == null) return 1;
 
-        if (!tile.data.url.equals(url)) {
+        URI uri = WaterFrames.createURI(url);
+
+        if (tile.data.uri != null && tile.data.uri.equals(uri)) {
             tile.data.tick = 0;
             tile.data.tickMax = -1;
         }
 
-        tile.data.url = url;
+        tile.data.uri = uri;
         tile.data.uuid = (source.getEntity() instanceof Player player) ? player.getUUID() : Util.NIL_UUID;
 
         tile.setDirty();

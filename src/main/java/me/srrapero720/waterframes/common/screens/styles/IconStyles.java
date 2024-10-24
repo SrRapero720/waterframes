@@ -46,6 +46,7 @@ public class IconStyles {
     public static final Icon STATUS_CASSETE_MODE = create(2, 7);
     public static final Icon STATUS_OFF = create(2, 8);
     public static final Icon STATUS_MEDIA_ERROR = create(2, 9);
+    public static final Icon STATUS_OK_CACHE = create(2, 10);
     public static final Icon MIRROR_ON = create(2, 14, 2);
     public static final Icon MIRROR_OFF = create(2, 15, 2);
 

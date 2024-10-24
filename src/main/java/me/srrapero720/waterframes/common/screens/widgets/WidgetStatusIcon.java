@@ -45,7 +45,7 @@ public class WidgetStatusIcon extends GuiIcon {
             case LOADING -> ChatFormatting.AQUA + translate("waterframes.status.loading");
             case FAILED -> ChatFormatting.RED + translate("waterframes.download.exception.invalid");
             case WAITING, FORGOTTEN -> {
-                if (tile.imageCache.url.isEmpty())
+                if (tile.imageCache.uri == null)
                     yield ChatFormatting.AQUA + translate("waterframes.status.idle");
                 else {
                     Exception e = tile.imageCache.getException();
@@ -58,6 +58,9 @@ public class WidgetStatusIcon extends GuiIcon {
             }
         };
         tooltip.add(translatable("waterframes.status", status));
+        if (tile.imageCache.isCache()) {
+            tooltip.add(translatable("waterframes.status.cache").withStyle(ChatFormatting.AQUA));
+        }
 
         return tooltip;
     }
@@ -67,10 +70,10 @@ public class WidgetStatusIcon extends GuiIcon {
         if (!tile.data.active) return IconStyles.STATUS_OFF;
         if (tile.imageCache == null) return IconStyles.STATUS_ERROR;
         return switch (tile.imageCache.getStatus()) {
-            case READY -> IconStyles.STATUS_OK;
+            case READY -> tile.imageCache.isCache() ? IconStyles.STATUS_OK_CACHE : IconStyles.STATUS_OK;
             case LOADING -> IconStyles.STATUS_WARN;
             case FAILED -> IconStyles.STATUS_ERROR;
-            case WAITING, FORGOTTEN -> tile.imageCache.url.isEmpty() ? IconStyles.STATUS_IDLE : IconStyles.STATUS_ERROR;
+            case WAITING, FORGOTTEN -> tile.imageCache.uri == null ? IconStyles.STATUS_IDLE : IconStyles.STATUS_ERROR;
         };
     }
 }

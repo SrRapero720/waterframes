@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.common.block.data;
 
 import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.types.AudioPosition;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
@@ -12,6 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import team.creative.creativecore.common.util.math.vec.Vec2f;
 
+import java.net.URI;
 import java.util.UUID;
 
 public class DisplayData {
@@ -51,7 +53,7 @@ public class DisplayData {
 
     public static final short V = 2;
 
-    public String url = "";
+    public URI uri = null;
     public UUID uuid = Util.NIL_UUID;
     public boolean active = true;
     public final Vec2f min = new Vec2f(0f, 0f); // TODO: use vanilla Vec2
@@ -88,7 +90,7 @@ public class DisplayData {
     public float getHeight() { return this.max.y - this.min.y; }
 
     public void save(CompoundTag nbt, DisplayTile tile) {
-        nbt.putString(URL, url);
+        nbt.putString(URL, uri == null ? "" : uri.toString());
         nbt.putUUID(PLAYER_UUID, uuid);
         nbt.putBoolean(ACTIVE, active);
         if (tile.caps.resizes()) {
@@ -126,7 +128,8 @@ public class DisplayData {
     }
 
     public void load(CompoundTag nbt, DisplayTile tile) {
-        this.url = nbt.getString(URL);
+        String url = nbt.getString(URL);
+        this.uri = url.isEmpty() ? null : WaterFrames.createURI(nbt.getString(URL));
         this.uuid = nbt.contains(PLAYER_UUID) ? nbt.getUUID(PLAYER_UUID) : this.uuid;
         this.active = nbt.contains(ACTIVE) ? nbt.getBoolean(ACTIVE) : this.active;
         if (tile.caps.resizes()) {
@@ -337,12 +340,13 @@ public class DisplayData {
     public static void sync(DisplayTile tile, Player player, CompoundTag nbt) {
         String url = nbt.getString(URL);
         if (WFConfig.canSave(player, url)) {
-            if (!tile.data.url.equals(url)) {
+            final URI uri = WaterFrames.createURI(url);
+            if (tile.data.uri != null && tile.data.uri.equals(uri)) {
                 tile.data.tick = 0;
                 tile.data.tickMax = -1;
             }
-            tile.data.url = url;
-            tile.data.uuid = !tile.data.url.isEmpty() ? player.getUUID() : Util.NIL_UUID;
+            tile.data.uri = uri;
+            tile.data.uuid = tile.data.uri != null ? player.getUUID() : Util.NIL_UUID;
             tile.data.active = nbt.getBoolean(ACTIVE);
 
             if (tile.caps.resizes()) {

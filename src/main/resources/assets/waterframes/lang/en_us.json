@@ -67,6 +67,7 @@
     "waterframes.status.idle": "Idle",
     "waterframes.status.failed": "Failed to load",
     "waterframes.status.not_working": "Something wrong happened",
+    "waterframes.status.cache": "Loaded from cache",
 
     "waterframes.download.exception.forbidden": "403 - Forbidden",
     "waterframes.download.exception.notfound": "404 - Not found",

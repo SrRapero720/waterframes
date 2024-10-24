@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.common.screens;
 
 import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.compat.videoplayer.VPCompat;
@@ -166,7 +167,7 @@ public class DisplayScreen extends GuiLayer {
 
         if (VPCompat.installed()) {
             this.videoplayer = new GuiButtonIcon("", IconStyles.VIDEOPLAYER_PLAY, button -> {
-                VPCompat.playVideo(tile.data.url, tile.data.volume, false, true);
+                VPCompat.playVideo(tile.data.uri.toString(), tile.data.volume, false, true);
                 tile.setPause(true, true);
             });
             this.videoplayer.setTooltip("waterframes.gui.videoplayer");
@@ -388,11 +389,11 @@ public class DisplayScreen extends GuiLayer {
     }
 
     public boolean enableVideoPlayer() {
-        return !tile.data.url.isEmpty() && tile.imageCache != null && tile.imageCache.getStatus() == ImageCache.Status.READY;
+        return tile.data.uri != null && tile.imageCache != null && tile.imageCache.getStatus() == ImageCache.Status.READY;
     }
 
     public boolean enableReload() {
-        return tile.imageCache != null && !this.url.getText().isEmpty() && !tile.data.url.isEmpty() && this.url.getText().equals(tile.data.url);
+        return tile.imageCache != null && !this.url.getText().isEmpty() && tile.data.uri != null && tile.data.uri.equals(WaterFrames.createURI(this.url.getText()));
     }
 
     @Override

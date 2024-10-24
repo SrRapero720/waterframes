@@ -29,7 +29,7 @@ public class TimePacket extends DisplayControlPacket {
 
     @Override
     public void exec(DisplayTile tile) {
-        if (tile.data.url.isEmpty()) {
+        if (tile.data.uri == null) {
             tile.data.tickMax = -1;
             tile.data.tick = 0;
         } else {
