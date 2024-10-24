@@ -90,6 +90,10 @@ public class DisplayTile extends BlockEntity {
             return null;
         }
 
+        if (imageCache == null && this.data.uri == null) {
+            return null;
+        }
+
         if (this.imageCache == null || !this.imageCache.uri.equals(this.data.uri)) {
             this.imageCache = ImageAPI.getCache(this.data.uri, Minecraft.getInstance());
             this.cleanDisplay();

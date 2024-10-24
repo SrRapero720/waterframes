@@ -12,7 +12,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 
-import java.net.URL;
+import java.net.URI;
 import java.util.*;
 
 public class WFConfig {
@@ -334,16 +334,15 @@ public class WFConfig {
         }
     }
 
-    public static boolean isWhiteListed(String url) {
+    public static boolean isWhiteListed(URI uri) {
         if (!useWhitelist()) return true;
 
-        if (url.startsWith("local://")
-                || url.startsWith("game://")
-                || url.startsWith("user://")
-                || url.startsWith("users://")) return true; // local files = anything you have
+        // watermedia driven protocol
+        if (uri.getAuthority().equals("water")) return true;
 
         try {
-            var host = new URL(url).getHost();
+            var host = uri.getHost();
+            if (host == null) return false;
 
             for (var s: whitelist.get()) {
                 if (host.endsWith("." + s) || host.equals(s)) {
@@ -365,7 +364,9 @@ public class WFConfig {
         if (isAdmin(player)) return true;
 
         try {
-            return url.isEmpty() || isWhiteListed(url);
+            URI uri = WaterFrames.createURI(url);
+            if (uri == null) return false;
+            return url.isEmpty() || isWhiteListed(uri);
         } catch (Exception e) {
             return false;
         }

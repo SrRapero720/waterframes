@@ -13,7 +13,6 @@ import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 import team.creative.creativecore.common.util.text.TextBuilder;
 
-import java.net.URL;
 import java.util.List;
 
 public class WidgetURLTextField extends GuiTextfield {
@@ -27,7 +26,7 @@ public class WidgetURLTextField extends GuiTextfield {
 
     @Override
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
-        return ScreenStyles.BLUE_BORDER;
+        return isUrlValid(this.getText()) ? ScreenStyles.BLUE_BORDER : ScreenStyles.RED_BORDER;
     }
 
     @Override

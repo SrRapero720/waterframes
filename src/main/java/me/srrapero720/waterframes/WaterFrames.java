@@ -17,6 +17,7 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
 import java.net.URI;
 
 @Mod(WaterFrames.ID)
@@ -47,9 +48,14 @@ public class WaterFrames {
         return FMLLoader.getLoadingModList().getModFileById(modId) != null;
     }
 
-    public static URI createURI(String uri) {
+    public static URI createURI(String s) {
+        File f = new File(s);
+        // accept local paths as file uris
+        if (!f.isDirectory() && f.exists())
+            return new File(s).toURI();
+
         try {
-            return new URI(uri);
+            return new URI(s);
         } catch (Exception e) {
             return null;
         }
