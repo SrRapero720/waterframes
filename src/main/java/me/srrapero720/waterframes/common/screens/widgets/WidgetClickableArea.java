@@ -2,15 +2,15 @@ package me.srrapero720.waterframes.common.screens.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import org.joml.Matrix4f;
 import team.creative.creativecore.common.gui.GuiChildControl;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
 import team.creative.creativecore.common.util.math.geo.Rect;
@@ -29,9 +29,8 @@ public class WidgetClickableArea extends GuiIcon {
     }
 
     @Override
-    protected void renderContent(GuiGraphics guiGraphics, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
-        PoseStack pose = guiGraphics.pose();
-        super.renderContent(guiGraphics, control, rect, mouseX, mouseY);
+    protected void renderContent(PoseStack pose, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
+        super.renderContent(pose, control, rect, mouseX, mouseY);
         this.renderSelector(pose, control, rect, mouseX, mouseY);
     }
 

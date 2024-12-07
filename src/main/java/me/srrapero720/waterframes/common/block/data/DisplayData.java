@@ -11,7 +11,7 @@ import me.srrapero720.waterframes.common.screens.DisplayScreen;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
-import org.joml.Vector2f;
+import team.creative.creativecore.common.util.math.vec.Vec2f;
 
 import java.net.URI;
 import java.util.UUID;
@@ -56,8 +56,8 @@ public class DisplayData {
     public URI uri = null;
     public UUID uuid = Util.NIL_UUID;
     public boolean active = true;
-    public Vector2f min = new Vector2f(0F, 0F);
-    public Vector2f max = new Vector2f(1F, 1F);
+    public Vec2f min = new Vec2f(0F, 0F);
+    public Vec2f max = new Vec2f(1F, 1F);
 
     public boolean flipX = false;
     public boolean flipY = false;

@@ -130,21 +130,21 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     private void sendSuccess(Player player, MutableComponent component) {
         if (player.level.isClientSide) {
             player.displayClientMessage(component.withStyle(ChatFormatting.AQUA), true);
-            player.playSound(NoteBlockInstrument.BELL.getSoundEvent().get(), 1.0f, 1.25f);
+            player.playSound(NoteBlockInstrument.BELL.getSoundEvent(), 1.0f, 1.25f);
         }
     }
 
     private void sendFailed(Player player, MutableComponent component) {
         if (player.level.isClientSide) {
             player.displayClientMessage(component.withStyle(ChatFormatting.RED), true);
-            player.playSound(NoteBlockInstrument.HARP.getSoundEvent().get(), 1.0f, 0.75f);
+            player.playSound(NoteBlockInstrument.HARP.getSoundEvent(), 1.0f, 0.75f);
         }
     }
 
     private void sendFatal(Player player, MutableComponent component) {
         if (player.level.isClientSide) {
             player.displayClientMessage(component.withStyle(ChatFormatting.DARK_RED), true);
-            player.playSound(NoteBlockInstrument.HARP.getSoundEvent().get(), 1.0f, 0.5f);
+            player.playSound(NoteBlockInstrument.HARP.getSoundEvent(), 1.0f, 0.5f);
         }
     }
 
