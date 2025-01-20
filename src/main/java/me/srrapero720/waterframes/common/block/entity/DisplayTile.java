@@ -273,7 +273,7 @@ public class DisplayTile extends BlockEntity {
         }
 
         // LIGHT
-        boolean lightOnPlay = DisplaysConfig.useLightOnPlay() && (DisplaysConfig.forceLightOnPlay() || this.data.lit);
+        boolean lightOnPlay = DisplaysConfig.forceLightOnPlay() || DisplaysConfig.useLightOnPlay() && this.data.lit;
         int calculatedLight = getLightLevel$internal();
         if (lightOnPlay && this.lightLevel != calculatedLight) {
             lightLevel = calculatedLight;
