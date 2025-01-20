@@ -119,8 +119,8 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         builder.vertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
                 .color(r, g, b, a)
                 .uv(corner.isFacing(boxface.getTexU()) != flipX ? 1f : 0f, corner.isFacing(boxface.getTexV()) != flipY ? 1f : 0f)
-                .uv2(packedLight)
                 .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(packedLight)
                 .normal(pose.last().normal(), normal.getX(), normal.getY(), normal.getZ())
                 .endVertex();
     }
