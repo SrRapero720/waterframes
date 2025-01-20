@@ -395,7 +395,11 @@ public class WFConfig {
         if (!useWhitelist()) return true;
 
         // watermedia driven protocol
-        if (uri.getAuthority().equals("water")) return true;
+        String scheme = uri.getScheme();
+        if (scheme == null)
+            return false; // no scheme, no url, in the best case this must never happend
+
+        if (scheme.equals("water")) return true;
 
         var host = uri.getHost();
         if (host == null) return false;
