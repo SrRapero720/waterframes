@@ -46,7 +46,7 @@ import static me.srrapero720.waterframes.WaterFrames.*;
 import static org.watermedia.WaterMedia.IT;
 
 @Mod.EventBusSubscriber(modid = ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class WFRegistry {
+public class DisplaysRegistry {
     private static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, ID);
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ID);
@@ -202,7 +202,7 @@ public class WFRegistry {
         @OnlyIn(Dist.CLIENT)
         public static void init(FMLClientSetupEvent e) {
             LOGGER.info(IT, "Running WATERFrAMES v{}", ModList.get().getModFileById(ID).versionString());
-            if (WaterFrames.isInstalled("mr_stellarity", "stellarity") && !WFConfig.isDevMode()) {
+            if (WaterFrames.isInstalled("mr_stellarity", "stellarity") && !DisplaysConfig.isDevMode()) {
                 throw new UnsupportedModException("mr_stellarity (Stellarity)", "breaks picture rendering, overwrites Minecraft core shaders and isn't possible work around that");
             }
         }

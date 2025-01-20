@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.block;
 
-import me.srrapero720.waterframes.WFRegistry;
+import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.common.block.entity.BigTvTile;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -29,7 +29,7 @@ public class BigTvBlock extends DisplayBlock {
 
     @Override
     public PermissionNode<Boolean> getPermissionNode() {
-        return WFRegistry.PERM_DISPLAYS_INTERACT_TV;
+        return DisplaysRegistry.PERM_DISPLAYS_INTERACT_TV;
     }
 
     public static AlignedBox box(Direction direction, Direction attachedFace, boolean renderMode) {

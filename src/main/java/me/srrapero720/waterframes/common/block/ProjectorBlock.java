@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.block;
 
-import me.srrapero720.waterframes.WFRegistry;
+import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -28,7 +28,7 @@ public class ProjectorBlock extends DisplayBlock {
 
     @Override
     public PermissionNode<Boolean> getPermissionNode() {
-        return WFRegistry.PERM_DISPLAYS_INTERACT_PROJECTOR;
+        return DisplaysRegistry.PERM_DISPLAYS_INTERACT_PROJECTOR;
     }
 
     @Override

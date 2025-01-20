@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.screens;
 
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
@@ -198,7 +198,7 @@ public class RemoteControlScreen extends GuiLayer {
         if (!isClient()) return;
 
         double distance = WaterFrames.getDistance(tile, player.position());
-        if (distance < WFConfig.maxRcDis()) {
+        if (distance < DisplaysConfig.maxRcDis()) {
             if (!allEnabled) {
                 this.allEnabled = true;
                 hyperIterate(this.iterator(), c -> {
@@ -210,7 +210,7 @@ public class RemoteControlScreen extends GuiLayer {
             if (distance == 0) {
                 this.signal.setIcon(IconStyles.SIGNAL_4);
             } else {
-                int diff = (int) ((distance / WFConfig.maxRcDis()) * 100); // 100 - far | 0 - closer
+                int diff = (int) ((distance / DisplaysConfig.maxRcDis()) * 100); // 100 - far | 0 - closer
                 if (diff < 25) {
                     this.signal.setIcon(IconStyles.SIGNAL_4);
                 } else if (diff < 50) {

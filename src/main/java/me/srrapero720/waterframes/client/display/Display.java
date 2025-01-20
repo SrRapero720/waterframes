@@ -47,14 +47,14 @@ public class Display {
         if (this.imageCache.isVideo()) this.switchVideoMode();
         else this.imageCache.addReleaseCallback(renderer -> {
             for (int tex: renderer.textures) {
-                WFRegistry.unregisterTexture(TEXTURES.remove(tex));
+                DisplaysRegistry.unregisterTexture(TEXTURES.remove(tex));
             }
         });
     }
 
     private void switchVideoMode() {
         // DO NOT USE VIDEOLAN IF I DONT WANT
-        if (!WFConfig.useMultimedia()) {
+        if (!DisplaysConfig.useMultimedia()) {
             return;
         }
 
@@ -123,7 +123,7 @@ public class Display {
         if (texture != -1) {
             return TEXTURES.computeIfAbsent(texture, (Function<Integer, ResourceLocation>) integer -> {
                 var id = WaterFrames.asResource(texture);
-                WFRegistry.registerTexture(id, new TextureWrapper(texture));
+                DisplaysRegistry.registerTexture(id, new TextureWrapper(texture));
                 return id;
             });
         }
@@ -192,7 +192,7 @@ public class Display {
                             time = (time == 0 || mediaDuration == 0) ? 0 : Math.floorMod(time, this.mediaPlayer.getMediaInfoDuration());
                         }
 
-                        if (Math.abs(time - mediaPlayer.getTime()) > (WFConfig.useSlavismMode() ? 10000 : WaterFrames.SYNC_TIME) && Math.abs(time - currentLastTime) > (WFConfig.useSlavismMode() ? 10000 : WaterFrames.SYNC_TIME)) {
+                        if (Math.abs(time - mediaPlayer.getTime()) > (DisplaysConfig.useSlavismMode() ? 10000 : WaterFrames.SYNC_TIME) && Math.abs(time - currentLastTime) > (DisplaysConfig.useSlavismMode() ? 10000 : WaterFrames.SYNC_TIME)) {
                             this.currentLastTime = time;
                             this.seekTo(time);
                         }
@@ -207,7 +207,7 @@ public class Display {
     }
 
     private void seekTo(long time) {
-        if (WFConfig.useSlavismMode() && this.seeking()) {
+        if (DisplaysConfig.useSlavismMode() && this.seeking()) {
             this.seekTime = time;
         } else {
             this.mediaPlayer.seekTo(time);
@@ -287,7 +287,7 @@ public class Display {
             case PICTURE -> {}
             case VIDEO, AUDIO -> {
                 mediaPlayer.release();
-                WFRegistry.unregisterTexture(TEXTURES.remove(mediaPlayer.texture()));
+                DisplaysRegistry.unregisterTexture(TEXTURES.remove(mediaPlayer.texture()));
                 DisplayList.remove(this);
             }
         }
@@ -309,7 +309,7 @@ public class Display {
         if (distance > min)
             volume = (distance > max + 1) ? 0 : (int) (volume * (1 - ((distance - min) / ((1 + max) - min))));
 
-        if (WFConfig.useMasterVolume()) {
+        if (DisplaysConfig.useMasterVolume()) {
             volume = (int) (volume * (Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER)));
         }
 

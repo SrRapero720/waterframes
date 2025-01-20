@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.client.display;
 
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.api.distmarker.Dist;
@@ -104,7 +104,7 @@ public class DisplayList {
     @SubscribeEvent
     public static void onLoadingLevel(LevelEvent.Load event) {
         if (event.getLevel() != null && event.getLevel().isClientSide()) {
-            WaterMedia.setSlavismMode(WFConfig.useSlavismMode());
+            WaterMedia.setSlavismMode(DisplaysConfig.useSlavismMode());
         }
     }
 

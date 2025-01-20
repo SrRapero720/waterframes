@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.block;
 
-import me.srrapero720.waterframes.WFRegistry;
+import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.common.block.entity.FrameTile;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -31,7 +31,7 @@ public class FrameBlock extends DisplayBlock {
 
     @Override
     public PermissionNode<Boolean> getPermissionNode() {
-        return WFRegistry.PERM_DISPLAYS_INTERACT_FRAME;
+        return DisplaysRegistry.PERM_DISPLAYS_INTERACT_FRAME;
     }
 
     @Override

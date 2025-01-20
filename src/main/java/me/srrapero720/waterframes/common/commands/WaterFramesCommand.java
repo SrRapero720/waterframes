@@ -7,8 +7,8 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.WFRegistry;
+import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
@@ -196,12 +196,12 @@ public class WaterFramesCommand {
         );
 
         DEFAULT_INPUTS = new ItemInput[] {
-                new ItemInput(Holder.direct(WFRegistry.REMOTE_ITEM.get()), null),
-                new ItemInput(Holder.direct(WFRegistry.FRAME_ITEM.get()), null),
-                new ItemInput(Holder.direct(WFRegistry.PROJECTOR_ITEM.get()), null),
-                new ItemInput(Holder.direct(WFRegistry.TV_ITEM.get()), null),
-                new ItemInput(Holder.direct(WFRegistry.BIG_TV_ITEM.get()), null),
-                new ItemInput(Holder.direct(WFRegistry.TV_BOX_ITEM.get()), null),
+                new ItemInput(Holder.direct(DisplaysRegistry.REMOTE_ITEM.get()), null),
+                new ItemInput(Holder.direct(DisplaysRegistry.FRAME_ITEM.get()), null),
+                new ItemInput(Holder.direct(DisplaysRegistry.PROJECTOR_ITEM.get()), null),
+                new ItemInput(Holder.direct(DisplaysRegistry.TV_ITEM.get()), null),
+                new ItemInput(Holder.direct(DisplaysRegistry.BIG_TV_ITEM.get()), null),
+                new ItemInput(Holder.direct(DisplaysRegistry.TV_BOX_ITEM.get()), null),
         };
 
         dispatcher.register(waterframes);
@@ -448,7 +448,7 @@ public class WaterFramesCommand {
     }
 
     public static int slavistMode(CommandSourceStack source, boolean enabled) {
-        WFConfig.useSlavismMode(enabled);
+        DisplaysConfig.useSlavismMode(enabled);
         source.sendSuccess(msgSuccess("waterframes.commands.slavist.success", enabled ? ACTIVATED : DEACTIVATED), true);
 
         for(ServerPlayer p: source.getServer().getPlayerList().getPlayers()) {
@@ -458,12 +458,12 @@ public class WaterFramesCommand {
     }
 
     public static int whitelist$toggle(CommandSourceStack source) {
-        source.sendSuccess(msgSuccess("waterframes.commands.whitelist.toggle", WFConfig.toggleWhitelist() ? ACTIVATED : DEACTIVATED), true);
+        source.sendSuccess(msgSuccess("waterframes.commands.whitelist.toggle", DisplaysConfig.toggleWhitelist() ? ACTIVATED : DEACTIVATED), true);
         return 0;
     }
 
     public static int whitelist$remove(CommandSourceStack source, String value) {
-        boolean removed = WFConfig.removeOnWhitelist(value);
+        boolean removed = DisplaysConfig.removeOnWhitelist(value);
         if (removed)
             source.sendSuccess(msgSuccess("waterframes.commands.whitelist.remove", value), true);
         else
@@ -472,7 +472,7 @@ public class WaterFramesCommand {
     }
 
     public static int whitelist$add(CommandSourceStack source, String value) {
-        WFConfig.addOnWhitelist(value);
+        DisplaysConfig.addOnWhitelist(value);
         source.sendSuccess(msgSuccess("waterframes.commands.whitelist.add", value), true);
         return 0;
     }

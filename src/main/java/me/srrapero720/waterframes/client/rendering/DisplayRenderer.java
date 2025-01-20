@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.client.rendering;
 
 import com.mojang.blaze3d.vertex.*;
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.Util;
@@ -46,7 +46,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     @Override
     public void render(DisplayTile tile, float partialTicks, PoseStack pose, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         var display = tile.activeDisplay();
-        if (display == null || !WFConfig.keepsRendering()) return;
+        if (display == null || !DisplaysConfig.keepsRendering()) return;
         display.preRender();
 
         var direction = tile.getDirection();

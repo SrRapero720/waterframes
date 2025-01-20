@@ -32,8 +32,8 @@ public class WaterFrames {
 
     // BOOTSTRAP
     public WaterFrames() {
-        WFConfig.init();
-        WFRegistry.init(FMLJavaModLoadingContext.get().getModEventBus());
+        DisplaysConfig.init();
+        DisplaysRegistry.init(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
     public static ResourceLocation asResource(String id) {
@@ -75,7 +75,7 @@ public class WaterFrames {
     }
 
     public static double getDistance(Level level, BlockPos pos, Position position) {
-        if (VSCompat.installed() && WFConfig.vsEurekaCompat()) {
+        if (VSCompat.installed() && DisplaysConfig.vsEurekaCompat()) {
             return Math.sqrt(VSCompat.getSquaredDistance(level, pos, position));
         }
         return Math.sqrt(pos.distToLowCornerSqr(position.x(), position.y(), position.z()));

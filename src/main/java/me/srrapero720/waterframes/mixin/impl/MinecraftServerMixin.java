@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.mixin.impl;
 
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.Util;
@@ -25,7 +25,7 @@ public class MinecraftServerMixin {
 
     @Redirect(method = "runServer", at = @At(value = "INVOKE", target = "Lnet/minecraft/Util;getMillis()J", ordinal = 1))
     public long redirect$runServer$getMillisWhile() {
-        if (!WFConfig.useLagTickCorrection()) return Util.getMillis();
+        if (!DisplaysConfig.useLagTickCorrection()) return Util.getMillis();
         long millis = Util.getMillis();
         long time = millis - wf$lastMillisTime;
         if (time > 100) // 50ms is 1 tick

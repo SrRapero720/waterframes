@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.network.packets;
 
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.core.BlockPos;
 
@@ -26,7 +26,7 @@ public class VolumePacket extends DisplayControlPacket {
 
     @Override
     public void exec(DisplayTile tile) {
-        tile.data.volume = WFConfig.maxVol(this.volume);
+        tile.data.volume = DisplaysConfig.maxVol(this.volume);
     }
 
 }

@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.item;
 
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.RemoteControlScreen;
@@ -24,8 +24,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Marker;
@@ -54,7 +52,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
             return InteractionResultHolder.fail(stack);
         }
 
-        if (!WFConfig.canInteractRemote(player)) {
+        if (!DisplaysConfig.canInteractRemote(player)) {
             this.sendFatal(player, Component.translatable("waterframes.common.access.denied"));
             return InteractionResultHolder.fail(stack);
         }
@@ -84,7 +82,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
 
         if (level.getBlockEntity(blockPos) instanceof DisplayTile tile) {
             double distance = WaterFrames.getDistance(tile, player.position());
-            if (level.dimension().location().equals(dimension) && distance < WFConfig.maxRcDis()) {
+            if (level.dimension().location().equals(dimension) && distance < DisplaysConfig.maxRcDis()) {
                 GuiCreator.ITEM_OPENER.open(player.getItemInHand(hand).getOrCreateTag(), player, hand);
                 return InteractionResultHolder.success(stack);
             }
@@ -109,7 +107,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
             return InteractionResult.PASS;
         }
 
-        if (!WFConfig.canBindRemote(player)) {
+        if (!DisplaysConfig.canBindRemote(player)) {
             this.sendFatal(player, Component.translatable("waterframes.common.access.denied"));
             return InteractionResult.FAIL;
         }

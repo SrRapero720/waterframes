@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.block.entity;
 
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.Display;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
@@ -273,7 +273,7 @@ public class DisplayTile extends BlockEntity {
         }
 
         // LIGHT
-        boolean lightOnPlay = WFConfig.useLightOnPlay() && (WFConfig.forceLightOnPlay() || this.data.lit);
+        boolean lightOnPlay = DisplaysConfig.useLightOnPlay() && (DisplaysConfig.forceLightOnPlay() || this.data.lit);
         int calculatedLight = getLightLevel$internal();
         if (lightOnPlay && this.lightLevel != calculatedLight) {
             lightLevel = calculatedLight;

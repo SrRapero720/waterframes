@@ -18,7 +18,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class WFConfig {
+public class DisplaysConfig {
     private static final Pattern HOSTS_PATTERN = Pattern.compile("^(?!-)([a-zA-Z0-9-]{1,63}\\.)+[a-zA-Z]{2,63}$");
 
     private static final Builder SERVER = new Builder();
@@ -423,8 +423,8 @@ public class WFConfig {
         URI uri = WaterFrames.createURI(url);
         boolean valid = uri != null || url.isEmpty();
         if (usePermissionsAPI.get()) {
-            boolean canSave = WFRegistry.getPermBoolean(player.getUUID(), WFRegistry.PERM_DISPLAYS_EDIT);
-            boolean canBypass = WFRegistry.getPermBoolean(player.getUUID(), WFRegistry.PERM_WHITELIST_BYPASS);
+            boolean canSave = DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_DISPLAYS_EDIT);
+            boolean canBypass = DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_WHITELIST_BYPASS);
             boolean whitelisted = isWhiteListed(uri);
 
             if (canSave && (whitelisted || canBypass)) {
@@ -444,7 +444,7 @@ public class WFConfig {
         if (usePermissionsAPI.get()) {
             PermissionNode<Boolean> NODE = block.getPermissionNode();
 
-            return WFRegistry.getPermBoolean(player.getUUID(), WFRegistry.PERM_DISPLAYS_INTERACT) || WFRegistry.getPermBoolean(player.getUUID(), NODE);
+            return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_DISPLAYS_INTERACT) || DisplaysRegistry.getPermBoolean(player.getUUID(), NODE);
         } else {
             GameType gameType = (player instanceof ServerPlayer serverPlayer)
                     ? serverPlayer.gameMode.getGameModeForPlayer()
@@ -460,7 +460,7 @@ public class WFConfig {
 
     public static boolean canInteractRemote(Player player) {
         if (usePermissionsAPI.get()) {
-            return WFRegistry.getPermBoolean(player.getUUID(), WFRegistry.PERM_REMOTE_INTERACT) || isOwner(player);
+            return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_REMOTE_INTERACT) || isOwner(player);
         } else {
             if (isAdmin(player)) return true;
             return useRemotes.get();
@@ -469,7 +469,7 @@ public class WFConfig {
 
     public static boolean canBindRemote(Player player) {
         if (usePermissionsAPI.get()) {
-            return WFRegistry.getPermBoolean(player.getUUID(), WFRegistry.PERM_REMOTE_BIND) || isOwner(player);
+            return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_REMOTE_BIND) || isOwner(player);
         } else {
             if (isAdmin(player)) return true;
             return useBindingRemotes.get();

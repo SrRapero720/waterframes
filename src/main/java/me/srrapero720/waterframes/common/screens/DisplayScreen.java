@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.screens;
 
-import me.srrapero720.waterframes.WFConfig;
+import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
@@ -10,7 +10,6 @@ import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
 import me.srrapero720.waterframes.common.compat.creativecore.IScalableText;
-import org.watermedia.api.image.ImageCache;
 import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -101,14 +100,14 @@ public class DisplayScreen extends GuiLayer {
         var resize_y = new GuiButtonIcon("rs_y", IconStyles.EXPAND_Y, this::resizeYOnRatio);
         var resize_x = new GuiButtonIcon("rs_x", IconStyles.EXPAND_X, this::resizeXOnRation);
 
-        this.widthField = new GuiCounterDecimal("width", BigDecimal.valueOf(tile.data.getWidth()).setScale(2, RoundingMode.CEILING).doubleValue(), 0.1, WFConfig.maxWidth(), ControlFormatting.CLICKABLE_NO_PADDING);
+        this.widthField = new GuiCounterDecimal("width", BigDecimal.valueOf(tile.data.getWidth()).setScale(2, RoundingMode.CEILING).doubleValue(), 0.1, DisplaysConfig.maxWidth(), ControlFormatting.CLICKABLE_NO_PADDING);
         this.widthField.setSpacing(0).setStep(SCALE).setAlign(Align.STRETCH).setVAlign(VAlign.STRETCH);
 
         this.widthField.buttons.setVAlign(VAlign.STRETCH);
         this.widthField.get("value").setTooltip("waterframes.common.width");
         this.widthField.addControl(resize_y.setDim(16, 16));
 
-        this.heightField = new GuiCounterDecimal("height", BigDecimal.valueOf(tile.data.getHeight()).setScale(2, RoundingMode.CEILING).doubleValue(), 0.1, WFConfig.maxHeight(), ControlFormatting.CLICKABLE_NO_PADDING);
+        this.heightField = new GuiCounterDecimal("height", BigDecimal.valueOf(tile.data.getHeight()).setScale(2, RoundingMode.CEILING).doubleValue(), 0.1, DisplaysConfig.maxHeight(), ControlFormatting.CLICKABLE_NO_PADDING);
         this.heightField.setSpacing(0).setStep(SCALE).setAlign(Align.STRETCH).setVAlign(VAlign.STRETCH);
 
         this.heightField.buttons.setVAlign(VAlign.STRETCH);
@@ -123,8 +122,8 @@ public class DisplayScreen extends GuiLayer {
         this.rotation = new GuiSlider(DisplayData.ROTATION, tile.data.rotation, 0, 360, DoubleValueParser.ANGLE);
         this.alpha = new GuiSteppedSlider(DisplayData.ALPHA, tile.data.alpha, 0, 255, (v, max) -> (Math.round(((v != 0 && max != 0 ? (float) v / (float) max : 0) * 100))) + "%");
         this.brightness = new GuiSteppedSlider(DisplayData.BRIGHTNESS, tile.data.brightness, 0, 255, (v, max) -> Math.round(((v != 0 && max != 0 ? (float) v / (float) max : 0) * 100)) + "%");
-        this.render_distance = new GuiSteppedSlider(DisplayData.RENDER_DISTANCE, tile.data.renderDistance, 4, WFConfig.maxRenDis(), IntValueParser.BLOCKS);
-        this.projection_distance = new GuiSlider(DisplayData.PROJECTION_DISTANCE, tile.data.projectionDistance, 4, WFConfig.maxProjDis(), DoubleValueParser.BLOCKS);
+        this.render_distance = new GuiSteppedSlider(DisplayData.RENDER_DISTANCE, tile.data.renderDistance, 4, DisplaysConfig.maxRenDis(), IntValueParser.BLOCKS);
+        this.projection_distance = new GuiSlider(DisplayData.PROJECTION_DISTANCE, tile.data.projectionDistance, 4, DisplaysConfig.maxProjDis(), DoubleValueParser.BLOCKS);
         this.audio_offset = new GuiStateButtonIcon(DisplayData.AUDIO_OFFSET, IconStyles.AUDIO_POS_BLOCK, IconStyles.AUDIO_POS_PICTURE, IconStyles.AUDIO_POS_CENTER);
         this.audio_offset.setControlFormatting(ControlFormatting.CLICKABLE_NO_PADDING)
                 .setState(tile.data.getAudioPosition().ordinal())
@@ -146,9 +145,9 @@ public class DisplayScreen extends GuiLayer {
         this.stop = new GuiButtonIcon("stop", IconStyles.STOP, button -> tile.setStop(true));
         this.loop = new GuiCheckButtonIcon(DisplayData.LOOP, IconStyles.REPEAT_ON, IconStyles.REPEAT_OFF, tile.data.loop, button -> tile.loop(true, !tile.data.loop));
 
-        this.volume = new GuiSteppedSlider(DisplayData.VOLUME, tile.data.volume, 0, WFConfig.maxVol(), (v, max) -> v + "%");
-        this.volume_min = new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, tile.data.minVolumeDistance, 0, Math.min(tile.data.maxVolumeDistance, WFConfig.maxVolDis()), IntValueParser.BLOCKS);
-        this.volume_max = new GuiSteppedSlider(DisplayData.VOL_RANGE_MAX, tile.data.maxVolumeDistance, 0, WFConfig.maxVolDis(), IntValueParser.BLOCKS);
+        this.volume = new GuiSteppedSlider(DisplayData.VOLUME, tile.data.volume, 0, DisplaysConfig.maxVol(), (v, max) -> v + "%");
+        this.volume_min = new GuiSteppedSlider(DisplayData.VOL_RANGE_MIN, tile.data.minVolumeDistance, 0, Math.min(tile.data.maxVolumeDistance, DisplaysConfig.maxVolDis()), IntValueParser.BLOCKS);
+        this.volume_max = new GuiSteppedSlider(DisplayData.VOL_RANGE_MAX, tile.data.maxVolumeDistance, 0, DisplaysConfig.maxVolDis(), IntValueParser.BLOCKS);
         this.volume_max.setMinSlider(this.volume_min);
 
         this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax, LongValueParser.TIME_DURATION_TICK) {
@@ -261,7 +260,7 @@ public class DisplayScreen extends GuiLayer {
                             show_model.set(tile.isVisible());
                             return show_model;
                         })
-                        .add(!WFConfig.forceLightOnPlay(), () -> {
+                        .add(!DisplaysConfig.forceLightOnPlay(), () -> {
                             lit.set(tile.data.lit);
                             return lit;
                         })
@@ -306,7 +305,7 @@ public class DisplayScreen extends GuiLayer {
         this.add(new GuiParent(GuiFlow.STACK_X)
                 .add(this.seekbar.setDim(-1, 14 + 4).setExpandableX())
                 .add(this.reload.setDim(14, 14))
-                .add(this.save.setDim(28, 14).setSquared(true).setEnabled(WFConfig.canSave(getPlayer(), url.getText())))
+                .add(this.save.setDim(28, 14).setSquared(true).setEnabled(DisplaysConfig.canSave(getPlayer(), url.getText())))
         );
     }
 
@@ -393,7 +392,7 @@ public class DisplayScreen extends GuiLayer {
 
         // OTHER UPDATES
         this.vol_i.setIcon(IconStyles.getVolumeIcon(volume.getIntValue(), tile.data.muted));
-        this.save.setEnabled(WFConfig.canSave(getPlayer(), this.url.getText()));
+        this.save.setEnabled(DisplaysConfig.canSave(getPlayer(), this.url.getText()));
         this.reload.setEnabled(enableReload());
     }
 

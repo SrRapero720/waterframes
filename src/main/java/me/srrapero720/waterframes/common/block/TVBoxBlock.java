@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.block;
 
-import me.srrapero720.waterframes.WFRegistry;
+import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.common.block.entity.TVBoxTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -39,7 +39,7 @@ public class TVBoxBlock extends DisplayBlock {
 
     @Override
     public PermissionNode<Boolean> getPermissionNode() {
-        return WFRegistry.PERM_DISPLAYS_INTERACT_TV;
+        return DisplaysRegistry.PERM_DISPLAYS_INTERACT_TV;
     }
 
     public static AlignedBox box(Direction direction, boolean renderMode) {

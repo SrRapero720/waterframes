@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.common.block;
 
-import me.srrapero720.waterframes.WFConfig;
-import me.srrapero720.waterframes.WFRegistry;
+import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
@@ -65,7 +65,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     public abstract DirectionProperty getFacing();
 
     public PermissionNode<Boolean> getPermissionNode() {
-        return WFRegistry.PERM_DISPLAYS_INTERACT;
+        return DisplaysRegistry.PERM_DISPLAYS_INTERACT;
     }
 
     @Override
@@ -106,7 +106,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
             }
         }
 
-        if (!level.isClientSide && WFConfig.canInteractBlock(player, this)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        if (!level.isClientSide && DisplaysConfig.canInteractBlock(player, this)) GuiCreator.BLOCK_OPENER.open(player, pos);
         return InteractionResult.SUCCESS;
     }
 
@@ -160,7 +160,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     @Override public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, BlockPos neighborPos, boolean isMoving) {
         super.neighborChanged(state, level, pos, block, neighborPos, isMoving);
-        if (!WFConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof DisplayTile tile)) return;
+        if (!DisplaysConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof DisplayTile tile)) return;
         boolean signal = level.hasNeighborSignal(pos);
 
         if (state.getValue(POWERED) != signal) {
