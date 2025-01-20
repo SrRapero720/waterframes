@@ -36,10 +36,3 @@ license="${modlicense}"
 	ordering="AFTER"
 	side="CLIENT"
 	versionRange="${watermediarange}"
-
-[[dependencies.${modid}]]
-	modId="videoplayer"
-	mandatory=false
-	ordering="NONE"
-	side="CLIENT"
-	versionRange="${videoplayerrange}"

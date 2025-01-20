@@ -4,7 +4,6 @@ import me.srrapero720.waterframes.WFConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.compat.videoplayer.VPCompat;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.DataSyncPacket;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
@@ -79,8 +78,6 @@ public class DisplayScreen extends GuiLayer {
 
     public final GuiButtonIcon reload;
     public final GuiSeekBar seekbar;
-
-    public final GuiButtonIcon videoplayer;
 
     // WIDGETS
     public final GuiCheckBox flip_x;
@@ -176,18 +173,18 @@ public class DisplayScreen extends GuiLayer {
         this.save = new GuiButtonIcon("save", IconStyles.SAVE, click -> DisplayNetwork.sendServer(new DataSyncPacket(tile.getBlockPos(), DisplayData.build(this, tile))));
         this.save.setTooltip("waterframes.gui.save");
 
-        if (VPCompat.installed()) {
-            this.videoplayer = new GuiButtonIcon("", IconStyles.VIDEOPLAYER_PLAY, button -> {
-                VPCompat.playVideo(tile.data.uri.toString(), tile.data.volume, false, true);
-                tile.setPause(true, true);
-            });
-            this.videoplayer.setTooltip("waterframes.gui.videoplayer");
-            if (isClient()) {
-                this.videoplayer.setEnabled(enableVideoPlayer());
-            }
-        } else {
-            this.videoplayer = null;
-        }
+//        if (VPCompat.installed()) {
+//            this.videoplayer = new GuiButtonIcon("", IconStyles.VIDEOPLAYER_PLAY, button -> {
+//                VPCompat.playVideo(tile.data.uri.toString(), tile.data.volume, false, true);
+//                tile.setPause(true, true);
+//            });
+//            this.videoplayer.setTooltip("waterframes.gui.videoplayer");
+//            if (isClient()) {
+//                this.videoplayer.setEnabled(enableVideoPlayer());
+//            }
+//        } else {
+//            this.videoplayer = null;
+//        }
 
         IScalableText.setScale(url_l, 0.75f);
         IScalableText.setScale(url, 0.80f);
@@ -284,10 +281,6 @@ public class DisplayScreen extends GuiLayer {
         // MEDIA SETTINGS
         this.add(new WidgetPairTable(GuiFlow.STACK_Y, 2)
                 .spaceBetween()
-                .addLeft(new GuiParent(GuiFlow.STACK_X)
-                        .add(VPCompat.installed(), () -> this.videoplayer.setDim(12, 12))
-                        .setExpandableX()
-                )
                 .addLeft(new GuiParent(GuiFlow.STACK_X)
                         .add(this.loop.setDim(12, 12))
                         .add(this.playback.setDim(16, 12).setSquared(true))
@@ -402,13 +395,6 @@ public class DisplayScreen extends GuiLayer {
         this.vol_i.setIcon(IconStyles.getVolumeIcon(volume.getIntValue(), tile.data.muted));
         this.save.setEnabled(WFConfig.canSave(getPlayer(), this.url.getText()));
         this.reload.setEnabled(enableReload());
-        if (videoplayer != null) {
-            videoplayer.setEnabled(enableVideoPlayer());
-        }
-    }
-
-    public boolean enableVideoPlayer() {
-        return tile.data.hasUri() && tile.imageCache != null && tile.imageCache.getStatus() == ImageCache.Status.READY;
     }
 
     public boolean enableReload() {
