@@ -54,13 +54,11 @@ mixin {
 }
 
 repositories {
+    maven { url 'https://maven.minecraftforge.net/' }
     maven { url 'https://repo.spongepowered.org/maven' }
     maven { url 'https://jitpack.io' }
-    maven {
-        url 'https://www.cursemaven.com'
-        content {
-            includeGroup 'curse.maven'
-        }
+    maven { url 'https://www.cursemaven.com'
+        content {includeGroup 'curse.maven' }
     }
 }
 
@@ -72,10 +70,6 @@ dependencies {
     implementation "com.github.WaterMediaTeam:watermedia:$watermediaversion"
     implementation fg.deobf("curse.maven:creativecore-257814:${creativecoreversion}")
     compileOnly fg.deobf("curse.maven:videoplayer-645407:$videoplayerversion")
-
-
-    implementation fg.deobf("curse.maven:oculus-581495:6020952")
-    implementation fg.deobf("curse.maven:embeddium-908741:5681725")
 }
 
 tasks.processResources.outputs.upToDateWhen { false }
