@@ -53,7 +53,7 @@
     "waterframes.commands.audit.author": "Author of the display URL is: ",
     "waterframes.commands.audit.author.failed": "Player with UUID [%s] wasn't found",
     "waterframes.commands.audit.author.console": "Author of the display URL is: [console]",
-    "waterframes.commands.audit.in_range.success": "Founded %s, teleport to them clicking on the index number",
+    "waterframes.commands.audit.in_range.success": "Found %s, Click any number to be teleported",
     "waterframes.commands.audit.in_range.author": "Url author: §8%s",
     "waterframes.commands.audit.in_range.tooltip.position": "Teleport to %s %s %s",
     "waterframes.commands.audit.in_range.failed": "No display founded in range",
