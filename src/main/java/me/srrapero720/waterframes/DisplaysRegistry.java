@@ -196,6 +196,7 @@ public class DisplaysRegistry {
             NET.registerType(TimePacket.class, TimePacket::new);
             NET.registerType(VolumePacket.class, VolumePacket::new);
             NET.registerType(VolumeRangePacket.class, VolumeRangePacket::new);
+            NET.registerType(PositionPacket.class, PositionPacket::new);
         }
 
         @SubscribeEvent

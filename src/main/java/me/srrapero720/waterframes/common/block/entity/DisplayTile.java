@@ -6,6 +6,8 @@ import me.srrapero720.waterframes.client.display.Display;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.data.DisplayCaps;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
+import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
+import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.*;
 import org.watermedia.api.image.ImageAPI;
@@ -242,6 +244,11 @@ public class DisplayTile extends BlockEntity {
     public void loop(boolean clientSide, boolean loop) {
         if (clientSide) DisplayNetwork.sendServer(new LoopPacket(this.getBlockPos(), loop, true));
         else            DisplayNetwork.sendClient(new LoopPacket(this.getBlockPos(), loop, true), this);
+    }
+
+    public void position(boolean clientSide, PositionHorizontal horizontal, PositionVertical vertical) {
+        if (clientSide) DisplayNetwork.sendServer(new PositionPacket(this.getBlockPos(), horizontal, vertical, true));
+        else            DisplayNetwork.sendClient(new PositionPacket(this.getBlockPos(), horizontal, vertical, true), this);
     }
 
     public void tick(BlockState state) {

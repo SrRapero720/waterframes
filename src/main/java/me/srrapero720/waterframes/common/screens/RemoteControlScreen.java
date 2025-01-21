@@ -2,6 +2,8 @@ package me.srrapero720.waterframes.common.screens;
 
 import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
+import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
@@ -97,17 +99,29 @@ public class RemoteControlScreen extends GuiLayer {
             }
         };
 
-        this.arrowUp = new GuiButtonIcon("arrow_up", IconStyles.ARROW_UP, button -> {});
-        this.arrowDown = new GuiButtonIcon("arrow_down", IconStyles.ARROW_DOWN, button -> {});
-        this.arrowLeft = new GuiButtonIcon("arrow_left", IconStyles.ARROW_LEFT, button -> {});
-        this.arrowRight = new GuiButtonIcon("arrow_right", IconStyles.ARROW_RIGHT, button -> {});
-        this.arrowCenter = new GuiButtonIcon("arrow_center", IconStyles.ARROW_CENTER, button -> {});
+        this.arrowUp = new GuiButtonIcon("arrow_up", IconStyles.ARROW_UP, button -> {
+            tile.position(true, null, tile.data.getPosY().up());
+        });
+        this.arrowDown = new GuiButtonIcon("arrow_down", IconStyles.ARROW_DOWN, button -> {
+            tile.position(true, null, tile.data.getPosY().down());
+        });
+        this.arrowLeft = new GuiButtonIcon("arrow_left", IconStyles.ARROW_LEFT, button -> {
+            tile.position(true, tile.data.getPosX().left(), null);
+        });
+        this.arrowRight = new GuiButtonIcon("arrow_right", IconStyles.ARROW_RIGHT, button -> {
+            tile.position(true, tile.data.getPosX().right(), null);
+        });
+        this.arrowCenter = new GuiButtonIcon("arrow_center", IconStyles.ARROW_CENTER, button -> {
+            tile.position(true, PositionHorizontal.CENTER, PositionVertical.CENTER);
+        });
 
-        this.arrowUp.setEnabled(false);
-        this.arrowDown.setEnabled(false);
-        this.arrowLeft.setEnabled(false);
-        this.arrowRight.setEnabled(false);
-        this.arrowCenter.setEnabled(false);
+        if (!tile.caps.resizes()) {
+            this.arrowUp.setEnabled(false);
+            this.arrowDown.setEnabled(false);
+            this.arrowLeft.setEnabled(false);
+            this.arrowRight.setEnabled(false);
+            this.arrowCenter.setEnabled(false);
+        }
 
         this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, button -> { if (tile.imageCache != null) tile.imageCache.reload(); });
 
