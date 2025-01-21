@@ -54,7 +54,7 @@ public class ProjectorBlock extends DisplayBlock {
     }
 
     @Override
-    protected void registerDefaultState(BlockState state) {
+    public void registerDefaultState(BlockState state) {
         super.registerDefaultState(state.setValue(VISIBLE, true));
     }
 

@@ -9,7 +9,6 @@ import me.srrapero720.waterframes.common.network.packets.DataSyncPacket;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
-import me.srrapero720.waterframes.common.compat.creativecore.IScalableText;
 import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -171,31 +170,6 @@ public class DisplayScreen extends GuiLayer {
         }
         this.save = new GuiButtonIcon("save", IconStyles.SAVE, click -> DisplayNetwork.sendServer(new DataSyncPacket(tile.getBlockPos(), DisplayData.build(this, tile))));
         this.save.setTooltip("waterframes.gui.save");
-
-//        if (VPCompat.installed()) {
-//            this.videoplayer = new GuiButtonIcon("", IconStyles.VIDEOPLAYER_PLAY, button -> {
-//                VPCompat.playVideo(tile.data.uri.toString(), tile.data.volume, false, true);
-//                tile.setPause(true, true);
-//            });
-//            this.videoplayer.setTooltip("waterframes.gui.videoplayer");
-//            if (isClient()) {
-//                this.videoplayer.setEnabled(enableVideoPlayer());
-//            }
-//        } else {
-//            this.videoplayer = null;
-//        }
-
-        IScalableText.setScale(url_l, 0.75f);
-        IScalableText.setScale(url, 0.80f);
-
-        IScalableText.setScale(rotation, 0.90f);
-        IScalableText.setScale(alpha, 0.90f);
-        IScalableText.setScale(brightness, 0.90f);
-        IScalableText.setScale(render_distance, 0.90f);
-        IScalableText.setScale(projection_distance, 0.90f);
-        IScalableText.setScale(volume, 0.90f);
-        IScalableText.setScale(volume_min, 0.90f);
-        IScalableText.setScale(volume_max, 0.90f);
 
         if (!tile.caps.resizes()) {
             this.setDim(WIDTH - 10, HEIGHT - 60);

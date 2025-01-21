@@ -9,9 +9,6 @@
     "MinecraftMixin"
   ],
   "mixins": [
-    "MinecraftServerMixin",
-    "creativecore.CompiledTextMixin",
-    "creativecore.GuiLabelMixin",
-    "creativecore.GuiSliderMixin"
+    "MinecraftServerMixin"
   ]
 }

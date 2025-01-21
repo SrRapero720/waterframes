@@ -45,19 +45,18 @@ public class FrameBlock extends DisplayBlock {
     }
 
     @Override
-    protected void registerDefaultState(BlockState state) {
-        super.registerDefaultState(state.setValue(VISIBLE, true));
-    }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder.add(VISIBLE));
     }
 
     @Override
+    public void registerDefaultState(BlockState state) {
+        super.registerDefaultState(state.setValue(VISIBLE, true));
+    }
+
+    @Override
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
-        return super.getStateForPlacement(context)
-                .setValue(getFacing(), context.getClickedFace());
+        return super.getStateForPlacement(context).setValue(getFacing(), context.getClickedFace());
     }
 
     @Override

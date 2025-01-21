@@ -98,6 +98,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
                 int i = 0;
                 do {
+                    // TODO: use voxel shape
                     level.addParticle(opts, vec.x + randomNegative(Math.random()) / 4, vec.y, vec.z + randomNegative(Math.random()) / 4,
                             randomNegative(Math.random()), Math.random() * 3, randomNegative(Math.random()));
                     i++;
@@ -118,7 +119,7 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
         return state.getValue(this.getFacing()) == direction;
     }
 
-    @Override protected void registerDefaultState(BlockState state) {
+    @Override public void registerDefaultState(BlockState state) {
         super.registerDefaultState(state
                 .setValue(WATERLOGGED, false)
                 .setValue(POWERED, false)
@@ -126,12 +127,9 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
     }
 
     @Override protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder
-                .add(this.getFacing())
-                .add(ATTACHED_FACE)
-                .add(POWERED)
-                .add(WATERLOGGED)
-        );
+        super.createBlockStateDefinition(builder.add(
+                this.getFacing(), ATTACHED_FACE, POWERED, WATERLOGGED
+        ));
     }
 
     @Override public BlockState getStateForPlacement(BlockPlaceContext context) {

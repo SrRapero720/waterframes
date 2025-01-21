@@ -76,10 +76,8 @@ public class TVBoxBlock extends DisplayBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
-        Direction current = context.getHorizontalDirection();
-        Player player = context.getPlayer();
-        return super.getStateForPlacement(context)
-                .setValue(this.getFacing(), player != null && player.isCrouching() ? current : current.getOpposite());
+        BlockState st = super.getStateForPlacement(context);
+        return st.setValue(this.getFacing(), st.getValue(this.getFacing()).getOpposite());
     }
 
     @Override
