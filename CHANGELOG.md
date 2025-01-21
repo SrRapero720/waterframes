@@ -1,3 +1,11 @@
+# UPDATE 2.1.10
+- ✨ Remote Arrows can now switch picture position (for frames and projectors)
+- 🛠️ Required watermedia 2.1.12 as minimum
+- 🛠️ Removed VideoPlayer integration (until VP gets updated)
+- 🐛 Fixed few rendering issues with texture transparency
+- 🐛 Fixed crashes typing URLS when the whitelist is enabled
+- 🐛 Fixed blocklight wasn't updated when option is disabled or media is updated
+
 # UPDATE 2.1.9
 - ✨ Added slavism mode configuration
   - ✨ Integrated in server-side config (waterframes.multimedia.slavismMode)
