@@ -22,10 +22,11 @@ public class TextureWrapper extends AbstractTexture {
     @Override public void close() { /* NO OP */}
 
     @OnlyIn(Dist.CLIENT)
-    public static class Renderer extends AbstractTexture {
+    public static class Renderer extends TextureWrapper {
         private final ImageRenderer renderer;
 
         public Renderer(ImageRenderer imageRenderer) {
+            super(-1);
             this.renderer = imageRenderer;
         }
 
@@ -33,8 +34,5 @@ public class TextureWrapper extends AbstractTexture {
         public int getId() {
             return renderer.texture(WaterFrames.getTicks(), WaterFrames.deltaFrames(), true);
         }
-
-        @Override
-        public void load(ResourceManager resourceManager) {}
     }
 }
