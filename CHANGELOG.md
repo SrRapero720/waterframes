@@ -1,3 +1,10 @@
+# UPDATE 2.1.11
+- 🛠️ Removed hard-crash of Stellarity mod (wasn't fixed, but recent WF changes makes it immune)
+- 🛠️ Ensure watermedia textures are not released by minecraft
+- 🐛 Fixed rendering issues on swords and enchanted items
+  - 🐛 At the cost of make images with smooth transparency get stepped-cut
+- ✨ `ᔑ↸↸ᒷ↸ ⍑ᒷ∷𝙹ʖ∷╎リᒷ`
+
 # UPDATE 2.1.10
 - ✨ Remote Arrows can now switch picture position (for frames and projectors)
 - 🛠️ Required watermedia 2.1.12 as minimum
