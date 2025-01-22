@@ -7,11 +7,10 @@ import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import org.joml.Matrix4f;
-import team.creative.creativecore.client.render.GuiRenderHelper;
 import team.creative.creativecore.common.gui.GuiChildControl;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
 import team.creative.creativecore.common.util.math.geo.Rect;
@@ -57,7 +56,7 @@ public class WidgetClickableArea extends GuiIcon {
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(CoreShaders.POSITION_TEX);
         RenderSystem.setShaderTexture(0, icon.location());
 
         this.color.glColor();
@@ -75,7 +74,7 @@ public class WidgetClickableArea extends GuiIcon {
         u2 = (icon.minX() + icon.width()) / 256f;
         v2 = (icon.minY() + icon.height()) / 256f;
 
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShader(CoreShaders.POSITION_TEX);
         BufferBuilder bufferbuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
         bufferbuilder.addVertex(matrix, x, y2, 0).setUv(u, v2);
         bufferbuilder.addVertex(matrix, x2, y2, 0).setUv(u2, v2);

@@ -9,6 +9,7 @@ import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.item.data.CodecManager;
 import me.srrapero720.waterframes.common.item.data.RemoteData;
 import me.srrapero720.waterframes.common.network.packets.*;
+import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.server.permission.PermissionAPI;
 import net.neoforged.neoforge.server.permission.events.PermissionGatherEvent;
 import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
@@ -66,21 +67,23 @@ public class DisplaysRegistry {
 
     /* BLOCKS */
     public static final DeferredBlock<DisplayBlock>
-            FRAME = BLOCKS.register("frame", () -> new FrameBlock()),
-            PROJECTOR = BLOCKS.register("projector", () -> new ProjectorBlock()),
-            TV = BLOCKS.register("tv", () -> new TvBlock()),
-            BIG_TV = BLOCKS.register("big_tv", () -> new BigTvBlock()),
-            TV_BOX = BLOCKS.register("tv_box", () -> new TVBoxBlock());
+            FRAME = BLOCKS.register("frame", name -> new FrameBlock(ResourceKey.create(Registries.BLOCK, name))),
+            PROJECTOR = BLOCKS.register("projector", name -> new ProjectorBlock(ResourceKey.create(Registries.BLOCK, name))),
+            TV = BLOCKS.register("tv", name -> new TvBlock(ResourceKey.create(Registries.BLOCK, name))),
+            BIG_TV = BLOCKS.register("big_tv", name -> new BigTvBlock(ResourceKey.create(Registries.BLOCK, name))),
+            TV_BOX = BLOCKS.register("tv_box", name -> new TVBoxBlock(ResourceKey.create(Registries.BLOCK, name)));
 //            GOLDEN_PROJECTOR = BLOCKS.register("golden_projector", ProjectorBlock::new);
 
-    /* ITEMS */
     public static final DeferredItem<Item>
-            REMOTE_ITEM = ITEMS.register("remote", () -> new RemoteControl(remoteProp())),
-            FRAME_ITEM = ITEMS.register("frame", () -> new BlockItem(FRAME.get(), prop())),
-            PROJECTOR_ITEM = ITEMS.register("projector", () -> new BlockItem(PROJECTOR.get(), prop())),
-            TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), prop())),
-            BIG_TV_ITEM = ITEMS.register("big_tv", () -> new BlockItem(BIG_TV.get(), prop())),
-            TV_BOX_ITEM = ITEMS.register("tv_box", () -> new BlockItem(TV_BOX.get(), prop()));
+            REMOTE_ITEM = ITEMS.register("remote", name -> new RemoteControl(remoteProp(name)));
+
+    /* BLOCK ITEMS */
+    public static final DeferredItem<BlockItem>
+            FRAME_ITEM = ITEMS.registerSimpleBlockItem("frame", FRAME, prop()),
+            PROJECTOR_ITEM = ITEMS.registerSimpleBlockItem("projector", PROJECTOR, prop()),
+            TV_ITEM = ITEMS.registerSimpleBlockItem("tv", TV, prop()),
+            BIG_TV_ITEM = ITEMS.registerSimpleBlockItem("big_tv", BIG_TV, prop()),
+            TV_BOX_ITEM = ITEMS.registerSimpleBlockItem("tv_box", TV_BOX, prop());
 //            GOLDEN_PROJECTOR_ITEM = ITEMS.register("golden_projector", () -> new BlockItem(GOLDEN_PROJECTOR.get(), prop().tab(null)));
 
     /* TILES */
@@ -121,11 +124,11 @@ public class DisplaysRegistry {
     }
 
     private static DeferredHolder<BlockEntityType<?>, BlockEntityType<DisplayTile>> tile(String name, BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
-        return TILES.register(name, () -> BlockEntityType.Builder.of(creator, block.get()).build(null));
+        return TILES.register(name, () -> new BlockEntityType<>(creator, block.get()));
     }
 
-    private static Item.Properties remoteProp() {
-        return new Item.Properties().stacksTo(1).rarity(Rarity.RARE).setNoRepair().fireResistant();
+    private static Item.Properties remoteProp(ResourceLocation res) {
+        return new Item.Properties().setId(ResourceKey.create(Registries.ITEM, res)).stacksTo(1).rarity(Rarity.RARE).setNoCombineRepair().fireResistant();
     }
 
     private static Item.Properties prop() {
