@@ -1,23 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "pattern": [
     "##A",
     "#GA",
     "#RA"
   ],
   "key": {
-    "#": {
-      "item": "minecraft:iron_block"
-    },
-    "A": {
-      "item": "minecraft:amethyst_shard"
-    },
-    "G": {
-      "item": "minecraft:glowstone"
-    },
-    "R": {
-      "item": "waterframes:remote"
-    }
+    "#": "minecraft:iron_block",
+    "A": "minecraft:amethyst_shard",
+    "G": "minecraft:glowstone",
+    "R": "waterframes:remote"
   },
   "result": {
     "id": "waterframes:projector",
