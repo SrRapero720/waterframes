@@ -1,14 +1,14 @@
-import net.darkhax.curseforgegradle.TaskPublishCurseForge
-
 plugins {
     id 'java'
     id 'idea'
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-    id 'com.modrinth.minotaur' version '2.+'
-    id 'net.darkhax.curseforgegradle' version '1.1.+'
+    id "me.modmuss50.mod-publish-plugin" version "0.8.3"
 }
+
+def MT_TOKEN = System.getenv("MODRINTH_TOKEN")
+def CF_TOKEN = System.getenv("CURSEFORGE_TOKEN")
 
 base {
     archivesName = modid
@@ -93,55 +93,41 @@ jar {
     finalizedBy('reobfJar')
 }
 
-task upload(type: GradleBuild) {
-    enabled = System.getenv("MODRINTH_TOKEN") != null && System.getenv("CURSEFORGE_TOKEN") != null
-    description 'Uploads new version to CurseForge and Modrinth'
-    group = 'publishing'
-    tasks = [ 'curseforge', 'modrinth' ]
-}
+publishMods {
+    file = jar.archiveFile
+    displayName = "WF-$modloader/mc$mcversion/v$modversion"
+    type = STABLE
+    changelog = getChangelogText()
 
-task curseforge(type: TaskPublishCurseForge) {
-    disableVersionDetection()
-    apiToken = System.getenv("CURSEFORGE_TOKEN")
+    maxRetries = 2
+    dryRun = false
 
-    def mainFile = upload(curseforgeid, jar)
-    mainFile.displayName = getVersionBuildName()
-    mainFile.addModLoader(modloader.toLowerCase().capitalize(), "NeoForge")
-    mainFile.addGameVersion(mcversion, "server", "client")
-    mainFile.addRequirement("creativecore", "watermedia")
-    mainFile.addOptional("video-player")
-    mainFile.changelog = getChangelogText(false)
-    mainFile.changelogType = "markdown"
-    mainFile.releaseType = versiontype
-}
+    modLoaders.add(modloader.toLowerCase())
 
-modrinth {
-    token = System.getenv("MODRINTH_TOKEN")
-    projectId = modrinthid
+    curseforge {
+        accessToken = CF_TOKEN
+        projectId = curseforgeid
+        minecraftVersions.addAll(mcversion)
+        javaVersions.addAll(JavaVersion.VERSION_17)
+        clientRequired = true
+        serverRequired = true
+        projectSlug = modid
+        requires("creativecore", "watermedia")
+    }
 
-    uploadFile = jar
-    versionName = getVersionBuildName()
-    versionNumber = version.toString()
-    versionType = versiontype
-    gameVersions = [ mcversion ]
-    changelog = getChangelogText(true)
-    loaders = [ "forge", "neoforge" ]
-    dependencies {
-        required.project "creativecore"
-        required.project "watermedia"
-        optional.project "video-player"
+    modrinth {
+        accessToken = MT_TOKEN
+        projectId = modrinthid
+        minecraftVersions.addAll(mcversion)
+        requires("creativecore", "watermedia")
     }
 }
 
-String getVersionBuildName() {
-    return "$modbrandname/${modloader.toLowerCase().capitalize()}/mc$mcversion/v$modversion"
-}
-
-String getChangelogText(boolean latest) {
-    String result = ''
+def getChangelogText() {
+    def result = ""
     for (String line: file('CHANGELOG.md').readLines('UTF-8')) {
-        if (latest && line.isEmpty()) return result
-        result += line + "\n"
+        if (line.isEmpty()) return result
+        result += line + '\n'
     }
     return result
 }
