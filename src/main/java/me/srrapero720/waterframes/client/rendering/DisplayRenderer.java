@@ -57,7 +57,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         boolean flipX = tile.caps.projects() != tile.data.flipX;
         boolean flipY = tile.data.flipY;
         int r, b, g;
-        r = g = b= tile.data.brightness;
+        r = g = b = tile.data.brightness;
         int a = tile.data.alpha;
 
         pose.pushPose();
@@ -95,7 +95,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     public void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing, int packedLight, int packedOverlay,
                        boolean front, boolean back, boolean flipX, boolean flipY, int r, int g, int b, int a, ResourceLocation texture) {
 
-        VertexConsumer builder = source.getBuffer(RenderType.entityTranslucent(texture));
+        VertexConsumer builder = source.getBuffer(RenderType.entityTranslucentCull(texture));
         if (front) {
             for (int i = 0; i < boxface.corners.length; i++) {
                 BoxCorner corner = boxface.corners[i];
