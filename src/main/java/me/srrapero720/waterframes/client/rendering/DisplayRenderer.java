@@ -4,10 +4,12 @@ import com.mojang.blaze3d.vertex.*;
 import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
@@ -20,6 +22,7 @@ import team.creative.creativecore.common.util.math.box.BoxFace;
 
 public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     private final BlockEntityRendererProvider.Context context;
+    long loggerTime = System.currentTimeMillis();
     public DisplayRenderer(BlockEntityRendererProvider.Context context) {
         this.context = context;
     }
@@ -31,7 +34,8 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
     @Override
     public boolean shouldRender(DisplayTile tile, @NotNull Vec3 cameraPos) {
-        return Vec3.atCenterOf(tile.getBlockPos()).closerThan(cameraPos, tile.data.renderDistance);
+        BlockPos tilePos = tile.getBlockPos().relative(tile.getDirection(), (int) tile.data.projectionDistance);
+        return Vec3.atCenterOf(tilePos).closerThan(cameraPos, tile.data.renderDistance);
     }
 
     @Override
