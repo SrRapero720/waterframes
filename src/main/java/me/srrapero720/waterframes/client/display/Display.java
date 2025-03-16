@@ -34,12 +34,8 @@ public class Display {
     private long currentLastTime = Long.MIN_VALUE;
     private Mode displayMode = Mode.PICTURE;
     private boolean stream = false;
-    private boolean synced = false;
+    private int synced = -1;
     private boolean released = false;
-
-    // SEEK CONTROL (WHEN SLAVISM MODE IS ENABLED)
-    private long seekTime;
-    private long lastSeekingTime;
 
     public Display(DisplayTile tile) {
         this.tile = tile;
@@ -137,7 +133,7 @@ public class Display {
     public long duration() {
         return switch (displayMode) {
             case PICTURE -> this.imageCache.getRenderer() != null ? this.imageCache.getRenderer().duration : 0;
-            case VIDEO -> this.mediaPlayer.getDuration();
+            case VIDEO -> this.mediaPlayer.getMediaInfoDuration();
             case AUDIO -> 0;
         };
     }
@@ -161,6 +157,7 @@ public class Display {
     public void syncDuration() {
         if (tile.data.tickMax == -1) tile.data.tick = 0;
         tile.syncTime(true, tile.data.tick, durationInTicks());
+        this.synced = tile.data.tickMax;
     }
 
     public void tick() {
@@ -171,10 +168,6 @@ public class Display {
             case VIDEO, AUDIO -> {
                 if (this.mediaPlayer.isBroken()) break;
                 int volume = rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
-
-                if (!seeking() && this.seekTime != 0) {
-                    this.seekTo(this.seekTime);
-                }
 
                 if (this.currentVolume != volume) this.mediaPlayer.setVolume(this.currentVolume = volume);
                 if (this.mediaPlayer.isSafeUse() && this.mediaPlayer.isValid()) {
@@ -192,32 +185,19 @@ public class Display {
                             time = (time == 0 || mediaDuration == 0) ? 0 : Math.floorMod(time, this.mediaPlayer.getMediaInfoDuration());
                         }
 
-                        if (Math.abs(time - mediaPlayer.getTime()) > (DisplaysConfig.useSlavismMode() ? 10000 : WaterFrames.SYNC_TIME) && Math.abs(time - currentLastTime) > (DisplaysConfig.useSlavismMode() ? 10000 : WaterFrames.SYNC_TIME)) {
+                        if (Math.abs(time - mediaPlayer.getTime()) > WaterFrames.SYNC_TIME && Math.abs(time - currentLastTime) > WaterFrames.SYNC_TIME) {
                             this.currentLastTime = time;
-                            this.seekTo(time);
+                            this.mediaPlayer.seekTo(time);
                         }
                     }
                 }
             }
         }
-        if (!this.synced && this.canRender()) {
+        if (this.synced == -1 && this.canRender()) {
             this.syncDuration();
-            this.synced = true;
+        } else if (this.synced != this.durationInTicks() && this.canRender()) {
+            this.syncDuration();
         }
-    }
-
-    private void seekTo(long time) {
-        if (DisplaysConfig.useSlavismMode() && this.seeking()) {
-            this.seekTime = time;
-        } else {
-            this.mediaPlayer.seekTo(time);
-            this.lastSeekingTime = System.currentTimeMillis();
-            this.seekTime = 0;
-        }
-    }
-
-    public boolean seeking() {
-        return this.lastSeekingTime + 10000 > System.currentTimeMillis();
     }
 
     public boolean isReady() {
@@ -265,9 +245,9 @@ public class Display {
         switch (displayMode) {
             case PICTURE -> {}
             case VIDEO, AUDIO -> {
-                this.seekTo(MathAPI.tickToMs(this.tile.data.tick));
-                mediaPlayer.setPauseMode(pause);
-                mediaPlayer.setMuteMode(this.tile.data.muted);
+                this.mediaPlayer.seekTo(MathAPI.tickToMs(this.tile.data.tick));
+                this.mediaPlayer.setPauseMode(pause);
+                this.mediaPlayer.setMuteMode(this.tile.data.muted);
             }
         }
     }

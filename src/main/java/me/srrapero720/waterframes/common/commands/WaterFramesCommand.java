@@ -189,12 +189,6 @@ public class WaterFramesCommand {
                 )
         );
 
-        waterframes.then(Commands.literal("slavism")
-                .then(Commands.argument("enable", BoolArgumentType.bool())
-                        .executes(c -> slavistMode(c.getSource(), BoolArgumentType.getBool(c, "enable")))
-                )
-        );
-
         DEFAULT_INPUTS = new ItemInput[] {
                 new ItemInput(Holder.direct(DisplaysRegistry.REMOTE_ITEM.get()), null),
                 new ItemInput(Holder.direct(DisplaysRegistry.FRAME_ITEM.get()), null),
@@ -445,16 +439,6 @@ public class WaterFramesCommand {
         }
 
         return players.size();
-    }
-
-    public static int slavistMode(CommandSourceStack source, boolean enabled) {
-        DisplaysConfig.useSlavismMode(enabled);
-        source.sendSuccess(msgSuccess("waterframes.commands.slavist.success", enabled ? ACTIVATED : DEACTIVATED), true);
-
-        for(ServerPlayer p: source.getServer().getPlayerList().getPlayers()) {
-            p.connection.disconnect(Component.translatable("multiplayer.disconnect.generic"));
-        }
-        return 0;
     }
 
     public static int whitelist$toggle(CommandSourceStack source) {

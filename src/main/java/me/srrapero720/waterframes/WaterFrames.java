@@ -27,7 +27,7 @@ public class WaterFrames {
     public static final String NAME = "WATERFrAMES";
     public static final Logger LOGGER = LogManager.getLogger(ID);
     public static final ResourceLocation LOADING_ANIMATION = WaterFrames.asResource("loading_animation");
-    public static final long SYNC_TIME = 1000L;
+    public static final long SYNC_TIME = 2000L;
     private static int ticks = 0;
 
     // BOOTSTRAP

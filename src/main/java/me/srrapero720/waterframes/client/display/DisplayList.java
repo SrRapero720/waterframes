@@ -101,13 +101,6 @@ public class DisplayList {
         if (level != null && level.isClientSide()) DisplayList.release();
     }
 
-    @SubscribeEvent
-    public static void onLoadingLevel(LevelEvent.Load event) {
-        if (event.getLevel() != null && event.getLevel().isClientSide()) {
-            WaterMedia.setSlavismMode(DisplaysConfig.useSlavismMode());
-        }
-    }
-
     // @SubscribeEvent
     public static void onClientPause(/*ClientPauseChangeEvent.Post event*/boolean paused) {
         if (/*event.isPaused()*/paused) DisplayList.pause();

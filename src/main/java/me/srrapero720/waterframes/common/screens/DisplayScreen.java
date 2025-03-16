@@ -316,14 +316,6 @@ public class DisplayScreen extends GuiLayer {
         if (!isClient())
             return;
 
-        if (tile.display != null) {
-            this.seekbar.setEnabled(!tile.display.seeking());
-            // TODO: FIX IN CREATIVECORE
-            if (this.seekbar.grabbedSlider) {
-                this.seekbar.mouseReleased(null, 0, 0, 0);
-            }
-        }
-
         float ySize = getYSizeRatio();
         this.widthField.get("rs_y").setTooltip(List.of(
                 translatable("waterframes.gui.resize.y"),
