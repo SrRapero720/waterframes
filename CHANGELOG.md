@@ -1,3 +1,8 @@
+# UPDATE 2.1.12
+- 🛠️ Removed slavisim mode (not needed/working anymore)
+- 🛠️ Ensure synchronized duration when vlc updates it (somehow for a few seconds VLC reports no duration after playing specific streams)
+- 🐛 Fixed wrong distance calculation on projection distance (causes projectors to not render)
+
 # UPDATE 2.1.11
 - 🛠️ Removed hard-crash of Stellarity mod (wasn't fixed, but recent WF changes makes it immune)
 - 🛠️ Ensure watermedia textures are not released by minecraft
