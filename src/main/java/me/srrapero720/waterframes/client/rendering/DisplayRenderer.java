@@ -45,7 +45,8 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         var invertedFace = tile.caps.invertedFace(tile);
         var boxFace = BoxFace.get(Facing.get(invertedFace ? direction.getOpposite() : direction));
         var facing = boxFace.facing;
-        packedLight = LightTexture.pack(15, 15);
+        packedLight = LightTexture.FULL_BRIGHT;
+
 
         boolean front = !tile.caps.projects() || tile.data.renderBothSides;
         boolean back = tile.caps.projects() || tile.data.renderBothSides;
@@ -90,7 +91,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     public void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing, int packedLight, int packedOverlay,
                        boolean front, boolean back, boolean flipX, boolean flipY, int r, int g, int b, int a, ResourceLocation texture) {
 
-        VertexConsumer builder = source.getBuffer(RenderType.entityTranslucentCull(texture));
+        VertexConsumer builder = source.getBuffer(RenderType.entityTranslucent(texture));
         if (front) {
             for (int i = 0; i < boxface.corners.length; i++) {
                 BoxCorner corner = boxface.corners[i];
