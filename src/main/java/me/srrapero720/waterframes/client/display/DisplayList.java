@@ -5,7 +5,7 @@ import me.srrapero720.waterframes.WaterFrames;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.watermedia.WaterMedia;
@@ -96,8 +96,8 @@ public class DisplayList {
     }
 
     @SubscribeEvent
-    public static void onUnloadingLevel(LevelEvent.Unload event) {
-        LevelAccessor level = event.getLevel();
+    public static void onUnloadingLevel(WorldEvent.Unload event) {
+        LevelAccessor level = event.getWorld();
         if (level != null && level.isClientSide()) DisplayList.release();
     }
 

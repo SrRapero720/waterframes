@@ -8,6 +8,7 @@ import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.network.packets.*;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.server.permission.PermissionAPI;
 import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 import net.minecraftforge.server.permission.nodes.PermissionNode;
@@ -47,7 +48,7 @@ import static org.watermedia.WaterMedia.IT;
 public class DisplaysRegistry {
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ID);
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ID);
-    private static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, ID);
+    private static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, ID);
     private static final CreativeModeTab TAB = new CreativeModeTab(ID) {
         @Override public ItemStack makeIcon() { return new ItemStack(FRAME_ITEM.get()); }
     };
@@ -94,7 +95,7 @@ public class DisplaysRegistry {
     @SuppressWarnings("unchecked")
     private static PermissionNode<Boolean> permission(String node, boolean def, String title, String desc) {
         return new PermissionNode<>(WaterFrames.ID, node, PermissionTypes.BOOLEAN, (player, uuid, context) -> def)
-                .setInformation(Component.literal(title), Component.literal(desc));
+                .setInformation(new TextComponent(title), new TextComponent(desc));
     }
 
     public static boolean getPermBoolean(UUID player, PermissionNode<Boolean> node) {
@@ -146,7 +147,7 @@ public class DisplaysRegistry {
 
     @SubscribeEvent
     public static void onPlayerConnects(PlayerEvent.PlayerLoggedInEvent event) {
-        var playername = event.getEntity().getGameProfile().getName();
+        var playername = event.getPlayer().getGameProfile().getName();
         if (playername.equals("Belupe_")) { // Belupe_: Anti-license reinforcement
             event.getEntity().getServer().execute(() -> {
                 throw new UnsupportedOperationException("Belupe_ is not allowed to use this mod");

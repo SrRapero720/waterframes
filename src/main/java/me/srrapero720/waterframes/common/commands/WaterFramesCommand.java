@@ -41,8 +41,8 @@ import java.net.URI;
 import java.util.*;
 public class WaterFramesCommand {
     private static final Marker IT = MarkerManager.getMarker("Commands");
-    public static final Component ACTIVATED = Component.translatable("waterframes.common.activated");
-    public static final Component DEACTIVATED = Component.translatable("waterframes.common.deactivated");
+    public static final Component ACTIVATED = new TranslatableComponent("waterframes.common.activated");
+    public static final Component DEACTIVATED = new TranslatableComponent("waterframes.common.deactivated");
 
     public static ItemInput[] DEFAULT_INPUTS = new ItemInput[0];
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -187,12 +187,12 @@ public class WaterFramesCommand {
         );
 
         DEFAULT_INPUTS = new ItemInput[] {
-                new ItemInput(Holder.direct(DisplaysRegistry.REMOTE_ITEM.get()), null),
-                new ItemInput(Holder.direct(DisplaysRegistry.FRAME_ITEM.get()), null),
-                new ItemInput(Holder.direct(DisplaysRegistry.PROJECTOR_ITEM.get()), null),
-                new ItemInput(Holder.direct(DisplaysRegistry.TV_ITEM.get()), null),
-                new ItemInput(Holder.direct(DisplaysRegistry.BIG_TV_ITEM.get()), null),
-                new ItemInput(Holder.direct(DisplaysRegistry.TV_BOX_ITEM.get()), null),
+                new ItemInput(DisplaysRegistry.REMOTE_ITEM.get(), null),
+                new ItemInput(DisplaysRegistry.FRAME_ITEM.get(), null),
+                new ItemInput(DisplaysRegistry.PROJECTOR_ITEM.get(), null),
+                new ItemInput(DisplaysRegistry.TV_ITEM.get(), null),
+                new ItemInput(DisplaysRegistry.BIG_TV_ITEM.get(), null),
+                new ItemInput(DisplaysRegistry.TV_BOX_ITEM.get(), null),
         };
 
         dispatcher.register(waterframes);
@@ -328,7 +328,7 @@ public class WaterFramesCommand {
                 source.sendFailure(msgFailed("waterframes.commands.audit.author.failed", tile.data.uuid.toString()));
                 return 2;
             }
-            source.sendSuccess(msgSuccess("waterframes.commands.audit.author", Component.literal(profiler.get().getName()).withStyle(ChatFormatting.AQUA)), true);
+            source.sendSuccess(msgSuccess("waterframes.commands.audit.author", new TextComponent(profiler.get().getName()).withStyle(ChatFormatting.AQUA)), true);
         }
         return 0;
     }
@@ -360,12 +360,12 @@ public class WaterFramesCommand {
         response.append("\n");
         for (var tile: displayTiles) {
             BlockPos pos = tile.getBlockPos();
-            Component index = Component.literal("- [" + i + "] ").withStyle(ChatFormatting.GOLD)
+            Component index = new TextComponent("- [" + i + "] ").withStyle(ChatFormatting.GOLD)
                     .withStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, String.format("/teleport %s %s %s %s", player.getGameProfile().getName(), pos.getX(), pos.getY(), pos.getZ()))))
-                    .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.translatable("waterframes.commands.audit.in_range.tooltip.position", pos.getX(), pos.getY(), pos.getZ()))));
-            Component x = Component.literal("X: " + pos.getX()).withStyle(ChatFormatting.RED);
-            Component y = Component.literal("Y: " + pos.getY()).withStyle(ChatFormatting.GREEN);
-            Component z = Component.literal("Z: " + pos.getZ()).withStyle(ChatFormatting.AQUA);
+                    .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TranslatableComponent("waterframes.commands.audit.in_range.tooltip.position", pos.getX(), pos.getY(), pos.getZ()))));
+            Component x = new TextComponent("X: " + pos.getX()).withStyle(ChatFormatting.RED);
+            Component y = new TextComponent("Y: " + pos.getY()).withStyle(ChatFormatting.GREEN);
+            Component z = new TextComponent("Z: " + pos.getZ()).withStyle(ChatFormatting.AQUA);
 
             String playerAuthor;
             if (tile.data.uuid == Util.NIL_UUID) {
@@ -374,9 +374,9 @@ public class WaterFramesCommand {
                 var profiler = source.getServer().getProfileCache().get(tile.data.uuid);
                 playerAuthor =  profiler.isEmpty() ? "unknown" : profiler.get().getName();
             }
-            Component author = Component.translatable("waterframes.commands.audit.in_range.author", playerAuthor)
+            Component author = new TranslatableComponent("waterframes.commands.audit.in_range.author", playerAuthor)
                     .withStyle(ChatFormatting.DARK_GRAY)
-                    .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("UUID: " + tile.data.uuid.toString()))));
+                    .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new TextComponent("UUID: " + tile.data.uuid.toString()))));
 
             response.append(index).append(x).append(" ").append(y).append(" ").append(z).append(" || ").append(author);
             if (i != displayTiles.size()) {
@@ -513,23 +513,23 @@ public class WaterFramesCommand {
     }
 
     private static MutableComponent msgFailed(String t) {
-        return Component.translatable("waterframes.commands.prefix").append(Component.translatable(t).withStyle(ChatFormatting.RED));
+        return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t).withStyle(ChatFormatting.RED));
     }
 
     private static MutableComponent msgFailed(String t, String t2) {
-        return Component.translatable("waterframes.commands.prefix").append(Component.translatable(t, t2).withStyle(ChatFormatting.RED));
+        return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t, t2).withStyle(ChatFormatting.RED));
     }
 
     private static MutableComponent msgSuccess(String t) {
-        return Component.translatable("waterframes.commands.prefix").append(Component.translatable(t).withStyle(ChatFormatting.GREEN));
+        return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN));
     }
 
     private static MutableComponent msgSuccess(String t, Component c) {
-        return Component.translatable("waterframes.commands.prefix").append(Component.translatable(t).withStyle(ChatFormatting.GREEN).append(c));
+        return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t).withStyle(ChatFormatting.GREEN).append(c));
     }
 
     private static MutableComponent msgSuccess(String t, String... a) {
-        return Component.translatable("waterframes.commands.prefix").append(Component.translatable(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
+        return new TranslatableComponent("waterframes.commands.prefix").append(new TranslatableComponent(t, (Object[]) a).withStyle(ChatFormatting.GREEN));
     }
 
     public static boolean hasPermissions(CommandSourceStack sourceStack) {
