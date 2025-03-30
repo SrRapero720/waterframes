@@ -5,6 +5,7 @@ import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
+import net.minecraft.Util;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -20,7 +21,15 @@ import team.creative.creativecore.common.util.math.box.AlignedBox;
 import team.creative.creativecore.common.util.math.box.BoxCorner;
 import team.creative.creativecore.common.util.math.box.BoxFace;
 
+import java.util.function.Function;
+
 public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
+
+    private static final Function<ResourceLocation, RenderType> BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE = Util.memoize((p_173198_) -> {
+        RenderType.CompositeState rendertype$compositestate = RenderType.CompositeState.builder().setShaderState(RenderType.RENDERTYPE_TRANSLUCENT_SHADER).setTextureState(new RenderStateShard.TextureStateShard(p_173198_, false, false)).setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY).setLightmapState(RenderType.LIGHTMAP).setOverlayState(RenderType.NO_OVERLAY).createCompositeState(false);
+        return RenderType.create("block_translucent_cull_custom_texture", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 256, true, true, rendertype$compositestate);
+    });
+
     private final BlockEntityRendererProvider.Context context;
     long loggerTime = System.currentTimeMillis();
     public DisplayRenderer(BlockEntityRendererProvider.Context context) {
@@ -95,7 +104,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     public void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing, int packedLight, int packedOverlay,
                        boolean front, boolean back, boolean flipX, boolean flipY, int r, int g, int b, int a, ResourceLocation texture) {
 
-        VertexConsumer builder = source.getBuffer(RenderType.entityTranslucentCull(texture));
+        VertexConsumer builder = source.getBuffer(BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE.apply(texture));
         if (front) {
             for (int i = 0; i < boxface.corners.length; i++) {
                 BoxCorner corner = boxface.corners[i];
