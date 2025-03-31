@@ -66,6 +66,7 @@ public class DisplayScreen extends GuiLayer {
 
     public final GuiCheckBox show_model;
     public final GuiCheckBox lit;
+    private final GuiCheckBox shaderMode;
     public final GuiCheckButtonIcon mirror;
     public final GuiCheckButtonIcon loop;
 
@@ -137,6 +138,10 @@ public class DisplayScreen extends GuiLayer {
 
         this.lit = new GuiCheckBox("lit", tile.canHideModel() && tile.isVisible());
         this.lit.setTranslate("waterframes.gui.lit");
+
+        this.shaderMode = new GuiCheckBox("shader_mode", DisplaysConfig.shaderMode());
+        this.shaderMode.setTranslate("waterframes.gui.shader_mode");
+        this.shaderMode.consumeChanged(DisplaysConfig::shaderMode);
 
         this.pos_view = new WidgetClickableArea("pos_view", tile.data.getPosX(), tile.data.getPosY());
 
@@ -238,6 +243,7 @@ public class DisplayScreen extends GuiLayer {
                             lit.set(tile.data.lit);
                             return lit;
                         })
+                        .add(shaderMode)
                         .setSpacing(6)
                 )
                 .applyOnLeft(column -> {

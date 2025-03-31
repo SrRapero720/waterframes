@@ -31,7 +31,6 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     });
 
     private final BlockEntityRendererProvider.Context context;
-    long loggerTime = System.currentTimeMillis();
     public DisplayRenderer(BlockEntityRendererProvider.Context context) {
         this.context = context;
     }
@@ -104,7 +103,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     public void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing, int packedLight, int packedOverlay,
                        boolean front, boolean back, boolean flipX, boolean flipY, int r, int g, int b, int a, ResourceLocation texture) {
 
-        VertexConsumer builder = source.getBuffer(BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE.apply(texture));
+        VertexConsumer builder = source.getBuffer(DisplaysConfig.shaderMode() ? RenderType.entityTranslucentCull(texture) : BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE.apply(texture));
         if (front) {
             for (int i = 0; i < boxface.corners.length; i++) {
                 BoxCorner corner = boxface.corners[i];

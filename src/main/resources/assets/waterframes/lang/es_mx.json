@@ -129,6 +129,7 @@
 
     "waterframes.gui.show_model": "bloque",
     "waterframes.gui.lit": "emitir luz",
+    "waterframes.gui.shader_mode": "modo shaders",
 
     "waterframes.gui.reload": "Recargar",
     "waterframes.gui.save": "Guardar"

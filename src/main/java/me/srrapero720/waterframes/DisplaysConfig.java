@@ -99,6 +99,7 @@ public class DisplaysConfig {
     private final static BooleanValue overrideServerConfig;
     private static final BooleanValue clientUseMultimedia;
     private static final BooleanValue clientKeepsRendering;
+    private static final BooleanValue clientShaderMode;
     private static final BooleanValue forceDevMode;
 
     private static final ForgeConfigSpec SERVER_SPEC;
@@ -281,6 +282,13 @@ public class DisplaysConfig {
                 )
                 .define("keepRendering", false);
 
+        clientShaderMode = CLIENT
+                .comment(
+                        "Enables compatibility with shaders",
+                        "This is not enabled by default because i am tired"
+                )
+                .define("shaderMode", false);
+
         forceDevMode = CLIENT
                 .comment(
                         "WARNING: DO NOT CHANGE IT EXCEPT IF YOU KNOW WHAT ARE YOU DOING, TOGGLING IT ON MAY CAUSE CORRUPTIONS, UNEXPECTED BEHAVIORS OR WORLD DESTRUCTION",
@@ -336,6 +344,8 @@ public class DisplaysConfig {
     public static boolean useRedstone() { return useRedstone.get(); }
     public static boolean useMasterModeRedstone() { return useRedstone() && useMasterModeOnRedstone.get(); }
     public static int maxRcDis() { return remoteDistance.get(); }
+    public static boolean shaderMode() { return clientShaderMode.get(); }
+    public static void shaderMode(boolean value) { clientShaderMode.set(value); }
 
     // PERMISSIONS
     public static boolean useInAdv() { return useInAdventure.get(); }
