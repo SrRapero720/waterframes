@@ -13,6 +13,7 @@ import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 import team.creative.creativecore.common.util.text.TextBuilder;
 
+import java.net.URI;
 import java.util.List;
 
 public class WidgetURLTextField extends GuiTextfield {
@@ -21,12 +22,14 @@ public class WidgetURLTextField extends GuiTextfield {
         super(DisplayData.URL);
         this.setMaxStringLength(2048);
         this.setSuggestion("https://i.imgur.com/1yCDs5C.mp4");
-        this.setText(tile.data.hasUri() ? tile.data.uri.toString() : "");
+        if (tile != null) {
+            this.setText(tile.data.hasUri() ? tile.data.getUri().toString() : "");
+        }
     }
 
     @Override
     public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
-        return isUrlValid(this.getText()) ? ScreenStyles.BLUE_BORDER : ScreenStyles.RED_BORDER;
+        return isUrlValid() ? ScreenStyles.BLUE_BORDER : ScreenStyles.RED_BORDER;
     }
 
     @Override
@@ -40,7 +43,7 @@ public class WidgetURLTextField extends GuiTextfield {
 
         if (this.getText().isEmpty()) {
             builder.text(ChatFormatting.BLUE + GuiControl.translate("waterframes.gui.url.tooltip.empty"));
-        } else if (!isUrlValid(this.getText())) {
+        } else if (!isUrlValid()) {
             builder.text(ChatFormatting.RED + GuiControl.translate("waterframes.gui.url.tooltip.invalid_url"));
         } else if (!DisplaysConfig.canSave(this.getPlayer(), this.getText())) {
             builder.text(ChatFormatting.RED + GuiControl.translate("waterframes.gui.url.tooltip.not_whitelisted"));
@@ -50,7 +53,11 @@ public class WidgetURLTextField extends GuiTextfield {
         return result.isEmpty() ? null : result;
     }
 
-    public static boolean isUrlValid(String url) {
-        return WaterFrames.createURI(url) != null;
+    public URI getURI() {
+        return WaterFrames.createURI(getText());
+    }
+
+    public boolean isUrlValid() {
+        return WaterFrames.createURI(getText()) != null;
     }
 }

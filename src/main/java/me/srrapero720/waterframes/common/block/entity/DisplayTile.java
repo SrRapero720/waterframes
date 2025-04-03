@@ -97,8 +97,8 @@ public class DisplayTile extends BlockEntity {
             return null;
         }
 
-        if (this.imageCache == null || (this.data.hasUri() && !this.imageCache.uri.equals(this.data.uri))) {
-            this.imageCache = ImageAPI.getCache(this.data.uri, Minecraft.getInstance());
+        if (this.imageCache == null || (this.data.hasUri() && !this.imageCache.uri.equals(this.data.getUri()))) {
+            this.imageCache = ImageAPI.getCache(this.data.getUri(), Minecraft.getInstance());
             this.cleanDisplay();
         }
 
@@ -236,6 +236,16 @@ public class DisplayTile extends BlockEntity {
         else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), Math.max(data.tick - (5000 / 50), 0), this.data.tickMax, true), this);
     }
 
+    public void nextUri(boolean clientSide) {
+        if (clientSide) DisplayNetwork.sendServer(new NextPacket(this.getBlockPos(), true));
+        else            DisplayNetwork.sendClient(new NextPacket(this.getBlockPos(), true), this);
+    }
+
+    public void prevUri(boolean clientSide) {
+        if (clientSide) DisplayNetwork.sendServer(new PreviousPacket(this.getBlockPos(), true));
+        else            DisplayNetwork.sendClient(new PreviousPacket(this.getBlockPos(), true), this);
+    }
+
     public void syncTime(boolean clientSide, int tick, int maxTick) {
         if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), tick, maxTick, true));
         else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), tick, maxTick, true), this);
@@ -267,6 +277,10 @@ public class DisplayTile extends BlockEntity {
                 }
             } else {
                 if (this.data.loop || this.data.tickMax == -1) this.data.tick = 0;
+
+                if (!this.data.loop && this.data.tickMax != -1) {
+                    this.data.nextUri();
+                }
             }
         }
 

@@ -189,6 +189,9 @@ public class DisplaysRegistry {
         @SubscribeEvent
         public static void init(FMLCommonSetupEvent event) {
             NET.registerType(DataSyncPacket.class, DataSyncPacket::new);
+            NET.registerType(DataListSyncPacket.class, DataListSyncPacket::new);
+            NET.registerType(NextPacket.class, NextPacket::new);
+            NET.registerType(PreviousPacket.class, PreviousPacket::new);
             NET.registerType(ActivePacket.class, ActivePacket::new);
             NET.registerType(LoopPacket.class, LoopPacket::new);
             NET.registerType(MutePacket.class, MutePacket::new);

@@ -8,16 +8,20 @@ import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
+import me.srrapero720.waterframes.common.screens.PlayListScreen;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector2f;
 
 import java.net.URI;
+import java.util.LinkedList;
 import java.util.UUID;
 
 public class DisplayData {
     public static final String URL = "url";
+    public static final String URI_LIST = "uri_list";
+    public static final String URI_INDEX = "uri_index";
     public static final String PLAYER_UUID = "player_uuid";
     public static final String ACTIVE = "active";
     public static final String MIN_X = "min_x";
@@ -54,6 +58,8 @@ public class DisplayData {
     public static final short V = 2;
 
     public URI uri = null;
+    public LinkedList<URI> uris = new LinkedList<>();
+    public int uri_index;
     public UUID uuid = Util.NIL_UUID;
     public boolean active = true;
     public Vector2f min = new Vector2f(0F, 0F);
@@ -84,14 +90,41 @@ public class DisplayData {
     public float projectionDistance = DisplaysConfig.maxProjDis(8f);
     public float audioOffset = 0;
 
-    public boolean hasUri() { return this.uri != null; }
+    public boolean nextUri() {
+        if (this.uris.isEmpty()) return false;
+        this.uri_index++;
+        if (this.uri_index >= this.uris.size()) {
+            this.uri_index = 0;
+        }
+        this.uri = this.uris.get(this.uri_index);
+        this.tick = 0;
+        this.tickMax = -1;
+        return true;
+    }
+    public boolean prevUri() {
+        if (this.uris.isEmpty()) return false;
+        this.uri_index--;
+        if (this.uri_index < 0) {
+            this.uri_index = this.uris.size() - 1;
+        }
+        this.uri = this.uris.get(this.uri_index);
+        this.tick = 0;
+        this.tickMax = -1;
+        return true;
+    }
+    public boolean hasUri() { return this.uri != null || !this.uris.isEmpty(); }
+    public URI getUri() { return this.uris.isEmpty() ? this.uri : this.uris.get(this.uri_index); }
     public PositionHorizontal getPosX() { return this.min.x == 0 ? PositionHorizontal.LEFT : this.max.x == 1 ? PositionHorizontal.RIGHT : PositionHorizontal.CENTER; }
     public PositionVertical getPosY() { return this.min.y == 0 ? PositionVertical.TOP : this.max.y == 1 ? PositionVertical.BOTTOM : PositionVertical.CENTER; }
     public float getWidth() { return this.max.x - this.min.x; }
     public float getHeight() { return this.max.y - this.min.y; }
 
     public void save(CompoundTag nbt, DisplayTile tile) {
-        nbt.putString(URL, !hasUri() ? "" : uri.toString());
+        nbt.putString(URL, !hasUri() ? "" : this.getUri().toString());
+        // EXPERIMENTAL: LISTING
+        nbt.putString(URI_LIST, WaterFrames.composeURIString(this.uris));
+        nbt.putInt(URI_INDEX, uri_index);
+        // HERE ENDS
         nbt.putUUID(PLAYER_UUID, uuid);
         nbt.putBoolean(ACTIVE, active);
         if (tile.caps.resizes()) {
@@ -131,6 +164,11 @@ public class DisplayData {
     public void load(CompoundTag nbt, DisplayTile tile) {
         String url = nbt.getString(URL);
         this.uri = url.isEmpty() ? null : WaterFrames.createURI(nbt.getString(URL));
+        // EXPERIMENTAL: LISTING
+        this.uris = WaterFrames.decomposeURIString(nbt.getString(URI_LIST));
+        this.uri_index = nbt.getInt(URI_INDEX);
+        // EXPERIMENTAL ENDS
+
         this.uuid = nbt.contains(PLAYER_UUID) ? nbt.getUUID(PLAYER_UUID) : this.uuid;
         this.active = nbt.contains(ACTIVE) ? nbt.getBoolean(ACTIVE) : this.active;
         if (tile.caps.resizes()) {
@@ -295,6 +333,15 @@ public class DisplayData {
         }
     }
 
+    public static CompoundTag build(PlayListScreen screen, DisplayTile tile) {
+        CompoundTag nbt = new CompoundTag();
+
+        nbt.putString(URI_LIST, WaterFrames.composeURIString(screen.getUris()));
+        nbt.putInt(URI_INDEX, 0);
+
+        return nbt;
+    }
+
     public static CompoundTag build(DisplayScreen screen, DisplayTile tile) {
         CompoundTag nbt = new CompoundTag();
 
@@ -338,11 +385,17 @@ public class DisplayData {
         return nbt;
     }
 
+    public static void syncList(DisplayTile tile, Player player, CompoundTag tag) {
+        tile.data.uris = WaterFrames.decomposeURIString(tag.getString(URI_LIST));
+        tile.data.uri_index = tag.getInt(URI_INDEX);
+        tile.setDirty();
+    }
+
     public static void sync(DisplayTile tile, Player player, CompoundTag nbt) {
         String url = nbt.getString(URL);
         if (DisplaysConfig.canSave(player, url)) {
             final URI uri = WaterFrames.createURI(url);
-            if (!tile.data.hasUri() || !tile.data.uri.equals(uri)) {
+            if (!tile.data.hasUri() || !tile.data.getUri().equals(uri)) {
                 tile.data.tick = 0;
                 tile.data.tickMax = -1;
             }

@@ -77,7 +77,7 @@ public class Display {
         this.mediaPlayer.setRepeatMode(this.tile.data.loop);
         this.mediaPlayer.setPauseMode(this.tile.data.paused);
         this.mediaPlayer.setMuteMode(this.tile.data.muted);
-        this.mediaPlayer.start(this.tile.data.uri);
+        this.mediaPlayer.start(this.tile.data.getUri());
         DisplayList.add(this);
     }
 

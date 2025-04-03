@@ -19,6 +19,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.net.URI;
+import java.util.LinkedList;
+import java.util.List;
 
 @Mod(WaterFrames.ID)
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -59,6 +61,29 @@ public class WaterFrames {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static String composeURIString(LinkedList<URI> s) {
+        final StringBuilder sb = new StringBuilder();
+        for (URI uri: s) {
+            sb.append(uri.toString());
+            if (uri != s.getLast()) {
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    public static LinkedList<URI> decomposeURIString(String s) {
+        LinkedList<URI> uris = new LinkedList<>();
+        String[] split = s.split("\n");
+        for (String uri: split) {
+            if (uri.isEmpty()) continue;
+            URI u = createURI(uri);
+            WaterFrames.LOGGER.info("DECOMPOSED: {}", u);
+            if (u != null) uris.add(u);
+        }
+        return uris;
     }
 
     public static boolean isInstalled(String... mods) {

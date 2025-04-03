@@ -79,6 +79,7 @@ public class DisplaysConfig {
     private static final BooleanValue useLagTickCorrection;
     private static final BooleanValue useRedstone;
     private static final BooleanValue useMasterModeOnRedstone;
+    public static final BooleanValue useExperimentalPlaylistMode;
     // REMOTE CONTROL
     private static final IntValue remoteDistance;
 
@@ -188,6 +189,10 @@ public class DisplaysConfig {
         useMasterModeOnRedstone = SERVER
                 .comment("Redstone inputs forces paused playback and ignores any other control sources")
                 .define("masterMode", false);
+
+        useExperimentalPlaylistMode = SERVER
+                .comment("Experimental playlist mode, this will make the display to play a list of videos")
+                .define("experimentalPlaylistMode", false);
 
         SERVER.pop();
 
@@ -492,5 +497,9 @@ public class DisplaysConfig {
 
     public static boolean isDevMode() {
         return !FMLLoader.isProduction() || forceDevMode.get();
+    }
+
+    public static void setPlaylistMode(boolean v) {
+        DisplaysConfig.useExperimentalPlaylistMode.set(v);
     }
 }

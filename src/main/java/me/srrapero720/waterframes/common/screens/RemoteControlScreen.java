@@ -132,10 +132,12 @@ public class RemoteControlScreen extends GuiLayer {
         this.volumeUp = new GuiButtonIcon("volume_up", IconStyles.VOLUME_UP, button -> tile.volumeUp(true));
         this.volumeDown = new GuiButtonIcon("volume_down", IconStyles.VOLUME_DOWN, button -> tile.volumeDown(true));
 
-        this.channelUp = new GuiButtonIcon("channel_up", IconStyles.CHANNEL_UP, button -> {});
-        this.channelDown = new GuiButtonIcon("channel_down", IconStyles.CHANNEL_DOWN, button -> {});
-        this.channelUp.setTooltip("waterframes.common.soon").setEnabled(false);
-        this.channelDown.setTooltip("waterframes.common.soon").setEnabled(false);
+        this.channelUp = new GuiButtonIcon("channel_up", IconStyles.CHANNEL_UP, button -> tile.nextUri(true));
+        this.channelDown = new GuiButtonIcon("channel_down", IconStyles.CHANNEL_DOWN, button -> tile.prevUri(true));
+        if (this.tile.data.uris.isEmpty()) {
+            this.channelDown.setEnabled(false);
+            this.channelUp.setEnabled(false);
+        }
 
         this.rewind = new GuiButtonIcon("fast_backward", IconStyles.FAST_BACKWARD, button -> tile.rewind(true));
         this.fastfoward = new GuiButtonIcon("fast_forward", IconStyles.FAST_FOWARD, button -> tile.fastFoward(true));

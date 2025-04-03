@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.common.commands;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.FloatArgumentType;
@@ -169,6 +170,11 @@ public class WaterFramesCommand {
                 )
         );
 
+        waterframes.then(Commands.literal("experiments")
+                .then(Commands.literal("playlistMode")
+                        .then(Commands.argument("enable", BoolArgumentType.bool())
+                                .executes(c -> enablePlaylistMode(c.getSource(), BoolArgumentType.getBool(c, "enable"))))));
+
         waterframes.then(Commands.literal("give")
                 .executes(c -> giveSelfKit(c.getSource()))
                 .then(Commands.argument("targets", EntityArgument.players())
@@ -201,6 +207,17 @@ public class WaterFramesCommand {
         dispatcher.register(waterframes);
     }
 
+    private static int enablePlaylistMode(CommandSourceStack source, boolean enable) {
+        if (enable) {
+            DisplaysConfig.setPlaylistMode(true);
+            source.sendSuccess(msgSuccess("waterframes.commands.experiments.playlist_mode.enabled"), true);
+        } else {
+            DisplaysConfig.setPlaylistMode(false);
+            source.sendSuccess(msgSuccess("waterframes.commands.experiments.playlist_mode.disabled"), true);
+        }
+        return 0;
+    }
+
     @OnlyIn(Dist.CLIENT)
     public static void registerClient(CommandDispatcher<CommandSourceStack> dispatcher) {
         var waterframes = Commands.literal("waterframes");
@@ -213,9 +230,14 @@ public class WaterFramesCommand {
     public static int setUrl(DisplayTile tile, CommandSourceStack source, String url) {
         if (tile == null) return 1;
 
+        if (!tile.data.uris.isEmpty()) {
+            source.sendFailure(msgFailed("waterframes.commands.edit.url.failed.experimental"));
+            return 1;
+        }
+
         URI uri = WaterFrames.createURI(url);
 
-        if (tile.data.hasUri() && tile.data.uri.equals(uri)) {
+        if (tile.data.hasUri() && tile.data.getUri().equals(uri)) {
             tile.data.tick = 0;
             tile.data.tickMax = -1;
         }

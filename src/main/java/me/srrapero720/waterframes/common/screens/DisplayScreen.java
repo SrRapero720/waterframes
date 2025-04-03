@@ -10,6 +10,7 @@ import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import me.srrapero720.waterframes.common.screens.widgets.*;
 import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
@@ -192,7 +193,10 @@ public class DisplayScreen extends GuiLayer {
         // URL FIELD
         this.add(new WidgetPairTable(GuiFlow.STACK_Y, 4)
                 .addLeft(url_l)
-                .addLeft(url.setExpandableX())
+                .addLeft(!DisplaysConfig.useExperimentalPlaylistMode.get(), url::setExpandableX)
+                .addLeft(DisplaysConfig.useExperimentalPlaylistMode.get(), () -> new GuiButton("open_uri", mouse ->
+                        this.getIntegratedParent().openLayer(new PlayListScreen(this.tile))).setTitle(Component.literal("Select Playlist")
+                ).setExpandableX())
                 .addRight(new WidgetStatusIcon("", IconStyles.STATUS_OK, tile).setDim(30, 30)));
 
 
@@ -369,7 +373,7 @@ public class DisplayScreen extends GuiLayer {
     }
 
     public boolean enableReload() {
-        return tile.imageCache != null && !this.url.getText().isEmpty() && tile.data.hasUri() && tile.data.uri.equals(WaterFrames.createURI(this.url.getText()));
+        return tile.imageCache != null && !this.url.getText().isEmpty() && tile.data.hasUri() && tile.data.getUri().equals(WaterFrames.createURI(this.url.getText()));
     }
 
     @Override
