@@ -1,3 +1,14 @@
+# UPDATE 2.1.13
+- ✨ Added experimental "playListMode"
+  - 🛠️ Can be enabled using `/waterframes experimentals playListMode <true/false>`
+  - 🛠️ This will allow you to play a list of videos in a row
+  - 🛠️ DO NOT USE IT ON EXISTING WORLDS
+  - ✨ Remote buttons to "change channel" now are enabled and let you move up and down the list.
+- ✨ Added shaderMode on displays gui
+  - 🛠️ Enables extra-compatibility for some shaderpacks using Iris/Oculus
+  - 🛠️ Its fully client-side config, it won't affect server-side
+- 🛠️ [1.21.1 -> 4] Updated to the latest version of CreativeCore
+
 # UPDATE 2.1.12
 - 🛠️ Removed slavisim mode (not needed/working anymore)
 - 🛠️ Ensure synchronized duration when vlc updates it (somehow for a few seconds VLC reports no duration after playing specific streams)
