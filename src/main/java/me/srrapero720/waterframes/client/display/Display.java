@@ -195,7 +195,8 @@ public class Display {
         }
         if (this.synced == -1 && this.canRender()) {
             this.syncDuration();
-        } else if (this.synced != this.durationInTicks() && this.canRender()) {
+        } else if (this.synced != this.durationInTicks() && !(this.synced == 200 && this.durationInTicks() == 0) && this.canRender()) {
+            WaterFrames.LOGGER.info("Synced duration is {}, duration in ticks is {}", this.synced, this.durationInTicks());
             this.syncDuration();
         }
     }
