@@ -388,6 +388,9 @@ public class DisplayData {
     public static void syncList(DisplayTile tile, Player player, CompoundTag tag) {
         tile.data.uris = WaterFrames.decomposeURIString(tag.getString(URI_LIST));
         tile.data.uri_index = tag.getInt(URI_INDEX);
+        if (tile.data.uris.isEmpty()) {
+            tile.data.uri = null;
+        }
         tile.setDirty();
     }
 
