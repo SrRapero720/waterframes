@@ -42,6 +42,9 @@ public class TimePacket extends DisplayControlPacket {
             }
 
             tile.data.tickMax = this.tickMax;
+            if (tile.data.tickMax == 0 && tile.data.uris.size() > 1) {
+                tile.data.tickMax = 20 * 10; // ADD 10 seconds
+            }
         }
     }
 }
