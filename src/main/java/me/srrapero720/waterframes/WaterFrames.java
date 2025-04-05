@@ -80,7 +80,6 @@ public class WaterFrames {
         for (String uri: split) {
             if (uri.isEmpty()) continue;
             URI u = createURI(uri);
-            WaterFrames.LOGGER.info("DECOMPOSED: {}", u);
             if (u != null) uris.add(u);
         }
         return uris;

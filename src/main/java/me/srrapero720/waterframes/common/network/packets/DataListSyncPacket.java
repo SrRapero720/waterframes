@@ -19,7 +19,6 @@ public class DataListSyncPacket extends DisplayDataPacket {
 
     @Override
     public void execServer(DisplayTile tile, ServerPlayer player) {
-        WaterFrames.LOGGER.info("PACKET RECEIVED");
         DisplayData.syncList(tile, player, nbt);
     }
 
