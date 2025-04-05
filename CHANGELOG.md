@@ -1,3 +1,12 @@
+# UPDATE 2.1.14
+- ✨ Overhaul experimental playlist GUI layout and colors
+  - ✨ Added a new button to "play next and previous"
+  - ✨ Added a new button to "play and pause" media
+  - ✨ Added a reload button on the loaded entry
+  - ✨ Colorize active playlist media
+- 🛠️ Using playlist, single pictures will be forced to be shown for 10 seconds
+- 🐛 Fixed GUI was not rendered in non-singleplayer worlds
+
 # UPDATE 2.1.13
 - ✨ Added experimental "playListMode"
   - 🛠️ Can be enabled using `/waterframes experimentals playListMode <true/false>`
