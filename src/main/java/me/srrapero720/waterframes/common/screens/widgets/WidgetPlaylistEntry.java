@@ -59,7 +59,7 @@ public class WidgetPlaylistEntry extends GuiParent {
     @Override
     @OnlyIn(Dist.CLIENT)
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
-        return tile.data.getUri().equals(uri) ? ScreenStyles.DARK_BLUE_HIGHLIGHT : ScreenStyles.DARK_BLUE_BACKGROUND;
+        return tile.data.hasUri() && tile.data.getUri().equals(uri) ? ScreenStyles.DARK_BLUE_HIGHLIGHT : ScreenStyles.DARK_BLUE_BACKGROUND;
     }
 
     @Override
@@ -83,6 +83,6 @@ public class WidgetPlaylistEntry extends GuiParent {
     }
 
     private boolean checkReload() {
-        return tile.data.getUri().equals(uri);
+        return tile.data.hasUri() && tile.data.getUri().equals(uri);
     }
 }
