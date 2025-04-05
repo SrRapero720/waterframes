@@ -79,6 +79,7 @@ public class IconStyles {
     public static final Icon BACK_MEDIA = create(15, 6);
     public static final Icon ADD = create(15, 7);
     public static final Icon OFF_ON = create(15, 8);
+    public static final Icon REMOVE = create(15, 9);
     public static final Icon VOLUME_DOWN = create(15, 10);
     public static final Icon VOLUME_UP = create(15, 11);
     public static final Icon CHANNEL_UP = create(15, 12);

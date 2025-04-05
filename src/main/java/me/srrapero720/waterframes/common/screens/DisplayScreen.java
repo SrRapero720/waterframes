@@ -140,7 +140,7 @@ public class DisplayScreen extends GuiLayer {
         this.lit = new GuiCheckBox("lit", tile.canHideModel() && tile.isVisible());
         this.lit.setTranslate("waterframes.gui.lit");
 
-        this.shaderMode = new GuiCheckBox("shader_mode", DisplaysConfig.shaderMode());
+        this.shaderMode = new GuiCheckBox("shader_mode", false);
         this.shaderMode.setTranslate("waterframes.gui.shader_mode");
         this.shaderMode.consumeChanged(DisplaysConfig::shaderMode);
 
@@ -247,12 +247,13 @@ public class DisplayScreen extends GuiLayer {
                             lit.set(tile.data.lit);
                             return lit;
                         })
-                        .add(shaderMode)
+                        .add(this.isClient(), () -> {
+                            shaderMode.set(DisplaysConfig.shaderMode());
+                            return shaderMode;
+                        })
                         .setSpacing(6)
                 )
-                .applyOnLeft(column -> {
-                    column.setSpacing(2);
-                })
+                .applyOnLeft(column -> column.setSpacing(2))
                 .addRight(tile.caps.resizes(), () -> pos_view.setDim(64, 64))
                 .addRight(!tile.caps.resizes(), () -> flip_x)
                 .addRight(!tile.caps.resizes(), () -> flip_y)
