@@ -37,13 +37,11 @@ public class TimePacket extends DisplayControlPacket {
             final boolean maxNegative = tile.data.tickMax == -1;
             if (maxNegative) {
                 tile.data.tick = 0;
+            } else if (tile.data.tickMax != this.tickMax) {
+                LOGGER.warn("Received maxTick value major than current one, media differs?.");
             }
 
-            if (tile.data.tickMax < this.tickMax) {
-                tile.data.tickMax = this.tickMax;
-                if (!maxNegative) LOGGER.warn("Received maxTick value major than current one, media differs?.");
-            }
+            tile.data.tickMax = this.tickMax;
         }
     }
-
 }
