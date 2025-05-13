@@ -224,7 +224,7 @@ public class DisplaysRegistry {
         @SubscribeEvent
         @OnlyIn(Dist.CLIENT)
         public static void registerOtherStuff(FMLClientSetupEvent e) {
-            registerTexture(LOADING_ANIMATION, new TextureWrapper.Renderer(ImageAPI.loadingGif(WaterFrames.ID)));
+            e.enqueueWork(() -> registerTexture(LOADING_ANIMATION, new TextureWrapper.Renderer(ImageAPI.loadingGif(WaterFrames.ID))));
         }
 
         @SubscribeEvent
