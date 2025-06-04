@@ -1,19 +1,17 @@
 package me.srrapero720.waterframes.common.screens.widgets;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.CoreShaders;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import org.joml.Matrix4f;
-import team.creative.creativecore.common.gui.GuiChildControl;
-import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
-import team.creative.creativecore.common.util.math.geo.Rect;
+import team.creative.creativecore.common.gui.control.simple.GuiIcon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +27,12 @@ public class WidgetClickableArea extends GuiIcon {
     }
 
     @Override
-    protected void renderContent(GuiGraphics graphics, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
-        super.renderContent(graphics, control, rect, mouseX, mouseY);
-        this.renderSelector(graphics, control, rect, mouseX, mouseY);
+    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY) {
+        super.renderContent(graphics, mouseX, mouseY);
+        this.renderSelector(graphics, mouseX, mouseY);
     }
 
-    protected void renderSelector(GuiGraphics graphics, GuiChildControl control, Rect rect, int mouseX, int mouseY) {
+    protected void renderSelector(GuiGraphics graphics, int mouseX, int mouseY) {
         PoseStack pose = graphics.pose();
         var icon = IconStyles.POS_ICON;
         float width = ((float) rect.getWidth()) / 3f;
@@ -53,14 +51,7 @@ public class WidgetClickableArea extends GuiIcon {
         };
 
         pose.pushPose();
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(CoreShaders.POSITION_TEX);
-        RenderSystem.setShaderTexture(0, icon.location());
-
         this.color.glColor();
-        Matrix4f matrix = pose.last().pose();
 
         float x, x2, y, y2;
         x = offsetX;
@@ -74,29 +65,31 @@ public class WidgetClickableArea extends GuiIcon {
         u2 = (icon.minX() + icon.width()) / 256f;
         v2 = (icon.minY() + icon.height()) / 256f;
 
-        RenderSystem.setShader(CoreShaders.POSITION_TEX);
-        BufferBuilder bufferbuilder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        bufferbuilder.addVertex(matrix, x, y2, 0).setUv(u, v2);
-        bufferbuilder.addVertex(matrix, x2, y2, 0).setUv(u2, v2);
-        bufferbuilder.addVertex(matrix, x2, y, 0).setUv(u2, v);
-        bufferbuilder.addVertex(matrix, x, y, 0).setUv(u, v);
-        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
+        graphics.drawSpecial(b -> {
+            ResourceLocation rl = icon.location();
+            final VertexConsumer vertexConsumer = b.getBuffer(RenderType.guiTextured(rl));
+            float bo = 0;
+            Matrix4f matrix = graphics.pose().last().pose();
+            vertexConsumer.addVertex(matrix, x, y2, 0).setUv(u, v2).setColor(-1);
+            vertexConsumer.addVertex(matrix, x2, y2, 0).setUv(u2, v2).setColor(-1);
+            vertexConsumer.addVertex(matrix, x2, y, 0).setUv(u2, v).setColor(-1);
+            vertexConsumer.addVertex(matrix, x, y, 0).setUv(u, v).setColor(-1);
+        });
 
-        RenderSystem.disableBlend();
         pose.popPose();
     }
 
     @Override
-    public boolean mouseClicked(Rect rect, double mouseX, double mouseY, int button) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         playSound(SoundEvents.UI_BUTTON_CLICK);
         this.selected = true;
-        this.mouseMoved(rect, mouseX, mouseY);
+        this.mouseMoved(mouseX, mouseY);
         return true;
     }
 
     @Override
-    public void mouseMoved(Rect rect, double mouseX, double mouseY) {
-        super.mouseMoved(rect, mouseX, mouseY);
+    public void mouseMoved(double mouseX, double mouseY) {
+        super.mouseMoved(mouseX, mouseY);
         if (selected) {
             int areaX = (int) (mouseX / rect.getWidth() * 3d);
             int areaY = (int) (mouseY / rect.getHeight() * 3d);
@@ -119,9 +112,9 @@ public class WidgetClickableArea extends GuiIcon {
     }
 
     @Override
-    public void mouseReleased(Rect rect, double x, double y, int button) {
+    public void mouseReleased(double x, double y, int button) {
         this.selected = false;
-        super.mouseReleased(rect, x, y, button);
+        super.mouseReleased(x, y, button);
     }
 
     @Override

@@ -7,7 +7,7 @@ import net.minecraft.network.chat.Component;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.watermedia.api.player.PlayerAPI;
-import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
+import team.creative.creativecore.common.gui.control.simple.GuiIcon;
 import team.creative.creativecore.common.gui.style.Icon;
 
 import java.util.ArrayList;

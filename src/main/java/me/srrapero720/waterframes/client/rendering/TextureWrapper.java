@@ -9,14 +9,16 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class TextureWrapper extends AbstractTexture {
+    private final int id;
+
     public TextureWrapper(int id) {
         this.id = id;
     }
 
-    @Override public int getId() {
+    public int getId() {
         return this.id;
     }
-    @Override public void releaseId() { /* NO OP */ }
+
     @Override public void close() { /* NO OP */}
 
     @OnlyIn(Dist.CLIENT)
@@ -28,7 +30,6 @@ public class TextureWrapper extends AbstractTexture {
             this.renderer = imageRenderer;
         }
 
-        @Override
         public int getId() {
             return renderer.texture(WaterFrames.getTicks(), WaterFrames.deltaFrames(), true);
         }

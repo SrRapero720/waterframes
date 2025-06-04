@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,6 +35,7 @@ import team.creative.creativecore.common.gui.creator.GuiCreator;
 import team.creative.creativecore.common.gui.creator.ItemGuiCreator;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class RemoteControl extends Item implements ItemGuiCreator {
     private static final String POSITION = "position";
@@ -150,7 +152,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     }
 
     public int[] getPosition(CompoundTag data) {
-        return data.getIntArray(POSITION);
+        return data.getIntArray(POSITION).orElse(null);
     }
 
     public int[] getPosition(RemoteData data) {
@@ -183,10 +185,10 @@ public class RemoteControl extends Item implements ItemGuiCreator {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void appendHoverText(ItemStack pStack, TooltipContext pContext, List<Component> pTooltipComponents, TooltipFlag pTooltipFlag) {
-        super.appendHoverText(pStack, pContext, pTooltipComponents, pTooltipFlag);
+    public void appendHoverText(ItemStack pStack, TooltipContext pContext, TooltipDisplay pDisplay, Consumer<Component> pTooltipComponents, TooltipFlag pTooltipFlag) {
+        super.appendHoverText(pStack, pContext, pDisplay, pTooltipComponents, pTooltipFlag);
         Options opts = Minecraft.getInstance().options;
-        pTooltipComponents.add(Component.translatable("waterframes.remote.description.1", opts.keyShift.getKey().getDisplayName(), opts.keyUse.getKey().getDisplayName()));
+        pTooltipComponents.accept(Component.translatable("waterframes.remote.description.1", opts.keyShift.getKey().getDisplayName(), opts.keyUse.getKey().getDisplayName()));
     }
 
     @Override
@@ -195,12 +197,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     }
 
     @Override
-    public boolean canAttackBlock(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
+    public boolean canDestroyBlock(ItemStack pStack, BlockState pState, Level pLevel, BlockPos pPos, LivingEntity pPlayer) {
         return false;
-    }
-
-    @Override
-    public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
-        return true;
     }
 }
