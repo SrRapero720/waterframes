@@ -1,11 +1,9 @@
 package me.srrapero720.waterframes.client.rendering;
 
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.blaze3d.vertex.Tesselator;
 import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -49,55 +47,54 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     public void render(DisplayTile tile, float partialTicks, PoseStack pose, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
         var display = tile.activeDisplay();
         if (display == null || !DisplaysConfig.keepsRendering()) return;
-        // @TODO: crashing the game at the moment, maybe its coming from watermedia ?
-//        display.preRender();
-//
-//        var direction = tile.getDirection();
-//        var box = tile.getRenderBox();
-//        var invertedFace = tile.caps.invertedFace(tile);
-//        var boxFace = BoxFace.get(Facing.get(invertedFace ? direction.getOpposite() : direction));
-//        var facing = boxFace.facing;
-//        packedLight = LightTexture.FULL_BRIGHT;
-//
-//
-//        boolean front = !tile.caps.projects() || tile.data.renderBothSides;
-//        boolean back = tile.caps.projects() || tile.data.renderBothSides;
-//        boolean flipX = tile.caps.projects() != tile.data.flipX;
-//        boolean flipY = tile.data.flipY;
-//        int r, b, g;
-//        r = g = b = tile.data.brightness;
-//        int a = tile.data.alpha;
-//
-//        pose.pushPose();
-//        pose.translate(0.5, 0.5, 0.5);
-//        pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-tile.data.rotation)));
-//        pose.translate(-0.5, -0.5, -0.5);
-//
-//        // TWEAK FOR "EXTRA-RESIZING"
-//        if (tile.caps.growMax(tile, facing, invertedFace)) {
-//            box.setMax(facing.axis,box.getMax(facing.axis) + tile.caps.growSize());
-//        } else {
-//            box.setMin(facing.axis, box.getMin(facing.axis) - tile.caps.growSize());
-//        }
-//
-//        // RENDERING
-//        if (display.isLoading()) {
-//            this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing, packedLight, packedOverlay,
-//                    front, back, flipX, flipY, r, g, b, a, WaterFrames.LOADING_ANIMATION);
-//        } else if (display.canRender()) {
-//            var tex = display.getTextureId();
-//            if (tex != null) {
-//                this.vertex(pose, bufferSource, box, boxFace, facing, packedLight, packedOverlay,
-//                        front, back, flipX, flipY, r, g, b, a, tex);
-//            }
-//
-//            if (display.isBuffering()) {
-//                this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing, packedLight, packedOverlay,
-//                        front, back, flipX, flipY, r, g, b, a, WaterFrames.LOADING_ANIMATION);
-//            }
-//        }
-//
-//        pose.popPose();
+        display.preRender();
+
+        var direction = tile.getDirection();
+        var box = tile.getRenderBox();
+        var invertedFace = tile.caps.invertedFace(tile);
+        var boxFace = BoxFace.get(Facing.get(invertedFace ? direction.getOpposite() : direction));
+        var facing = boxFace.facing;
+        packedLight = LightTexture.FULL_BRIGHT;
+
+
+        boolean front = !tile.caps.projects() || tile.data.renderBothSides;
+        boolean back = tile.caps.projects() || tile.data.renderBothSides;
+        boolean flipX = tile.caps.projects() != tile.data.flipX;
+        boolean flipY = tile.data.flipY;
+        int r, b, g;
+        r = g = b = tile.data.brightness;
+        int a = tile.data.alpha;
+
+        pose.pushPose();
+        pose.translate(0.5, 0.5, 0.5);
+        pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-tile.data.rotation)));
+        pose.translate(-0.5, -0.5, -0.5);
+
+        // TWEAK FOR "EXTRA-RESIZING"
+        if (tile.caps.growMax(tile, facing, invertedFace)) {
+            box.setMax(facing.axis, box.getMax(facing.axis) + tile.caps.growSize());
+        } else {
+            box.setMin(facing.axis, box.getMin(facing.axis) - tile.caps.growSize());
+        }
+
+        // RENDERING
+        if (display.isLoading()) {
+            this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing, packedLight, packedOverlay,
+                    front, back, flipX, flipY, r, g, b, a, WaterFrames.LOADING_ANIMATION);
+        } else if (display.canRender()) {
+            var tex = display.getTextureId();
+            if (tex != null) {
+                this.vertex(pose, bufferSource, box, boxFace, facing, packedLight, packedOverlay,
+                        front, back, flipX, flipY, r, g, b, a, tex);
+            }
+
+            if (display.isBuffering()) {
+                this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing, packedLight, packedOverlay,
+                        front, back, flipX, flipY, r, g, b, a, WaterFrames.LOADING_ANIMATION);
+            }
+        }
+
+        pose.popPose();
     }
 
     public void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing, int packedLight, int packedOverlay,

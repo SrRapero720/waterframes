@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.client.display;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import me.srrapero720.waterframes.*;
 import me.srrapero720.waterframes.client.rendering.TextureWrapper;
@@ -110,7 +111,11 @@ public class Display {
     public void preRender() {
         switch (displayMode) {
             case PICTURE -> {}
-            case VIDEO -> this.mediaPlayer.preRender();
+            case VIDEO -> {
+                int texture = this.mediaPlayer.preRender();
+                // the following line allow to make it work and not have everything "black"
+                GlStateManager._bindTexture(texture);
+            }
         }
     }
 
