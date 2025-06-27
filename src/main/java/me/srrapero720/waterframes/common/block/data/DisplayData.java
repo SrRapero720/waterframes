@@ -198,7 +198,7 @@ public class DisplayData {
         }
 
         if (tile.caps.projects()) {
-            this.projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? DisplaysConfig.maxProjDis(nbt.getInt(PROJECTION_DISTANCE)) : this.projectionDistance;
+            this.projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? DisplaysConfig.maxProjDis(nbt.getFloat(PROJECTION_DISTANCE)) : this.projectionDistance;
             this.audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : this.audioOffset;
         }
 

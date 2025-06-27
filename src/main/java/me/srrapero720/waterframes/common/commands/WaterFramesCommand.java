@@ -11,6 +11,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
@@ -56,7 +57,7 @@ public class WaterFramesCommand {
 
         // URL
         edit.then(Commands.literal("url")
-                .then(Commands.argument("url", StringArgumentType.greedyString())
+                .then(Commands.argument(DisplayData.URL, StringArgumentType.greedyString())
                         .executes(c -> setUrl(getTile(c), c.getSource(), getStr(c, "url")))
                 )
         );
@@ -104,44 +105,44 @@ public class WaterFramesCommand {
 
         // ROTATION
         edit.then(Commands.literal("rotation")
-                .then(Commands.argument("rotation", FloatArgumentType.floatArg(0f, 360.0f))
+                .then(Commands.argument(DisplayData.ROTATION, FloatArgumentType.floatArg(0f, 360.0f))
                         .executes(c -> setRotation(getTile(c), c.getSource(), getFloat(c, "rotation")))
                 )
         );
 
         // TRANSPARENCY
         edit.then(Commands.literal("alpha")
-                .then(Commands.argument("alpha", IntegerArgumentType.integer(0, 255))
+                .then(Commands.argument(DisplayData.ALPHA, IntegerArgumentType.integer(0, 255))
                         .executes(c -> setAlpha(getTile(c), c.getSource(), getInt(c, "alpha")))
                 )
         );
 
         // BRIGHTNESS
         edit.then(Commands.literal("brightness")
-                .then(Commands.argument("brightness", IntegerArgumentType.integer(0, 255))
+                .then(Commands.argument(DisplayData.BRIGHTNESS, IntegerArgumentType.integer(0, 255))
                         .executes(c -> setBrightness(getTile(c), c.getSource(), getInt(c, "brightness")))
                 )
         );
 
         // RENDER DISTANCE
         edit.then(Commands.literal("renderDistance")
-                .then(Commands.argument("render_distance", IntegerArgumentType.integer(4))
+                .then(Commands.argument(DisplayData.RENDER_DISTANCE, IntegerArgumentType.integer(4))
                         .executes(c -> setRenderDistance(getTile(c), c.getSource(), getInt(c, "render_distance")))
                 )
         );
 
         // RENDER DISTANCE
         edit.then(Commands.literal("projectionDistance")
-                .then(Commands.argument("projection_distance", IntegerArgumentType.integer(4))
-                        .executes(c -> setProjectionDistance(getTile(c), c.getSource(), getInt(c, "projection_distance")))
+                .then(Commands.argument(DisplayData.PROJECTION_DISTANCE, FloatArgumentType.floatArg(4))
+                        .executes(c -> setProjectionDistance(getTile(c), c.getSource(), getFloat(c, "projection_distance")))
                 )
         );
 
         // VOLUME DISTANCE
-        var volumeDistance = Commands.argument("min_distance", IntegerArgumentType.integer(0))
-                .executes(c -> setVolume(getTile(c), c.getSource(), getIntOr(c, "volume", -1), getInt(c, "min_distance"), -1))
-                .then(Commands.argument("max_distance", IntegerArgumentType.integer(0))
-                        .executes(c -> setVolume(getTile(c), c.getSource(), getIntOr(c, "volume", -1), getInt(c, "min_distance"), getInt(c, "max_distance")))
+        var volumeDistance = Commands.argument(DisplayData.VOL_RANGE_MIN, IntegerArgumentType.integer(0))
+                .executes(c -> setVolume(getTile(c), c.getSource(), getIntOr(c, DisplayData.VOLUME, -1), getInt(c, DisplayData.VOL_RANGE_MIN), -1))
+                .then(Commands.argument(DisplayData.VOL_RANGE_MAX, IntegerArgumentType.integer(0))
+                        .executes(c -> setVolume(getTile(c), c.getSource(), getIntOr(c, DisplayData.VOLUME, -1), getInt(c, DisplayData.VOL_RANGE_MIN), getInt(c, DisplayData.VOL_RANGE_MAX)))
                 );
 
         edit.then(Commands.literal("volumeDistance")
@@ -150,8 +151,8 @@ public class WaterFramesCommand {
 
         // VOLUME
         edit.then(Commands.literal("volume")
-                .then(Commands.argument("volume", IntegerArgumentType.integer(0, 120))
-                        .executes(c -> setVolume(getTile(c), c.getSource(), getInt(c, "volume"), -1, -1))
+                .then(Commands.argument(DisplayData.VOLUME, IntegerArgumentType.integer(0, 120))
+                        .executes(c -> setVolume(getTile(c), c.getSource(), getInt(c, DisplayData.VOLUME), -1, -1))
                         .then(volumeDistance)
                 )
         );
@@ -327,7 +328,7 @@ public class WaterFramesCommand {
         return 0;
     }
 
-    public static int setProjectionDistance(DisplayTile tile, CommandSourceStack source, int projectionDistance) {
+    public static int setProjectionDistance(DisplayTile tile, CommandSourceStack source, float projectionDistance) {
         if (tile == null) return 1;
 
         if (!tile.caps.projects()) {

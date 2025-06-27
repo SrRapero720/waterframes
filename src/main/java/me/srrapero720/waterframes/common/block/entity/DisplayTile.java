@@ -377,7 +377,7 @@ public class DisplayTile extends BlockEntity {
         final var box = new AlignedBox();
 
         if (facing.positive) box.setMax(facing.axis, tile.data.projectionDistance);
-        else box.setMin(facing.axis, 1 - tile.data.projectionDistance);
+        else box.setMin(facing.axis, 1f - tile.data.projectionDistance);
 
         Axis one = facing.one();
         Axis two = facing.two();
