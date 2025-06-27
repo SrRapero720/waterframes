@@ -1,3 +1,7 @@
+# UPDATE 2.1.15
+- 🐛 Fixed ProjectionDistance rounds decimal values to integer
+- 🛠️ Ported to 1.21.5 (by @linkpad)
+
 # UPDATE 2.1.14
 - ✨ Overhaul experimental playlist GUI layout and colors
   - ✨ Added a new button to "play next and previous"
