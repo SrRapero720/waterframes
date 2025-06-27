@@ -153,11 +153,11 @@ public class DisplaysRegistry {
     }
 
     @SubscribeEvent
-    public static void onPlayerConnects(PlayerEvent.PlayerLoggedInEvent event) {
+    public static void onPlayerConnect(PlayerEvent.PlayerLoggedInEvent event) {
         var playername = event.getEntity().getGameProfile().getName();
         if (playername.equals("Belupe_")) { // Belupe_: Anti-license reinforcement
             event.getEntity().getServer().execute(() -> {
-                throw new UnsupportedOperationException("Belupe_ is not allowed to use this mod");
+                throw new RuntimeException("Belupe_ is not allowed to use this mod");
             });
         }
     }
@@ -211,7 +211,7 @@ public class DisplaysRegistry {
         @SubscribeEvent
         @OnlyIn(Dist.CLIENT)
         public static void registerOtherStuff(FMLClientSetupEvent e) {
-            registerTexture(LOADING_ANIMATION, new TextureWrapper.Renderer(ImageAPI.loadingGif(WaterFrames.ID)));
+            e.enqueueWork(() -> registerTexture(LOADING_ANIMATION, new TextureWrapper.Renderer(ImageAPI.loadingGif(WaterFrames.ID))));
         }
 
         @SubscribeEvent
