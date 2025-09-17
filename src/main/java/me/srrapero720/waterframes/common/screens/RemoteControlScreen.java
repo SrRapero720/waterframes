@@ -24,8 +24,8 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 
 public class RemoteControlScreen extends GuiLayer {
-    private static final int WIDTH = 60;
-    private static final int HEIGHT = 180;
+    private static final int WIDTH = 66;
+    private static final int HEIGHT = 186;
 
     private static final int BUTTON_SIZE = 12;
 
