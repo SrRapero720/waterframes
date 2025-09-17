@@ -4,6 +4,7 @@ import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.compat.watervision.WVCompat;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.DataSyncPacket;
 import me.srrapero720.waterframes.common.screens.styles.IconStyles;
@@ -14,6 +15,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
+import org.watermedia.api.image.ImageCache;
 import team.creative.creativecore.common.gui.*;
 import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
@@ -76,6 +78,7 @@ public class DisplayScreen extends GuiLayer {
 
     public final GuiStateButtonIcon audio_offset;
 
+    public final GuiButtonIcon watervision;
     public final GuiButtonIcon reload;
     public final GuiSeekBar seekbar;
 
@@ -171,11 +174,24 @@ public class DisplayScreen extends GuiLayer {
 
         this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, x -> tile.imageCache.reload());
         this.reload.setTooltip("waterframes.gui.reload");
-        if (isClient()){
+        if (isClient()) {
             this.reload.setEnabled(enableReload());
         }
         this.save = new GuiButtonIcon("save", IconStyles.SAVE, click -> DisplayNetwork.sendServer(new DataSyncPacket(tile.getBlockPos(), DisplayData.build(this, tile))));
         this.save.setTooltip("waterframes.gui.save");
+
+        if (WVCompat.installed()) {
+            this.watervision = new GuiButtonIcon("", IconStyles.VIDEOPLAYER_PLAY, button -> {
+                WVCompat.openScreen(tile.data.uri, tile.data.volume);
+                tile.setPause(true, true);
+            });
+            this.watervision.setTooltip("waterframes.gui.videoplayer");
+            if (isClient()) {
+                this.watervision.setEnabled(enableWaterVision());
+            }
+        } else {
+            this.watervision = null;
+        }
 
         if (!tile.caps.resizes()) {
             this.setDim(WIDTH - 10, HEIGHT - 60);
@@ -266,6 +282,10 @@ public class DisplayScreen extends GuiLayer {
         this.add(new WidgetPairTable(GuiFlow.STACK_Y, 2)
                 .spaceBetween()
                 .addLeft(new GuiParent(GuiFlow.STACK_X)
+                        .add(WVCompat.installed(), () -> this.watervision.setDim(12, 12))
+                        .setExpandableX()
+                )
+                .addLeft(new GuiParent(GuiFlow.STACK_X)
                         .add(this.loop.setDim(12, 12))
                         .add(this.playback.setDim(16, 12).setSquared(true))
                         .add(this.stop.setDim(12, 12))
@@ -292,6 +312,10 @@ public class DisplayScreen extends GuiLayer {
                 .add(this.reload.setDim(14, 14))
                 .add(this.save.setDim(28, 14).setSquared(true).setEnabled(DisplaysConfig.canSave(getPlayer(), url.getText())))
         );
+
+        if (watervision != null) {
+            watervision.setEnabled(enableWaterVision());
+        }
     }
 
     public void resizeYOnRatio(int click) {
@@ -375,6 +399,10 @@ public class DisplayScreen extends GuiLayer {
 
     public boolean enableReload() {
         return tile.imageCache != null && !this.url.getText().isEmpty() && tile.data.hasUri() && tile.data.getUri().equals(WaterFrames.createURI(this.url.getText()));
+    }
+
+    public boolean enableWaterVision() {
+        return tile.data.hasUri() && tile.imageCache != null && tile.imageCache.getStatus() == ImageCache.Status.READY;
     }
 
     @Override
