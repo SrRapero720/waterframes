@@ -57,6 +57,9 @@ public class WidgetStatusIcon extends GuiIcon {
                         yield ChatFormatting.RED + translate("waterframes.status.failed.video");
                     if (tile.display != null && tile.display.isBuffering())
                         yield ChatFormatting.YELLOW + translate("waterframes.status.buffering");
+                    if (tile.display != null && tile.display.isBroken()) {
+                        yield ChatFormatting.DARK_RED + translate("waterframes.status.not_working");
+                    }
                 }
                 yield ChatFormatting.GREEN + translate("waterframes.status.operative");
             }
@@ -98,6 +101,9 @@ public class WidgetStatusIcon extends GuiIcon {
                         yield IconStyles.STATUS_INTERNAL_ERROR_2;
                     if (tile.display != null && (tile.display.isBuffering()))
                         yield IconStyles.STATUS_BUFFERING;
+                    if (tile.display != null && tile.display.isBroken()) {
+                        yield IconStyles.STATUS_ERROR;
+                    }
                 }
 
                 yield tile.imageCache.isCache() ? IconStyles.STATUS_OK_CACHE : IconStyles.STATUS_OK;

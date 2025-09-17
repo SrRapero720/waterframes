@@ -222,6 +222,13 @@ public class Display {
         };
     }
 
+    public boolean isBroken() {
+        return switch (displayMode) {
+            case PICTURE -> this.imageCache == null;
+            case VIDEO, AUDIO -> this.mediaPlayer.isBroken();
+        };
+    }
+
     public boolean isNotVideo() {
         if (this.imageCache.getStatus() == ImageCache.Status.FAILED)
             return true;
