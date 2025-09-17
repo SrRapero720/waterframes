@@ -1,3 +1,13 @@
+# UPDATE 2.1.20
+- ✨ Added error status for videos (this will stop showing "working" when player fails to play)
+- ✨ Update GUI textures (textures made by Kotyarendj)
+- ✨ Re-enable VideoPlayer integration using [WaterVision](https://www.curseforge.com/minecraft/mc-mods/watervision)
+- 🐛 Fixed `/waterframes` commands doesn't work on command blocks
+- 🐛 Fixed Displays resets time and log spams mismatchs when a player reconnects or joins the chunk
+- 🐛 Fixed lagTickCorrection causes time jumps on media players without tick compensation
+  - This option will still cause small jumps, a proper fix will come with v3 update
+- 🐛 [FABRIC] Fixed display packets are sent to players who are not tracking that chunk 
+
 # UPDATE 2.1.15
 - 🐛 Fixed race condition on texture registration (Crashing other mods)
 - 🐛 Fixed ProjectionDistance rounds decimal values to integer
