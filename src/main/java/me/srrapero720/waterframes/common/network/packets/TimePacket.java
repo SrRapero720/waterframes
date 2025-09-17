@@ -37,13 +37,12 @@ public class TimePacket extends DisplayControlPacket {
             tile.data.tick = this.tick;
             if (tile.data.tickMax == -1) {
                 tile.data.tick = 0;
-            } else if (tile.data.tickMax != this.tickMax && !(tile.data.tickMax == 200 && this.tickMax == 0)) {
-                LOGGER.warn("Missmatchig max tick time! {} != {}", tile.data.tickMax, this.tickMax);
+            } else if (tile.data.tickMax > 0 && tile.data.tickMax != this.tickMax) { // SEND A MISMATCH WHEN TIME IS NOT ZERO
+                LOGGER.warn("Mismatch! Max time in tile ({}) doesn't equals to received max time ({})", tile.data.tickMax, this.tickMax);
             }
 
-            tile.data.tickMax = this.tickMax;
-            if (tile.data.tickMax == 0 && tile.data.uris.size() > 1) {
-                tile.data.tickMax = 20 * 10; // ADD 10 seconds
+            if (this.tickMax > tile.data.tickMax) {
+                tile.data.tickMax = this.tickMax;
             }
         }
     }

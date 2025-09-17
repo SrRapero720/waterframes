@@ -34,7 +34,7 @@ public class Display {
     private long currentLastTime = Long.MIN_VALUE;
     private Mode displayMode = Mode.PICTURE;
     private boolean stream = false;
-    private int synced = -1;
+    private boolean synced = false;
     private boolean released = false;
 
     public Display(DisplayTile tile) {
@@ -132,8 +132,15 @@ public class Display {
 
     public long duration() {
         return switch (displayMode) {
-            case PICTURE -> this.imageCache.getRenderer() != null ? this.imageCache.getRenderer().duration : 0;
-            case VIDEO -> this.mediaPlayer.getMediaInfoDuration();
+            case PICTURE -> {
+                var renderer = this.imageCache.getRenderer();
+                if (renderer != null) {
+                    yield renderer.duration == 0 ? 20 * 10 : renderer.duration;
+                } else {
+                    yield 0;
+                }
+            }
+            case VIDEO -> this.mediaPlayer.getDuration();
             case AUDIO -> 0;
         };
     }
@@ -148,8 +155,8 @@ public class Display {
 
     public boolean canRender() {
         return switch (displayMode) {
-            case PICTURE -> (this.imageCache.getStatus() == ImageCache.Status.READY && !this.imageCache.isVideo() && tile.data.active) || notVideo;
-            case VIDEO -> this.mediaPlayer.isValid() && tile.data.active;
+            case PICTURE -> (this.imageCache.getRenderer() != null && !this.imageCache.isVideo() && tile.data.active) || notVideo;
+            case VIDEO -> this.mediaPlayer.isSafeUse() && !this.mediaPlayer.isLoading() && this.mediaPlayer.isReady() && tile.data.active;
             case AUDIO -> false;
         };
     }
@@ -157,7 +164,7 @@ public class Display {
     public void syncDuration() {
         if (tile.data.tickMax == -1) tile.data.tick = 0;
         tile.syncTime(true, tile.data.tick, durationInTicks());
-        this.synced = tile.data.tickMax;
+        this.synced = true;
     }
 
     public void tick() {
@@ -193,10 +200,7 @@ public class Display {
                 }
             }
         }
-        if (this.synced == -1 && this.canRender()) {
-            this.syncDuration();
-        } else if (this.synced != this.durationInTicks() && !(this.synced == 200 && this.durationInTicks() == 0) && this.canRender()) {
-            WaterFrames.LOGGER.info("Synced duration is {}, duration in ticks is {}", this.synced, this.durationInTicks());
+        if (!this.synced && this.canRender()) {
             this.syncDuration();
         }
     }
