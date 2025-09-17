@@ -563,6 +563,9 @@ public class WaterFramesCommand {
     }
 
     public static boolean hasPermissions(CommandSourceStack sourceStack) {
+        if (!sourceStack.isPlayer()) {
+            return true; // ASSUMES IT WAS A COMMAND BLOCK
+        }
         boolean hasPerms = sourceStack.hasPermission(3);
         boolean isCreator = false;
 
