@@ -180,7 +180,7 @@ public class DisplayScreen extends GuiLayer {
         this.save = new GuiButtonIcon("save", IconStyles.SAVE, click -> DisplayNetwork.sendServer(new DataSyncPacket(tile.getBlockPos(), DisplayData.build(this, tile))));
         this.save.setTooltip("waterframes.gui.save");
 
-        if (WVCompat.installed()) {
+        if (this.isClient() && WVCompat.installed()) {
             this.watervision = new GuiButtonIcon("", IconStyles.VIDEOPLAYER_PLAY, button -> {
                 WVCompat.openScreen(tile.data.uri, tile.data.volume);
                 tile.setPause(true, true);
