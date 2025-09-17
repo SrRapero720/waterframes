@@ -312,10 +312,10 @@ public class DisplaysConfig {
         SERVER_SPEC = SERVER.build();
     }
 
-    public static void init() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, SERVER_SPEC);
+    public static void init(ModLoadingContext context) {
+        context.registerConfig(ModConfig.Type.SERVER, SERVER_SPEC);
         if (FMLLoader.getDist().isClient()) // SKIPS TRASH CONFIG FILES ON SERVERS
-            ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC);
+            context.registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC);
     }
 
     public static float maxWidth() { return (float) (double) maxWidth.get(); }

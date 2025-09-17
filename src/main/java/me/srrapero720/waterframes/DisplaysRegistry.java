@@ -152,16 +152,6 @@ public class DisplaysRegistry {
         WaterFramesCommand.registerClient(event.getDispatcher());
     }
 
-    @SubscribeEvent
-    public static void onPlayerConnect(PlayerEvent.PlayerLoggedInEvent event) {
-        var playername = event.getEntity().getGameProfile().getName();
-        if (playername.equals("Belupe_")) { // Belupe_: Anti-license reinforcement
-            event.getEntity().getServer().execute(() -> {
-                throw new RuntimeException("Belupe_ is not allowed to use this mod");
-            });
-        }
-    }
-
     @OnlyIn(Dist.CLIENT)
     public static void registerTexture(ResourceLocation location, AbstractTexture texture) {
         Minecraft.getInstance().getTextureManager().register(location, texture);

@@ -20,7 +20,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.net.URI;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Objects;
 
 @Mod(WaterFrames.ID)
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -33,17 +33,17 @@ public class WaterFrames {
     private static int ticks = 0;
 
     // BOOTSTRAP
-    public WaterFrames() {
-        DisplaysConfig.init();
-        DisplaysRegistry.init(FMLJavaModLoadingContext.get().getModEventBus());
+    public WaterFrames(FMLJavaModLoadingContext context) {
+        DisplaysConfig.init(context);
+        DisplaysRegistry.init(context.getModEventBus());
     }
 
     public static ResourceLocation asResource(String id) {
-        return new ResourceLocation(ID, id);
+        return Objects.requireNonNull(ResourceLocation.tryBuild(ID, id));
     }
 
     public static ResourceLocation asResource(int texture) {
-        return new ResourceLocation(ID, "dynamic_texture_" + texture);
+        return Objects.requireNonNull(ResourceLocation.tryBuild(ID, "dynamic_texture_" + texture));
     }
 
     public static boolean isInstalled(String modId) {
