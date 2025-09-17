@@ -39,6 +39,7 @@ import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class DisplayTile extends BlockEntity {
     private static int lagTickTime;
+    private static int lagTickCompensate;
 
     public final DisplayData data;
     public final DisplayCaps caps;
@@ -65,6 +66,7 @@ public class DisplayTile extends BlockEntity {
     }
 
     public static void clearLagTickTime() {
+        lagTickCompensate += lagTickTime;
         lagTickTime = 0;
     }
 
@@ -266,7 +268,11 @@ public class DisplayTile extends BlockEntity {
 
         if (!this.data.paused && this.data.active) {
             if (this.data.tick < this.data.tickMax) {
-                this.data.tick++;
+                if (lagTickCompensate <= 0) {
+                    this.data.tick++;
+                } else {
+                    lagTickCompensate--;
+                }
                 if (lagTickTime != 0 && this.isServer()) {
                     int ticks = this.data.tick + lagTickTime;
                     while (ticks > this.data.tickMax) {
