@@ -114,6 +114,7 @@ publishMods {
         serverRequired = true
         projectSlug = modid
         requires("creativecore", "watermedia")
+        optional("watervision")
     }
 
     modrinth {
@@ -121,6 +122,7 @@ publishMods {
         projectId = modrinthid
         minecraftVersions.addAll(mcversion)
         requires("creativecore", "watermedia")
+        optional("watervision")
     }
 }
 
