@@ -1,3 +1,7 @@
+# UPDATE 2.1.21
+- 🐛 Fixed crashes when WATERViSION is not installed
+- 🛠️ Marked WATERViSION as optional dependency
+
 # UPDATE 2.1.20
 - ✨ Added error status for videos (this will stop showing "working" when player fails to play)
 - ✨ Update GUI textures (textures made by Kotyarendj)
