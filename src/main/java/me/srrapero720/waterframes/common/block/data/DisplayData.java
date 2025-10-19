@@ -44,6 +44,7 @@ public class DisplayData {
     public static final String PAUSED = "paused";
     public static final String MUTED = "muted";
     public static final String TICK = "tick";
+    public static final String TIME  = "time_ms";
     public static final String TICK_MAX = "tick_max";
     public static final String LIT = "lit";
     public static final String DATA_V = "data_v";

@@ -1,11 +1,7 @@
 package me.srrapero720.waterframes.common.commands;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.FloatArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.srrapero720.waterframes.DisplaysConfig;
@@ -154,6 +150,18 @@ public class WaterFramesCommand {
                 .then(Commands.argument(DisplayData.VOLUME, IntegerArgumentType.integer(0, 120))
                         .executes(c -> setVolume(getTile(c), c.getSource(), getInt(c, DisplayData.VOLUME), -1, -1))
                         .then(volumeDistance)
+                )
+        );
+
+        edit.then(Commands.literal("pause")
+                .then(Commands.argument(DisplayData.PAUSED, BoolArgumentType.bool())
+                        .executes(c -> setPauseState(getTile(c), c.getSource(), getBoolean(c, DisplayData.PAUSED)))
+                )
+        );
+
+        edit.then(Commands.literal("time")
+                .then(Commands.argument(DisplayData.TIME, LongArgumentType.longArg())
+                        .executes(c -> setTimeTick(getTile(c), c.getSource(), getLong(c, DisplayData.TIME)))
                 )
         );
 
@@ -343,6 +351,33 @@ public class WaterFramesCommand {
         return 0;
     }
 
+    public static int setPauseState(DisplayTile tile, CommandSourceStack source, boolean pause) {
+        if (tile == null) return 1;
+
+        tile.data.paused = pause;
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.pause.success"), true);
+        return 0;
+    }
+
+    public static int setTimeTick(DisplayTile tile, CommandSourceStack source, long time) {
+        if (tile == null) return 1;
+
+        int tickTime = (int) (time / 50L);
+
+        if (tickTime > tile.data.tickMax) {
+            source.sendFailure(msgFailed("waterframes.commands.edit.settime.failed"));
+            return 2;
+        }
+
+        tile.data.tick = tickTime;
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.settime.success"), true);
+        return 0;
+    }
+
     public static int auditURLAuthor(DisplayTile tile, CommandSourceStack source) {
         if (tile == null) return 1;
 
@@ -509,6 +544,14 @@ public class WaterFramesCommand {
 
     public static int getInt(CommandContext<CommandSourceStack> context, String name) {
         return context.getArgument(name, int.class);
+    }
+
+    public static boolean getBoolean(CommandContext<CommandSourceStack> context, String name) {
+        return context.getArgument(name, boolean.class);
+    }
+
+    public static long getLong(CommandContext<CommandSourceStack> context, String name) {
+        return context.getArgument(name, long.class);
     }
 
     public static int getIntOr(CommandContext<CommandSourceStack> context, String name, int def) {
