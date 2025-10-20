@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.common.compat.watervision;
 
 import me.srrapero720.waterframes.WaterFrames;
-import net.minecraft.client.Minecraft;
+import me.srrapero720.watervision.WaterVisionClient;
 
 import java.net.URI;
 
@@ -15,6 +15,6 @@ public class WVCompat {
     public static void openScreen(URI uri, int volume) {
         if (!INSTALLED) return;
 
-        Minecraft.getInstance().setScreen(WVExpansion.getWaterVisionExpansion(uri, volume));
+        WaterVisionClient.openScreen(uri, volume, 1.0f, false, 20.0F, 20.0F, true, true);
     }
 }
