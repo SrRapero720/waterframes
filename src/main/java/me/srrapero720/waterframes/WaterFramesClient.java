@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes;
 
+import me.srrapero720.waterframes.client.rendering.RendererWrapper;
 import me.srrapero720.waterframes.client.rendering.TextureWrapper;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import org.watermedia.api.image.ImageAPI;
@@ -28,7 +29,7 @@ public class WaterFramesClient implements ClientModInitializer {
         // EVENTS
         ClientTickEvents.END_CLIENT_TICK.register(client -> WaterFrames.tick());
         ClientLifecycleEvents.CLIENT_STARTED.register(client ->
-                DisplaysRegistry.registerTexture(LOADING_ANIMATION, new TextureWrapper.Renderer(ImageAPI.loadingGif(WaterFrames.ID)))
+                DisplaysRegistry.registerTexture(LOADING_ANIMATION, new RendererWrapper(ImageAPI.loadingGif(WaterFrames.ID)))
         );
     }
 }

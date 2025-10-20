@@ -1,5 +1,6 @@
 package me.srrapero720.waterframes.client.display;
 
+import com.mojang.blaze3d.opengl.GlStateManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import me.srrapero720.waterframes.*;
 import me.srrapero720.waterframes.client.rendering.TextureWrapper;
@@ -61,7 +62,11 @@ public class Display {
 
         // START
         this.displayMode = Mode.VIDEO;
-        this.mediaPlayer = new VideoPlayer(Minecraft.getInstance());
+        this.mediaPlayer = new VideoPlayer((runnable) -> {
+            GlStateManager._bindTexture(0);
+            Minecraft.getInstance().execute(runnable);
+            GlStateManager._bindTexture(0);
+        });
 
         // CHECK IF VLC CAN BE USED
         if (mediaPlayer.isBroken()) {
@@ -119,7 +124,7 @@ public class Display {
         if (texture != -1) {
             return TEXTURES.computeIfAbsent(texture, (Function<Integer, ResourceLocation>) integer -> {
                 var id = WaterFrames.asResource(texture);
-                DisplaysRegistry.registerTexture(id, new TextureWrapper(texture));
+                DisplaysRegistry.registerTexture(id, new TextureWrapper(texture, width(), height()));
                 return id;
             });
         }

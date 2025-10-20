@@ -18,13 +18,18 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
+import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static me.srrapero720.waterframes.common.network.DisplayNetwork.*;
@@ -39,30 +44,35 @@ public class DisplaysRegistry {
 
     /* BLOCKS */
     public static final DisplayBlock
-            FRAME = Registry.register(BuiltInRegistries.BLOCK, resloc("frame"), new FrameBlock()),
-            PROJECTOR = Registry.register(BuiltInRegistries.BLOCK, resloc("projector"), new ProjectorBlock()),
-            TV = Registry.register(BuiltInRegistries.BLOCK, resloc("tv"), new TvBlock()),
-            BIG_TV = Registry.register(BuiltInRegistries.BLOCK, resloc("big_tv"), new BigTvBlock()),
-            TV_BOX = Registry.register(BuiltInRegistries.BLOCK, resloc("tv_box"), new TVBoxBlock());
+            FRAME = registerBlock("frame", FrameBlock::new),
+            PROJECTOR = registerBlock("projector", ProjectorBlock::new),
+            TV = registerBlock("tv", TvBlock::new),
+            BIG_TV = registerBlock("big_tv", BigTvBlock::new),
+            TV_BOX = registerBlock("tv_box", TVBoxBlock::new);
 //            GOLDEN_PROJECTOR = BLOCKS.register("golden_projector", ProjectorBlock::new);
+
+    public static DisplayBlock registerBlock(String name, Function<ResourceKey<Block>, DisplayBlock> createFunction) {
+        final ResourceLocation location = resloc(name);
+        return Registry.register(BuiltInRegistries.BLOCK, location, createFunction.apply(ResourceKey.create(Registries.BLOCK, location)));
+    }
 
     /* ITEMS */
     public static final Item
-            REMOTE_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("remote"), new RemoteControl(remoteProp())),
-            FRAME_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("frame"), new BlockItem(FRAME, prop())),
-            PROJECTOR_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("projector"), new BlockItem(PROJECTOR, prop())),
-            TV_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("tv"), new BlockItem(TV, prop())),
-            BIG_TV_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("big_tv"), new BlockItem(BIG_TV, prop())),
-            TV_BOX_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("tv_box"), new BlockItem(TV_BOX, prop()));
+            REMOTE_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("remote"), new RemoteControl(remoteProp("remote"))),
+            FRAME_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("frame"), new BlockItem(FRAME, prop("frame"))),
+            PROJECTOR_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("projector"), new BlockItem(PROJECTOR, prop("projector"))),
+            TV_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("tv"), new BlockItem(TV, prop("tv"))),
+            BIG_TV_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("big_tv"), new BlockItem(BIG_TV, prop("big_tv"))),
+            TV_BOX_ITEM = Registry.register(BuiltInRegistries.ITEM, resloc("tv_box"), new BlockItem(TV_BOX, prop("tv_box")));
 //            GOLDEN_PROJECTOR_ITEM = ITEMS.register("golden_projector", () -> new BlockItem(GOLDEN_PROJECTOR.get(), prop().tab(null)));
 
     /* TILES */
-    public static final BlockEntityType<DisplayTile>
-            TILE_FRAME = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, resloc("frame"), tile(FrameTile::new, () -> FRAME)),
-            TILE_PROJECTOR = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, resloc("projector"), tile(ProjectorTile::new, () -> PROJECTOR)),
-            TILE_TV = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, resloc("tv"), tile(TvTile::new, () -> TV)),
-            TILE_BIG_TV = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, resloc("big_tv"), tile(BigTvTile::new, () -> BIG_TV)),
-            TILE_TV_BOX = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, resloc("tv_box"), tile(TVBoxTile::new, () -> TV_BOX));
+    public static final BlockEntityType<? extends DisplayTile>
+            TILE_FRAME = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, resloc("frame"), tile(FrameTile::new, Set.of(FRAME))),
+            TILE_PROJECTOR = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, resloc("projector"), tile(ProjectorTile::new, Set.of(PROJECTOR))),
+            TILE_TV = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, resloc("tv"), tile(TvTile::new, Set.of(TV))),
+            TILE_BIG_TV = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, resloc("big_tv"), tile(BigTvTile::new, Set.of(BIG_TV))),
+            TILE_TV_BOX = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, resloc("tv_box"), tile(TVBoxTile::new, Set.of(TV_BOX)));
 
     /* TABS */
     public static final CreativeModeTab WATERTAB = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, resloc("tab"), FabricItemGroup.builder()
@@ -93,16 +103,16 @@ public class DisplaysRegistry {
         return DisplaysConfig.isOwner(player) || player.hasPermissions(2);
     }
 
-    private static BlockEntityType<DisplayTile> tile(BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
-        return BlockEntityType.Builder.of(creator, block.get()).build(null);
+    private static BlockEntityType<? extends DisplayTile> tile(BlockEntityType.BlockEntitySupplier<? extends DisplayTile> creator, Set<Block> block) {
+        return new BlockEntityType<DisplayTile>(creator, block);
     }
 
-    private static Item.Properties remoteProp() {
-        return new Item.Properties().stacksTo(1).rarity(Rarity.RARE).fireResistant();
+    private static Item.Properties remoteProp(String name) {
+        return new Item.Properties().setId(ResourceKey.create(Registries.ITEM, WaterFrames.asResource(name))).stacksTo(1).rarity(Rarity.RARE).fireResistant();
     }
 
-    private static Item.Properties prop() {
-        return new Item.Properties().stacksTo(16).rarity(Rarity.RARE);
+    private static Item.Properties prop(String name) {
+        return new Item.Properties().setId(ResourceKey.create(Registries.ITEM, WaterFrames.asResource(name))).useBlockDescriptionPrefix().stacksTo(16).rarity(Rarity.RARE);
     }
 
     public static void init() {

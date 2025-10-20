@@ -1,12 +1,9 @@
 {
   "type": "minecraft:crafting_shapeless",
+  "category": "misc",
   "ingredients": [
-    {
-      "item": "minecraft:note_block"
-    },
-    {
-      "item": "waterframes:frame"
-    }
+   "minecraft:note_block",
+   "waterframes:frame"
   ],
   "result": {
     "id": "waterframes:tv_box",

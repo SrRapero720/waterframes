@@ -10,6 +10,7 @@ import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.DisplayScreen;
 import me.srrapero720.waterframes.common.screens.PlayListScreen;
 import net.minecraft.Util;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector2f;
@@ -126,7 +127,7 @@ public class DisplayData {
         nbt.putString(URI_LIST, WaterFrames.composeURIString(this.uris));
         nbt.putInt(URI_INDEX, uri_index);
         // HERE ENDS
-        nbt.putUUID(PLAYER_UUID, uuid);
+        nbt.store(PLAYER_UUID, UUIDUtil.CODEC, uuid);
         nbt.putBoolean(ACTIVE, active);
         if (tile.caps.resizes()) {
             nbt.putFloat(MIN_X, min.x);
@@ -163,75 +164,44 @@ public class DisplayData {
     }
 
     public void load(CompoundTag nbt, DisplayTile tile) {
-        String url = nbt.getString(URL);
-        this.uri = url.isEmpty() ? null : WaterFrames.createURI(nbt.getString(URL));
+        String url = nbt.getStringOr(URL, "");
+        this.uri = url.isEmpty() ? null : WaterFrames.createURI(url);
         // EXPERIMENTAL: LISTING
-        this.uris = WaterFrames.decomposeURIString(nbt.getString(URI_LIST));
-        this.uri_index = nbt.getInt(URI_INDEX);
+        this.uris = WaterFrames.decomposeURIString(nbt.getStringOr(URI_LIST, ""));
+        this.uri_index = nbt.getIntOr(URI_INDEX, 0);
         // EXPERIMENTAL ENDS
 
-        this.uuid = nbt.contains(PLAYER_UUID) ? nbt.getUUID(PLAYER_UUID) : this.uuid;
-        this.active = nbt.contains(ACTIVE) ? nbt.getBoolean(ACTIVE) : this.active;
+        this.uuid = nbt.read(PLAYER_UUID, UUIDUtil.CODEC).orElse(this.uuid);
+        this.active = nbt.getBooleanOr(ACTIVE, active);
         if (tile.caps.resizes()) {
-            this.min.x = nbt.getFloat(MIN_X);
-            this.min.y = nbt.getFloat(MIN_Y);
-            this.max.x = nbt.getFloat(MAX_X);
-            this.max.y = nbt.getFloat(MAX_Y);
-            this.rotation = nbt.getFloat(ROTATION);
+            this.min.x = nbt.getFloatOr(MIN_X, 0F);
+            this.min.y = nbt.getFloatOr(MIN_Y, 0F);
+            this.max.x = nbt.getFloatOr(MAX_X, 1F);
+            this.max.y = nbt.getFloatOr(MAX_Y, 1F);
+            this.rotation = nbt.getFloatOr(ROTATION, 0F);
         }
-        this.renderDistance = DisplaysConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
-        this.flipX = nbt.getBoolean(FLIP_X);
-        this.flipY = nbt.getBoolean(FLIP_Y);
-        this.alpha = nbt.contains(ALPHA) ? nbt.getInt(ALPHA) : this.alpha;
-        this.brightness = nbt.contains(BRIGHTNESS) ? nbt.getInt(BRIGHTNESS) : this.alpha;
-        this.volume = nbt.contains(VOLUME) ? DisplaysConfig.maxVol(nbt.getInt(VOLUME)) : this.volume;
-        this.maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? DisplaysConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX)) : this.maxVolumeDistance;
-        this.minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), this.maxVolumeDistance) : this.minVolumeDistance;
-        this.paused = nbt.getBoolean(PAUSED);
-        this.muted = nbt.getBoolean(MUTED);
-        this.lit = !nbt.contains(LIT) || nbt.getBoolean(LIT);
-        this.tick = nbt.getInt(TICK);
-        this.tickMax = nbt.contains(TICK_MAX) ? nbt.getInt(TICK_MAX) : this.tickMax;
-        this.loop = nbt.getBoolean(LOOP);
+        this.renderDistance = DisplaysConfig.maxRenDis(nbt.getIntOr(RENDER_DISTANCE, this.renderDistance));
+        this.flipX = nbt.getBooleanOr(FLIP_X, this.flipX);
+        this.flipY = nbt.getBooleanOr(FLIP_Y, this.flipY);
+        this.alpha = nbt.getIntOr(ALPHA, this.alpha);
+        this.brightness = nbt.getIntOr(BRIGHTNESS, this.brightness);
+        this.volume = DisplaysConfig.maxVol(nbt.getIntOr(VOLUME, this.volume));
+        this.maxVolumeDistance = DisplaysConfig.maxVolDis(nbt.getIntOr(VOL_RANGE_MAX, this.maxVolumeDistance));
+        this.minVolumeDistance = Math.min(nbt.getIntOr(VOL_RANGE_MIN, this.maxVolumeDistance), this.maxVolumeDistance);
+        this.paused = nbt.getBooleanOr(PAUSED, this.paused);
+        this.muted = nbt.getBooleanOr(MUTED, this.muted);
+        this.lit = nbt.getBooleanOr(LIT, this.lit);
+        this.tick = nbt.getIntOr(TICK, 0);
+        this.tickMax = nbt.getIntOr(TICK_MAX, this.tickMax);
+        this.loop = nbt.getBooleanOr(LOOP, this.loop);
 
         if (tile.caps.renderBehind()) {
-            this.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
+            this.renderBothSides = nbt.getBooleanOr(RENDER_BOTH_SIDES, this.renderBothSides);
         }
 
         if (tile.caps.projects()) {
-            this.projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? DisplaysConfig.maxProjDis(nbt.getFloat(PROJECTION_DISTANCE)) : this.projectionDistance;
-            this.audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : this.audioOffset;
-        }
-
-        switch (nbt.getShort(DATA_V)) {
-            case 1 -> {
-                this.alpha = (int) (nbt.getFloat(ALPHA) * 255);
-                this.brightness = (int) (nbt.getFloat(BRIGHTNESS) * 255);
-            }
-
-            default -> { // NO EXISTS
-                if (!nbt.contains("maxx")) return; // no exists then ignore, prevents broke new data on 2.0
-                this.min.x = nbt.getFloat("minx");
-                this.min.y = nbt.getFloat("miny");
-                this.max.x = nbt.getFloat("maxx");
-                this.max.y = nbt.getFloat("maxy");
-
-                this.flipX = nbt.getBoolean("flipX");
-                this.flipY = nbt.getBoolean("flipY");
-
-                this.maxVolumeDistance = DisplaysConfig.maxVolDis((int) nbt.getFloat("max"));
-                this.minVolumeDistance = Math.min((int) nbt.getFloat("min"), maxVolumeDistance);
-
-                this.renderDistance = nbt.getInt("render");
-
-                if (tile.canHideModel()) {
-                    tile.setVisibility(nbt.getBoolean("visibleFrame"));
-                }
-
-                if (tile.caps.renderBehind()) {
-                    this.renderBothSides = nbt.getBoolean("bothSides");
-                }
-            }
+            this.projectionDistance = DisplaysConfig.maxProjDis(nbt.getFloatOr(PROJECTION_DISTANCE, this.projectionDistance));
+            this.audioOffset = nbt.getFloatOr(AUDIO_OFFSET, this.audioOffset);
         }
 
         this.restrictWidth();
@@ -387,8 +357,8 @@ public class DisplayData {
     }
 
     public static void syncList(DisplayTile tile, Player player, CompoundTag tag) {
-        tile.data.uris = WaterFrames.decomposeURIString(tag.getString(URI_LIST));
-        tile.data.uri_index = tag.getInt(URI_INDEX);
+        tile.data.uris = WaterFrames.decomposeURIString(tag.getStringOr(URI_LIST, ""));
+        tile.data.uri_index = tag.getIntOr(URI_INDEX, 0);
         if (tile.data.uris.isEmpty()) {
             tile.data.uri = null;
         }
@@ -396,7 +366,7 @@ public class DisplayData {
     }
 
     public static void sync(DisplayTile tile, Player player, CompoundTag nbt) {
-        String url = nbt.getString(URL);
+        String url = nbt.getStringOr(URL, "");
         if (DisplaysConfig.canSave(player, url)) {
             final URI uri = WaterFrames.createURI(url);
             if (!tile.data.hasUri() || !tile.data.getUri().equals(uri)) {
@@ -405,44 +375,44 @@ public class DisplayData {
             }
             tile.data.uri = uri;
             tile.data.uuid = tile.data.hasUri() ? player.getUUID() : Util.NIL_UUID;
-            tile.data.active = nbt.getBoolean(ACTIVE);
+            tile.data.active = nbt.getBooleanOr(ACTIVE, true);
 
             if (tile.caps.resizes()) {
-                float width = DisplaysConfig.maxWidth(nbt.getFloat("width"));
-                float height = DisplaysConfig.maxHeight(nbt.getFloat("height"));
-                int posX = nbt.getInt("pos_x");
-                int posY = nbt.getInt("pos_y");
+                float width = DisplaysConfig.maxWidth(nbt.getFloatOr("width", 1F));
+                float height = DisplaysConfig.maxHeight(nbt.getFloatOr("height", 1F));
+                int posX = nbt.getIntOr("pos_x", PositionHorizontal.LEFT.ordinal());
+                int posY = nbt.getIntOr("pos_y", PositionVertical.TOP.ordinal());
 
                 tile.data.setWidth(PositionHorizontal.VALUES[posX], width);
                 tile.data.setHeight(PositionVertical.VALUES[posY], height);
-                tile.data.rotation = nbt.getFloat(ROTATION);
+                tile.data.rotation = nbt.getFloatOr(ROTATION, 0);
             }
 
-            tile.data.flipX = nbt.getBoolean(FLIP_X);
-            tile.data.flipY = nbt.getBoolean(FLIP_Y);
-            tile.data.alpha = nbt.getInt(ALPHA);
-            tile.data.brightness = nbt.getInt(BRIGHTNESS);
-            tile.data.renderDistance = DisplaysConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
-            tile.data.volume = DisplaysConfig.maxVol(nbt.getInt(VOLUME));
-            tile.data.maxVolumeDistance = DisplaysConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX));
-            tile.data.minVolumeDistance = Math.min(nbt.getInt(VOL_RANGE_MIN), tile.data.maxVolumeDistance);
+            tile.data.flipX = nbt.getBooleanOr(FLIP_X, false);
+            tile.data.flipY = nbt.getBooleanOr(FLIP_Y, false);
+            tile.data.alpha = nbt.getIntOr(ALPHA, 255);
+            tile.data.brightness = nbt.getIntOr(BRIGHTNESS, 255);
+            tile.data.renderDistance = DisplaysConfig.maxRenDis(nbt.getIntOr(RENDER_DISTANCE, 4));
+            tile.data.volume = DisplaysConfig.maxVol(nbt.getIntOr(VOLUME, 100));
+            tile.data.maxVolumeDistance = DisplaysConfig.maxVolDis(nbt.getIntOr(VOL_RANGE_MAX, 20));
+            tile.data.minVolumeDistance = Math.min(nbt.getIntOr(VOL_RANGE_MIN, 4), tile.data.maxVolumeDistance);
             if (tile.data.minVolumeDistance > tile.data.maxVolumeDistance)
                 tile.data.maxVolumeDistance = tile.data.minVolumeDistance;
 
             if (tile.canHideModel()) {
-                tile.setVisibility(nbt.getBoolean("visible"));
+                tile.setVisibility(nbt.getBooleanOr("visible", true));
             }
 
-            tile.data.lit = nbt.getBoolean(LIT);
+            tile.data.lit = nbt.getBooleanOr(LIT, true);
 
             if (tile.caps.renderBehind()) {
-                tile.data.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
+                tile.data.renderBothSides = nbt.getBooleanOr(RENDER_BOTH_SIDES, false);
             }
 
             if (tile.caps.projects()) {
-                int mode = nbt.getInt(AUDIO_OFFSET);
+                int mode = nbt.getIntOr(AUDIO_OFFSET, AudioPosition.BLOCK.ordinal());
 
-                tile.data.projectionDistance = DisplaysConfig.maxProjDis(nbt.getFloat(PROJECTION_DISTANCE));
+                tile.data.projectionDistance = DisplaysConfig.maxProjDis(nbt.getFloatOr(PROJECTION_DISTANCE, 8f));
                 tile.data.setAudioPosition(AudioPosition.VALUES[mode]);
             }
         }

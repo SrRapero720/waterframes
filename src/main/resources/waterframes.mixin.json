@@ -7,11 +7,12 @@
   "minVersion": "0.8.5",
   "client": [
     "DeltaTrackerTimerMixin",
-    "MinecraftMixin"
+    "MinecraftMixin",
+    "creativecore.GuiRenderHelperMixin"
   ],
   "mixins": [
-    "MinecraftServerMixin",
     "ArgumentTypeMixin",
+    "MinecraftServerMixin",
     "RedstoneWireBlockMixin"
   ]
 }

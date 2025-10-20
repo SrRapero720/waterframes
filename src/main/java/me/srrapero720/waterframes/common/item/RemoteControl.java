@@ -6,8 +6,6 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.item.data.RemoteData;
 import me.srrapero720.waterframes.common.screens.RemoteControlScreen;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -18,15 +16,18 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import team.creative.creativecore.common.gui.GuiLayer;
@@ -34,8 +35,7 @@ import team.creative.creativecore.common.gui.creator.GuiCreator;
 import team.creative.creativecore.common.gui.creator.ItemGuiCreator;
 
 import java.util.List;
-
-import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+import java.util.function.Consumer;
 
 public class RemoteControl extends Item implements ItemGuiCreator {
     private static final String POSITION = "position";
@@ -46,27 +46,27 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         final ItemStack stack = player.getItemInHand(hand);
         if (hand == InteractionHand.OFF_HAND) {
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         if (!DisplaysConfig.canInteractRemote(player)) {
             this.sendFatal(player, Component.translatable("waterframes.common.access.denied"));
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         var data = stack.get(DisplaysRegistry.REMOTE_DATA);
         if (data == null) {
             this.sendFailed(player, Component.translatable("waterframes.remote.bound.failed"));
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
         if (player.isCrouching()) {
             stack.set(DisplaysRegistry.REMOTE_DATA, null);
             this.sendSuccess(player, Component.translatable("waterframes.remote.unbound.success"));
-            return InteractionResultHolder.success(stack);
+            return InteractionResult.SUCCESS;
         }
 
         var blockPos = new BlockPos(data.x(), data.y(), data.z());
@@ -80,17 +80,17 @@ public class RemoteControl extends Item implements ItemGuiCreator {
                 tag.putIntArray("position", data.getPos());
 
                 GuiCreator.ITEM_OPENER.open(tag, player, hand);
-                return InteractionResultHolder.success(stack);
+                return InteractionResult.SUCCESS;
             }
 
             this.sendFailed(player, Component.translatable("waterframes.remote.distance.failed"));
-            return InteractionResultHolder.fail(stack);
+            return InteractionResult.FAIL;
         }
 
         // FALLBACK UNBIND
         player.getItemInHand(hand).set(DisplaysRegistry.REMOTE_DATA, null);
         this.sendFailed(player, Component.translatable("waterframes.remote.display.failed"));
-        return InteractionResultHolder.fail(stack);
+        return InteractionResult.FAIL;
     }
 
     @Override
@@ -143,12 +143,16 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         }
     }
 
-    public String getDimension(CompoundTag tag) {
-        return tag.getString(DIMENSION);
+    public boolean hasPosition(CompoundTag tag) {
+        return tag.contains(POSITION);
+    }
+
+    public boolean hasDimension(CompoundTag tag) {
+        return tag.contains(DIMENSION);
     }
 
     public int[] getPosition(CompoundTag data) {
-        return data.getIntArray(POSITION);
+        return data.getIntArray(POSITION).orElse(null);
     }
 
     public int[] getPosition(RemoteData data) {
@@ -159,6 +163,14 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         return data.dimension();
     }
 
+    public void setPosition(CompoundTag tag, BlockPos pos) {
+        tag.putIntArray(POSITION, new int[] { pos.getX(), pos.getY(), pos.getZ() });
+    }
+
+    public void setDimension(CompoundTag tag, Level level) {
+        tag.putString(DIMENSION, level.dimension().location().toString());
+    }
+
     @Override
     public GuiLayer create(CompoundTag tag, Player player) {
         int[] pos = this.getPosition(tag);
@@ -166,26 +178,21 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         return new RemoteControlScreen(player, (DisplayTile) player.level.getBlockEntity(blockPos), tag, this);
     }
 
-//    @Override
-    // TODO: please send help
-    public Component getHighlightTip(ItemStack item, Component displayName) {
-        return Component.literal(displayName.getString()).withStyle(ChatFormatting.AQUA);
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public void appendHoverText(ItemStack pStack, TooltipContext pContext, TooltipDisplay tooltipDisplay, Consumer<Component> pTooltipComponents, TooltipFlag pTooltipFlag) {
+        super.appendHoverText(pStack, pContext, tooltipDisplay, pTooltipComponents, pTooltipFlag);
+        Options opts = Minecraft.getInstance().options;
+        pTooltipComponents.accept(Component.translatable("waterframes.remote.description.1", opts.keyShift.key.getDisplayName(), opts.keyUse.key.getDisplayName()));
     }
 
-    @Override
-    @Environment(EnvType.CLIENT)
-    public void appendHoverText(ItemStack pStack, TooltipContext pContext, List<Component> pTooltipComponents, TooltipFlag pTooltipFlag) {
-        super.appendHoverText(pStack, pContext, pTooltipComponents, pTooltipFlag);
-        Options opts = Minecraft.getInstance().options;
-//        pTooltipComponents.add(Component.translatable("waterframes.remote.description.1", opts.keyShift.getKey().getDisplayName(), opts.keyUse.getKey().getDisplayName()));
-    }
     @Override
     public boolean isFoil(ItemStack pStack) {
         return pStack.get(DisplaysRegistry.REMOTE_DATA) != null;
     }
 
     @Override
-    public boolean canAttackBlock(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
+    public boolean canDestroyBlock(ItemStack stack, BlockState pState, Level pLevel, BlockPos pPos, LivingEntity pPlayer) {
         return false;
     }
 }
