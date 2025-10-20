@@ -1,3 +1,10 @@
+# UPDATE 2.1.22
+- ✨ Added command `/waterframes edit <x> <y> <z> time <time_in_ms>` to set displays time (like the gui seekbar)
+- ✨ Added command `/waterframes edit <x> <y> <z> pause <true/false>` to set the pause state
+- 🛠️ Update watervision integration to support 0.1.0-alpha+
+- 🛠️ Ported to fabric 1.21.5, 1.21.8 and 1.21.10
+- 🐛 Fixed watervision integration wasn't working
+
 # UPDATE 2.1.21
 - 🐛 Fixed crashes when WATERViSION is not installed
 - 🛠️ Marked WATERViSION as optional dependency
