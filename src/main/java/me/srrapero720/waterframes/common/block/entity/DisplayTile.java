@@ -10,6 +10,7 @@ import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.*;
+import net.minecraft.world.level.chunk.LevelChunk;
 import org.watermedia.api.image.ImageAPI;
 import org.watermedia.api.image.ImageCache;
 import org.watermedia.api.math.MathAPI;
@@ -176,6 +177,10 @@ public class DisplayTile extends BlockEntity {
     public void onChunkUnloaded() {
         if (this.isClient()) this.release();
         super.onChunkUnloaded();
+    }
+
+    public LevelChunk getChunk() {
+        return this.getLevel().getChunkAt(this.getBlockPos());
     }
 
     public int getLightLevel() {

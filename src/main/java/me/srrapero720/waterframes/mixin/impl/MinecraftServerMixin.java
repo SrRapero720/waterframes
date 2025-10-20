@@ -31,7 +31,7 @@ public class MinecraftServerMixin {
         if (time > 100) // 50ms is 1 tick
             wf$timeStack += time;
 
-        if (wf$timeStack > WaterFrames.SYNC_TIME + 1000) {
+        if (wf$timeStack > WaterFrames.SYNC_TIME) {
             DisplayTile.setLagTickTime(wf$timeStack);
             if (millis - wf$lastWarnTime > 15000) {
                 LOGGER.warn("Server seems overloading, jumping {}ms or {} ticks", wf$timeStack, wf$timeStack / 50L);

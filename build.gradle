@@ -113,16 +113,14 @@ publishMods {
         clientRequired = true
         serverRequired = true
         projectSlug = modid
-        requires("creativecore", "watermedia")
-        optional("watervision")
+        requires("creativecore", "watermedia", "watervision")
     }
 
     modrinth {
         accessToken = MT_TOKEN
         projectId = modrinthid
         minecraftVersions.addAll(mcversion)
-        requires("creativecore", "watermedia")
-        optional("watervision")
+        requires("creativecore", "watermedia", "watervision")
     }
 }
 
