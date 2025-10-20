@@ -156,7 +156,7 @@ public class Display {
     public boolean canRender() {
         return switch (displayMode) {
             case PICTURE -> (this.imageCache.getRenderer() != null && !this.imageCache.isVideo() && tile.data.active) || notVideo;
-            case VIDEO -> this.mediaPlayer.isSafeUse() && !this.mediaPlayer.isLoading() && this.mediaPlayer.isReady() && tile.data.active;
+            case VIDEO -> this.mediaPlayer.isSafeUse() && !this.mediaPlayer.isWaiting() && !this.mediaPlayer.isLoading() && this.mediaPlayer.isReady() && tile.data.active;
             case AUDIO -> false;
         };
     }
@@ -165,6 +165,10 @@ public class Display {
         if (tile.data.tickMax == -1) tile.data.tick = 0;
         tile.syncTime(true, tile.data.tick, durationInTicks());
         this.synced = true;
+    }
+
+    public void forceSeek() {
+        this.mediaPlayer.seekTo(MathAPI.tickToMs(tile.data.tick));
     }
 
     public void tick() {

@@ -11,6 +11,7 @@ import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import net.minecraftforge.fml.loading.FMLLoader;
 import org.watermedia.api.image.ImageAPI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -371,9 +372,9 @@ public class WaterFramesCommand {
             return 2;
         }
 
-        tile.data.tick = tickTime;
+        tile.syncTime(FMLLoader.getDist().isClient(),tickTime, -1);
 
-        tile.setDirty();
+
         source.sendSuccess(msgSuccess("waterframes.commands.edit.settime.success"), true);
         return 0;
     }

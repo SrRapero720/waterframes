@@ -25,7 +25,9 @@ public class TimePacket extends DisplayControlPacket {
 
     @Override
     public void execClient(DisplayTile tile) {
-
+        if (tile.display != null) {
+            tile.display.forceSeek();
+        }
     }
 
     @Override
