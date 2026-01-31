@@ -123,7 +123,7 @@ public class RemoteControlScreen extends GuiLayer {
             this.arrowCenter.setEnabled(false);
         }
 
-        this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, button -> { if (tile.imageCache != null) tile.imageCache.reload(); });
+        this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, button -> { });
 
         this.play = new GuiButtonIcon("pause", IconStyles.PAUSE, button -> tile.setPause(true, true));
         this.pause = new GuiButtonIcon("play", IconStyles.PLAY, button -> tile.setPause(true, false));
@@ -132,9 +132,9 @@ public class RemoteControlScreen extends GuiLayer {
         this.volumeUp = new GuiButtonIcon("volume_up", IconStyles.VOLUME_UP, button -> tile.volumeUp(true));
         this.volumeDown = new GuiButtonIcon("volume_down", IconStyles.VOLUME_DOWN, button -> tile.volumeDown(true));
 
-        this.channelUp = new GuiButtonIcon("channel_up", IconStyles.CHANNEL_UP, button -> tile.nextUri(true));
-        this.channelDown = new GuiButtonIcon("channel_down", IconStyles.CHANNEL_DOWN, button -> tile.prevUri(true));
-        if (this.tile.data.uris.isEmpty()) {
+        this.channelUp = new GuiButtonIcon("channel_up", IconStyles.CHANNEL_UP, button -> tile.nextUrl(true));
+        this.channelDown = new GuiButtonIcon("channel_down", IconStyles.CHANNEL_DOWN, button -> tile.prevUrl(true));
+        if (this.tile.data.urls.isEmpty()) {
             this.channelDown.setEnabled(false);
             this.channelUp.setEnabled(false);
         }

@@ -385,25 +385,31 @@ public class DisplaysConfig {
         }
     }
 
-    public static boolean isWhiteListed(URI uri) {
+    public static boolean isWhiteListed(String url) {
         if (!useWhitelist()) return true;
+        if (url == null || url.isEmpty()) return false;
 
         // watermedia driven protocol
-        String scheme = uri.getScheme();
-        if (scheme == null)
-            return false; // no scheme, no url, in the best case this must never happend
+        if (url.startsWith("water://")) return true;
 
-        if (scheme.equals("water")) return true;
+        // Parse URL to extract scheme and host
+        try {
+            URI uri = new URI(url);
+            String scheme = uri.getScheme();
+            if (scheme == null) return false;
 
-        var host = uri.getHost();
-        if (host == null) return false;
+            var host = uri.getHost();
+            if (host == null) return false;
 
-        for (var s: whitelist.get()) {
-            if (host.endsWith("." + s) || host.equals(s)) {
-                return !blackWhitelist.get();
+            for (var s: whitelist.get()) {
+                if (host.endsWith("." + s) || host.equals(s)) {
+                    return !blackWhitelist.get();
+                }
             }
+            return blackWhitelist.get();
+        } catch (Exception e) {
+            return false;
         }
-        return blackWhitelist.get();
     }
     public static <T> Set<T> mutableSet(Iterator<T> it) {
         var list = new HashSet<T>();
@@ -414,12 +420,11 @@ public class DisplaysConfig {
     }
 
     public static boolean canSave(Player player, String url) {
-        URI uri = WaterFrames.createURI(url);
-        boolean valid = uri != null || url.isEmpty();
+        boolean valid = WaterFrames.isValidUrl(url) || url.isEmpty();
         if (usePermissionsAPI.get()) {
             boolean canSave = DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_DISPLAYS_EDIT);
             boolean canBypass = DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_WHITELIST_BYPASS);
-            boolean whitelisted = isWhiteListed(uri);
+            boolean whitelisted = isWhiteListed(url);
 
             if (canSave && (whitelisted || canBypass)) {
                 return valid;
@@ -430,7 +435,7 @@ public class DisplaysConfig {
             boolean canSave = allowSaving.get();
             if (isAdmin(player)) return valid;
             if (url.isEmpty()) return true;
-            return valid && canSave && isWhiteListed(uri);
+            return valid && canSave && isWhiteListed(url);
         }
     }
 

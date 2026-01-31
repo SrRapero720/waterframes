@@ -4,7 +4,6 @@ import com.mojang.blaze3d.vertex.*;
 import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.block.entity.ProjectorTile;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -50,7 +49,6 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     public void render(DisplayTile tile, float partialTicks, PoseStack pose, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         var display = tile.activeDisplay();
         if (display == null || !DisplaysConfig.keepsRendering()) return;
-        display.preRender();
 
         var direction = tile.getDirection();
         var box = tile.getRenderBox();
@@ -82,10 +80,11 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
         // RENDERING
         if (display.isLoading()) {
-            this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing, packedLight, packedOverlay,
-                    front, back, flipX, flipY, r, g, b, a, WaterFrames.LOADING_ANIMATION);
+            // TODO: Loading animation rendering
+//            this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing, packedLight, packedOverlay,
+//                    front, back, flipX, flipY, r, g, b, a, WaterFrames.LOADING_ANIMATION);
         } else if (display.canRender()) {
-            var tex = display.getTextureId();
+            var tex = display.textureId();
             if (tex != null) {
                 this.vertex(pose, bufferSource, box, boxFace, facing, packedLight, packedOverlay,
                         front, back, flipX, flipY, r, g, b, a, tex);

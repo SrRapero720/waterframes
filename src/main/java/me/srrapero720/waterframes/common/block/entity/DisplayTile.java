@@ -11,10 +11,6 @@ import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.*;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.watermedia.api.image.ImageAPI;
-import org.watermedia.api.image.ImageCache;
-import org.watermedia.api.math.MathAPI;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -28,14 +24,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.watermedia.api.media.MRL;
+import org.watermedia.api.util.MathUtil;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
 import team.creative.creativecore.common.util.math.box.AlignedBox;
-
-import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 @Mod.EventBusSubscriber(modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class DisplayTile extends BlockEntity {
@@ -44,11 +38,11 @@ public class DisplayTile extends BlockEntity {
 
     public final DisplayData data;
     public final DisplayCaps caps;
-    @OnlyIn(Dist.CLIENT) public ImageCache imageCache;
+    @OnlyIn(Dist.CLIENT) public MRL mrl;
     @OnlyIn(Dist.CLIENT) public Display display;
     @OnlyIn(Dist.CLIENT) private boolean isReleased;
 
-    // this is more a runtime-block calculation variables, doesn't fix on DisplayData
+    // this is more a runtime-block calculation variables, doesn't fit on DisplayData
     private int lightLevel = 0;
     private int analogRedstoneLevel = 0;
 
@@ -58,26 +52,6 @@ public class DisplayTile extends BlockEntity {
         this.caps = caps;
     }
 
-    public static void setLagTickTime(long ltt) {
-        if (ltt < 60000) {
-            lagTickTime = (int) (ltt / 50);
-        } else {
-            LOGGER.warn("Rejected tick correction of {}ms, overpass watchdog time", ltt);
-        }
-    }
-
-    public static void clearLagTickTime() {
-        lagTickCompensate += lagTickTime;
-        lagTickTime = 0;
-    }
-
-    @SubscribeEvent
-    public static void onTickLast(TickEvent.ServerTickEvent e) {
-        if (e.phase == TickEvent.Phase.END) {
-            clearLagTickTime();
-        }
-    }
-
     @OnlyIn(Dist.CLIENT)
     public Display activeDisplay() {
         return display;
@@ -85,49 +59,39 @@ public class DisplayTile extends BlockEntity {
 
     @OnlyIn(Dist.CLIENT)
     public Display requestDisplay() {
-        if (!this.data.active || (!this.data.hasUri() && display != null)) {
+        // No active display or no URL configured
+        if (!this.data.active || (!this.data.hasUrl() && display != null)) {
             this.cleanDisplay();
             return null;
         }
 
         if (this.isReleased) {
-            this.imageCache = null;
+            this.mrl = null;
             return null;
         }
 
-        if (imageCache == null && !this.data.hasUri()) {
+        // No MRL and no URL to load
+        if (mrl == null && !this.data.hasUrl()) {
             this.cleanDisplay();
             return null;
         }
 
-        if (this.imageCache == null || (this.data.hasUri() && !this.imageCache.uri.equals(this.data.getUri()))) {
-            this.imageCache = ImageAPI.getCache(this.data.getUri(), Minecraft.getInstance());
+        // Get current URL string directly
+        String currentUrl = this.data.getUrl();
+
+        // Check if MRL needs to be (re)created - use string comparison directly
+        if (this.mrl == null || (currentUrl != null && !this.mrl.uri.toString().equals(currentUrl))) {
+            this.mrl = MRL.get(currentUrl); // MRL.get() accepts strings directly
             this.cleanDisplay();
         }
 
-        switch (imageCache.getStatus()) {
-            case LOADING, FAILED, READY -> {
-                if (this.display != null) return this.display;
-                return this.display = new Display(this);
-            }
-
-            case WAITING -> {
-                this.cleanDisplay();
-                this.imageCache.load();
-                return display;
-            }
-
-            case FORGOTTEN -> {
-                LOGGER.warn("Cached picture is forgotten, cleaning and reloading");
-                this.imageCache = null;
-                return null;
-            }
-
-            default -> {
-                LOGGER.warn("WATERMeDIA Behavior is modified, this shouldn't be executed");
-                return null;
-            }
+        // Create display once MRL is ready
+        if (this.mrl.ready() && !this.mrl.error()) {
+            if (this.display != null) return this.display;
+            return this.display = new Display(this);
         }
+
+        return display;
     }
 
     @Override
@@ -143,7 +107,7 @@ public class DisplayTile extends BlockEntity {
     }
 
     @OnlyIn(Dist.CLIENT)
-    private void cleanDisplay() {
+    public void cleanDisplay() {
         if (this.display != null) {
             this.display.release();
             this.display = null;
@@ -192,7 +156,7 @@ public class DisplayTile extends BlockEntity {
     }
 
     private int getLightLevel$internal() {
-        return !this.data.hasUri() ? 0 : (int) (((float) this.data.brightness / 255f) * level.getMaxLightLevel());
+        return !this.data.hasUrl() ? 0 : (int) (((float) this.data.brightness / 255f) * level.getMaxLightLevel());
     }
 
     private int getAnalogOutput$internal() {
@@ -234,21 +198,21 @@ public class DisplayTile extends BlockEntity {
     }
 
     public void fastFoward(boolean clientSide) {
-        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), Math.min(data.tick + MathAPI.msToTick(5000), this.data.tickMax), this.data.tickMax, true));
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), Math.min(data.tick + MathUtil.msToTick(5000), this.data.tickMax), this.data.tickMax, true));
         else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), Math.min(data.tick + (5000 / 50), this.data.tickMax), this.data.tickMax, true), this);
     }
 
     public void rewind(boolean clientSide) {
-        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), Math.max(data.tick - MathAPI.msToTick(5000), 0), this.data.tickMax, true));
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), Math.max(data.tick - MathUtil.msToTick(5000), 0), this.data.tickMax, true));
         else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), Math.max(data.tick - (5000 / 50), 0), this.data.tickMax, true), this);
     }
 
-    public void nextUri(boolean clientSide) {
+    public void nextUrl(boolean clientSide) {
         if (clientSide) DisplayNetwork.sendServer(new NextPacket(this.getBlockPos(), true));
         else            DisplayNetwork.sendClient(new NextPacket(this.getBlockPos(), true), this);
     }
 
-    public void prevUri(boolean clientSide) {
+    public void prevUrl(boolean clientSide) {
         if (clientSide) DisplayNetwork.sendServer(new PreviousPacket(this.getBlockPos(), true));
         else            DisplayNetwork.sendClient(new PreviousPacket(this.getBlockPos(), true), this);
     }
@@ -290,7 +254,7 @@ public class DisplayTile extends BlockEntity {
                 if (this.data.loop || this.data.tickMax == -1) this.data.tick = 0;
 
                 if (!this.data.loop && this.data.tickMax != -1) {
-                    this.data.nextUri();
+                    this.data.nextUrl();
                 }
             }
         }
@@ -431,4 +395,5 @@ public class DisplayTile extends BlockEntity {
         }
         return box;
     }
+
 }

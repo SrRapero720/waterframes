@@ -6,7 +6,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.watermedia.api.player.PlayerAPI;
 import team.creative.creativecore.common.gui.controls.simple.GuiIcon;
 import team.creative.creativecore.common.gui.style.Icon;
 
@@ -39,51 +38,37 @@ public class WidgetStatusIcon extends GuiIcon {
             return tooltip;
         }
 
-        if (tile.imageCache == null && !tile.data.hasUri()) {
+        if (tile.mrl == null && !tile.data.hasUrl()) {
             tooltip.add(translatable("waterframes.status", ChatFormatting.AQUA + translate("waterframes.status.idle")));
             tooltip.add(translatable("waterframes.status.idle.desc"));
             return tooltip;
         }
 
         // assuming it was
-        if (tile.imageCache == null) {
+        if (tile.mrl == null || tile.mrl.busy()) {
             tooltip.add(translatable("waterframes.status", ChatFormatting.RED + translate("waterframes.status.loading")));
             return tooltip;
         }
-        var status = switch (tile.imageCache.getStatus()) {
-            case READY -> {
-                if (tile.imageCache.isVideo()) {
-                    if (!PlayerAPI.isReady())
-                        yield ChatFormatting.RED + translate("waterframes.status.failed.video");
-                    if (tile.display != null && tile.display.isBuffering())
-                        yield ChatFormatting.YELLOW + translate("waterframes.status.buffering");
-                    if (tile.display != null && tile.display.isBroken()) {
-                        yield ChatFormatting.DARK_RED + translate("waterframes.status.not_working");
-                    }
-                }
-                yield ChatFormatting.GREEN + translate("waterframes.status.operative");
-            }
-            case LOADING, WAITING -> ChatFormatting.YELLOW + translate("waterframes.status.loading");
-            case FAILED -> {
-                Throwable e = tile.imageCache.getException();
-                if (e != null) {
-                    if (e.getLocalizedMessage() != null && !e.getLocalizedMessage().isEmpty())
-                        yield ChatFormatting.DARK_RED + e.getLocalizedMessage();
-                    if (e.getCause() != null && e.getCause().getLocalizedMessage() != null && !e.getCause().getLocalizedMessage().isEmpty())
-                        yield ChatFormatting.DARK_RED + e.getCause().getLocalizedMessage();
-                    if (e.getCause() != null)
-                        e = e.getCause();
 
-                    yield ChatFormatting.DARK_RED + e.getClass().getSimpleName();
-                }
-                yield ChatFormatting.RED + translate("waterframes.download.exception.invalid");
+        if (tile.display != null) {
+            if (tile.display.isNoEngine()) {
+                tooltip.add(translatable("waterframes.status", ChatFormatting.RED + translate("waterframes.status.no_engine")));
+                tooltip.add(translatable("waterframes.status.no_engine.desc"));
+                return tooltip;
             }
-            case FORGOTTEN -> ChatFormatting.DARK_RED + translate("waterframes.status.not_working");
-        };
-        tooltip.add(translatable("waterframes.status", status));
-        if (tile.imageCache.isCache()) {
-            tooltip.add(translatable("waterframes.status.cache").withStyle(ChatFormatting.AQUA));
+
+            var status = switch (tile.display.status()) {
+                case PLAYING, PAUSED, STOPPED, ENDED -> ChatFormatting.GREEN + translate("waterframes.status.operative");
+                case LOADING, WAITING -> ChatFormatting.YELLOW + translate("waterframes.status.loading");
+                case ERROR -> ChatFormatting.RED + translate("waterframes.download.exception.invalid");
+                case BUFFERING -> ChatFormatting.YELLOW + translate("waterframes.status.buffering");
+            };
+            tooltip.add(translatable("waterframes.status", status));
         }
+
+//        if (tile.mrl.isCache()) {
+//            tooltip.add(translatable("waterframes.status.cache").withStyle(ChatFormatting.AQUA));
+//        }
 
         return tooltip;
     }
@@ -91,26 +76,16 @@ public class WidgetStatusIcon extends GuiIcon {
     @OnlyIn(Dist.CLIENT)
     public Icon getStatusIcon() {
         if (!tile.data.active) return IconStyles.STATUS_OFF;
-        if (tile.imageCache == null && !tile.data.hasUri()) return IconStyles.STATUS_IDLE;
-        else if (tile.imageCache == null) return IconStyles.STATUS_LOADING; // ASSUMING IT WAS LOADING
+        if (tile.mrl == null && !tile.data.hasUrl()) return IconStyles.STATUS_IDLE;
+        else if (tile.mrl == null) return IconStyles.STATUS_LOADING; // ASSUMING IT WAS LOADING
+        if (tile.display == null) return IconStyles.STATUS_ERROR;
+        if (tile.display.isNoEngine()) return IconStyles.STATUS_ERROR;
 
-        return switch (tile.imageCache.getStatus()) {
-            case READY -> {
-                if (tile.imageCache.isVideo()) {
-                    if (!PlayerAPI.isReady())
-                        yield IconStyles.STATUS_INTERNAL_ERROR_2;
-                    if (tile.display != null && (tile.display.isBuffering()))
-                        yield IconStyles.STATUS_BUFFERING;
-                    if (tile.display != null && tile.display.isBroken()) {
-                        yield IconStyles.STATUS_ERROR;
-                    }
-                }
-
-                yield tile.imageCache.isCache() ? IconStyles.STATUS_OK_CACHE : IconStyles.STATUS_OK;
-            }
+        return switch (tile.display.status()) {
             case LOADING, WAITING -> IconStyles.STATUS_LOADING;
-            case FAILED -> IconStyles.STATUS_ERROR;
-            case FORGOTTEN -> lastIcon == null ? IconStyles.STATUS_WARN : lastIcon;
+            case BUFFERING -> IconStyles.STATUS_BUFFERING;
+            case ERROR -> IconStyles.STATUS_ERROR;
+            case PLAYING, PAUSED, STOPPED, ENDED -> IconStyles.STATUS_OK;
         };
     }
 }

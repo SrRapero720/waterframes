@@ -32,7 +32,7 @@ public class TimePacket extends DisplayControlPacket {
 
     @Override
     public void exec(DisplayTile tile) {
-        if (!tile.data.hasUri()) {
+        if (!tile.data.hasUrl()) {
             tile.data.tickMax = -1;
             tile.data.tick = 0;
         } else {

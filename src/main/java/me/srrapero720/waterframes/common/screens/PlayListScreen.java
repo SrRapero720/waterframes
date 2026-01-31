@@ -18,14 +18,13 @@ import team.creative.creativecore.common.gui.GuiParent;
 import team.creative.creativecore.common.gui.controls.parent.GuiScrollY;
 import team.creative.creativecore.common.gui.controls.simple.GuiButtonIcon;
 import team.creative.creativecore.common.gui.controls.simple.GuiCheckButtonIcon;
-import team.creative.creativecore.common.gui.controls.simple.GuiStateButtonIcon;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
+import java.util.List;
 
 public class PlayListScreen extends GuiLayer {
     protected static final int WIDTH = 225;
@@ -34,7 +33,7 @@ public class PlayListScreen extends GuiLayer {
     // IMPORTANT
     public final DisplayTile tile;
     private final GuiButtonIcon save;
-    public LinkedList<URI> uris;
+    public List<String> urls;
 
     // SCROLL
     public final GuiScrollY scrollY;
@@ -50,20 +49,22 @@ public class PlayListScreen extends GuiLayer {
         super("display_screen", WIDTH, HEIGHT);
         this.setFlow(GuiFlow.STACK_Y);
         this.tile = tile;
-        this.uris = new LinkedList<>();
+        this.urls = new ArrayList<>();
         this.scrollY = new GuiScrollY("parent_scroll");
         this.list = new GuiParent(GuiFlow.STACK_Y);
         this.scrollY.addControl(list);
         this.setSpacing(4);
 
-        for (URI uri: tile.data.uris) {
-            this.list.addControl(new WidgetPlaylistEntry(tile, this.uris, uri));
+        // Load existing URLs from tile
+        for (String url : tile.data.urls) {
+            this.list.addControl(new WidgetPlaylistEntry(tile, this.urls, url));
         }
 
         this.urlTextField = new WidgetURLTextField(null);
         this.addButton = new GuiButtonIcon("add", IconStyles.ADD, mouse -> {
-            if (urlTextField.isUrlValid()) {
-                this.list.addControl(new WidgetPlaylistEntry(tile, this.uris, urlTextField.getURI()));
+            String url = urlTextField.getUrl();
+            if (url != null && urlTextField.isUrlValid()) {
+                this.list.addControl(new WidgetPlaylistEntry(tile, this.urls, url));
                 this.urlTextField.setText("");
                 this.reflow();
             }
@@ -73,18 +74,21 @@ public class PlayListScreen extends GuiLayer {
         );
 
         this.playButton = new GuiCheckButtonIcon("playback", IconStyles.PLAY, IconStyles.PAUSE, tile.data.paused, button -> tile.setPause(true, !tile.data.paused));
-        this.nextButton = new GuiButtonIcon("next", IconStyles.NEXT_MEDIA, button -> tile.nextUri(true));
-        this.prevButton = new GuiButtonIcon("prev", IconStyles.BACK_MEDIA, button -> tile.prevUri(true));
+        this.nextButton = new GuiButtonIcon("next", IconStyles.NEXT_MEDIA, button -> tile.nextUrl(true));
+        this.prevButton = new GuiButtonIcon("prev", IconStyles.BACK_MEDIA, button -> tile.prevUrl(true));
     }
 
-    public LinkedList<URI> getUris() {
-        LinkedList<URI> uris = new LinkedList<>();
-        for (GuiChildControl control: this.list) {
+    /**
+     * Gets the list of URLs from the UI widgets.
+     */
+    public List<String> getUrls() {
+        List<String> urls = new ArrayList<>();
+        for (GuiChildControl control : this.list) {
             if (control.control instanceof WidgetPlaylistEntry element) {
-                uris.add(element.uri);
+                urls.add(element.url);
             }
         }
-        return uris;
+        return urls;
     }
 
     @Override

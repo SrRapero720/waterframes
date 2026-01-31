@@ -7,13 +7,13 @@ import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import org.watermedia.api.media.MRL;
 import team.creative.creativecore.common.gui.GuiControl;
 import team.creative.creativecore.common.gui.controls.simple.GuiTextfield;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 import team.creative.creativecore.common.util.text.TextBuilder;
 
-import java.net.URI;
 import java.util.List;
 
 public class WidgetURLTextField extends GuiTextfield {
@@ -23,7 +23,7 @@ public class WidgetURLTextField extends GuiTextfield {
         this.setMaxStringLength(2048);
         this.setSuggestion("https://i.imgur.com/1yCDs5C.mp4");
         if (tile != null) {
-            this.setText(tile.data.hasUri() ? tile.data.getUri().toString() : "");
+            this.setText(tile.data.hasUrl() ? tile.data.getUrl() : "");
         }
     }
 
@@ -53,11 +53,28 @@ public class WidgetURLTextField extends GuiTextfield {
         return result.isEmpty() ? null : result;
     }
 
-    public URI getURI() {
-        return WaterFrames.createURI(getText());
+    /**
+     * Gets the URL string directly (no URI conversion needed).
+     */
+    public String getUrl() {
+        String text = getText();
+        return text != null && !text.isEmpty() ? text.trim() : null;
     }
 
+    /**
+     * Validates the URL using MRL.
+     * Returns true while loading (optimistic validation).
+     */
     public boolean isUrlValid() {
-        return WaterFrames.createURI(getText()) != null;
+        String url = getUrl();
+        if (url == null || url.isEmpty()) return false;
+
+        MRL mrl = MRL.get(url);
+        if (mrl == null) return false;
+
+        // If still loading, consider it potentially valid
+        if (mrl.busy()) return true;
+
+        return mrl.ready() && !mrl.error() && !mrl.expired() && mrl.sourceCount() > 0;
     }
 }

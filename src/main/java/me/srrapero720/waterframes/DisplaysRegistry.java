@@ -11,7 +11,6 @@ import net.minecraftforge.server.permission.PermissionAPI;
 import net.minecraftforge.server.permission.events.PermissionGatherEvent;
 import net.minecraftforge.server.permission.nodes.PermissionNode;
 import net.minecraftforge.server.permission.nodes.PermissionTypes;
-import org.watermedia.api.image.ImageAPI;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -43,7 +42,6 @@ import java.util.function.Supplier;
 
 import static me.srrapero720.waterframes.common.network.DisplayNetwork.*;
 import static me.srrapero720.waterframes.WaterFrames.*;
-import static org.watermedia.WaterMedia.IT;
 
 @Mod.EventBusSubscriber(modid = ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class DisplaysRegistry {
@@ -196,12 +194,6 @@ public class DisplaysRegistry {
         @OnlyIn(Dist.CLIENT)
         public static void init(FMLClientSetupEvent e) {
             LOGGER.info(IT, "Running WATERFrAMES v{}", ModList.get().getModFileById(ID).versionString());
-        }
-
-        @SubscribeEvent
-        @OnlyIn(Dist.CLIENT)
-        public static void registerOtherStuff(FMLClientSetupEvent e) {
-            e.enqueueWork(() -> registerTexture(LOADING_ANIMATION, new TextureWrapper.Renderer(ImageAPI.loadingGif(WaterFrames.ID))));
         }
 
         @SubscribeEvent

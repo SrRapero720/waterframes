@@ -14,14 +14,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import org.joml.Vector2f;
 
-import java.net.URI;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class DisplayData {
+    // NBT Keys - kept as uri_* for backwards compatibility (NBT always stored strings)
     public static final String URL = "url";
-    public static final String URI_LIST = "uri_list";
-    public static final String URI_INDEX = "uri_index";
+    public static final String URL_LIST = "uri_list";
+    public static final String URL_INDEX = "uri_index";
     public static final String PLAYER_UUID = "player_uuid";
     public static final String ACTIVE = "active";
     public static final String MIN_X = "min_x";
@@ -58,9 +59,11 @@ public class DisplayData {
 
     public static final short V = 2;
 
-    public URI uri = null;
-    public LinkedList<URI> uris = new LinkedList<>();
-    public int uri_index;
+    // Media URLs - now stored as plain strings for direct MRL compatibility
+    public String url = null;
+    public List<String> urls = new ArrayList<>();
+    public int urlIndex = 0;
+
     public UUID uuid = Util.NIL_UUID;
     public boolean active = true;
     public Vector2f min = new Vector2f(0F, 0F);
@@ -91,41 +94,102 @@ public class DisplayData {
     public float projectionDistance = DisplaysConfig.maxProjDis(8f);
     public float audioOffset = 0;
 
-    public boolean nextUri() {
-        if (this.uris.isEmpty()) return false;
-        this.uri_index++;
-        if (this.uri_index >= this.uris.size()) {
-            this.uri_index = 0;
+    /**
+     * Advances to the next URL in the playlist.
+     * Resets tick/tickMax for the new media.
+     * @return true if advanced, false if playlist is empty
+     */
+    public boolean nextUrl() {
+        if (this.urls.isEmpty()) return false;
+        this.urlIndex++;
+        if (this.urlIndex >= this.urls.size()) {
+            this.urlIndex = 0;
         }
-        this.uri = this.uris.get(this.uri_index);
+        this.url = this.urls.get(this.urlIndex);
         this.tick = 0;
         this.tickMax = -1;
         return true;
     }
-    public boolean prevUri() {
-        if (this.uris.isEmpty()) return false;
-        this.uri_index--;
-        if (this.uri_index < 0) {
-            this.uri_index = this.uris.size() - 1;
+
+    /**
+     * Goes back to the previous URL in the playlist.
+     * Resets tick/tickMax for the new media.
+     * @return true if rewound, false if playlist is empty
+     */
+    public boolean prevUrl() {
+        if (this.urls.isEmpty()) return false;
+        this.urlIndex--;
+        if (this.urlIndex < 0) {
+            this.urlIndex = this.urls.size() - 1;
         }
-        this.uri = this.uris.get(this.uri_index);
+        this.url = this.urls.get(this.urlIndex);
         this.tick = 0;
         this.tickMax = -1;
         return true;
     }
-    public boolean hasUri() { return this.uri != null || !this.uris.isEmpty(); }
-    public URI getUri() { return this.uris.isEmpty() ? this.uri : this.uris.get(this.uri_index); }
+
+    /**
+     * Checks if any URL is configured (single or playlist).
+     */
+    public boolean hasUrl() {
+        return (this.url != null && !this.url.isEmpty()) || !this.urls.isEmpty();
+    }
+
+    /**
+     * Gets the current active URL.
+     * If using playlist, returns the URL at current index.
+     * @return the current URL string, or null if none
+     */
+    public String getUrl() {
+        if (!this.urls.isEmpty()) {
+            return this.urls.get(this.urlIndex);
+        }
+        return this.url;
+    }
+
+    /**
+     * Sets the current URL (clears playlist mode).
+     * @param url the URL string to set
+     */
+    public void setUrl(String url) {
+        this.url = (url != null && !url.isEmpty()) ? url : null;
+        this.urls.clear();
+        this.urlIndex = 0;
+    }
+
+    /**
+     * Sets the playlist URLs.
+     * @param urls list of URL strings
+     */
+    public void setUrls(List<String> urls) {
+        this.urls.clear();
+        if (urls != null) {
+            this.urls.addAll(urls);
+        }
+        this.urlIndex = 0;
+        this.url = this.urls.isEmpty() ? null : this.urls.get(0);
+    }
+
+    /**
+     * Checks if currently in playlist mode.
+     */
+    public boolean isPlaylist() {
+        return !this.urls.isEmpty();
+    }
+
     public PositionHorizontal getPosX() { return this.min.x == 0 ? PositionHorizontal.LEFT : this.max.x == 1 ? PositionHorizontal.RIGHT : PositionHorizontal.CENTER; }
     public PositionVertical getPosY() { return this.min.y == 0 ? PositionVertical.TOP : this.max.y == 1 ? PositionVertical.BOTTOM : PositionVertical.CENTER; }
     public float getWidth() { return this.max.x - this.min.x; }
     public float getHeight() { return this.max.y - this.min.y; }
 
     public void save(CompoundTag nbt, DisplayTile tile) {
-        nbt.putString(URL, !hasUri() ? "" : this.getUri().toString());
-        // EXPERIMENTAL: LISTING
-        nbt.putString(URI_LIST, WaterFrames.composeURIString(this.uris));
-        nbt.putInt(URI_INDEX, uri_index);
-        // HERE ENDS
+        // Save URL as string directly
+        nbt.putString(URL, this.url != null ? this.url : "");
+
+        // Playlist: save as newline-delimited string
+        nbt.putString(URL_LIST, WaterFrames.composeUrlList(this.urls));
+        nbt.putInt(URL_INDEX, urlIndex);
+
         nbt.putUUID(PLAYER_UUID, uuid);
         nbt.putBoolean(ACTIVE, active);
         if (tile.caps.resizes()) {
@@ -163,12 +227,20 @@ public class DisplayData {
     }
 
     public void load(CompoundTag nbt, DisplayTile tile) {
-        String url = nbt.getString(URL);
-        this.uri = url.isEmpty() ? null : WaterFrames.createURI(nbt.getString(URL));
-        // EXPERIMENTAL: LISTING
-        this.uris = WaterFrames.decomposeURIString(nbt.getString(URI_LIST));
-        this.uri_index = nbt.getInt(URI_INDEX);
-        // EXPERIMENTAL ENDS
+        short version = nbt.getShort(DATA_V);
+
+        // Load URL (NBT always stored as string)
+        String loadedUrl = nbt.getString(URL);
+        this.url = loadedUrl.isEmpty() ? null : loadedUrl;
+
+        // Load playlist
+        this.urls = WaterFrames.decomposeUrlList(nbt.getString(URL_LIST));
+        this.urlIndex = nbt.getInt(URL_INDEX);
+
+        // Ensure index is valid
+        if (!this.urls.isEmpty() && this.urlIndex >= this.urls.size()) {
+            this.urlIndex = 0;
+        }
 
         this.uuid = nbt.contains(PLAYER_UUID) ? nbt.getUUID(PLAYER_UUID) : this.uuid;
         this.active = nbt.contains(ACTIVE) ? nbt.getBoolean(ACTIVE) : this.active;
@@ -203,14 +275,14 @@ public class DisplayData {
             this.audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : this.audioOffset;
         }
 
-        switch (nbt.getShort(DATA_V)) {
+        // Handle legacy data versions
+        switch (version) {
             case 1 -> {
                 this.alpha = (int) (nbt.getFloat(ALPHA) * 255);
                 this.brightness = (int) (nbt.getFloat(BRIGHTNESS) * 255);
             }
-
-            default -> { // NO EXISTS
-                if (!nbt.contains("maxx")) return; // no exists then ignore, prevents broke new data on 2.0
+            case 0 -> { // Very old format
+                if (!nbt.contains("maxx")) return;
                 this.min.x = nbt.getFloat("minx");
                 this.min.y = nbt.getFloat("miny");
                 this.max.x = nbt.getFloat("maxx");
@@ -245,6 +317,7 @@ public class DisplayData {
             case CENTER -> projectionDistance / 2f;
         };
     }
+
     public AudioPosition getAudioPosition() {
         return audioOffset == 0 ? AudioPosition.BLOCK : audioOffset == projectionDistance ? AudioPosition.PROJECTION : AudioPosition.CENTER;
     }
@@ -337,8 +410,8 @@ public class DisplayData {
     public static CompoundTag build(PlayListScreen screen, DisplayTile tile) {
         CompoundTag nbt = new CompoundTag();
 
-        nbt.putString(URI_LIST, WaterFrames.composeURIString(screen.getUris()));
-        nbt.putInt(URI_INDEX, 0);
+        nbt.putString(URL_LIST, WaterFrames.composeUrlList(screen.getUrls()));
+        nbt.putInt(URL_INDEX, 0);
 
         return nbt;
     }
@@ -347,7 +420,7 @@ public class DisplayData {
         CompoundTag nbt = new CompoundTag();
 
         nbt.putString(URL, screen.url.getText());
-        nbt.putBoolean(ACTIVE, true); // reset
+        nbt.putBoolean(ACTIVE, true);
 
         if (tile.caps.resizes()) {
             nbt.putFloat("width", Math.max(0.1F, (float) screen.widthField.getValue()));
@@ -387,10 +460,12 @@ public class DisplayData {
     }
 
     public static void syncList(DisplayTile tile, Player player, CompoundTag tag) {
-        tile.data.uris = WaterFrames.decomposeURIString(tag.getString(URI_LIST));
-        tile.data.uri_index = tag.getInt(URI_INDEX);
-        if (tile.data.uris.isEmpty()) {
-            tile.data.uri = null;
+        tile.data.urls = WaterFrames.decomposeUrlList(tag.getString(URL_LIST));
+        tile.data.urlIndex = tag.getInt(URL_INDEX);
+        if (tile.data.urls.isEmpty()) {
+            tile.data.url = null;
+        } else {
+            tile.data.url = tile.data.urls.get(tile.data.urlIndex);
         }
         tile.setDirty();
     }
@@ -398,13 +473,13 @@ public class DisplayData {
     public static void sync(DisplayTile tile, Player player, CompoundTag nbt) {
         String url = nbt.getString(URL);
         if (DisplaysConfig.canSave(player, url)) {
-            final URI uri = WaterFrames.createURI(url);
-            if (!tile.data.hasUri() || !tile.data.getUri().equals(uri)) {
+            boolean urlChanged = !url.equals(tile.data.url);
+            if (urlChanged) {
                 tile.data.tick = 0;
                 tile.data.tickMax = -1;
             }
-            tile.data.uri = uri;
-            tile.data.uuid = tile.data.hasUri() ? player.getUUID() : Util.NIL_UUID;
+            tile.data.url = url.isEmpty() ? null : url;
+            tile.data.uuid = tile.data.hasUrl() ? player.getUUID() : Util.NIL_UUID;
             tile.data.active = nbt.getBoolean(ACTIVE);
 
             if (tile.caps.resizes()) {

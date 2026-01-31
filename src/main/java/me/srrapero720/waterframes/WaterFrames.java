@@ -16,20 +16,23 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import java.io.File;
-import java.net.URI;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Mod(WaterFrames.ID)
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class WaterFrames {
+    static final Marker IT = MarkerManager.getMarker(WaterFrames.class.getName());
     public static final String ID = "waterframes";
     public static final String NAME = "WATERFrAMES";
     public static final Logger LOGGER = LogManager.getLogger(ID);
     public static final ResourceLocation LOADING_ANIMATION = WaterFrames.asResource("loading_animation");
-    public static final long SYNC_TIME = 2000L;
+    public static final long SYNC_TIME = 5000L;
     private static int ticks = 0;
 
     // BOOTSTRAP
@@ -50,39 +53,49 @@ public class WaterFrames {
         return FMLLoader.getLoadingModList().getModFileById(modId) != null;
     }
 
-    public static URI createURI(String s) {
-        File f = new File(s);
-        // accept local paths as file uris
-        if (!f.isDirectory() && f.exists())
-            return new File(s).toURI();
+    /**
+     * Checks if a URL string is valid for use with MRL.
+     * @param url the URL string to validate
+     * @return true if valid
+     */
+    public static boolean isValidUrl(String url) {
+        if (url == null || url.isEmpty()) return false;
 
-        try {
-            return new URI(s);
-        } catch (Exception e) {
-            return null;
-        }
+        // Local file check
+        File f = new File(url);
+        if (!f.isDirectory() && f.exists()) return true;
+
+        // Basic URL validation - let MRL handle detailed validation
+        return url.contains("://") || url.startsWith("water://");
     }
 
-    public static String composeURIString(LinkedList<URI> s) {
-        final StringBuilder sb = new StringBuilder();
-        for (URI uri: s) {
-            sb.append(uri.toString());
-            if (uri != s.getLast()) {
-                sb.append("\n");
+    /**
+     * Composes a list of URLs into a newline-delimited string for NBT storage.
+     * @param urls list of URL strings
+     * @return newline-delimited string
+     */
+    public static String composeUrlList(List<String> urls) {
+        if (urls == null || urls.isEmpty()) return "";
+        return String.join("\n", urls);
+    }
+
+    /**
+     * Decomposes a newline-delimited URL string into a list.
+     * @param str the newline-delimited string
+     * @return list of URL strings (never null)
+     */
+    public static List<String> decomposeUrlList(String str) {
+        List<String> urls = new ArrayList<>();
+        if (str == null || str.isEmpty()) return urls;
+
+        String[] split = str.split("\n");
+        for (String url : split) {
+            String trimmed = url.trim();
+            if (!trimmed.isEmpty()) {
+                urls.add(trimmed);
             }
         }
-        return sb.toString();
-    }
-
-    public static LinkedList<URI> decomposeURIString(String s) {
-        LinkedList<URI> uris = new LinkedList<>();
-        String[] split = s.split("\n");
-        for (String uri: split) {
-            if (uri.isEmpty()) continue;
-            URI u = createURI(uri);
-            if (u != null) uris.add(u);
-        }
-        return uris;
+        return urls;
     }
 
     public static boolean isInstalled(String... mods) {

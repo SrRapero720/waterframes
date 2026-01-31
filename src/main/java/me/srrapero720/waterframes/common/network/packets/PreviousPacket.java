@@ -21,6 +21,6 @@ public class PreviousPacket extends DisplayControlPacket {
 
     @Override
     public void exec(DisplayTile tile) {
-        tile.data.prevUri();
+        tile.data.prevUrl();
     }
 }

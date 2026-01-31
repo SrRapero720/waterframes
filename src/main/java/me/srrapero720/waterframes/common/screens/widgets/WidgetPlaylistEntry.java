@@ -17,19 +17,18 @@ import team.creative.creativecore.common.gui.style.display.StyleDisplay;
 import team.creative.creativecore.common.util.math.geo.Rect;
 
 import java.net.URI;
-import java.util.LinkedList;
+import java.util.List;
 
 public class WidgetPlaylistEntry extends GuiParent {
 
-    public final URI uri;
-    public final LinkedList<URI> list;
+    public final String url;
+    public final List<String> list;
     public final DisplayTile tile;
     private final GuiButtonIcon reload;
-    private boolean added = false;
 
-    public WidgetPlaylistEntry(DisplayTile tile, LinkedList<URI> list, URI uri) {
-        super("experimental_element_" + uri.toString());
-        this.uri = uri;
+    public WidgetPlaylistEntry(DisplayTile tile, List<String> list, String url) {
+        super("playlist_entry_" + url.hashCode());
+        this.url = url;
         this.tile = tile;
         this.list = list;
 
@@ -40,33 +39,53 @@ public class WidgetPlaylistEntry extends GuiParent {
 
         this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, mouse -> {
             if (mouse != GLFW.GLFW_MOUSE_BUTTON_LEFT) return;
-            tile.imageCache.reload();
         });
 
-        list.add(uri);
+        list.add(url);
+
+        // Display a shortened version of the URL for readability
+        String displayUrl = getDisplayUrl(url);
+
         this.add(new GuiParent("").setDim(4, 1));
-        this.add(new GuiLabel("name").setTitle(Component.literal(uri.toString().substring(uri.toString().indexOf(uri.getScheme())))).setExpandableX());
+        this.add(new GuiLabel("name").setTitle(Component.literal(displayUrl)).setExpandableX());
         this.add(this.checkReload(), () -> reload.setDim(12, 12));
         this.add(new GuiButtonIcon("remove", IconStyles.REMOVE, mouse -> {
             if (mouse != GLFW.GLFW_MOUSE_BUTTON_LEFT) return;
             ((GuiParent) this.getParent()).remove(this);
-            list.remove(uri);
+            list.remove(url);
             this.getParent().reflow();
         }).setDim(12, 12));
         this.add(new GuiParent("").setDim(4, 1));
     }
 
+    /**
+     * Gets a display-friendly version of the URL.
+     */
+    private String getDisplayUrl(String url) {
+        if (url == null) return "";
+        // Remove scheme prefix if present
+        int schemeEnd = url.indexOf("://");
+        if (schemeEnd > 0 && schemeEnd < url.length() - 3) {
+            return url.substring(schemeEnd + 3);
+        }
+        return url;
+    }
+
     @Override
     @OnlyIn(Dist.CLIENT)
     public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
-        return tile.data.hasUri() && tile.data.getUri().equals(uri) ? ScreenStyles.DARK_BLUE_HIGHLIGHT : ScreenStyles.DARK_BLUE_BACKGROUND;
+        return tile.data.hasUrl() && url.equals(tile.data.getUrl()) ? ScreenStyles.DARK_BLUE_HIGHLIGHT : ScreenStyles.DARK_BLUE_BACKGROUND;
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public boolean mouseClicked(Rect rect, double x, double y, int button) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-            Util.getPlatform().openUri(this.uri);
+            try {
+                Util.getPlatform().openUri(URI.create(this.url));
+            } catch (Exception ignored) {
+                // Ignore invalid URIs for opening in browser
+            }
         }
         return super.mouseClicked(rect, x, y, button);
     }
@@ -83,6 +102,6 @@ public class WidgetPlaylistEntry extends GuiParent {
     }
 
     private boolean checkReload() {
-        return tile.data.hasUri() && tile.data.getUri().equals(uri);
+        return tile.data.hasUrl() && url.equals(tile.data.getUrl());
     }
 }

@@ -15,7 +15,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.glfw.GLFW;
-import org.watermedia.api.image.ImageCache;
 import team.creative.creativecore.common.gui.*;
 import team.creative.creativecore.common.gui.controls.simple.*;
 import team.creative.creativecore.common.gui.flow.GuiFlow;
@@ -172,7 +171,7 @@ public class DisplayScreen extends GuiLayer {
                 .setOnTimeUpdate(v -> tile.data.tick = (int) v)
                 .setOnLastTimeUpdate(v -> tile.syncTime(true, (int) v, tile.data.tickMax));
 
-        this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, x -> tile.imageCache.reload());
+        this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, x -> tile.cleanDisplay());
         this.reload.setTooltip("waterframes.gui.reload");
         if (isClient()) {
             this.reload.setEnabled(enableReload());
@@ -182,7 +181,7 @@ public class DisplayScreen extends GuiLayer {
 
         if (this.isClient() && WVCompat.installed()) {
             this.watervision = new GuiButtonIcon("", IconStyles.VIDEOPLAYER_PLAY, button -> {
-                WVCompat.openScreen(tile.data.uri, tile.data.volume);
+                WVCompat.openScreen(tile.data.url, tile.data.volume);
                 tile.setPause(true, true);
             });
             this.watervision.setTooltip("waterframes.gui.videoplayer");
@@ -398,11 +397,13 @@ public class DisplayScreen extends GuiLayer {
     }
 
     public boolean enableReload() {
-        return tile.imageCache != null && !this.url.getText().isEmpty() && tile.data.hasUri() && tile.data.getUri().equals(WaterFrames.createURI(this.url.getText()));
+        String currentUrl = tile.data.getUrl();
+        String inputUrl = this.url.getText();
+        return tile.mrl != null && !inputUrl.isEmpty() && tile.data.hasUrl() && currentUrl != null && currentUrl.equals(inputUrl.trim());
     }
 
     public boolean enableWaterVision() {
-        return tile.data.hasUri() && tile.imageCache != null && tile.imageCache.getStatus() == ImageCache.Status.READY;
+        return tile.data.hasUrl() && tile.mrl != null && tile.mrl.ready();
     }
 
     @Override

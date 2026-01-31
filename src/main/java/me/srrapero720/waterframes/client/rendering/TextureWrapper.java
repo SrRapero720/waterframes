@@ -1,7 +1,5 @@
 package me.srrapero720.waterframes.client.rendering;
 
-import me.srrapero720.waterframes.WaterFrames;
-import org.watermedia.api.image.ImageRenderer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,19 +18,4 @@ public class TextureWrapper extends AbstractTexture {
     @Override public void load(ResourceManager manager) { /* NO OP */ }
     @Override public void releaseId() { /* NO OP */ }
     @Override public void close() { /* NO OP */}
-
-    @OnlyIn(Dist.CLIENT)
-    public static class Renderer extends TextureWrapper {
-        private final ImageRenderer renderer;
-
-        public Renderer(ImageRenderer imageRenderer) {
-            super(-1);
-            this.renderer = imageRenderer;
-        }
-
-        @Override
-        public int getId() {
-            return renderer.texture(WaterFrames.getTicks(), WaterFrames.deltaFrames(), true);
-        }
-    }
 }

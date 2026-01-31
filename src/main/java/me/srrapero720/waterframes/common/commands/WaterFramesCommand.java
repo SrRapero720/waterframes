@@ -12,7 +12,6 @@ import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraftforge.fml.loading.FMLLoader;
-import org.watermedia.api.image.ImageAPI;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -36,7 +35,6 @@ import net.minecraftforge.server.command.EnumArgument;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.net.URI;
 import java.util.*;
 
 import java.util.function.Supplier;
@@ -240,19 +238,17 @@ public class WaterFramesCommand {
     public static int setUrl(DisplayTile tile, CommandSourceStack source, String url) {
         if (tile == null) return 1;
 
-        if (!tile.data.uris.isEmpty()) {
+        if (!tile.data.urls.isEmpty()) {
             source.sendFailure(msgFailed("waterframes.commands.edit.url.failed.experimental"));
             return 1;
         }
 
-        URI uri = WaterFrames.createURI(url);
-
-        if (tile.data.hasUri() && tile.data.getUri().equals(uri)) {
+        if (tile.data.hasUrl() && tile.data.getUrl().equals(url)) {
             tile.data.tick = 0;
             tile.data.tickMax = -1;
         }
 
-        tile.data.uri = uri;
+        tile.data.url = url;
         tile.data.uuid = (source.getEntity() instanceof Player player) ? player.getUUID() : Util.NIL_UUID;
 
         tile.setDirty();
@@ -522,7 +518,6 @@ public class WaterFramesCommand {
 
     @OnlyIn(Dist.CLIENT)
     public static int watermedia$reloadAll(CommandSourceStack source) {
-        ImageAPI.reloadCache();
         source.sendSuccess(msgSuccess("waterframes.commands.reload_all.success"), true);
         return 0;
     }
