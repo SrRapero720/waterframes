@@ -98,9 +98,11 @@ jar {
 publishMods {
     file = jar.archiveFile
     displayName = "WF-$modloader/mc$mcversion/v$modversion"
-    type = STABLE
+    type = "alpha".equalsIgnoreCase(project.properties.versiontype?.toString())
+            ? ALPHA : "beta".equalsIgnoreCase(project.properties.versiontype?.toString())
+            ? BETA : "release".equalsIgnoreCase(project.properties.versiontype?.toString())
+            ? STABLE : ALPHA
     changelog = getChangelogText()
-
     maxRetries = 2
     dryRun = false
 
