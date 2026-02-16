@@ -27,8 +27,8 @@ public class VolumeRangePacket extends DisplayControlPacket {
 
     @Override
     public void exec(DisplayTile tile) {
-        tile.data.maxVolumeDistance = DisplaysConfig.maxVolDis(this.max);
-        tile.data.minVolumeDistance = Math.min(tile.data.maxVolumeDistance, this.min);
+        tile.data.maxVolumeDistance = Math.max(0, this.max);
+        tile.data.minVolumeDistance = Math.min(tile.data.maxVolumeDistance, Math.max(0, this.min));
     }
 
 }

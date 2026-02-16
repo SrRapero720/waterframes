@@ -58,8 +58,8 @@ public class DisplaysConfig implements ICreativeConfig {
     // MULTIMEDIA
     public static class Multimedia {
         @CreativeConfig(type = ConfigSynchronization.SERVER)
-        @CreativeConfig.IntRange(min = 8, max = 512)
-        public int maxVolumeDistance = 64;
+        @CreativeConfig.IntRange(min = 8, max = 1000000)
+        public int maxVolumeDistance = 1000000;
 
         // MULTIMEDIA
         @CreativeConfig(type = ConfigSynchronization.SERVER)

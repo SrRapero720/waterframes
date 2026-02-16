@@ -7,8 +7,7 @@
   "minVersion": "0.8.5",
   "client": [
     "DeltaTrackerTimerMixin",
-    "MinecraftMixin",
-    "creativecore.GuiRenderHelperMixin"
+    "MinecraftMixin"
   ],
   "mixins": [
     "ArgumentTypeMixin",

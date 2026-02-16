@@ -148,6 +148,12 @@ public class DisplaysRegistry {
         BlockEntityRenderers.register(TILE_TV, DisplayRenderer::new);
         BlockEntityRenderers.register(TILE_BIG_TV, DisplayRenderer::new);
         BlockEntityRenderers.register(TILE_TV_BOX, DisplayRenderer::new);
+
+        // Register custom GUI client control handlers
+        team.creative.creativecore.client.gui.registry.GuiClientRegistry.register(
+                me.srrapero720.waterframes.common.screens.widgets.WidgetClickableArea.class,
+                me.srrapero720.waterframes.client.screens.WidgetClickableAreaClient::new
+        );
     }
 
     public static ResourceLocation resloc(String name) {

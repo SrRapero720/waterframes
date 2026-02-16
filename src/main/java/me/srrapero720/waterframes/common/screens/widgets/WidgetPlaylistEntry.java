@@ -9,6 +9,7 @@ import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import team.creative.creativecore.common.gui.GuiParent;
+import team.creative.creativecore.common.gui.IGuiParent;
 import team.creative.creativecore.common.gui.VAlign;
 import team.creative.creativecore.common.gui.control.simple.GuiButtonIcon;
 import team.creative.creativecore.common.gui.control.simple.GuiLabel;
@@ -27,7 +28,7 @@ public class WidgetPlaylistEntry extends GuiParent {
     private boolean added = false;
 
     public WidgetPlaylistEntry(DisplayTile tile, LinkedList<URI> list, URI uri) {
-        super("experimental_element_" + uri.toString());
+        super((IGuiParent) null, "experimental_element_" + uri.toString());
         this.uri = uri;
         this.tile = tile;
         this.list = list;
@@ -37,37 +38,22 @@ public class WidgetPlaylistEntry extends GuiParent {
         this.setExpandableX();
         this.setVAlign(VAlign.CENTER);
 
-        this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, mouse -> {
+        this.reload = new GuiButtonIcon(this, "reload", IconStyles.RELOAD, mouse -> {
             if (mouse != GLFW.GLFW_MOUSE_BUTTON_LEFT) return;
             tile.imageCache.reload();
         });
 
         list.add(uri);
-        this.add(new GuiParent("").setDim(4, 1));
-        this.add(new GuiLabel("name").setTitle(Component.literal(uri.toString().substring(uri.toString().indexOf(uri.getScheme())))).setExpandableX());
+        this.add(new GuiParent(this, "").setDim(4, 1));
+        this.add(new GuiLabel(this, "name").setTitle(Component.literal(uri.toString().substring(uri.toString().indexOf(uri.getScheme())))).setExpandableX());
         this.add(this.checkReload(), () -> reload.setDim(12, 12));
-        this.add(new GuiButtonIcon("remove", IconStyles.REMOVE, mouse -> {
+        this.add(new GuiButtonIcon(this, "remove", IconStyles.REMOVE, mouse -> {
             if (mouse != GLFW.GLFW_MOUSE_BUTTON_LEFT) return;
             ((GuiParent) this.getParent()).remove(this);
             list.remove(uri);
             this.getParent().reflow();
         }).setDim(12, 12));
-        this.add(new GuiParent("").setDim(4, 1));
-    }
-
-    @Override
-    @Environment(EnvType.CLIENT)
-    public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
-        return tile.data.hasUri() && tile.data.getUri().equals(uri) ? ScreenStyles.DARK_BLUE_HIGHLIGHT : ScreenStyles.DARK_BLUE_BACKGROUND;
-    }
-
-    @Override
-    @Environment(EnvType.CLIENT)
-    public boolean mouseClicked(double x, double y, int button) {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-            Util.getPlatform().openUri(this.uri);
-        }
-        return super.mouseClicked(x, y, button);
+        this.add(new GuiParent(this, "").setDim(4, 1));
     }
 
     @Override
@@ -78,7 +64,7 @@ public class WidgetPlaylistEntry extends GuiParent {
             return;
 
         this.reload.setEnabled(this.checkReload());
-        this.reload.setVisible(this.reload.enabled);
+        this.reload.setVisible(this.checkReload());
     }
 
     private boolean checkReload() {

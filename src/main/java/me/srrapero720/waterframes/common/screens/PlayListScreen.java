@@ -47,12 +47,12 @@ public class PlayListScreen extends GuiLayer {
     public final GuiCheckButtonIcon playButton;
 
     public PlayListScreen(DisplayTile tile) {
-        super("display_screen", WIDTH, HEIGHT);
+        super(true, "display_screen", WIDTH, HEIGHT);
         this.setFlow(GuiFlow.STACK_Y);
         this.tile = tile;
         this.uris = new LinkedList<>();
-        this.scrollY = new GuiScrollY("parent_scroll");
-        this.list = new GuiParent(GuiFlow.STACK_Y);
+        this.scrollY = new GuiScrollY(this, "parent_scroll");
+        this.list = new GuiParent(this, GuiFlow.STACK_Y);
         this.scrollY.add(list);
         this.setSpacing(4);
 
@@ -60,21 +60,22 @@ public class PlayListScreen extends GuiLayer {
             this.list.add(new WidgetPlaylistEntry(tile, this.uris, uri));
         }
 
-        this.urlTextField = new WidgetURLTextField(null);
-        this.addButton = new GuiButtonIcon("add", IconStyles.ADD, mouse -> {
+        this.urlTextField = new WidgetURLTextField(this, null);
+        this.addButton = new GuiButtonIcon(this, "add", IconStyles.ADD, mouse -> {
             if (urlTextField.isUrlValid()) {
                 this.list.add(new WidgetPlaylistEntry(tile, this.uris, urlTextField.getURI()));
                 this.urlTextField.setText("");
                 this.reflow();
             }
         });
-        this.save = new GuiButtonIcon("save", IconStyles.SAVE, click ->
+        this.save = new GuiButtonIcon(this, "save", IconStyles.SAVE, click ->
                 DisplayNetwork.sendServer(new DataListSyncPacket(tile.getBlockPos(), DisplayData.build(this, tile)))
         );
 
-        this.playButton = new GuiCheckButtonIcon("playback", IconStyles.PLAY, IconStyles.PAUSE, tile.data.paused, button -> tile.setPause(true, !tile.data.paused));
-        this.nextButton = new GuiButtonIcon("next", IconStyles.NEXT_MEDIA, button -> tile.nextUri(true));
-        this.prevButton = new GuiButtonIcon("prev", IconStyles.BACK_MEDIA, button -> tile.prevUri(true));
+        this.playButton = new GuiCheckButtonIcon(this, "playback", IconStyles.PLAY, IconStyles.PAUSE, tile.data.paused, button -> tile.setPause(true, !tile.data.paused));
+        this.playButton.setIcon(tile.data.paused ? IconStyles.PLAY : IconStyles.PAUSE);
+        this.nextButton = new GuiButtonIcon(this, "next", IconStyles.NEXT_MEDIA, button -> tile.nextUri(true));
+        this.prevButton = new GuiButtonIcon(this, "prev", IconStyles.BACK_MEDIA, button -> tile.prevUri(true));
     }
 
     public LinkedList<URI> getUris() {
@@ -89,13 +90,13 @@ public class PlayListScreen extends GuiLayer {
 
     @Override
     public void create() {
-        this.add(new GuiParent("", GuiFlow.STACK_X, Align.STRETCH)
+        this.add(new GuiParent(this, "", GuiFlow.STACK_X, Align.STRETCH)
                 .add(prevButton.setSquared(true).setDim(1, 18).setExpandableX())
                 .add(playButton.setSquared(true).setDim(1, 18).setExpandableX())
                 .add(nextButton.setSquared(true).setDim(1, 18).setExpandableX())
         );
         this.add(scrollY.setExpandable());
-        this.add(new GuiParent(GuiFlow.STACK_X)
+        this.add(new GuiParent(this, GuiFlow.STACK_X)
                 .add(urlTextField.setDim(1, 12).setExpandableX())
                 .add(addButton.setDim(12, 12))
                 .add(save.setDim(12, 12))
@@ -113,20 +114,8 @@ public class PlayListScreen extends GuiLayer {
         if (this.playButton.getState() != tile.data.paused) {
             this.playButton.setState(tile.data.paused);
             this.playButton.setTooltip(Collections.singletonList(
-                    translatable("waterframes.gui.playback", ChatFormatting.AQUA + translate("waterframes.common." + (this.playButton.value ? "paused" : "playing")))
+                    translatable("waterframes.gui.playback", ChatFormatting.AQUA + translate("waterframes.common." + (this.playButton.getState() ? "paused" : "playing")))
             ));
         }
     }
-
-    @Override
-    @Environment(EnvType.CLIENT)
-    public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) { return ScreenStyles.SCREEN_BACKGROUND; }
-
-    @Override
-    @Environment(EnvType.CLIENT)
-    public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) { return ScreenStyles.SCREEN_BORDER; }
-
-    @Override
-    @Environment(EnvType.CLIENT)
-    public GuiStyle getStyle() { return ScreenStyles.DISPLAYS; }
 }

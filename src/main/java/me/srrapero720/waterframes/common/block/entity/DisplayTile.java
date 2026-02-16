@@ -23,6 +23,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -123,15 +125,15 @@ public class DisplayTile extends BlockEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-        this.data.save(nbt, this);
-        super.saveAdditional(nbt, registries);
+    protected void saveAdditional(ValueOutput output) {
+        this.data.save(output, this);
+        super.saveAdditional(output);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
-        this.data.load(nbt, this);
-        super.loadAdditional(nbt, registries);
+    protected void loadAdditional(ValueInput input) {
+        this.data.load(input, this);
+        super.loadAdditional(input);
         this.setDirty();
     }
 

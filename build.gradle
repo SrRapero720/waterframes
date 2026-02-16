@@ -49,7 +49,7 @@ dependencies {
     minecraft "com.mojang:minecraft:$mcversion"
     mappings loom.layered() {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-$mcversion:$mappings_version@zip")
+        parchment("org.parchmentmc.data:parchment-$parchment_mcversion:$mappings_version@zip")
     }
     modImplementation "net.fabricmc:fabric-loader:$flversion"
     modImplementation "net.fabricmc.fabric-api:fabric-api:$fabricversion"
@@ -57,7 +57,7 @@ dependencies {
     //DEPENDENCIES
     modImplementation "com.github.WaterMediaTeam:watermedia:$watermediaversion"
     modImplementation "curse.maven:creativecore-257814:$creativecoreversion"
-    modImplementation "curse.maven:watervision-1167473:$watervisionversion"
+    modCompileOnly "curse.maven:watervision-1167473:$watervisionversion"
 }
 
 tasks.processResources.outputs.upToDateWhen { false }

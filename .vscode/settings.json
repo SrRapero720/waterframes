@@ -1,0 +1,9 @@
+{
+    "files.exclude": {
+        "**/*.rpyc": true,
+        "**/*.rpa": true,
+        "**/*.rpymc": true,
+        "**/cache/": true
+    },
+    "java.configuration.updateBuildConfiguration": "interactive"
+}
