@@ -8,6 +8,7 @@ import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import team.creative.creativecore.common.gui.GuiControl;
+import team.creative.creativecore.common.gui.IGuiParent;
 import team.creative.creativecore.common.gui.control.simple.GuiTextfield;
 import team.creative.creativecore.common.gui.style.GuiStyle;
 import team.creative.creativecore.common.gui.style.display.StyleDisplay;
@@ -18,8 +19,8 @@ import java.util.List;
 
 public class WidgetURLTextField extends GuiTextfield {
 
-    public WidgetURLTextField(DisplayTile tile) {
-        super(DisplayData.URL);
+    public WidgetURLTextField(IGuiParent parent, DisplayTile tile) {
+        super(parent, DisplayData.URL);
         this.setMaxStringLength(2048);
         this.setSuggestion("https://i.imgur.com/1yCDs5C.mp4");
         if (tile != null) {
@@ -27,18 +28,7 @@ public class WidgetURLTextField extends GuiTextfield {
         }
     }
 
-    @Override
-    public StyleDisplay getBorder(GuiStyle style, StyleDisplay display) {
-        return isUrlValid() ? ScreenStyles.BLUE_BORDER : ScreenStyles.RED_BORDER;
-    }
-
-    @Override
-    public StyleDisplay getBackground(GuiStyle style, StyleDisplay display) {
-        return ScreenStyles.DARK_BLUE_BACKGROUND;
-    }
-
-    @Override
-    public List<Component> getTooltip() {
+    public List<Component> getUrlTooltip() {
         var builder = new TextBuilder();
 
         if (this.getText().isEmpty()) {

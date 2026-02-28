@@ -7,6 +7,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import org.watermedia.api.player.PlayerAPI;
+import team.creative.creativecore.common.gui.IGuiParent;
 import team.creative.creativecore.common.gui.control.simple.GuiIcon;
 import team.creative.creativecore.common.gui.style.Icon;
 
@@ -17,8 +18,8 @@ public class WidgetStatusIcon extends GuiIcon {
     Icon lastIcon;
 
     private final DisplayTile tile;
-    public WidgetStatusIcon(String name, Icon icon, DisplayTile tile) {
-        super(name, icon);
+    public WidgetStatusIcon(IGuiParent parent, String name, Icon icon, DisplayTile tile) {
+        super(parent, name, icon);
         this.tile = tile;
     }
 

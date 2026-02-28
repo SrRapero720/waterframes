@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.common.screens.widgets;
 
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.GuiControl;
+import team.creative.creativecore.common.gui.IGuiParent;
 import team.creative.creativecore.common.gui.VAlign;
 import team.creative.creativecore.common.gui.control.parent.GuiColumn;
 import team.creative.creativecore.common.gui.control.parent.GuiRow;
@@ -18,18 +19,19 @@ public class WidgetPairTable extends GuiTable {
     protected boolean spaceBetween;
 
     private final GuiFlow defaultFlow;
-    public WidgetPairTable(GuiFlow columGuiFlow) {
-        this(columGuiFlow, 0);
+    public WidgetPairTable(IGuiParent parent, GuiFlow columGuiFlow) {
+        this(parent, columGuiFlow, 0);
     }
 
-    public WidgetPairTable(GuiFlow columGuiFlow, int spacing) {
-        this(columGuiFlow, Align.LEFT, spacing);
+    public WidgetPairTable(IGuiParent parent, GuiFlow columGuiFlow, int spacing) {
+        this(parent, columGuiFlow, Align.LEFT, spacing);
     }
 
-    public WidgetPairTable(GuiFlow defaultFlow, Align align, int spacing) {
+    public WidgetPairTable(IGuiParent parent, GuiFlow defaultFlow, Align align, int spacing) {
+        super(parent);
         this.defaultFlow = defaultFlow;
-        this.spacing = spacing;
-        this.align = align;
+        super.setSpacing(spacing);
+        super.setAlign(align);
         this.createRow();
     }
 
@@ -54,26 +56,28 @@ public class WidgetPairTable extends GuiTable {
 
     public WidgetPairTable spaceBetween() {
         this.spaceBetween = true;
-        this.left.align = Align.LEFT;
-        this.right.align = Align.RIGHT;
+        this.left.setAlign(Align.LEFT);
+        this.right.setAlign(Align.RIGHT);
         return this;
     }
 
     public WidgetPairTable createRow(GuiFlow flow) {
         this.addRow(row());
         if (flow != null) {
-            left.flow = flow;
-            right.flow = flow;
+            left.setFlow(flow);
+            right.setFlow(flow);
         }
         if (this.spaceBetween) {
-            this.left.align = Align.LEFT;
-            this.right.align = Align.RIGHT;
+            this.left.setAlign(Align.LEFT);
+            this.right.setAlign(Align.RIGHT);
         }
         return this;
     }
 
     protected GuiRow row() {
-        return new GuiRow(left = new GuiColumn(), right = new GuiColumn());
+        left = new GuiColumn(this);
+        right = new GuiColumn(this);
+        return new GuiRow(this, left, right);
     }
 
     public WidgetPairTable addLeft(GuiControl... guiControls) {
@@ -100,7 +104,7 @@ public class WidgetPairTable extends GuiTable {
     }
 
     public WidgetPairTable setFlowLeft(GuiFlow flow) {
-        this.left.flow = flow;
+        this.left.setFlow(flow);
         return this;
     }
 
@@ -115,7 +119,7 @@ public class WidgetPairTable extends GuiTable {
     }
 
     public WidgetPairTable setFlowRight(GuiFlow flow) {
-        this.right.flow = flow;
+        this.right.setFlow(flow);
         return this;
     }
 
@@ -136,17 +140,17 @@ public class WidgetPairTable extends GuiTable {
     }
 
     public WidgetPairTable setFlow(GuiFlow flow) {
-        this.flow = flow;
+        super.setFlow(flow);
         return this;
     }
 
     public WidgetPairTable setSpacing(int spacing) {
-        this.spacing = spacing;
+        super.setSpacing(spacing);
         return this;
     }
 
     public WidgetPairTable setAlign(Align aligh) {
-        this.align = aligh;
+        super.setAlign(aligh);
         return this;
     }
 

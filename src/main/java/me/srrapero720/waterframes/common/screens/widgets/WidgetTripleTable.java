@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.common.screens.widgets;
 
 import team.creative.creativecore.common.gui.Align;
 import team.creative.creativecore.common.gui.GuiControl;
+import team.creative.creativecore.common.gui.IGuiParent;
 import team.creative.creativecore.common.gui.VAlign;
 import team.creative.creativecore.common.gui.control.parent.GuiColumn;
 import team.creative.creativecore.common.gui.control.parent.GuiRow;
@@ -12,20 +13,23 @@ import java.util.function.Supplier;
 public class WidgetTripleTable extends WidgetPairTable {
     private GuiColumn center;
 
-    public WidgetTripleTable(GuiFlow columGuiFlow) {
-        super(columGuiFlow);
+    public WidgetTripleTable(IGuiParent parent, GuiFlow columGuiFlow) {
+        super(parent, columGuiFlow);
     }
 
     @Override
     public WidgetTripleTable spaceBetween() {
-        this.center.align = Align.CENTER;
+        this.center.setAlign(Align.CENTER);
         super.spaceBetween();
         return this;
     }
 
     @Override
     protected GuiRow row() {
-        return new GuiRow(left = new GuiColumn(), center = new GuiColumn(), right = new GuiColumn());
+        left = new GuiColumn(this);
+        center = new GuiColumn(this);
+        right = new GuiColumn(this);
+        return new GuiRow(this, left, center, right);
     }
 
     @Override
@@ -38,10 +42,10 @@ public class WidgetTripleTable extends WidgetPairTable {
     public WidgetTripleTable createRow(GuiFlow flow) {
         super.createRow(flow);
         if (flow != null) {
-            center.flow = flow;
+            center.setFlow(flow);
         }
         if (spaceBetween) {
-            this.center.align = Align.CENTER;
+            this.center.setAlign(Align.CENTER);
         }
         return this;
     }
@@ -71,7 +75,7 @@ public class WidgetTripleTable extends WidgetPairTable {
     }
 
     public WidgetTripleTable setFlowCenter(GuiFlow flow) {
-        this.center.flow = flow;
+        this.center.setFlow(flow);
         return this;
     }
 

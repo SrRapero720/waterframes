@@ -13,16 +13,31 @@ having a custom audio distance from the block!
 
 and the big difference with LittleFrames is **WATERFrAMES is fully designed to work in survival mode!**
 
+## 📦 VERSION INFO
+| Property | Value |
+|---|---|
+| Mod Version | 2.1.22 |
+| Minecraft | 1.21.8 |
+| Mod Loader | Fabric |
+| Fabric Loader | ≥ 0.17.2 |
+| Java | 21 |
+
 ## 🎁 CONTENT OF THE MOD
 - 📺 Multiple ways to show images (Frames, Projectors, TVs and Big TVs)
 - 🎮 Items and commands to control the frames from far away
 - 📂 Local files support *(powered by WATERMeDIA)*
 - ⚙️ Fully customizable and configurable
 - ⏱️ Easy to use and compatible with every mod
+- 🔊 Unlimited volume distance range — set audio reach to any number of blocks
+- ➕ Width/Height controls with +/- buttons for precise sizing
 
 ## 🧩 DEPENDENCIES
-- [CreativeCore](https://www.curseforge.com/minecraft/mc-mods/creativecore): GuiAPI and Networking
-- [WATERMeDIA](https://wwww.curseforge.com/minecraft/mc-mods/watermedia): Multimedia Support
+| Dependency | Version | Required | Purpose |
+|---|---|---|---|
+| [CreativeCore](https://www.curseforge.com/minecraft/mc-mods/creativecore) | ≥ 2.14.7 | ✅ Yes | GUI API and Networking |
+| [WATERMeDIA](https://www.curseforge.com/minecraft/mc-mods/watermedia) | ≥ 2.1.34 | ✅ Yes | Multimedia Support (video/image/audio playback) |
+| [Fabric API](https://modrinth.com/mod/fabric-api) | 0.136.1+1.21.8 | ✅ Yes | Fabric mod platform |
+| [WATERViSION](https://www.curseforge.com/minecraft/mc-mods/watervision) | ≥ 0.1 | ❌ Optional | External video player integration |
 
 ## 🕹️ WANT A SERVER?
 **Get a server at just 1$ to get a 15% discount and make a theater with your friends**
@@ -53,6 +68,16 @@ Having me patience on the PRs and begin a nice dude.
 # ⁉️ FAQ
 - If it appears an error playing videos, try installing VLC
 - No backports to 1.16.5 (is not possible)
+- Volume distance range (min/max) can be set to any value — type any number directly in the input field
+
+## 🔧 RECENT CHANGES (1.21.8 Port)
+- Ported from Minecraft 1.21.5 to **1.21.8**
+- Updated to **CreativeCore 2.14.7** and **Fabric API 0.136.1+1.21.8**
+- Fixed multiple runtime crashes (rendering, GL state, null icons, texture views)
+- Added explicit **+/- buttons** for Width and Height fields (step = 1 block)
+- **Volume distance range is now unlimited** — no longer capped by config (type any value)
+- Fixed anchor/position arrow buttons (WidgetClickableArea coordinate bug)
+- Fixed WATERViSION integration compatibility
 
 ## ©️ COPYRIGHT AND PERMISSIONS
 Copyright SrRapero720—All rights reserved

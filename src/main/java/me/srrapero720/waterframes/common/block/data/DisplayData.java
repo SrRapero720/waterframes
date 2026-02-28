@@ -13,6 +13,8 @@ import net.minecraft.Util;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.joml.Vector2f;
 
 import java.net.URI;
@@ -76,8 +78,8 @@ public class DisplayData {
     public int renderDistance = DisplaysConfig.maxRenDis(32);
 
     public int volume = DisplaysConfig.maxVol();
-    public int maxVolumeDistance = DisplaysConfig.maxVolDis(20);
-    public int minVolumeDistance = Math.min(5, maxVolumeDistance);
+    public int maxVolumeDistance = 20;
+    public int minVolumeDistance = 5;
 
     public boolean loop = true;
     public boolean paused = false;
@@ -121,7 +123,7 @@ public class DisplayData {
     public float getWidth() { return this.max.x - this.min.x; }
     public float getHeight() { return this.max.y - this.min.y; }
 
-    public void save(CompoundTag nbt, DisplayTile tile) {
+    public void save(ValueOutput nbt, DisplayTile tile) {
         nbt.putString(URL, !hasUri() ? "" : this.getUri().toString());
         // EXPERIMENTAL: LISTING
         nbt.putString(URI_LIST, WaterFrames.composeURIString(this.uris));
@@ -163,7 +165,7 @@ public class DisplayData {
         nbt.putShort(DATA_V, V);
     }
 
-    public void load(CompoundTag nbt, DisplayTile tile) {
+    public void load(ValueInput nbt, DisplayTile tile) {
         String url = nbt.getStringOr(URL, "");
         this.uri = url.isEmpty() ? null : WaterFrames.createURI(url);
         // EXPERIMENTAL: LISTING
@@ -186,8 +188,8 @@ public class DisplayData {
         this.alpha = nbt.getIntOr(ALPHA, this.alpha);
         this.brightness = nbt.getIntOr(BRIGHTNESS, this.brightness);
         this.volume = DisplaysConfig.maxVol(nbt.getIntOr(VOLUME, this.volume));
-        this.maxVolumeDistance = DisplaysConfig.maxVolDis(nbt.getIntOr(VOL_RANGE_MAX, this.maxVolumeDistance));
-        this.minVolumeDistance = Math.min(nbt.getIntOr(VOL_RANGE_MIN, this.maxVolumeDistance), this.maxVolumeDistance);
+        this.maxVolumeDistance = nbt.getIntOr(VOL_RANGE_MAX, this.maxVolumeDistance);
+        this.minVolumeDistance = Math.min(nbt.getIntOr(VOL_RANGE_MIN, this.minVolumeDistance), this.maxVolumeDistance);
         this.paused = nbt.getBooleanOr(PAUSED, this.paused);
         this.muted = nbt.getBooleanOr(MUTED, this.muted);
         this.lit = nbt.getBooleanOr(LIT, this.lit);
@@ -327,25 +329,25 @@ public class DisplayData {
             nbt.putFloat(ROTATION, (float) screen.rotation.getValue());
         }
 
-        nbt.putBoolean(FLIP_X, screen.flip_x.value);
-        nbt.putBoolean(FLIP_Y, screen.flip_y.value);
+        nbt.putBoolean(FLIP_X, screen.flip_x.get());
+        nbt.putBoolean(FLIP_Y, screen.flip_y.get());
 
         nbt.putInt(ALPHA, screen.alpha.getIntValue());
         nbt.putInt(BRIGHTNESS, screen.brightness.getIntValue());
         nbt.putInt(RENDER_DISTANCE, screen.render_distance.getIntValue());
 
         nbt.putInt(VOLUME, screen.volume.getIntValue());
-        nbt.putInt(VOL_RANGE_MIN, screen.volume_min.getIntValue());
-        nbt.putInt(VOL_RANGE_MAX, screen.volume_max.getIntValue());
+        nbt.putInt(VOL_RANGE_MIN, (int) screen.volume_min.getValue());
+        nbt.putInt(VOL_RANGE_MAX, (int) screen.volume_max.getValue());
 
         if (tile.getBlockState().hasProperty(DisplayBlock.VISIBLE)) {
-            nbt.putBoolean("visible", screen.show_model.value);
+            nbt.putBoolean("visible", screen.show_model.get());
         }
 
-        nbt.putBoolean(LIT, screen.lit.value);
+        nbt.putBoolean(LIT, screen.lit.get());
 
         if (tile.caps.renderBehind()) {
-            nbt.putBoolean(RENDER_BOTH_SIDES, screen.mirror.value);
+            nbt.putBoolean(RENDER_BOTH_SIDES, screen.mirror.getState());
         }
 
         if (tile.caps.projects()) {
@@ -394,7 +396,7 @@ public class DisplayData {
             tile.data.brightness = nbt.getIntOr(BRIGHTNESS, 255);
             tile.data.renderDistance = DisplaysConfig.maxRenDis(nbt.getIntOr(RENDER_DISTANCE, 4));
             tile.data.volume = DisplaysConfig.maxVol(nbt.getIntOr(VOLUME, 100));
-            tile.data.maxVolumeDistance = DisplaysConfig.maxVolDis(nbt.getIntOr(VOL_RANGE_MAX, 20));
+            tile.data.maxVolumeDistance = nbt.getIntOr(VOL_RANGE_MAX, 20);
             tile.data.minVolumeDistance = Math.min(nbt.getIntOr(VOL_RANGE_MIN, 4), tile.data.maxVolumeDistance);
             if (tile.data.minVolumeDistance > tile.data.maxVolumeDistance)
                 tile.data.maxVolumeDistance = tile.data.minVolumeDistance;

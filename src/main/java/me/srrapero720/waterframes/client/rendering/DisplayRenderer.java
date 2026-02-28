@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.TriState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -42,15 +41,14 @@ public record DisplayRenderer(BlockEntityRendererProvider.Context context) imple
             RenderPipelines.TRANSLUCENT,
             RenderType.CompositeState.builder()
                     .setLightmapState(LIGHTMAP)
-                    .setTextureState(new TextureStateShard(texture, TriState.FALSE, false))
+                    .setTextureState(new TextureStateShard(texture, false))
                     .setOutputState(TRANSLUCENT_TARGET)
                     .createCompositeState(false)
     ));
 
     @Override
-    public boolean shouldRenderOffScreen(DisplayTile tile) {
-
-        return tile.data.getWidth() > 16 || tile.data.getHeight() > 16;
+    public boolean shouldRenderOffScreen() {
+        return true;
     }
 
     @Override
