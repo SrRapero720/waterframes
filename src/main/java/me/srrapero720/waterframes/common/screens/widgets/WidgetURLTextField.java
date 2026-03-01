@@ -8,6 +8,7 @@ import me.srrapero720.waterframes.common.screens.styles.ScreenStyles;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import org.watermedia.api.media.MRL;
+import org.watermedia.api.media.MediaAPI;
 import team.creative.creativecore.common.gui.GuiControl;
 import team.creative.creativecore.common.gui.controls.simple.GuiTextfield;
 import team.creative.creativecore.common.gui.style.GuiStyle;
@@ -69,7 +70,7 @@ public class WidgetURLTextField extends GuiTextfield {
         String url = getUrl();
         if (url == null || url.isEmpty()) return false;
 
-        MRL mrl = MRL.get(url);
+        MRL mrl = MediaAPI.getMRL(url);
         if (mrl == null) return false;
 
         // If still loading, consider it potentially valid

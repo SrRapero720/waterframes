@@ -26,6 +26,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.common.Mod;
 import org.watermedia.api.media.MRL;
+import org.watermedia.api.media.MediaAPI;
 import org.watermedia.api.util.MathUtil;
 import team.creative.creativecore.common.util.math.base.Axis;
 import team.creative.creativecore.common.util.math.base.Facing;
@@ -81,7 +82,7 @@ public class DisplayTile extends BlockEntity {
 
         // Check if MRL needs to be (re)created - use string comparison directly
         if (this.mrl == null || (currentUrl != null && !this.mrl.uri.toString().equals(currentUrl))) {
-            this.mrl = MRL.get(currentUrl); // MRL.get() accepts strings directly
+            this.mrl = MediaAPI.getMRL(currentUrl); // MRL.get() accepts strings directly
             this.cleanDisplay();
         }
 
