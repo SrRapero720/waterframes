@@ -26,7 +26,12 @@ public class ScreenStyles {
 
     static {
         REMOTE_CONTROL.borderThickWidth = 6;
+        REMOTE_CONTROL.background = SCREEN_BACKGROUND;
+        REMOTE_CONTROL.border = SCREEN_BORDER;
+
         DISPLAYS.borderThickWidth = 6;
+        DISPLAYS.background = SCREEN_BACKGROUND;
+        DISPLAYS.border = SCREEN_BORDER;
     }
 
     public static float color(int value) {
