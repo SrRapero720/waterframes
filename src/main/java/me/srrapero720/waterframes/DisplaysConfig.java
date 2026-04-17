@@ -3,6 +3,19 @@ package me.srrapero720.waterframes;
 import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
+import me.srrapero720.waterframes.common.block.DisplayBlock;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.server.IntegratedServer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.*;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.server.permission.nodes.PermissionNode;
 
 public class DisplaysConfig {
     private static final Pattern HOSTS_PATTERN = Pattern.compile("^(?!-)([a-zA-Z0-9-]{1,63}\\.)+[a-zA-Z]{2,63}$");
