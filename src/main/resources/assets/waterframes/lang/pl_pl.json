@@ -4,7 +4,7 @@
     "block.waterframes.projector": "Projektor",
     "block.waterframes.tv": "Telewizor",
     "block.waterframes.big_tv": "Duży telewizor",
-    "block.waterframes.tv_box": "Telewizor pudełkowy",
+    "block.waterframes.tv_box": "Telewizor CRT",
     "item.waterframes.remote": "Pilot",
 
     "waterframes.common.true": "Włączone",
@@ -19,14 +19,14 @@
     "waterframes.common.unavailable": "Niedostępne",
     "waterframes.common.access.denied": "Brak dostępu",
 
-    "waterframes.remote.description.1": "§8[%s§8]§8 + [%s§8] aby przypisać i odpiąć",
-    "waterframes.remote.bound.success": "Pomyślnie przypisano",
+    "waterframes.remote.description.1": "§8[%s§8]§8 + [%s§8] aby przypiąć i odpiąć",
+    "waterframes.remote.bound.success": "Pomyślnie przypięto",
     "waterframes.remote.unbound.success": "Pomyślnie odpięto",
     "waterframes.remote.bound.failed": "Nie przypięto",
     "waterframes.remote.code.failed": "Coś poszło nie tak!",
     "waterframes.remote.distance.failed": "Jesteś poza zasięgiem",
     "waterframes.remote.display.failed": "Wyświetlacz jest uszkodzony, odpięto go",
-    "waterframes.remote.display.invalid": "Najpierw trzeba go przypisać.",
+    "waterframes.remote.display.invalid": "Najpierw trzeba go przypiąć.",
 
     "waterframes.commands.prefix": "§6§l[§r§bWATERF§3r§bAMES§6§l]: ",
     "waterframes.commands.give.single": "Dano zestaw wyświetlaczy graczowi %s",
@@ -73,11 +73,11 @@
     "waterframes.status.operative": "Działa",
     "waterframes.status.loading": "Ładowanie...",
     "waterframes.status.buffering": "Buforowanie...",
-    "waterframes.status.idle": "Bezczynne",
+    "waterframes.status.idle": "Oczekiwanie",
     "waterframes.status.idle.desc": "Wpisz dowolny adres URL, aby rozpocząć",
     "waterframes.status.failed": "Nie udało się załadować",
     "waterframes.status.failed.video": "Nie udało się otworzyć filmu",
-    "waterframes.status.not_working": "Wystąpił problem",
+    "waterframes.status.not_working": "Coś poszło nie tak",
     "waterframes.status.cache": "Załadowano z pamięci podręcznej",
 
     "waterframes.download.exception.forbidden": "403 - Zabronione",
@@ -101,7 +101,7 @@
     "waterframes.gui.resize.y": "Zmień rozmiar Y, aby dopasować do proporcji obrazu",
     "waterframes.gui.resize.x": "Zmień rozmiar X, aby dopasować do proporcji obrazu",
     "waterframes.gui.resize.size": "Obliczony rozmiar: %s bloków",
-    "waterframes.gui.resize.no_size": "Brak rozmiaru! Brakuje multimediów",
+    "waterframes.gui.resize.no_size": "Brak rozmiaru — brak multimediów",
 
     "waterframes.gui.loop": "Pętla: %s",
     "waterframes.gui.playback": "Odtwarzanie: %s",
@@ -119,8 +119,8 @@
     "waterframes.gui.position.horizontal": "Poziomo: %s",
     "waterframes.gui.position.desc": "Położenie obrazu",
     "waterframes.gui.position.center": "Środek",
-    "waterframes.gui.position.left": "Lewo",
-    "waterframes.gui.position.right": "Prawo",
+    "waterframes.gui.position.left": "Lewa",
+    "waterframes.gui.position.right": "Prawa",
     "waterframes.gui.position.top": "Góra",
     "waterframes.gui.position.bottom": "Dół",
 
@@ -136,7 +136,7 @@
     "waterframes.gui.audio_pos.states.2": "Środek",
 
     "waterframes.gui.show_model": "model",
-    "waterframes.gui.lit": "emituje światło",
+    "waterframes.gui.lit": "Emituje światło",
     "waterframes.gui.shader_mode": "Tryb shaderów",
 
     "waterframes.gui.reload": "Przeładuj",
