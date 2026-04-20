@@ -26,7 +26,7 @@ public class Display {
     private static final Int2ObjectOpenHashMap<ResourceLocation> TEXTURES = new Int2ObjectOpenHashMap<>();
 
     // ENGINE BUILDERS - Configured once, built per-player
-    private static final GLEngine.Builder GL_BUILDER = new GLEngine.Builder()
+    private static final GLEngine.Builder GL_BUILDER = new GLEngine.Builder(Minecraft.getInstance().gameThread, Minecraft.getInstance())
             .setGenTexture(GlStateManager::_genTexture)
             .setBindTexture((target, tex) -> GlStateManager._bindTexture(tex))
             .setTexParameter(GlStateManager::_texParameter)
@@ -83,15 +83,7 @@ public class Display {
         }
 
         // Create player from MRL (uses source index internally)
-        this.mediaPlayer = tile.mrl.createPlayer(
-                sourceIndex,
-                Minecraft.getInstance().gameThread,
-                Minecraft.getInstance(),
-                GL_BUILDER.build(),
-                AL_BUILDER.build(),
-                true,
-                true
-        );
+        this.mediaPlayer = tile.mrl.createPlayer(sourceIndex, GL_BUILDER.build(), AL_BUILDER.build());
 
         if (this.mediaPlayer == null) {
             this.noEngine = true;
@@ -159,7 +151,7 @@ public class Display {
     }
 
     public int texture() {
-        return this.mediaPlayer != null ? this.mediaPlayer.texture() : -1;
+        return this.mediaPlayer != null ? (int) this.mediaPlayer.texture() : -1;
     }
 
     public ResourceLocation textureId() {
@@ -394,7 +386,7 @@ public class Display {
         this.released = true;
 
         if (this.mediaPlayer != null) {
-            int texture = this.mediaPlayer.texture();
+            int texture = (int) this.mediaPlayer.texture();
             this.mediaPlayer.release();
             if (texture != -1) {
                 DisplaysRegistry.unregisterTexture(TEXTURES.remove(texture));
