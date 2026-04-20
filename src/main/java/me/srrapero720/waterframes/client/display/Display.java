@@ -26,8 +26,7 @@ public class Display {
     private static final Int2ObjectOpenHashMap<ResourceLocation> TEXTURES = new Int2ObjectOpenHashMap<>();
 
     // ENGINE BUILDERS - Configured once, built per-player
-    private static final GLEngine.Builder GL_BUILDER = new GLEngine.Builder(Minecraft.getInstance().gameThread,
-            Minecraft.getInstance())
+    private static final GLEngine.Builder GL_BUILDER = new GLEngine.Builder()
             .setGenTexture(GlStateManager::_genTexture)
             .setBindTexture((target, tex) -> GlStateManager._bindTexture(tex))
             .setTexParameter(GlStateManager::_texParameter)
@@ -35,6 +34,10 @@ public class Display {
             .setDelTexture(GlStateManager::_deleteTexture);
 
     private static final ALEngine.Builder AL_BUILDER = new ALEngine.Builder();
+
+    // Seeking thresholds
+    private static final long QUICK_SEEK_THRESHOLD = 2000L; // Use quick seek for smaller jumps (2 seconds)
+    private static final long SYNC_SEEK_COOLDOWN = 500L; // Minimum time between sync seeks (ms)
 
     // MEDIA AND DATA
     private MediaPlayer mediaPlayer;
@@ -44,6 +47,8 @@ public class Display {
 
     // PLAYBACK STATE
     private int currentVolume = 0;
+    private long lastSyncSeekTime = 0; // Track when we last did a sync seek
+    private long lastTargetTime = Long.MIN_VALUE; // Last target time for drift detection
     private boolean stream = false;
     private boolean synced = false;
     private boolean released = false;
@@ -80,8 +85,11 @@ public class Display {
         // Create player from MRL (uses source index internally)
         this.mediaPlayer = tile.mrl.createPlayer(
                 sourceIndex,
+                Minecraft.getInstance().gameThread,
+                Minecraft.getInstance(),
                 GL_BUILDER.build(),
                 AL_BUILDER.build(),
+                true,
                 true
         );
 
@@ -151,7 +159,7 @@ public class Display {
     }
 
     public int texture() {
-        return this.mediaPlayer != null ? (int) this.mediaPlayer.texture() : -1;
+        return this.mediaPlayer != null ? this.mediaPlayer.texture() : -1;
     }
 
     public ResourceLocation textureId() {
@@ -198,9 +206,38 @@ public class Display {
     /**
      * Forces a PRECISE seek to the current tile tick position.
      * Use this for user-initiated seeks where accuracy matters.
-     * DISABLED: Seeking is completely disabled.
      */
     public void forceSeek() {
+        if (this.mediaPlayer == null || !this.mediaPlayer.canSeek()) return;
+
+        long targetMs = MathUtil.tickToMs(tile.data.tick);
+        // Use precise seek for user-initiated actions
+        this.mediaPlayer.seek(targetMs);
+        this.lastTargetTime = targetMs;
+        WaterFrames.LOGGER.debug(IT, "Precise seek to {}ms", targetMs);
+    }
+
+    /**
+     * Performs a QUICK seek for sync corrections during playback.
+     * Less accurate but faster and lower CPU usage.
+     */
+    private void syncSeek(long targetMs) {
+        if (this.mediaPlayer == null || !this.mediaPlayer.canSeek()) return;
+
+        long currentTime = this.mediaPlayer.time();
+        long drift = Math.abs(targetMs - currentTime);
+
+        // Choose seek method based on drift amount
+        if (drift < QUICK_SEEK_THRESHOLD) {
+            // Small drift: use quick seek for responsiveness
+            this.mediaPlayer.seekQuick(targetMs);
+        } else {
+            // Large drift: use precise seek for accuracy
+            this.mediaPlayer.seek(targetMs);
+        }
+
+        this.lastTargetTime = targetMs;
+        this.lastSyncSeekTime = System.currentTimeMillis();
     }
 
     // =========================================================================
@@ -245,6 +282,37 @@ public class Display {
         // Sync pause state
         if (this.mediaPlayer.paused() != shouldPause) {
             this.mediaPlayer.pause(shouldPause);
+        }
+
+        // Time sync for non-live sources
+        if (!this.stream && this.mediaPlayer.canSeek()) {
+            long targetTime = MathUtil.tickToMs(tile.data.tick);
+            if (!shouldPause) {
+                targetTime += MathUtil.tickToMs(WaterFrames.deltaFrames());
+            }
+
+            // Handle looping
+            if (tile.data.loop) {
+                long mediaDuration = mediaPlayer.duration();
+                if (mediaDuration > 0 && targetTime > mediaDuration) {
+                    targetTime = Math.floorMod(targetTime, mediaDuration);
+                }
+            }
+
+            // Check if we need to sync seek
+            long currentTime = mediaPlayer.time();
+            long drift = Math.abs(targetTime - currentTime);
+            long timeSinceLastSeek = System.currentTimeMillis() - lastSyncSeekTime;
+
+            // Only seek if:
+            // 1. Drift exceeds threshold
+            // 2. Target has changed significantly from last seek
+            // 3. Enough time has passed since last seek (cooldown)
+            if (drift > WaterFrames.SYNC_TIME &&
+                Math.abs(targetTime - lastTargetTime) > WaterFrames.SYNC_TIME &&
+                timeSinceLastSeek > SYNC_SEEK_COOLDOWN) {
+                syncSeek(targetTime);
+            }
         }
 
         // Sync duration on first render
@@ -304,6 +372,10 @@ public class Display {
 
     public void setPauseMode(boolean pause) {
         if (this.mediaPlayer == null) return;
+        if (this.mediaPlayer.canSeek()) {
+            // Use precise seek for user-initiated pause/resume
+            this.mediaPlayer.seek(MathUtil.tickToMs(this.tile.data.tick));
+        }
         this.mediaPlayer.pause(pause);
         this.mediaPlayer.mute(this.tile.data.muted);
     }
@@ -322,7 +394,7 @@ public class Display {
         this.released = true;
 
         if (this.mediaPlayer != null) {
-            int texture = (int) this.mediaPlayer.texture();
+            int texture = this.mediaPlayer.texture();
             this.mediaPlayer.release();
             if (texture != -1) {
                 DisplaysRegistry.unregisterTexture(TEXTURES.remove(texture));

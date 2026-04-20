@@ -68,6 +68,7 @@ dependencies {
 
     //DEPENDENCIES
     implementation files('watermedia-3.0.0.14.jar')
+    implementation 'com.github.WaterMediaTeam:watermedia-v3:3.0.0-beta.8'
     implementation 'com.github.WaterMediaTeam:binaries:3.0.0-rc.1'
     implementation fg.deobf("curse.maven:creativecore-257814:$creativecoreversion")
     compileOnly fg.deobf("curse.maven:watervision-1167473:$watervisionversion")

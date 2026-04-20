@@ -160,16 +160,16 @@ public class DisplayScreen extends GuiLayer {
         this.seekbar = new GuiSeekBar("seek", () -> tile.data.tick, () -> tile.data.tickMax, LongValueParser.TIME_DURATION_TICK) {
             @Override
             public boolean mouseScrolled(Rect rect, double x, double y, double scrolled) {
-                return false;
+                if (scrolled > 0.0f) {
+                    tile.fastFoward(true);
+                } else {
+                    tile.rewind(true);
+                }
+                return true;
             }
-            @Override
-            public boolean mouseClicked(Rect rect, double x, double y, int button) {
-                return false;
-            }
-            @Override
-            public void mouseDragged(Rect rect, double x, double y, int button, double dragX, double dragY, double time) {
-            }
-        };
+        }
+                .setOnTimeUpdate(v -> tile.data.tick = (int) v)
+                .setOnLastTimeUpdate(v -> tile.syncTime(true, (int) v, tile.data.tickMax));
 
         this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, x -> tile.cleanDisplay());
         this.reload.setTooltip("waterframes.gui.reload");
@@ -307,7 +307,7 @@ public class DisplayScreen extends GuiLayer {
 
         // SEEKBAR + buttons
         this.add(new GuiParent(GuiFlow.STACK_X)
-                .add(this.seekbar.setDim(-1, 14 + 4).setEnabled(false).setExpandableX())
+                .add(this.seekbar.setDim(-1, 14 + 4).setExpandableX())
                 .add(this.reload.setDim(14, 14))
                 .add(this.save.setDim(28, 14).setSquared(true).setEnabled(DisplaysConfig.canSave(getPlayer(), url.getText())))
         );

@@ -61,9 +61,8 @@ public class DisplayTile extends BlockEntity {
     @OnlyIn(Dist.CLIENT)
     public Display requestDisplay() {
         // No active display or no URL configured
-        if (!this.data.active || !this.data.hasUrl()) {
+        if (!this.data.active || (!this.data.hasUrl() && display != null)) {
             this.cleanDisplay();
-            this.mrl = null;
             return null;
         }
 
@@ -72,12 +71,18 @@ public class DisplayTile extends BlockEntity {
             return null;
         }
 
+        // No MRL and no URL to load
+        if (mrl == null && !this.data.hasUrl()) {
+            this.cleanDisplay();
+            return null;
+        }
+
         // Get current URL string directly
         String currentUrl = this.data.getUrl();
 
         // Check if MRL needs to be (re)created - use string comparison directly
-        if (this.mrl == null || !this.mrl.uri.toString().equals(currentUrl)) {
-            this.mrl = MediaAPI.getMRL(currentUrl);
+        if (this.mrl == null || (currentUrl != null && !this.mrl.uri.toString().equals(currentUrl))) {
+            this.mrl = MediaAPI.getMRL(currentUrl); // MRL.get() accepts strings directly
             this.cleanDisplay();
         }
 
@@ -194,13 +199,13 @@ public class DisplayTile extends BlockEntity {
     }
 
     public void fastFoward(boolean clientSide) {
-//        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), Math.min(data.tick + MathUtil.msToTick(5000), this.data.tickMax), this.data.tickMax, true));
-//        else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), Math.min(data.tick + (5000 / 50), this.data.tickMax), this.data.tickMax, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), Math.min(data.tick + MathUtil.msToTick(5000), this.data.tickMax), this.data.tickMax, true));
+        else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), Math.min(data.tick + (5000 / 50), this.data.tickMax), this.data.tickMax, true), this);
     }
 
     public void rewind(boolean clientSide) {
-//        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), Math.max(data.tick - MathUtil.msToTick(5000), 0), this.data.tickMax, true));
-//        else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), Math.max(data.tick - (5000 / 50), 0), this.data.tickMax, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), Math.max(data.tick - MathUtil.msToTick(5000), 0), this.data.tickMax, true));
+        else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), Math.max(data.tick - (5000 / 50), 0), this.data.tickMax, true), this);
     }
 
     public void nextUrl(boolean clientSide) {
@@ -214,8 +219,8 @@ public class DisplayTile extends BlockEntity {
     }
 
     public void syncTime(boolean clientSide, int tick, int maxTick) {
-//        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), tick, maxTick, true));
-//        else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), tick, maxTick, true), this);
+        if (clientSide) DisplayNetwork.sendServer(new TimePacket(this.getBlockPos(), tick, maxTick, true));
+        else            DisplayNetwork.sendClient(new TimePacket(this.getBlockPos(), tick, maxTick, true), this);
     }
 
     public void loop(boolean clientSide, boolean loop) {
