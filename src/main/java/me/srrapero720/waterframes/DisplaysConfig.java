@@ -72,6 +72,7 @@ public class DisplaysConfig {
     private static final IntValue maxVolume;
     private static final BooleanValue useMasterVolume;
     private static final BooleanValue useVSEurekaCompat;
+    private static final BooleanValue useSableCompat;
     private static final BooleanValue useMultimedia;
     private static final BooleanValue keepRendering;
     // BEHAVIOR
@@ -156,6 +157,14 @@ public class DisplaysConfig {
                         "(This option is called VSEureka because valkirienskies is too long, and VS may be misleading)"
                 )
                 .define("vsEurekaCompat", true);
+
+        useSableCompat = SERVER
+                .comment(
+                        "Enables compatibility with Sable (used by Create: Simulated / Aeronautics contraptions)",
+                        "Projects sub-level block positions to global space so audio attenuates correctly from contraption-mounted displays",
+                        "Disable if sable misbehaves or audio stops working while using it"
+                )
+                .define("sableCompat", true);
 
         // WATERFRAMES -> multimedia -> watermedia
         SERVER.push("watermedia");
@@ -340,6 +349,7 @@ public class DisplaysConfig {
     public static int maxVolDis(int value) { return Math.min(value, maxVolDis()); }
     public static boolean useMasterVolume() { return useMasterVolume.get(); }
     public static boolean vsEurekaCompat() { return useVSEurekaCompat.get(); }
+    public static boolean sableCompat() { return useSableCompat.get(); }
 
     public static int maxVol() { return maxVolume.get(); }
     public static int maxVol(int value) { return Math.max(Math.min(value, maxVol()), 0); }
