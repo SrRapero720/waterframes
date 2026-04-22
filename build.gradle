@@ -86,6 +86,7 @@ jar {
         attributes "MixinConfigs"               : "$modid.$mixin_file_suffix"
     }
     exclude('org/valkyrienskies/**')
+    exclude('dev/ryanhcode/sable/companion/**')
 }
 
 publishMods {
