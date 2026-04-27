@@ -2,6 +2,7 @@ package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.client.display.DisplayList;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.compat.sable.SableCompat;
 import me.srrapero720.waterframes.common.compat.valkyrienskies.VSCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -115,6 +116,9 @@ public class WaterFrames {
     }
 
     public static double getDistance(Level level, BlockPos pos, Position position) {
+        if (SableCompat.installed() && DisplaysConfig.sableCompat()) {
+            return Math.sqrt(SableCompat.getSquaredDistance(level, pos, position));
+        }
         if (VSCompat.installed() && DisplaysConfig.vsEurekaCompat()) {
             return Math.sqrt(VSCompat.getSquaredDistance(level, pos, position));
         }
