@@ -391,6 +391,7 @@ public class Display {
             if (texture != -1) {
                 DisplaysRegistry.unregisterTexture(TEXTURES.remove(texture));
             }
+            this.mediaPlayer = null;
         }
 
         this.currentSource = null;
