@@ -45,8 +45,11 @@ public class WidgetStatusIcon extends GuiIcon {
         }
 
         // assuming it was
-        if (tile.mrl == null || tile.mrl.busy()) {
+        if (tile.mrl == null || (!tile.mrl.ready() && !tile.mrl.hasError())) {
             tooltip.add(translatable("waterframes.status", ChatFormatting.RED + translate("waterframes.status.loading")));
+            return tooltip;
+        } else if (tile.mrl != null && tile.mrl.ready() && tile.mrl.hasError()) {
+            tooltip.add(translatable("waterframes.status", ChatFormatting.RED + translate("waterframes.download.exception.invalid")));
             return tooltip;
         }
 

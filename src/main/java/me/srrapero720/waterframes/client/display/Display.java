@@ -6,6 +6,7 @@ import me.srrapero720.waterframes.*;
 import me.srrapero720.waterframes.client.rendering.TextureWrapper;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import org.watermedia.api.media.MRL;
+import org.watermedia.api.media.MediaAPI;
 import org.watermedia.api.media.engines.ALEngine;
 import org.watermedia.api.media.engines.GLEngine;
 import org.watermedia.api.media.players.MediaPlayer;
@@ -18,6 +19,7 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.watermedia.api.util.MathUtil;
 
+import java.util.List;
 import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
@@ -31,6 +33,10 @@ public class Display {
             .setBindTexture((target, tex) -> GlStateManager._bindTexture(tex))
             .setTexParameter(GlStateManager::_texParameter)
             .setPixelStore(GlStateManager::_pixelStore)
+            .setBindBuffer(GlStateManager::_glBindBuffer)
+            .setBindVertexArray(GlStateManager::_glBindVertexArray)
+            .setBindFrameBuffer(GlStateManager::_glBindFramebuffer)
+            .setActiveTexture(GlStateManager::_activeTexture)
             .setDelTexture(GlStateManager::_deleteTexture);
 
     private static final ALEngine.Builder AL_BUILDER = new ALEngine.Builder();
@@ -61,15 +67,15 @@ public class Display {
 
     private void openPlayer(final int sourceIndex) {
         // Get the source from MRL
-        MRL.Source[] sources = tile.mrl.sources();
-        if (sources == null || sources.length == 0) {
+        List<MRL.Source> sources = tile.mrl.sources();
+        if (sources == null || sources.size() == 0) {
             this.noEngine = true;
             WaterFrames.LOGGER.warn(IT, "No sources available in MRL");
             return;
         }
 
         // Select source (prefer video, fall back to first available)
-        this.currentSource = sourceIndex < sources.length ? sources[sourceIndex] : sources[0];
+        this.currentSource = sourceIndex < sources.size() ? sources.get(sourceIndex) : sources.get(0);
         if (this.currentSource == null) {
             MRL.Source videoSource = tile.mrl.videoSource();
             MRL.Source imageSource = tile.mrl.imageSource();
@@ -83,7 +89,7 @@ public class Display {
         }
 
         // Create player from MRL (uses source index internally)
-        this.mediaPlayer = tile.mrl.createPlayer(sourceIndex, GL_BUILDER.build(), AL_BUILDER.build());
+        this.mediaPlayer = MediaAPI.createPlayer(tile.mrl, sourceIndex, GL_BUILDER::build, AL_BUILDER::build);
 
         if (this.mediaPlayer == null) {
             this.noEngine = true;
@@ -330,7 +336,7 @@ public class Display {
     }
 
     public boolean isLoading() {
-        if (this.tile.mrl.busy()) return true;
+        if (!this.tile.mrl.ready()) return true;
         return this.mediaPlayer != null && (this.mediaPlayer.loading() || this.mediaPlayer.waiting());
     }
 
