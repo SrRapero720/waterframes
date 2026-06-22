@@ -68,7 +68,7 @@ public class Display {
     private void openPlayer(final int sourceIndex) {
         // Get the source from MRL
         List<MRL.Source> sources = tile.mrl.sources();
-        if (sources == null || sources.size() == 0) {
+        if (sources == null || sources.isEmpty()) {
             this.noEngine = true;
             WaterFrames.LOGGER.warn(IT, "No sources available in MRL");
             return;
@@ -336,7 +336,7 @@ public class Display {
     }
 
     public boolean isLoading() {
-        if (!this.tile.mrl.ready()) return true;
+        if (!this.tile.mrl.status().loaded()) return true;
         return this.mediaPlayer != null && (this.mediaPlayer.loading() || this.mediaPlayer.waiting());
     }
 

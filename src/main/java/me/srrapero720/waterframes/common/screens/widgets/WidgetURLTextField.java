@@ -73,6 +73,6 @@ public class WidgetURLTextField extends GuiTextfield {
         MRL mrl = MediaAPI.getMRL(url);
         if (mrl == null) return false;
 
-        return mrl.ready() && !mrl.hasError() && !mrl.expired() && mrl.sourceCount() > 0;
+        return mrl.status() == MRL.Status.FETCHING || mrl.status().loaded();
     }
 }

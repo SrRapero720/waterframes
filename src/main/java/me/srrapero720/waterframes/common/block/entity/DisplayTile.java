@@ -87,7 +87,7 @@ public class DisplayTile extends BlockEntity {
         }
 
         // Create display once MRL is ready
-        if (this.mrl.ready() && !this.mrl.hasError()) {
+        if (this.mrl.status().loaded()) {
             if (this.display != null) return this.display;
             return this.display = new Display(this);
         }

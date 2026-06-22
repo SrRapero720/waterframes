@@ -403,7 +403,7 @@ public class DisplayScreen extends GuiLayer {
     }
 
     public boolean enableWaterVision() {
-        return tile.data.hasUrl() && tile.mrl != null && tile.mrl.ready();
+        return tile.data.hasUrl() && tile.mrl != null && tile.mrl.status().loaded();
     }
 
     @Override
