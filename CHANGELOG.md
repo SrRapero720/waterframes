@@ -1,4 +1,7 @@
 # UPDATE 2.2.0-beta.5
+- ✨ Updated to support WaterMedia v3 Beta 18
+
+# UPDATE 2.2.0-beta.5
 - ✨ Updated to support WaterMedia v3 Beta 17
 
 # UPDATE 2.2.0-beta.1
