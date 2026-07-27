@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WidgetStatusIcon extends GuiIcon {
-    Icon lastIcon;
-
     private final DisplayTile tile;
     public WidgetStatusIcon(String name, Icon icon, DisplayTile tile) {
         super(name, icon);
@@ -44,34 +42,29 @@ public class WidgetStatusIcon extends GuiIcon {
             return tooltip;
         }
 
-        // assuming it was
-        if (tile.mrl == null || tile.mrl.status().loaded()) {
-            tooltip.add(translatable("waterframes.status", ChatFormatting.RED + translate("waterframes.status.loading")));
-            return tooltip;
-        } else if (tile.mrl != null && tile.mrl.status().loaded()) {
+        if (tile.mrl != null && tile.mrl.status().failed()) {
             tooltip.add(translatable("waterframes.status", ChatFormatting.RED + translate("waterframes.download.exception.invalid")));
             return tooltip;
         }
 
-        if (tile.display != null) {
-            if (tile.display.isNoEngine()) {
-                tooltip.add(translatable("waterframes.status", ChatFormatting.RED + translate("waterframes.status.no_engine")));
-                tooltip.add(translatable("waterframes.status.no_engine.desc"));
-                return tooltip;
-            }
-
-            var status = switch (tile.display.status()) {
-                case PLAYING, PAUSED, STOPPED, ENDED -> ChatFormatting.GREEN + translate("waterframes.status.operative");
-                case LOADING, WAITING -> ChatFormatting.YELLOW + translate("waterframes.status.loading");
-                case ERROR -> ChatFormatting.RED + translate("waterframes.download.exception.invalid");
-                case BUFFERING -> ChatFormatting.YELLOW + translate("waterframes.status.buffering");
-            };
-            tooltip.add(translatable("waterframes.status", status));
+        // NO MRL YET, STILL FETCHING SOURCES, OR PLAYER NOT BUILT: ALL OF THEM ARE LOADING STATES
+        if (tile.mrl == null || !tile.mrl.status().loaded() || tile.display == null) {
+            tooltip.add(translatable("waterframes.status", ChatFormatting.YELLOW + translate("waterframes.status.loading")));
+            return tooltip;
         }
 
-//        if (tile.mrl.isCache()) {
-//            tooltip.add(translatable("waterframes.status.cache").withStyle(ChatFormatting.AQUA));
-//        }
+        if (tile.display.isNoEngine()) {
+            tooltip.add(translatable("waterframes.status", ChatFormatting.RED + translate("waterframes.status.no_engine")));
+            tooltip.add(translatable("waterframes.status.no_engine.desc"));
+            return tooltip;
+        }
+
+        tooltip.add(translatable("waterframes.status", switch (tile.display.status()) {
+            case PLAYING, PAUSED, STOPPED, ENDED -> ChatFormatting.GREEN + translate("waterframes.status.operative");
+            case LOADING, WAITING -> ChatFormatting.YELLOW + translate("waterframes.status.loading");
+            case BUFFERING -> ChatFormatting.YELLOW + translate("waterframes.status.buffering");
+            case ERROR -> ChatFormatting.RED + translate("waterframes.download.exception.invalid");
+        }));
 
         return tooltip;
     }
@@ -80,8 +73,8 @@ public class WidgetStatusIcon extends GuiIcon {
     public Icon getStatusIcon() {
         if (!tile.data.active) return IconStyles.STATUS_OFF;
         if (tile.mrl == null && !tile.data.hasUrl()) return IconStyles.STATUS_IDLE;
-        else if (tile.mrl == null) return IconStyles.STATUS_LOADING; // ASSUMING IT WAS LOADING
-        if (tile.display == null) return IconStyles.STATUS_ERROR;
+        if (tile.mrl != null && tile.mrl.status().failed()) return IconStyles.STATUS_ERROR;
+        if (tile.mrl == null || !tile.mrl.status().loaded() || tile.display == null) return IconStyles.STATUS_LOADING;
         if (tile.display.isNoEngine()) return IconStyles.STATUS_ERROR;
 
         return switch (tile.display.status()) {

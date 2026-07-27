@@ -170,7 +170,11 @@ public class DisplayScreen extends GuiLayer {
                 .setOnTimeUpdate(v -> tile.data.tick = (int) v)
                 .setOnLastTimeUpdate(v -> tile.syncTime(true, (int) v, tile.data.tickMax));
 
-        this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, x -> tile.cleanDisplay());
+        // REFETCH THE MRL AND DROP THE PLAYER SO THE NEXT TICK REBUILDS IT FROM THE FRESH SOURCES
+        this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, x -> {
+            if (tile.mrl != null) tile.mrl.reload();
+            tile.cleanDisplay();
+        });
         this.reload.setTooltip("waterframes.gui.reload");
         if (isClient()) {
             this.reload.setEnabled(enableReload());

@@ -1,14 +1,13 @@
 package me.srrapero720.waterframes.client.display;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import me.srrapero720.waterframes.*;
 import me.srrapero720.waterframes.client.rendering.TextureWrapper;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import org.watermedia.api.media.MRL;
 import org.watermedia.api.media.MediaAPI;
-import org.watermedia.api.media.engines.ALEngine;
-import org.watermedia.api.media.engines.GLEngine;
+import org.watermedia.api.media.engines.GFXEngine;
+import org.watermedia.api.media.engines.SFXEngine;
 import org.watermedia.api.media.players.MediaPlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -18,28 +17,20 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.watermedia.api.util.MathUtil;
+import org.watermedia.api.util.MediaType;
 
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class Display {
     private static final Marker IT = MarkerManager.getMarker("Display");
     private static final Int2ObjectOpenHashMap<ResourceLocation> TEXTURES = new Int2ObjectOpenHashMap<>();
 
-    // ENGINE BUILDERS - Configured once, built per-player
-    private static final GLEngine.Builder GL_BUILDER = new GLEngine.Builder(Minecraft.getInstance().gameThread, Minecraft.getInstance())
-            .setGenTexture(GlStateManager::_genTexture)
-            .setBindTexture((target, tex) -> GlStateManager._bindTexture(tex))
-            .setTexParameter(GlStateManager::_texParameter)
-            .setPixelStore(GlStateManager::_pixelStore)
-            .setBindBuffer(GlStateManager::_glBindBuffer)
-            .setBindVertexArray(GlStateManager::_glBindVertexArray)
-            .setBindFrameBuffer(GlStateManager::_glBindFramebuffer)
-            .setActiveTexture(GlStateManager::_activeTexture)
-            .setDelTexture(GlStateManager::_deleteTexture);
-
-    private static final ALEngine.Builder AL_BUILDER = new ALEngine.Builder();
+    // ENGINE FACTORIES - ONE INSTANCE PER PLAYER; THE GL ONE IS PINNED TO MINECRAFT'S RENDER THREAD
+    private static final Supplier<GFXEngine> GFX_ENGINE = () -> MediaAPI.glEngine(Minecraft.getInstance().gameThread, Minecraft.getInstance());
+    private static final Supplier<SFXEngine> SFX_ENGINE = MediaAPI::alEngine;
 
     // Seeking thresholds
     private static final long QUICK_SEEK_THRESHOLD = 2000L; // Use quick seek for smaller jumps (2 seconds)
@@ -77,9 +68,8 @@ public class Display {
         // Select source (prefer video, fall back to first available)
         this.currentSource = sourceIndex < sources.size() ? sources.get(sourceIndex) : sources.get(0);
         if (this.currentSource == null) {
-            MRL.Source videoSource = tile.mrl.videoSource();
-            MRL.Source imageSource = tile.mrl.imageSource();
-            this.currentSource = videoSource != null ? videoSource : imageSource;
+            MRL.Source videoSource = tile.mrl.sourceByType(MediaType.VIDEO);
+            this.currentSource = videoSource != null ? videoSource : tile.mrl.sourceByType(MediaType.IMAGE);
         }
 
         if (this.currentSource == null) {
@@ -89,7 +79,7 @@ public class Display {
         }
 
         // Create player from MRL (uses source index internally)
-        this.mediaPlayer = MediaAPI.createPlayer(tile.mrl, sourceIndex, GL_BUILDER::build, AL_BUILDER::build);
+        this.mediaPlayer = MediaAPI.createPlayer(tile.mrl, sourceIndex, GFX_ENGINE, SFX_ENGINE);
 
         if (this.mediaPlayer == null) {
             this.noEngine = true;
@@ -134,14 +124,14 @@ public class Display {
      * Checks if the current source is a video.
      */
     public boolean isVideo() {
-        return this.currentSource != null && this.currentSource.isVideo();
+        return this.currentSource != null && this.currentSource.type() == MediaType.VIDEO;
     }
 
     /**
      * Checks if the current source is an image.
      */
     public boolean isImage() {
-        return this.currentSource != null && this.currentSource.isImage();
+        return this.currentSource != null && this.currentSource.type() == MediaType.IMAGE;
     }
 
     // =========================================================================

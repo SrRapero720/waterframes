@@ -5,7 +5,5 @@
   "plugin": "me.srrapero720.waterframes.mixin.MixinPlugin",
   "minVersion": "0.8.5",
   "client": [],
-  "mixins": [
-    "watermedia.WaterMediaMixin"
-  ]
+  "mixins": []
 }

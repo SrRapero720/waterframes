@@ -70,7 +70,7 @@ public class WidgetURLTextField extends GuiTextfield {
         String url = getUrl();
         if (url == null || url.isEmpty()) return false;
 
-        MRL mrl = MediaAPI.getMRL(url);
+        MRL mrl = MediaAPI.mrl(url);
         if (mrl == null) return false;
 
         return mrl.status() == MRL.Status.FETCHING || mrl.status().loaded();

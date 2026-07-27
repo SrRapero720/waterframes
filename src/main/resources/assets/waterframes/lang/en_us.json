@@ -79,6 +79,8 @@
     "waterframes.status.failed.video": "Failed to open video",
     "waterframes.status.not_working": "Something wrong happened",
     "waterframes.status.cache": "Loaded from cache",
+    "waterframes.status.no_engine": "No playback engine",
+    "waterframes.status.no_engine.desc": "WaterMedia could not open this source, check the logs",
 
     "waterframes.download.exception.forbidden": "403 - Forbidden",
     "waterframes.download.exception.notfound": "404 - Not found",

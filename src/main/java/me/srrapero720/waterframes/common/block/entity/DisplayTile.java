@@ -83,7 +83,7 @@ public class DisplayTile extends BlockEntity {
 
         // Check if MRL needs to be (re)created - use string comparison directly
         if (this.mrl == null || (currentUrl != null && !this.mrl.uri.toString().equals(currentUrl))) {
-            this.mrl = MediaAPI.getMRL(currentUrl); // MRL.get() accepts strings directly
+            this.mrl = MediaAPI.mrl(currentUrl);
             this.cleanDisplay();
         }
 

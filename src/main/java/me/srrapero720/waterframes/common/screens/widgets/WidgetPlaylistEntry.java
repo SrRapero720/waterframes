@@ -37,8 +37,11 @@ public class WidgetPlaylistEntry extends GuiParent {
         this.setExpandableX();
         this.setVAlign(VAlign.CENTER);
 
+        // ONLY SHOWN FOR THE ENTRY THE TILE IS PLAYING, SO IT REFETCHES THE TILE'S OWN MRL
         this.reload = new GuiButtonIcon("reload", IconStyles.RELOAD, mouse -> {
-            if (mouse != GLFW.GLFW_MOUSE_BUTTON_LEFT) return;
+            if (mouse != GLFW.GLFW_MOUSE_BUTTON_LEFT || tile.mrl == null) return;
+            tile.mrl.reload();
+            tile.cleanDisplay();
         });
 
         list.add(url);
