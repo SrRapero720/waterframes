@@ -1,5 +1,8 @@
 package me.srrapero720.waterframes;
 
+import java.net.URI;
+import java.util.*;
+import java.util.regex.Pattern;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.server.IntegratedServer;
@@ -13,10 +16,6 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.server.permission.nodes.PermissionNode;
-
-import java.net.URI;
-import java.util.*;
-import java.util.regex.Pattern;
 
 public class DisplaysConfig {
     private static final Pattern HOSTS_PATTERN = Pattern.compile("^(?!-)([a-zA-Z0-9-]{1,63}\\.)+[a-zA-Z]{2,63}$");
@@ -70,6 +69,7 @@ public class DisplaysConfig {
     private static final IntValue maxVolumeDistance;
     private static final IntValue maxVolume;
     private static final BooleanValue useMasterVolume;
+    private static final BooleanValue useRecordVolume;
     private static final BooleanValue useVSEurekaCompat;
     private static final BooleanValue useMultimedia;
     private static final BooleanValue keepRendering;
@@ -146,6 +146,10 @@ public class DisplaysConfig {
         useMasterVolume = SERVER
                 .comment("Makes Minecraft master volume affects waterframes volume")
                 .define("masterVolume", false);
+
+        useRecordVolume = SERVER
+                .comment("Makes Minecraft music volume affects waterframes volume")
+                .define("recordVolume", false);
 
         useVSEurekaCompat = SERVER
                 .comment(
@@ -338,6 +342,7 @@ public class DisplaysConfig {
     public static int maxVolDis() { return maxVolumeDistance.get(); }
     public static int maxVolDis(int value) { return Math.min(value, maxVolDis()); }
     public static boolean useMasterVolume() { return useMasterVolume.get(); }
+    public static boolean useRecordVolume() { return useRecordVolume.get(); }
     public static boolean vsEurekaCompat() { return useVSEurekaCompat.get(); }
 
     public static int maxVol() { return maxVolume.get(); }

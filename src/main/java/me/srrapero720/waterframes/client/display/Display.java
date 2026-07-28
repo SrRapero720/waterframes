@@ -428,6 +428,10 @@ public class Display {
             volume = (int) (volume * (Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER)));
         }
 
+        if (DisplaysConfig.useRecordVolume()) {
+            volume = (int) (volume * (Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.RECORDS)));
+        }
+
         return volume;
     }
 
