@@ -1,85 +1,74 @@
 package me.srrapero720.waterframes.client.display;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import me.srrapero720.waterframes.*;
 import me.srrapero720.waterframes.client.rendering.TextureWrapper;
+import me.srrapero720.waterframes.client.sound.DisplaySound;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.media.DisplayBridge;
 import org.watermedia.api.media.MRL;
 import org.watermedia.api.media.MediaAPI;
 import org.watermedia.api.media.engines.GFXEngine;
 import org.watermedia.api.media.engines.SFXEngine;
 import org.watermedia.api.media.players.MediaPlayer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import org.watermedia.api.util.MathUtil;
+import org.lwjgl.openal.AL10;
 import org.watermedia.api.util.MediaType;
 
-import java.util.List;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
-@OnlyIn(Dist.CLIENT)
 public class Display {
     private static final Marker IT = MarkerManager.getMarker("Display");
-    private static final Int2ObjectOpenHashMap<ResourceLocation> TEXTURES = new Int2ObjectOpenHashMap<>();
 
     // ENGINE FACTORIES - ONE INSTANCE PER PLAYER; THE GL ONE IS PINNED TO MINECRAFT'S RENDER THREAD
     private static final Supplier<GFXEngine> GFX_ENGINE = () -> MediaAPI.glEngine(Minecraft.getInstance().gameThread, Minecraft.getInstance());
     private static final Supplier<SFXEngine> SFX_ENGINE = MediaAPI::alEngine;
 
-    // Seeking thresholds
-    private static final long QUICK_SEEK_THRESHOLD = 2000L; // Use quick seek for smaller jumps (2 seconds)
-    private static final long SYNC_SEEK_COOLDOWN = 500L; // Minimum time between sync seeks (ms)
-
     // MEDIA AND DATA
     private MediaPlayer mediaPlayer;
     private MRL.Source currentSource;
     private final DisplayTile tile;
+    /** Which source of the media this player opened; the playlist entry decides it. */
+    private final int sourceIndex;
     private boolean noEngine;
 
     // PLAYBACK STATE
     private int currentVolume = 0;
-    private long lastSyncSeekTime = 0; // Track when we last did a sync seek
-    private long lastTargetTime = Long.MIN_VALUE; // Last target time for drift detection
-    private boolean stream = false;
-    private boolean synced = false;
     private boolean released = false;
+
+    // TEXTURE REGISTRATION, OWNED PER DISPLAY SO EVERY ID THIS VIEWER REGISTERS IS RELEASED WITH IT
+    private int glTexture = -1;
+    private ResourceLocation glLocation;
+
+    // SOUND REGISTRATION, THE AL SOURCE ADOPTED BY MINECRAFT'S ENGINE THE WAY THE TEXTURE IS
+    private DisplaySound sound;
+    private int soundRetry;
 
     public Display(DisplayTile tile) {
         this.tile = tile;
+        this.sourceIndex = tile.data.getSource();
         DisplayList.add(this);
-        this.openPlayer(0);
+        this.openPlayer();
     }
 
-    private void openPlayer(final int sourceIndex) {
-        // Get the source from MRL
-        List<MRL.Source> sources = tile.mrl.sources();
-        if (sources == null || sources.isEmpty()) {
+    private void openPlayer() {
+        // THE PLAYLIST ENTRY NAMES THE SOURCE; ONE THAT IS NOT THERE ANYMORE PLAYS NOTHING, AND THE
+        // ROW THAT POINTS AT IT SAYS SO INSTEAD OF QUIETLY SHOWING SOMETHING ELSE
+        this.currentSource = tile.mrl.source(this.sourceIndex);
+        if (this.currentSource == null) {
             this.noEngine = true;
-            WaterFrames.LOGGER.warn(IT, "No sources available in MRL");
+            WaterFrames.LOGGER.warn(IT, "Source {} is not part of {}", sourceIndex, tile.mrl.uri);
             return;
         }
 
-        // Select source (prefer video, fall back to first available)
-        this.currentSource = sourceIndex < sources.size() ? sources.get(sourceIndex) : sources.get(0);
-        if (this.currentSource == null) {
-            MRL.Source videoSource = tile.mrl.sourceByType(MediaType.VIDEO);
-            this.currentSource = videoSource != null ? videoSource : tile.mrl.sourceByType(MediaType.IMAGE);
-        }
-
-        if (this.currentSource == null) {
-            this.noEngine = true;
-            WaterFrames.LOGGER.warn(IT, "No valid source found in MRL");
-            return;
-        }
-
-        // Create player from MRL (uses source index internally)
-        this.mediaPlayer = MediaAPI.createPlayer(tile.mrl, sourceIndex, GFX_ENGINE, SFX_ENGINE);
+        // THE BRIDGE MAKES THIS PLAYER A FOLLOWER OF THE SERVER SESSION: TIME, PLAY STATE AND LOOP
+        // ARRIVE FROM THERE, AND THE DRIFT CORRECTION IS WATERMEDIA'S FROM HERE ON
+        this.mediaPlayer = MediaAPI.createPlayer(tile.mrl, sourceIndex, GFX_ENGINE, SFX_ENGINE,
+                new DisplayBridge(tile.getLevel(), tile.getBlockPos()));
 
         if (this.mediaPlayer == null) {
             this.noEngine = true;
@@ -87,16 +76,20 @@ public class Display {
             return;
         }
 
-        // Initialize player state
-        this.currentVolume = this.rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
-        this.mediaPlayer.volume(this.currentVolume);
-        this.mediaPlayer.repeat(this.tile.data.loop);
-        this.mediaPlayer.mute(this.tile.data.muted);
-
-        if (this.tile.data.paused) {
-            this.mediaPlayer.startPaused();
+        // VOLUME AND MUTE STAY PRIVATE TO THIS VIEWER, THE SESSION GRANTS NO SAY OVER THEM. NOTHING
+        // IS STARTED HERE EITHER: A START REQUEST WOULD REWIND THE MEDIA FOR EVERYONE WATCHING
+        if (DisplaysConfig.soundIntegration()) {
+            // THE GAME OWNS THE GAIN ONCE THE SOUND REGISTERS; STAY SILENT UNTIL THEN
+            this.mediaPlayer.mute(true);
         } else {
-            this.mediaPlayer.start();
+            // A RAW SOURCE SITS AT THE WORLD ORIGIN UNDER OPENAL'S DEFAULT DISTANCE MODEL; MADE
+            // LISTENER-RELATIVE SO MONO MEDIA DOESN'T FADE AND PAN AGAINST THE SPAWN COORDINATES
+            int source = this.mediaPlayer.audioSource();
+            if (source != MediaPlayer.NO_SOURCE) AL10.alSourcei(source, AL10.AL_SOURCE_RELATIVE, AL10.AL_TRUE);
+
+            this.currentVolume = this.rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+            this.mediaPlayer.volume(this.currentVolume);
+            this.mediaPlayer.mute(this.tile.data.muted);
         }
 
         WaterFrames.LOGGER.debug(IT, "Created media player for source type: {}", this.currentSource.type());
@@ -106,11 +99,21 @@ public class Display {
     // SOURCE/QUALITY ACCESS
     // =========================================================================
 
+    /** The player following the session: the network hands it its traffic, the screens drive it. */
+    public MediaPlayer player() {
+        return this.mediaPlayer;
+    }
+
     /**
      * Gets the current source being played.
      */
     public MRL.Source getSource() {
         return this.currentSource;
+    }
+
+    /** Index of that source inside the media, which is what the playlist entry pointed at. */
+    public int sourceIndex() {
+        return this.sourceIndex;
     }
 
     /**
@@ -146,24 +149,28 @@ public class Display {
         return this.mediaPlayer != null ? this.mediaPlayer.height() : 0;
     }
 
+    // GL TEXTURE 0 IS "NONE": PLAYERS ANSWER IT BEFORE THE FIRST FRAME AND IT MUST NEVER BE DRAWN
     public int texture() {
-        return this.mediaPlayer != null ? (int) this.mediaPlayer.texture() : -1;
+        int texture = this.mediaPlayer != null ? (int) this.mediaPlayer.texture() : -1;
+        return texture <= 0 ? -1 : texture;
     }
 
     public ResourceLocation textureId() {
         int texture = texture();
-        if (texture != -1) {
-            return TEXTURES.computeIfAbsent(texture, (Function<Integer, ResourceLocation>) integer -> {
-                var id = WaterFrames.asResource(texture);
-                DisplaysRegistry.registerTexture(id, new TextureWrapper(texture));
-                return id;
-            });
+        if (texture == -1) return null;
+
+        // A PLAYER MAY SWAP ITS GL TEXTURE MID-PLAY; RE-REGISTER AND DROP THE STALE ID
+        if (texture != this.glTexture) {
+            if (this.glLocation != null) DisplaysRegistry.unregisterTexture(this.glLocation);
+            this.glTexture = texture;
+            this.glLocation = WaterFrames.asResource(texture);
+            DisplaysRegistry.registerTexture(this.glLocation, new TextureWrapper(texture));
         }
-        return null;
+        return this.glLocation;
     }
 
-    public int durationInTicks() {
-        return MathUtil.msToTick(this.duration());
+    public long time() {
+        return this.mediaPlayer != null ? this.mediaPlayer.time() : 0;
     }
 
     public long duration() {
@@ -175,138 +182,57 @@ public class Display {
     }
 
     public boolean canRender() {
-        return this.mediaPlayer != null && this.mediaPlayer.canPlay() && this.mediaPlayer.texture() != -1;
-    }
-
-    // =========================================================================
-    // SEEKING - Optimized for Watermedia
-    // =========================================================================
-
-    /**
-     * Syncs duration to tile data on first successful render.
-     */
-    public void syncDuration() {
-        if (tile.data.tickMax == -1) tile.data.tick = 0;
-        this.tile.syncTime(true, tile.data.tick, this.durationInTicks());
-        this.synced = true;
-    }
-
-    /**
-     * Forces a PRECISE seek to the current tile tick position.
-     * Use this for user-initiated seeks where accuracy matters.
-     */
-    public void forceSeek() {
-        if (this.mediaPlayer == null || !this.mediaPlayer.canSeek()) return;
-
-        long targetMs = MathUtil.tickToMs(tile.data.tick);
-        // Use precise seek for user-initiated actions
-        this.mediaPlayer.seek(targetMs);
-        this.lastTargetTime = targetMs;
-        WaterFrames.LOGGER.debug(IT, "Precise seek to {}ms", targetMs);
-    }
-
-    /**
-     * Performs a QUICK seek for sync corrections during playback.
-     * Less accurate but faster and lower CPU usage.
-     */
-    private void syncSeek(long targetMs) {
-        if (this.mediaPlayer == null || !this.mediaPlayer.canSeek()) return;
-
-        long currentTime = this.mediaPlayer.time();
-        long drift = Math.abs(targetMs - currentTime);
-
-        // Choose seek method based on drift amount
-        if (drift < QUICK_SEEK_THRESHOLD) {
-            // Small drift: use quick seek for responsiveness
-            this.mediaPlayer.seekQuick(targetMs);
-        } else {
-            // Large drift: use precise seek for accuracy
-            this.mediaPlayer.seek(targetMs);
-        }
-
-        this.lastTargetTime = targetMs;
-        this.lastSyncSeekTime = System.currentTimeMillis();
+        return this.mediaPlayer != null && this.mediaPlayer.canPlay() && this.texture() != -1;
     }
 
     // =========================================================================
     // TICK LOOP
     // =========================================================================
 
+    /**
+     * Only what this viewer owns. Time, play state and loop belong to the session and are
+     * mirrored by WaterMedia on its own clock, several times per game tick.
+     */
     public void tick() {
-        if (this.mediaPlayer == null || this.mediaPlayer.error()) return;
+        if (this.mediaPlayer == null || !this.mediaPlayer.canPlay()) return;
 
-        // Handle ended state for non-looping media
-        if (this.mediaPlayer.ended() && !tile.data.loop) {
+        if (!DisplaysConfig.soundIntegration()) {
+            if (this.sound != null) {
+                this.sound.drop();
+                this.sound = null;
+            }
+
+            int volume = this.rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+            if (this.currentVolume != volume) {
+                this.mediaPlayer.volume(this.currentVolume = volume);
+            }
+
+            if (this.mediaPlayer.mute() != tile.data.muted) {
+                this.mediaPlayer.mute(tile.data.muted);
+            }
             return;
         }
 
-        // Wait for player to be ready
-        if (!this.mediaPlayer.canPlay()) return;
-
-        // Volume sync
-        int volume = this.rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
-        if (this.currentVolume != volume) {
-            this.mediaPlayer.volume(this.currentVolume = volume);
+        // MINECRAFT OWNS THE GAIN WHILE THE SOUND IS REGISTERED; A DROPPED ONE (STOPSOUND,
+        // CATEGORY AT ZERO, ENGINE RELOAD) LEAVES THE PLAYER MUTED AND RETRIES EVERY SECOND
+        if (this.sound != null && !this.sound.dropped()) return;
+        if (this.sound != null) {
+            this.sound = null;
+            this.mediaPlayer.mute(true);
         }
+        if (--this.soundRetry > 0) return;
+        this.soundRetry = 20;
+        if (!this.mediaPlayer.withAudio()) return;
 
-        // Sync repeat/loop state
-        if (this.mediaPlayer.repeat() != tile.data.loop) {
-            this.mediaPlayer.repeat(tile.data.loop);
-        }
+        int source = this.mediaPlayer.audioSource();
+        Options options = Minecraft.getInstance().options;
+        if (source == MediaPlayer.NO_SOURCE
+                || options.getSoundSourceVolume(SoundSource.MASTER) <= 0
+                || options.getSoundSourceVolume(SoundSource.RECORDS) <= 0) return;
 
-        // Sync mute state
-        if (this.mediaPlayer.mute() != tile.data.muted) {
-            this.mediaPlayer.mute(tile.data.muted);
-        }
-
-        // Detect live source
-        if (!this.stream && this.mediaPlayer.liveSource()) {
-            this.stream = true;
-        }
-
-        // Determine if we should pause
-        boolean shouldPause = tile.data.paused || !tile.data.active || Minecraft.getInstance().isPaused();
-
-        // Sync pause state
-        if (this.mediaPlayer.paused() != shouldPause) {
-            this.mediaPlayer.pause(shouldPause);
-        }
-
-        // Time sync for non-live sources
-        if (!this.stream && this.mediaPlayer.canSeek()) {
-            long targetTime = MathUtil.tickToMs(tile.data.tick);
-            if (!shouldPause) {
-                targetTime += MathUtil.tickToMs(WaterFrames.deltaFrames());
-            }
-
-            // Handle looping
-            if (tile.data.loop) {
-                long mediaDuration = mediaPlayer.duration();
-                if (mediaDuration > 0 && targetTime > mediaDuration) {
-                    targetTime = Math.floorMod(targetTime, mediaDuration);
-                }
-            }
-
-            // Check if we need to sync seek
-            long currentTime = mediaPlayer.time();
-            long drift = Math.abs(targetTime - currentTime);
-            long timeSinceLastSeek = System.currentTimeMillis() - lastSyncSeekTime;
-
-            // Only seek if:
-            // 1. Drift exceeds threshold
-            // 2. Target has changed significantly from last seek
-            // 3. Enough time has passed since last seek (cooldown)
-            if (drift > WaterFrames.SYNC_TIME &&
-                Math.abs(targetTime - lastTargetTime) > WaterFrames.SYNC_TIME &&
-                timeSinceLastSeek > SYNC_SEEK_COOLDOWN) {
-                syncSeek(targetTime);
-            }
-        }
-
-        // Sync duration on first render
-        if (!this.synced && this.canRender()) {
-            this.syncDuration();
-        }
+        // THE PLAYER STAYS FLAGGED MUTED FOR ITS WHOLE LIFE: WATERMEDIA NEVER TOUCHES THE GAIN
+        // AGAIN AND THE ENGINE BECOMES ITS ONLY WRITER, STARTING WITH THE SWAP SETUP PASS
+        this.sound = DisplaySound.create(this, this.tile, source);
     }
 
     // =========================================================================
@@ -343,7 +269,7 @@ public class Display {
     }
 
     public boolean isStream() {
-        return this.stream;
+        return this.mediaPlayer != null && this.mediaPlayer.liveSource();
     }
 
     public MediaPlayer.Status status() {
@@ -358,18 +284,19 @@ public class Display {
     // EXTERNAL CONTROL
     // =========================================================================
 
-    public void setPauseMode(boolean pause) {
+    /**
+     * The pause menu holds the whole session, not just this screen. Only true singleplayer ever
+     * gets here, a remote server never stops for one player, and a display already paused by
+     * hand stays that way when the game resumes.
+     */
+    public void gamePaused(boolean paused) {
         if (this.mediaPlayer == null) return;
-        if (this.mediaPlayer.canSeek()) {
-            // Use precise seek for user-initiated pause/resume
-            this.mediaPlayer.seek(MathUtil.tickToMs(this.tile.data.tick));
-        }
-        this.mediaPlayer.pause(pause);
-        this.mediaPlayer.mute(this.tile.data.muted);
+        this.mediaPlayer.pause(paused || this.tile.data.paused);
     }
 
     public void setMuteMode(boolean mute) {
-        if (this.mediaPlayer == null) return;
+        // UNDER ENGINE INTEGRATION THE PACKET'S DATA CHANGE ALREADY DRIVES THE INSTANCE GAIN
+        if (this.mediaPlayer == null || DisplaysConfig.soundIntegration()) return;
         this.mediaPlayer.mute(mute);
     }
 
@@ -381,13 +308,26 @@ public class Display {
         if (this.isReleased()) return;
         this.released = true;
 
+        if (this.sound != null) {
+            this.sound.drop();
+            this.sound = null;
+        }
+
         if (this.mediaPlayer != null) {
-            int texture = (int) this.mediaPlayer.texture();
-            this.mediaPlayer.release();
-            if (texture != -1) {
-                DisplaysRegistry.unregisterTexture(TEXTURES.remove(texture));
+            try {
+                this.mediaPlayer.release();
+            } catch (Throwable t) {
+                // A BACKEND THAT DIES ON ITS WAY OUT MUST NOT TAKE THE GAME WITH IT, AND MUST NOT
+                // LEAVE THIS DISPLAY HALF RELEASED EITHER: THE TEXTURE AND THE LIST STILL FOLLOW
+                WaterFrames.LOGGER.error(IT, "Media player failed to release", t);
             }
             this.mediaPlayer = null;
+        }
+
+        if (this.glLocation != null) {
+            DisplaysRegistry.unregisterTexture(this.glLocation);
+            this.glLocation = null;
+            this.glTexture = -1;
         }
 
         this.currentSource = null;
@@ -399,6 +339,30 @@ public class Display {
     // =========================================================================
 
     public int rangedVol(int volume, int min, int max) {
+        volume = this.falloffVol(volume, min, max);
+
+        if (DisplaysConfig.useMasterVolume()) {
+            volume = (int) (volume * (Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER)));
+        }
+
+        return volume;
+    }
+
+    /**
+     * Gain for the Minecraft sound instance; master and category belong to the engine, and so
+     * does the distance since OpenAL attenuates the source itself. {@code ranged} folds the
+     * emulated falloff back in for the distances the engine cannot measure.
+     */
+    public float soundVol(boolean ranged) {
+        if (this.tile.data.muted) return 0;
+        int volume = ranged
+                ? this.falloffVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance)
+                : this.tile.data.volume;
+        return Math.min(volume, 100) / 100f;
+    }
+
+    // THE DISPLAY'S OWN DISTANCE CURVE: FULL UNTIL min, LINEAR TO ZERO AT max
+    private int falloffVol(int volume, int min, int max) {
         double distance = WaterFrames.getDistance(
                 tile.level,
                 tile.getBlockPos().relative(tile.getDirection(), (int) tile.data.audioOffset),
@@ -413,10 +377,6 @@ public class Display {
 
         if (distance > min)
             volume = (distance > max + 1) ? 0 : (int) (volume * (1 - ((distance - min) / ((1 + max) - min))));
-
-        if (DisplaysConfig.useMasterVolume()) {
-            volume = (int) (volume * (Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER)));
-        }
 
         return volume;
     }

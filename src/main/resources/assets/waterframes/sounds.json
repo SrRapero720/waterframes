@@ -1,0 +1,12 @@
+{
+  "display": {
+    "subtitle": "subtitles.waterframes.display",
+    "sounds": [
+      {
+        "name": "waterframes:display",
+        "stream": true,
+        "preload": false
+      }
+    ]
+  }
+}

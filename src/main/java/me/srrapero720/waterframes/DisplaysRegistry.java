@@ -8,7 +8,6 @@ import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.item.data.CodecManager;
 import me.srrapero720.waterframes.common.item.data.RemoteData;
-import me.srrapero720.waterframes.common.network.packets.*;
 import net.neoforged.neoforge.server.permission.PermissionAPI;
 import net.neoforged.neoforge.server.permission.events.PermissionGatherEvent;
 import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
@@ -20,17 +19,16 @@ import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -44,7 +42,6 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import static me.srrapero720.waterframes.common.network.DisplayNetwork.*;
 import static me.srrapero720.waterframes.WaterFrames.*;
 
 @EventBusSubscriber(modid = ID)
@@ -53,7 +50,12 @@ public class DisplaysRegistry {
     private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(ID);
     private static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(ID);
     private static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, ID);
+    private static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(Registries.SOUND_EVENT, ID);
     public static final DeferredRegister<DataComponentType<?>> DATA = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, ID);
+
+    /* SOUNDS */
+    public static final DeferredHolder<SoundEvent, SoundEvent> DISPLAY_SOUND = SOUNDS.register("display",
+            () -> SoundEvent.createVariableRangeEvent(WaterFrames.asResource("display")));
 
     /* DATA */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<RemoteData>> REMOTE_DATA = DATA.register("remote", () -> new DataComponentType.Builder<RemoteData>()
@@ -136,6 +138,7 @@ public class DisplaysRegistry {
         ITEMS.register(bus);
         TILES.register(bus);
         TABS.register(bus);
+        SOUNDS.register(bus);
     }
 
     @SubscribeEvent
@@ -158,59 +161,39 @@ public class DisplaysRegistry {
     }
 
     @SubscribeEvent
-    @OnlyIn(Dist.CLIENT)
-    public static void registerCommands(RegisterClientCommandsEvent event) {
-        WaterFramesCommand.registerClient(event.getDispatcher());
+    public static void onCreativeTabsLoading(BuildCreativeModeTabContentsEvent event) {
+        if (event.getTabKey() == WATERTAB.getKey()) {
+            event.accept(REMOTE_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            event.accept(FRAME_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            event.accept(PROJECTOR_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            event.accept(TV_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            event.accept(BIG_TV_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+            event.accept(TV_BOX_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
+        }
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void registerTexture(ResourceLocation location, AbstractTexture texture) {
         Minecraft.getInstance().getTextureManager().register(location, texture);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void unregisterTexture(ResourceLocation location) {
         Minecraft.getInstance().getTextureManager().release(location);
     }
 
-    @EventBusSubscriber(modid = WaterFrames.ID)
-    public static class ModEvents {
+    // CLIENT-ONLY LISTENERS LIVE APART SO A DEDICATED SERVER NEVER REFLECTS OVER CLIENT EVENT TYPES
+    @EventBusSubscriber(modid = ID, value = Dist.CLIENT)
+    public static class ClientEvents {
         @SubscribeEvent
-        public static void onCreativeTabsLoading(BuildCreativeModeTabContentsEvent event) {
-            if (event.getTabKey() == WATERTAB.getKey()) {
-                event.accept(REMOTE_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-                event.accept(FRAME_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-                event.accept(PROJECTOR_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-                event.accept(TV_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-                event.accept(BIG_TV_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-                event.accept(TV_BOX_ITEM, CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS);
-            }
-        }
-
-        @SubscribeEvent
-        public static void init(FMLCommonSetupEvent event) {
-            NET.registerType(DataSyncPacket.class, DataSyncPacket::new);
-            NET.registerType(DataListSyncPacket.class, DataListSyncPacket::new);
-            NET.registerType(NextPacket.class, NextPacket::new);
-            NET.registerType(PreviousPacket.class, PreviousPacket::new);
-            NET.registerType(ActivePacket.class, ActivePacket::new);
-            NET.registerType(LoopPacket.class, LoopPacket::new);
-            NET.registerType(MutePacket.class, MutePacket::new);
-            NET.registerType(PausePacket.class, PausePacket::new);
-            NET.registerType(TimePacket.class, TimePacket::new);
-            NET.registerType(VolumePacket.class, VolumePacket::new);
-            NET.registerType(VolumeRangePacket.class, VolumeRangePacket::new);
-            NET.registerType(PositionPacket.class, PositionPacket::new);
-        }
-
-        @SubscribeEvent
-        @OnlyIn(Dist.CLIENT)
         public static void init(FMLClientSetupEvent e) {
             LOGGER.info(IT, "Running WATERFrAMES v{}", ModList.get().getModFileById(ID).versionString());
         }
 
         @SubscribeEvent
-        @OnlyIn(Dist.CLIENT)
+        public static void registerCommands(RegisterClientCommandsEvent event) {
+            WaterFramesCommand.registerClient(event.getDispatcher());
+        }
+
+        @SubscribeEvent
         public static void registerTileRenderer(EntityRenderersEvent.RegisterRenderers e) {
             BlockEntityRenderers.register(TILE_FRAME.get(), DisplayRenderer::new);
             BlockEntityRenderers.register(TILE_PROJECTOR.get(), DisplayRenderer::new);

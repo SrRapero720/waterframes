@@ -104,6 +104,7 @@ public class DisplaysConfig {
     private static final BooleanValue clientKeepsRendering;
     private static final BooleanValue clientShaderMode;
     private static final BooleanValue forceDevMode;
+    private static final BooleanValue soundEngineIntegration;
 
     private static final ModConfigSpec SERVER_SPEC;
     private static final ModConfigSpec CLIENT_SPEC;
@@ -315,6 +316,14 @@ public class DisplaysConfig {
 
         CLIENT.pop();
 
+        soundEngineIntegration = CLIENT
+                .comment(
+                        "Routes display audio through Minecraft's sound engine",
+                        "Displays become regular game sounds: Jukebox/Note Blocks volume applies and other mods can detect and customize them (e.g. Sound Physics)",
+                        "Disable to drive the OpenAL source directly like older versions"
+                )
+                .define("soundEngineIntegration", true);
+
         CLIENT.pop();
 
         // BULDING
@@ -348,6 +357,7 @@ public class DisplaysConfig {
     public static int maxVolDis() { return maxVolumeDistance.get(); }
     public static int maxVolDis(int value) { return Math.min(value, maxVolDis()); }
     public static boolean useMasterVolume() { return useMasterVolume.get(); }
+    public static boolean soundIntegration() { return soundEngineIntegration.get(); }
     public static boolean vsEurekaCompat() { return useVSEurekaCompat.get(); }
     public static boolean sableCompat() { return useSableCompat.get(); }
 

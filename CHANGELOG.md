@@ -1,3 +1,182 @@
+# 📦 UPDATE 2.3.0-beta.1
+- ✨ CreativeCore is no longer required, WATERFrAMES renders its own GUIs now
+- ✨ Display screen rebuilt around tabs: Sources, Render, Media and Redstone, with a transport bar that stays put whichever tab is open
+  - Sources replaces the old URL row and the experimental playlist screen: one list with the media playing now and everything queued after it
+  - Every entry reads its own metadata from the media: title, author, date, duration and preview picture, with the url as the fallback title
+  - Previews are real media: the thumbnail url is resolved and opened as a silent looping player, and released when its row goes away
+  - The url field adds a source instead of mirroring what plays; picking a row selects it and puts it on air
+  - A playlist now remembers who added each source and shows their face on the row, falling back to Steve and "unknown"
+  - Search runs through `PlatformAPI` and drops its results over the list; upload sends a local file through `NetworkAPI` and adds the url it answers with
+  - Each entry reports its own state, and the one on air reports the player; the screen no longer carries a single status light
+  - Render keeps size, anchor, colour levels and reach; Media keeps volume, range, audio origin and mute
+  - Media decoding options, redstone, contrast, saturation and overlay alpha are laid out but disabled: nothing backs them yet
+- ✨ Playback time is kept by WaterMedia now: the server runs the clock of every display and each viewer follows it, instead of the mod counting ticks and seeking to catch up
+  - The clock belongs to the media, so switching source resets the duration and the position with it
+  - Viewers correct themselves against the session several times per game tick, where the old sync only looked once every 50ms and left up to five seconds of drift alone
+  - Redstone output and the seek bar read that same clock, so a comparator and the screen never disagree anymore
+  - A session is named after the block it plays on, `waterframes:display_at_x_y_z`
+- ✨ A media that resolves into several sources fills the playlist with one entry per source, so a channel or a playlist url no longer plays only its first video
+  - Entries are flat rows; the up and down buttons move the whole media, every source of it at once
+  - An entry whose source is no longer in the media stays as the mark of what went wrong, and goes away as soon as a working one is picked
+  - Every source of a media is owned by whoever added the url
+- ✨ The display screen saves itself: edits are written half a second after the last one, and again when the screen closes, so the save button is gone
+- ✨ Display audio lives inside Minecraft's sound engine now: every display registers as a real streaming sound, `waterframes:display`
+  - The game treats it like any other sound: the Jukebox/Note Blocks slider scales it, subtitles caption it, `/stopsound` silences it, and it pans in 3D from the block it plays on
+  - Other mods can finally detect and customize it: `PlaySoundEvent` can replace or cancel it, and `PlayStreamingSourceEvent` hands audio mods (Sound Physics and alike) the real OpenAL source for filters and reverb
+  - The source stays WaterMedia's: a `SourceWrapper` channel adopts it the way `TextureWrapper` hands the GL texture to the game, with every ownership call a no-op so the engine can never stop, starve or delete a source it did not create
+  - The min/max range belongs to OpenAL now: gain holds full until min and fades linearly to silence at max, measured per audio frame against the real 3D position instead of once per game tick as a volume trick
+  - Stereo media obeys the range too: sources are force-spatialized (`AL_SOFT_source_spatialize`), so multichannel audio attenuates and pans from the block like the world sound it is
+  - Sable/Valkyrien Skies displays keep the emulated gain with a head-locked source: their distances cross sub-level projections the engine cannot measure
+  - A sound the engine lets go of re-registers itself within a second
+  - `soundEngineIntegration` client config opts back into driving the raw source like older versions; `masterVolume` has no effect while integrated, the engine always applies master on its own
+- 🛠️ Screen atlas gained the icons the tab strip and the source actions needed, in slots the old art left free
+- 🛠️ Search moved out of the source list into its own panel, with real previews, room around each result and titles that cut instead of spilling
+- 🛠️ Switches draw their track on the right of the label
+- 🛠️ Tab icons take almost the whole slot, the playlist sits 2px off the viewport frame, and every panel of the display screen carries the same one pixel frame
+- 🛠️ `@OnlyIn` is gone from the whole mod: client-only listeners sit behind `Dist.CLIENT` subscribers and the remote tooltip resolves its keybinds as components on the client
+  - Future NeoForge versions drop the runtime stripping the annotation relied on, and WaterMedia can live server-side now, so nothing depends on it anymore
+- 🛠️ Dead weight removed across WaterUI: the unused `Border` drawable, the element id lookup nothing ever called, an orphaned tick counter and the unused `PipScreen` accessors
+- 🛠️ Every colour WaterUI paints comes from the theme now: the aquatic accents, the selection, the danger pair and the chrome bands were hardcoded constants a custom theme could never touch
+  - The selected tab and the thin panel edge stopped being colours of their own: both are the panel colour by definition, so they follow it
+- 🛠️ WaterUI recalculates only what moved: text wrapping is measured once and kept until the label or its room changes, the four measurement paths of a container collapsed into one allocation-free loop, and the render path stopped copying the layer stack every frame
+- 🛠️ More dead weight out of WaterUI: the checkbox and item slot widgets nothing used, the theme withers nothing derived, container helpers without a caller and the icon stretch toggle nothing ever switched
+- 🛠️ WaterUI documents itself: the package carries an architecture guide covering the tree, layout, theming and input
+  - Theming carries its own manuals at the repo root: `WaterUI.md` walks a human through it, `WaterUI-AI.md` is the same contract as raw machine context
+- 🐛 The panel frame was a shade of the panel colour, which at one pixel thick read as no frame at all
+- 🐛 Source rows pushed their metadata into their labels every tick, and every push reflowed the whole screen even when nothing changed; a label now ignores text it already shows
+- 🐛 A media only listed its sources the first time it was added: a list saved before the media resolved never got them, because reopening the screen counted every stored entry as already expanded
+- 🐛 Picking a row flashed the previous entry's title and picture onto it, because the row read the media the display was still playing instead of its own
+- 🐛 A media player that failed while being released took the game down with it, and left the display half torn down
+- 🐛 A tab slot grew to the 20px its icon asked for and spilled it over the tab body underneath
+- 🐛 A container alignment other than STRETCH was ignored, leaving every child on its default corner; source rows read as centred and were not
+- 🐛 Source rows painted their metadata in the disabled colour instead of white, and the playlist lost the padding that kept the rows off the viewport frame
+- 🐛 Slider readouts followed the system locale: a comma-decimal system wrote `1,50` and the numeric editor refused it right back, leaving the field empty or stale
+- 🐛 A slider whose maximum sits off its step grid snapped past the end when dragged there, and the knob painted one pixel left of where the value said
+- 🐛 ESC inside a slider's numeric editor closed the whole screen instead of abandoning the edit, and numeric fields accepted `1e5`, `Infinity` and `NaN` and let them into the math
+- 🐛 ENTER never reached the screen layer, so saving the display screen and firing a search only worked from the mouse
+- 🐛 The aspect ratio buttons crashed the client while the media had no size yet: a zero side turned the ratio into NaN and the stepper refused it the hard way
+- 🐛 The loop toggle and the remote's channel buttons went stale when someone else edited the display while the screen was open
+- 🐛 WaterVision opened the stored url instead of the playlist entry actually on air
+- 🐛 A checkbox counted the box-to-text gap into its height and pinned its box to the top of a tall row; player heads drew off-centre in non-square boxes
+- 🐛 In shader mode the back of a two-sided display was lit as if it faced forward, because the back pass reused the front normal
+- 🐛 A player that swapped its GL texture mid-play left the old one registered forever; a display now owns and releases exactly what it registered
+- 🐛 A preview player that failed while being released took the sources tab down with it, the same way the main player already knew not to
+- 🐛 The scroll bar started a drag on any mouse button instead of only the left one
+- 🐛 Mono media faded and panned toward the world spawn: a raw OpenAL source sits at the origin under the default distance model, so the farther from spawn the quieter it got; integrated sources are positioned every tick and the raw fallback is listener-relative now
+- ⚙️ WaterUI: new layout API under `client.ui` with `Element`/`AbstractParent`, `Anchor` and `Spacing`
+  - Controls are named `<Name>Element`, containers `<Name>Parent`, panels `<Name>Screen`; nothing carries Android vocabulary anymore
+  - One value per axis describes the size: pixels for an exact content box, `FILL` takes the leftover of the parent, `CONTAIN` wraps the content
+    - `size(w, h)`, `size(s)`, `width(v)` and `height(v)` set it; `weight(f)` splits the leftover between several `FILL` siblings
+  - Minimums are never declared, they are computed from the content itself: text width, icon floor, children plus spacing, border and padding
+    - Shrinkable content reports less than its preference: cut-short text yields down to its ellipsis, icons scale, fields scroll
+  - Every configurator chains fluently: `element.enabled(false).shadow(true).border(4).size(20).padding(4)`
+  - Naming follows WaterMedia v3's own player UI, the layer can be extracted as a shared library later
+- ⚙️ WaterUI: `LayoutParent`, `StackParent` and `ScrollParent` replace every row, column, table and scroll of the old GUI
+- ⚙️ WaterUI: `Face`, `Theme`, `ElementTheme`, `Palette` and `Drawable` replace `ControlFormatting`, `GuiStyle`, `StyleDisplay` and `Icon`
+  - `Face` is the visual role of an element and stays internal: the widget declares it, the theme decides what it is worth
+  - `Theme` is a record: the global colours plus one `ElementTheme` per role (panel, clickable, nested, bar)
+  - `ElementTheme` is a record too: border thickness, padding, margin, icon shadow and the surfaces of that role; withers derive variants from the default
+  - An element reading a default uses it as is; setting `border(px)`, `padding(...)`, `margin(...)` or `shadow(b)` is an override on top of the theme
+  - Themes are inherited down the tree from the screen: an element with its own theme imposes it on its descendants until the next override
+  - Controls keep the neutral greys they always rendered with; the aquatic colours stay where they were, on the panel, the URL field, the playlist rows and the two remote toggles
+- ⚙️ WaterUI: `SliderElement.icon(Icon)` pins an icon to the left of the bar, inside the margin and outside the frame, so a labelled slider needs no wrapper row and the track shrinks to make room for it
+- ⚙️ WaterUI: new `SwitchElement` widget, same contract as `CheckBoxElement` drawn as a sliding track
+- ⚙️ WaterUI: widgets are event driven through suppliers and consumers
+  - Live widgets read their state through a supplier on every draw (`ToggleButtonElement`, `SwitchElement.live`, `CheckBoxElement.live`, `SeekBarElement`), so a control never shows a stale value nor waits a tick for the real one
+  - Editing widgets hold their own value, start from the real one, and report every edit through `onChange(...)`; `StepperElement`, `StateButtonElement` and `AnchorPickerElement` gained that hook
+  - `tick()` is for environment checks only: closing over a removed block, async results, enable gating
+- ⚙️ WaterUI: one reflow path: `Element.dirty()` queues the request and the screen runs a single reflow before the next frame; `relayout`, the per-screen dirty flag and the sources rebuild stopped being three different things
+- ⚙️ WaterUI: screens and tabs split construction from design: the constructor creates the widgets with their translations and icons, `init()` structures the page and sets sizes, spacing, borders and padding
+- ⚙️ WaterUI: new `ThumbnailElement` and `PlayerHeadElement` widgets, plus `TextElement.scale` and `TextElement.ellipsize`
+- ⚙️ WaterUI: new `ProgressBarElement`, the read only progress track `SeekBarElement` now extends; the upload panel reads its progress through it
+- ⚙️ WaterUI: new `ItemContainerElement`, a sunken slot drawing an item stack scaled to its box
+- ⚙️ WaterUI: panels compose their chrome with `header(title)` (title band with the close cross) and `footer(actions...)` (action band packed to the right)
+- 🛠️ Upload and search panels carry that header and footer, with room around the actions instead of rows touching each other
+- 🛠️ An open popup owns the screen: everything under it dims, stops lighting up under the cursor and keeps ignoring clicks
+- 🛠️ Panel frames are a 2px edge in the panel colour instead of a one pixel black line
+- 🛠️ More air in the popup chrome: wider header, footer and body padding, and both popups grew to keep their room
+- 🛠️ The upload path field dresses like the url field of the sources tab and matches the height of the buttons beside it
+- 🛠️ The source list opens looking at the entry on air instead of at its top
+- 🛠️ The placeholder icon of an empty thumbnail lost its drop shadow
+- ⚙️ WaterUI: `ScrollParent.focus(child)` scrolls until the child sits centred in the viewport on the next layout
+- ⚙️ WaterUI: `TextElement.lines(n)` word wraps the text over that many lines, cutting the last one; row titles use two now
+- ⚙️ WaterUI: `Element.hidden` skips painting and input but keeps the element's room, where `visible` hands it to the siblings; the status light of a row hides instead of leaving, so toggling it never reflows the list
+- ⚙️ WaterUI: new `ItemIconElement` drawing a stack as a plain icon; `ItemContainerElement` is that plus the frame and the stack decorations
+- 🛠️ Panel edges went back to one pixel, keeping the panel colour
+- 🛠️ The search list dresses like the sources list: same padding, same title scale, same two line cut
+- 🛠️ Thumbnails are 16:9 now, the shape almost every one actually arrives in
+- 🛠️ The search wait says "Searching" with dots that come and go instead of echoing the query
+- 🛠️ The block behind the display screen stands as a big emblem outside the panel, seated on its floor past the right edge, mirrored to face it and naming itself on hover
+- 🐛 A long search notice out-voted the panel width and stretched the input and the list past its edge
+- 🐛 Render and Media sliders lost the tooltips their icons used to carry in the old GUI; they sit on the whole slider now
+- 🛠️ Buttons take wider side padding from the theme so their labels breathe; icon buttons square it back on their own
+- 🛠️ Switches fill their row by default: label on the left, track pinned to the container edge
+- 🛠️ Only the media row of the playlist shows the owner head and the move and delete buttons; its expanded sources read as the immovable tail of it, and deleting the media takes all of them with it
+- 🛠️ The status light only shows on the row on air and mirrors the real pipeline: the media resolution first, then the player state, paused, stopped and no-engine included
+- 🛠️ Thumbnail preview players decode at the lowest level of detail, a picture a few pixels wide never needs full resolution
+- 🛠️ Smaller row title and owner head, the url no longer shouts over the metadata under it
+- 🛠️ The url field dropped its "Invalid URL" warning tooltip, and the add button hints "Type a query or a URL" instead of scolding
+- 🐛 Playlist rows resolved one per tick in list order, so the rows past the viewport fold sat on their raw url for seconds before their metadata arrived
+- 🐛 GL texture 0 was taken for a real frame: every player answers it before its first frame, so all of them shared one dead `dynamic_texture_0` entry that any of them could kill, spraying `FileNotFoundException` over the world and the playlist previews
+- 🐛 The buffering strip drew with the loading animation texture that does not exist yet, painting missing-texture squares over the media; it waits on the same TODO as the loading state now
+- ⚙️ WaterUI: `Element.elevation` lifts an element over its siblings, flushing the text batch so labels drawn earlier stop landing on top of it
+  - Stacked panels take one depth each, because turn order alone does not settle what covers what when the text and the rectangles of a frame travel in separate batches
+- ⚙️ WaterUI: layers can refuse the escape key with `closeable()` and take dropped files through `filesDropped(...)`
+- 🐛 A panel opened after the screen was already up came out empty, because only the layers present at init were ever built
+- 🐛 Picking a playlist row did nothing: the tile reads its url out of the list index, and only the index carries it
+- 🐛 Switching to another playlist entry kept the duration and the position of the previous one, because they belonged to the display and nothing reset them
+- 🐛 Pausing the game left the media running: the client stopped ticking before it could notice, and resuming was never wired at all
+- ⚙️ WaterUI: `SeekBarElement` works in milliseconds off the player instead of ticks off the display, and `ValueFormat.TICK_DURATION` became `DURATION`
+- ⚙️ DisplayData: a playlist is a list of `Entry(url, source, owner)` in `playlist`, picked by `entryIndex`; `urls`, `urlOwners` and `urlIndex` are gone
+  - A line of the stored list is `url`, `url<TAB>owner` or `url<TAB>owner<TAB>source`, so a playlist written by an older build reads back unchanged
+  - `getSource()` answers which source of the media plays, `entry()` the whole entry, and `moveMedia(list, index, delta)` reorders by media instead of by row
+  - `composePlaylist`/`decomposePlaylist` replace `WaterFrames.composeUrlList`/`decomposeUrlList`/`decomposeUrlOwners`
+  - `tick` and `tickMax` are gone from the data and from the NBT: the clock is not display state anymore
+  - `setUrls` and `isPlaylist` are gone, nothing ever called them
+- ⚙️ DisplayData: saves are partial now — `sync` applies only the keys present in the tag, with every clamp, permission and capability gate intact
+  - `DisplayData.patch(tile)` builds a fluent diff against the live data: each setter writes its key only when the value differs, so a save ships only what changed
+  - Capability gated setters are no-ops on tiles lacking the capability, the screen calls them unconditionally
+  - `listTag(playlist, index)` composes the playlist packet; the screen stopped assembling `uri_list`/`uri_index` by hand
+  - New constants `WIDTH`, `HEIGHT`, `POS_X`, `POS_Y` and `VISIBLE`; width/height and their anchor travel independently, the server reads the missing half from current data
+  - World `save`/`load` still write and read the full tag, older `data_v` versions load unchanged
+- 🛠️ The display screen reports edits as events and debounces them, instead of snapshotting every widget into a full tag each tick to diff it
+- 🐛 A sync tag missing a key reset that field to its NBT default: partial packets silently turned displays off and wiped their toggles
+- 🐛 A save denied by the whitelist still marked the tile dirty on the server
+- 🐛 Source rows opened showing the raw url and picked their metadata up one tick later, even when the media already knew it
+- 🐛 Every keystroke in the url field was handed to the media api as a whole url, spawning a doomed fetch job per typed prefix that dumped its stacktrace into the log; only text parsing as an absolute URI reaches the api now
+- 🐛 `load` fell back to the alpha value when the brightness key was absent
+- ⚙️ DisplayTile: `clock()` is the server side session, `follower()` the player that follows it on a client, and `cleanClock()` drops a session so the next tick opens a fresh one
+  - `syncTime`, `fastFoward` and `rewind` are gone; seeking is a session command and travels as one, `MediaPlayer.seek`/`skipTime` on the follower
+- ⚙️ Network: new `MediaSyncPacket` carries WaterMedia's own session traffic both ways, keyed by block position
+  - `TimePacket` is gone and `PausePacket` swapped its tick for a rewind flag, which is what the stop button always meant
+  - Protocol version bumped, older clients are rejected while joining
+- 🐛 A row of a scrolling list could out-vote the viewport with its own intrinsic width, pushing whatever sat on its right off the panel
+- 🐛 WaterUI: a weighted row lost a pixel whenever the leftover did not divide evenly between its children, showing a sliver of the parent at the end of the row
+- 🐛 WaterUI: `ScrollParent` claimed the whole space it was offered, which pushed every parent past the screen edge and could not be undone, since a container cannot shrink below what its children ask for
+- ⚙️ Geometry: own `AlignedBox`, `Facing`, `Axis`, `BoxFace` and `BoxCorner` in `common.util.geo`, built on `Direction`/`AABB`/`VoxelShape` instead of CreativeCore
+  - Verified against the old implementation over 500 random boxes plus every face and corner, with no differences
+- ⚙️ Network: `CreativeNetwork`/`CreativePacket` replaced by `CustomPacketPayload` + `StreamCodec` + `PayloadRegistrar`
+  - The `bounce` flag is gone from the wire, it was always true and only guarded CreativeCore's own recursion
+  - Packets are records now, one class per payload with its own codec
+- 🛠️ Display GUIs open from a server sent packet after the permission check, instead of building a screen on the server
+  - Dedicated servers no longer load a single UI class
+- 🛠️ Removed the server side branches of every screen, they only existed to keep the server copy alive
+- 🛠️ Removed the mixin config, the mod has no mixins left after the WaterMedia and CreativeCore migrations
+
+# 📦 UPDATE 2.2.0-beta.7
+- ✨ Updated to support WaterMedia v3.0.0.23 and Multimedia Binaries v3.0.0.6
+- ⚙️ MediaAPI: `getMRL(String)` calls replaced by `mrl(String)`
+- ⚙️ MRL: `videoSource()`/`imageSource()` replaced by `sourceByType(MediaType)`
+- ⚙️ MRL.Source: `isVideo()`/`isImage()` replaced by comparing `type()` against `MediaType`
+- ⚙️ Removed the `RenderAPI` redirect mixin, v3 dropped that API and `GLEngine` now saves and restores the GL state on its own
+- 🛠️ Engines are built through `MediaAPI.glEngine`/`alEngine` instead of the removed engine builders
+- 🛠️ NeoForge 1.21.1 branch rebased on top of the WaterMedia v3 line, every v3 change is now shared by both branches
+- 🛠️ Build migrated to Gradle 9.6.1 with ModDevGradle 2, NeoForge 21.1.244 and Parchment 2024.11.17
+- 🐛 Fixed the reload button doing nothing on both the display and the playlist screens
+- 🐛 Fixed the status tooltip reporting "Loading" while the media was already loaded and never reporting failures
+- 🐛 Fixed the status icon showing an error during the normal fetch of a source
+- 🐛 Added the missing `waterframes.status.no_engine` translations
+
 # UPDATE 2.2.0-beta.6
 - ✨ Updated to support WaterMedia v3 Beta 18
 
