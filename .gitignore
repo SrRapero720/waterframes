@@ -36,3 +36,6 @@ runs/*
 /Users/
 
 !/gradle/wrapper/gradle-wrapper.jar
+
+# Claude memory
+MEMORY.md
