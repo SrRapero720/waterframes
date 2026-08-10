@@ -1,0 +1,43 @@
+// SOURCE ENTRY ROW — ONE PLAYLIST LINE STAMPED PER KEY BY THE sources/list ParentList (§10.6).
+// LIVE vars READ THE ROW MODEL (SourceRow); BAKED vars AND EVENTS COME FROM DisplayScreen.
+// THE GENERATED ListRow ALREADY CARRIES face NESTED + border 1, SO THE ROOT ONLY SHAPES ITS LAYOUT.
+import "constants/icons"
+
+// ---- LIVE CONTRACT: THE ROW MODEL FEEDS THESE PER TICK ----
+var String title
+var String byline
+var String duration
+var String thumbnail
+
+// ---- BAKED CONTRACT: SUPPLIED PER ROW BY DisplayScreen.baked(key) ----
+final var String key
+final var media
+final var String uuid
+final var thumb_size
+final var title_scale
+final var row_inset
+
+// select LIVES ON THE CONTENT AND THE GRIP TAP, NOT THE ROOT: A PRESS ON THE REMOVE BUTTON MUST NEVER SELECT.
+// dragThumbId HANDS THE GRIP TO THE LIST'S INTEGRATED DRAG (§10.6); ITS onClick FIRES ONLY ON A TAP
+root[orientation=HORIZONTAL, align=CENTER, spacing=2, width=FILL, margin=row_inset,
+     dragThumbId=grip, onRightClick=openUri(key)]
+
+// GRAB THUMB: HOLD IT TO DRAG THE ROW, TAP IT TO SELECT. HIDDEN ON SUB-SOURCES, WHOSE COLUMN COLLAPSES
+Icon[id="grip", icon=icon_drag_thumb, width=10, height=FILL, visible=media, onClick=select(key)]
+
+// PICTURE WITH THE OWNER HEAD AS A WATERMARK AND THE DURATION RIDING ITS BOTTOM-LEFT CORNER
+Frame[width=thumb_size, height=thumb_size, face=field, onClick=select(key)] {
+    Thumbnail[anchor=STRETCH, source=thumbnail, fallback=icon_videoplayer]
+    PlayerHead[anchor=RIGHT|BOTTOM, uuid=uuid, width=12, height=12, visible=media]
+    Text[anchor=LEFT|BOTTOM, component=duration, fontScale=0.5]
+}
+
+// TITLE OVER THE BYLINE, CENTRED IN THE ROW HEIGHT; A SUB-SOURCE DROPS THE BYLINE AND SHRINKS ITS TITLE
+Parent[orientation=VERTICAL, width=FILL, justify=CENTER, spacing=1, onClick=select(key)] {
+    Text[component=title, fontScale=title_scale, ellipsize=true, lines=2, width=FILL]
+    Text[component=byline, fontScale=0.5, ellipsize=true, width=FILL, visible=media]
+}
+
+// ONLY THE MEDIA HEAD CARRIES THE REMOVE ACTION; A GROUP GOES AWAY WHOLE FROM ITS HEAD
+Button[width=16, height=16, icon=icon_remove, visible=media, onClick=remove(key),
+       tooltip="translatable:waterframes.gui.source.remove"]

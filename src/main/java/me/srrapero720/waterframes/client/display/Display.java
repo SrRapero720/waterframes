@@ -1,7 +1,6 @@
 package me.srrapero720.waterframes.client.display;
 
 import me.srrapero720.waterframes.*;
-import me.srrapero720.waterframes.client.rendering.TextureWrapper;
 import me.srrapero720.waterframes.client.sound.DisplaySound;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.media.DisplayBridge;
@@ -12,24 +11,23 @@ import org.watermedia.api.media.engines.SFXEngine;
 import org.watermedia.api.media.players.MediaPlayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.sounds.SoundSource;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.lwjgl.openal.AL10;
-import org.watermedia.api.util.MediaType;
 
-import java.util.function.Supplier;
-
-public class Display {
+public class Display extends AbstractTexture {
     private static final Marker IT = MarkerManager.getMarker("Display");
-
-    // ENGINE FACTORIES - ONE INSTANCE PER PLAYER; THE GL ONE IS PINNED TO MINECRAFT'S RENDER THREAD
-    private static final Supplier<GFXEngine> GFX_ENGINE = () -> MediaAPI.glEngine(Minecraft.getInstance().gameThread, Minecraft.getInstance());
-    private static final Supplier<SFXEngine> SFX_ENGINE = MediaAPI::alEngine;
 
     // MEDIA AND DATA
     private MediaPlayer mediaPlayer;
+    // ENGINES ARE EXCLUSIVE TO THIS DISPLAY: BUILT INSIDE THE PLAYER SUPPLIERS (INVOKED AT MOST
+    // ONCE) AND OWNED BY THE PLAYER FROM BIRTH, SO RELEASING THE PLAYER FREES THEM TOO
+    private GFXEngine gfx;
+    private SFXEngine sfx;
     private MRL.Source currentSource;
     private final DisplayTile tile;
     /** Which source of the media this player opened; the playlist entry decides it. */
@@ -40,9 +38,8 @@ public class Display {
     private int currentVolume = 0;
     private boolean released = false;
 
-    // TEXTURE REGISTRATION, OWNED PER DISPLAY SO EVERY ID THIS VIEWER REGISTERS IS RELEASED WITH IT
-    private int glTexture = -1;
-    private ResourceLocation glLocation;
+    // TEXTURE REGISTRATION, THE DISPLAY IS THE TEXTURE: ONE LOCATION PER BLOCK POSITION FOR ITS WHOLE LIFE
+    private final ResourceLocation location;
 
     // SOUND REGISTRATION, THE AL SOURCE ADOPTED BY MINECRAFT'S ENGINE THE WAY THE TEXTURE IS
     private DisplaySound sound;
@@ -51,6 +48,9 @@ public class Display {
     public Display(DisplayTile tile) {
         this.tile = tile;
         this.sourceIndex = tile.data.getSource();
+        // THE BLOCK POSITION IS THE DISPLAY'S IDENTITY, THE TEXTURE REGISTERS UNDER THE SAME NAME AS THE SESSION
+        this.location = DisplayBridge.session(tile.getBlockPos());
+        DisplaysRegistry.registerTexture(this.location, this);
         DisplayList.add(this);
         this.openPlayer();
     }
@@ -67,7 +67,9 @@ public class Display {
 
         // THE BRIDGE MAKES THIS PLAYER A FOLLOWER OF THE SERVER SESSION: TIME, PLAY STATE AND LOOP
         // ARRIVE FROM THERE, AND THE DRIFT CORRECTION IS WATERMEDIA'S FROM HERE ON
-        this.mediaPlayer = MediaAPI.createPlayer(tile.mrl, sourceIndex, GFX_ENGINE, SFX_ENGINE,
+        this.mediaPlayer = MediaAPI.createPlayer(tile.mrl, sourceIndex,
+                () -> this.gfx = MediaAPI.glEngine(Minecraft.getInstance().gameThread, Minecraft.getInstance()),
+                () -> this.sfx = MediaAPI.alEngine(),
                 new DisplayBridge(tile.getLevel(), tile.getBlockPos()));
 
         if (this.mediaPlayer == null) {
@@ -104,37 +106,9 @@ public class Display {
         return this.mediaPlayer;
     }
 
-    /**
-     * Gets the current source being played.
-     */
-    public MRL.Source getSource() {
-        return this.currentSource;
-    }
-
     /** Index of that source inside the media, which is what the playlist entry pointed at. */
     public int sourceIndex() {
         return this.sourceIndex;
-    }
-
-    /**
-     * Gets the number of available sources in the MRL.
-     */
-    public int getSourceCount() {
-        return tile.mrl != null ? tile.mrl.sourceCount() : 0;
-    }
-
-    /**
-     * Checks if the current source is a video.
-     */
-    public boolean isVideo() {
-        return this.currentSource != null && this.currentSource.type() == MediaType.VIDEO;
-    }
-
-    /**
-     * Checks if the current source is an image.
-     */
-    public boolean isImage() {
-        return this.currentSource != null && this.currentSource.type() == MediaType.IMAGE;
     }
 
     // =========================================================================
@@ -156,18 +130,18 @@ public class Display {
     }
 
     public ResourceLocation textureId() {
-        int texture = texture();
-        if (texture == -1) return null;
-
-        // A PLAYER MAY SWAP ITS GL TEXTURE MID-PLAY; RE-REGISTER AND DROP THE STALE ID
-        if (texture != this.glTexture) {
-            if (this.glLocation != null) DisplaysRegistry.unregisterTexture(this.glLocation);
-            this.glTexture = texture;
-            this.glLocation = WaterFrames.asResource(texture);
-            DisplaysRegistry.registerTexture(this.glLocation, new TextureWrapper(texture));
-        }
-        return this.glLocation;
+        return this.texture() == -1 ? null : this.location;
     }
+
+    // MINECRAFT'S ENGINE ADOPTS THIS TEXTURE BUT THE MEDIA PLAYER OWNS THE GL ID; NOTHING HERE
+    // ALLOCATES OR FREES, AND A PLAYER SWAPPING ITS TEXTURE MID-PLAY IS PICKED UP LIVE
+    @Override public int getId() {
+        return Math.max(this.texture(), 0);
+    }
+
+    @Override public void load(ResourceManager manager) { /* NO OP */ }
+    @Override public void releaseId() { /* NO OP */ }
+    @Override public void close() { /* NO OP */ }
 
     public long time() {
         return this.mediaPlayer != null ? this.mediaPlayer.time() : 0;
@@ -324,12 +298,7 @@ public class Display {
             this.mediaPlayer = null;
         }
 
-        if (this.glLocation != null) {
-            DisplaysRegistry.unregisterTexture(this.glLocation);
-            this.glLocation = null;
-            this.glTexture = -1;
-        }
-
+        DisplaysRegistry.unregisterTexture(this.location);
         this.currentSource = null;
         DisplayList.remove(this);
     }
@@ -381,7 +350,4 @@ public class Display {
         return volume;
     }
 
-    public enum Mode {
-        VIDEO, PICTURE, AUDIO
-    }
 }

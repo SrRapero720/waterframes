@@ -18,8 +18,8 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
-import team.creative.creativecore.common.util.math.base.Facing;
-import team.creative.creativecore.common.util.math.box.AlignedBox;
+import me.srrapero720.waterframes.common.util.geo.Facing;
+import me.srrapero720.waterframes.common.util.geo.AlignedBox;
 
 @SuppressWarnings({"deprecation", "null"})
 @MethodsReturnNonnullByDefault
@@ -48,7 +48,7 @@ public class ProjectorBlock extends DisplayBlock {
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         Direction direction = state.getValue(getFacing());
-        Facing facing = Facing.get(direction);
+        Facing facing = Facing.of(direction);
         var box = new AlignedBox();
 
         // fit projector model height
@@ -56,15 +56,15 @@ public class ProjectorBlock extends DisplayBlock {
 
         // fit projector thickness
         float blockThickness = 4f / 16f;
-        box.setMin(facing.axis, blockThickness);
-        box.setMax(facing.axis, 1 - blockThickness);
+        box.min(facing.axis, blockThickness);
+        box.max(facing.axis, 1 - blockThickness);
 
         // fit anchor of it
-        Facing clockWise = Facing.get(direction.getClockWise());
-        box.setMin(clockWise.axis, 1f / 16f);
-        box.setMax(clockWise.axis, 15f / 16f);
+        Facing clockWise = Facing.of(direction.getClockWise());
+        box.min(clockWise.axis, 1f / 16f);
+        box.max(clockWise.axis, 15f / 16f);
 
-        return box.voxelShape();
+        return box.shape();
     }
 
     @Override

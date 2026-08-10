@@ -1,0 +1,28 @@
+// SEARCH PANEL — HEADER, BODY AND FOOTER BANDS AUTHORED HERE; JAVA ONLY WIRES BEHAVIOUR.
+// A DIALOG IS AN OPENING MODE, NOT A FILE KIND: THIS IS A PLAIN DOCUMENT (§13.1).
+theme "waterui"
+import "constants/icons"
+
+root[frame=EDGE, spacing=0, padding=0]
+
+// TITLE BAND WITH THE DISMISS CROSS
+Parent[orientation=HORIZONTAL, width=FILL, height=20, align=CENTER, spacing=2, padding={6, 4}, face=field] {
+    Text[width=FILL, component="translatable:waterframes.gui.search.title"]
+    Button[width=16, height=16, icon=icon_remove, tooltip="translatable:waterframes.gui.search.close", onClick=close()]
+}
+
+// QUERY, NOTICE AND THE SCROLLING RESULT LIST
+Parent[orientation=VERTICAL, width=FILL, height=FILL, spacing=2, padding=6, align=STRETCH] {
+    Parent[orientation=HORIZONTAL, width=FILL, spacing=2, align=CENTER] {
+        InputText[id="search/query", width=FILL, height=18, suggestion="translatable:waterframes.gui.search.hint"]
+        Button[id="search/run", width=18, height=18, icon=icon_search, tooltip="translatable:waterframes.gui.source.search", onClick=search()]
+    }
+    Text[id="search/notice", width=FILL, ellipsize=true, component="translatable:waterframes.gui.search.empty"]
+    ParentList[id="search/results", entry="dialogs/search_result", spacing=2, scrollY=true, width=FILL, height=FILL, face=nested]
+}
+
+// ACTION BAND
+Parent[orientation=HORIZONTAL, width=FILL, height=22, align=CENTER, spacing=4, padding={6, 4}, face=field] {
+    Spacer[width=FILL, height=FILL]
+    Button[component="translatable:waterframes.gui.search.close", onClick=close()]
+}

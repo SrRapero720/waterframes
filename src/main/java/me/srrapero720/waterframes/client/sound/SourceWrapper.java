@@ -9,10 +9,10 @@ import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.SOFTSourceSpatialize;
 
 /**
- * A {@link Channel} over an OpenAL source owned by WaterMedia, the audio twin of
- * {@code TextureWrapper}: the game and audio mods drive gain, pitch, position and filters on the
- * real source, while every ownership operation is a no-op so the engine can never stop, starve
- * or delete a source it did not create.
+ * A {@link Channel} over an OpenAL source owned by WaterMedia, the audio twin of the display
+ * texture: the game and audio mods drive gain, pitch, position and filters on the real source,
+ * while every ownership operation is a no-op so the engine can never stop, starve or delete a
+ * source it did not create.
  */
 public class SourceWrapper extends Channel {
     // WITHOUT SPATIALIZE SUPPORT STEREO MEDIA IGNORES 3D ATTENUATION ENTIRELY; CALLERS MUST FALL

@@ -1,0 +1,40 @@
+// UPLOAD PANEL — HEADER, BODY AND FOOTER BANDS AUTHORED HERE; JAVA ONLY WIRES BEHAVIOUR.
+// A DIALOG IS AN OPENING MODE, NOT A FILE KIND: THIS IS A PLAIN DOCUMENT (§13.1).
+theme "waterui"
+import "constants/icons"
+
+// closeable GATES THE DISMISS BUTTONS WHILE AN UPLOAD IS IN FLIGHT
+var closeable
+var path_visible
+var progress_visible
+var browse_enabled
+var confirm_enabled
+var path_enabled
+var long progress_value
+
+root[frame=EDGE, spacing=0, padding=0]
+
+// TITLE BAND WITH THE DISMISS CROSS
+Parent[orientation=HORIZONTAL, width=FILL, height=20, align=CENTER, spacing=2, padding={6, 4}, face=field] {
+    Text[id="upload/title", width=FILL, component="translatable:waterframes.gui.upload.title"]
+    Button[id="upload/close", width=16, height=16, icon=icon_remove, tooltip="translatable:waterframes.gui.search.close", enabled=closeable, onClick=close()]
+}
+
+// PATH FIELD AND THE PROGRESS BAR IT SWAPS WITH, PARKED IN THE VERTICAL MIDDLE
+Parent[orientation=VERTICAL, width=FILL, height=FILL, spacing=2, padding=6, align=CENTER] {
+    Spacer[width=FILL, height=FILL]
+    Parent[orientation=HORIZONTAL, width=FILL, spacing=2, align=CENTER] {
+        InputText[id="upload/path", width=FILL, height=15, border=1, face=field, outline=accentBorder,
+                  suggestion="translatable:waterframes.gui.upload.path", visible=path_visible, enabled=path_enabled]
+        ProgressBar[id="upload/progress", width=FILL, height=11, value=progress_value, max=100, format=PERCENT, visible=progress_visible]
+        Button[id="upload/browse", component="translatable:waterframes.gui.upload.browse", onClick=browse(), enabled=browse_enabled]
+    }
+    Spacer[width=FILL, height=FILL]
+}
+
+// ACTION BAND
+Parent[orientation=HORIZONTAL, width=FILL, height=22, align=CENTER, spacing=4, padding={6, 4}, face=field] {
+    Spacer[width=FILL, height=FILL]
+    Button[id="upload/cancel", component="translatable:waterframes.gui.upload.cancel", enabled=closeable, onClick=close()]
+    Button[id="upload/confirm", component="translatable:waterframes.gui.upload.upload", onClick=confirm(), enabled=confirm_enabled]
+}

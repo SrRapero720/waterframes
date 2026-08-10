@@ -4,13 +4,13 @@ import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.item.RemoteControl;
-import me.srrapero720.waterframes.common.screens.DisplayScreen;
 import net.minecraft.ChatFormatting;
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -34,14 +34,12 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
 import org.joml.Vector3f;
-import team.creative.creativecore.common.gui.GuiLayer;
-import team.creative.creativecore.common.gui.creator.BlockGuiCreator;
-import team.creative.creativecore.common.gui.creator.GuiCreator;
+import me.srrapero720.waterframes.common.network.DisplayNetwork;
 
 @SuppressWarnings("deprecation")
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
-public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCreator, SimpleWaterloggedBlock {
+public abstract class DisplayBlock extends BaseEntityBlock implements SimpleWaterloggedBlock {
 
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
@@ -68,11 +66,6 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
 
     public PermissionNode<Boolean> getPermissionNode() {
         return DisplaysRegistry.PERM_DISPLAYS_INTERACT;
-    }
-
-    @Override
-    public GuiLayer create(CompoundTag tag, Level level, BlockPos blockPos, BlockState blockState, Player player) {
-        return level.getBlockEntity(blockPos) instanceof DisplayTile tile ? new DisplayScreen(tile) : null;
     }
 
     @Override
@@ -109,13 +102,17 @@ public abstract class DisplayBlock extends BaseEntityBlock implements BlockGuiCr
             }
         }
 
-        if (!level.isClientSide && DisplaysConfig.canInteractBlock(player, this)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        if (player instanceof ServerPlayer server && DisplaysConfig.canInteractBlock(player, this)) {
+            DisplayNetwork.openScreen(server, pos, false);
+        }
         return ItemInteractionResult.SUCCESS;
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (!level.isClientSide && DisplaysConfig.canInteractBlock(player, this)) GuiCreator.BLOCK_OPENER.open(player, pos);
+        if (player instanceof ServerPlayer server && DisplaysConfig.canInteractBlock(player, this)) {
+            DisplayNetwork.openScreen(server, pos, false);
+        }
         return InteractionResult.SUCCESS;
     }
 

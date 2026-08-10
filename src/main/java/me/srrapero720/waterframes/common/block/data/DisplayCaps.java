@@ -5,8 +5,8 @@ import me.srrapero720.waterframes.common.block.TVBoxBlock;
 import me.srrapero720.waterframes.common.block.TvBlock;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.core.Direction;
-import team.creative.creativecore.common.util.math.base.Facing;
-import team.creative.creativecore.common.util.math.box.AlignedBox;
+import me.srrapero720.waterframes.common.util.geo.Facing;
+import me.srrapero720.waterframes.common.util.geo.AlignedBox;
 
 public record DisplayCaps(boolean renderBehind, boolean projects, boolean resizes, float growSize, DisplayGrowMax growMax, Display2BoolFunction invertedFace, BoxFunction box) {
 

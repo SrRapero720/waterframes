@@ -1,0 +1,66 @@
+{
+  "text": "#FFFFFFFF",
+  "textDisabled": "#FFA0A0A0",
+  "accent": { "color": "#FF62AF44" },
+  "accentBorder": { "color": "#FFFFFFFF" },
+  "disabledOverlay": { "color": "#66000000" },
+  "field": { "color": "#72000000" },
+  "fieldHover": { "color": "#99464646" },
+  "selection": { "color": "#3FFFFFFF" },
+  "danger": { "color": "#FF962828" },
+  "dangerBorder": { "color": "#FFFF5555" },
+  "panel": {
+    "border": 1,
+    "padding": 5,
+    "shadow": true,
+    "outline": { "color": "#FF000000" },
+    "face": { "color": "#FF1E1E1E" }
+  },
+  "clickable": {
+    "border": 0,
+    "padding": [6, 2],
+    "shadow": true,
+    "face": { "sprite": "widget/button" },
+    "hover": { "sprite": "widget/button_highlighted" }
+  },
+  "nested": {
+    "border": 0,
+    "padding": 2,
+    "shadow": true,
+    "face": { "sprite": "widget/text_field" }
+  },
+  "bar": {
+    "border": 1,
+    "shadow": true,
+    "outline": { "sprite": "widget/slider" }
+  },
+  "toggle": {
+    "trackWidth": 20,
+    "trackHeight": 10,
+    "border": 1,
+    "gap": 3,
+    "slideMs": 0,
+    "thumbWidth": 8,
+    "thumbHeight": 10,
+    "outline": { "sprite": "widget/slider" },
+    "on": { "color": "#FF62AF44" },
+    "thumb": { "sprite": "widget/slider_handle" },
+    "thumbHover": { "sprite": "widget/slider_handle_highlighted" }
+  },
+  "slider": {
+    "height": 10,
+    "knobWidth": 8,
+    "track": { "sprite": "widget/slider" },
+    "knob": { "sprite": "widget/slider_handle" },
+    "knobHover": { "sprite": "widget/slider_handle_highlighted" }
+  },
+  "progress": {
+    "height": 14,
+    "fill": { "color": "#FF62AF44" }
+  },
+  "scroll": {
+    "width": 6,
+    "track": { "sprite": "widget/scroller_background" },
+    "thumb": { "sprite": "widget/scroller" }
+  }
+}

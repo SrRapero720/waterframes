@@ -1,0 +1,10 @@
+// REDSTONE TAB — RESERVED, NOTHING WIRED YET; FULLY STATIC.
+// ROOT PREFS SHAPE THE AUTO-GENERATED TAB BODY (§6.1, §10.3): tabIcon/tabTooltip GO TO THE STRIP, THE REST IS LAYOUT.
+import "constants/icons"
+
+root[tabIcon=icon_redstone, tabTooltip="translatable:waterframes.gui.tab.redstone",
+     orientation=VERTICAL, align=STRETCH, width=FILL, height=FILL, spacing=4]
+
+Spacer[width=FILL, height=FILL]
+Text[component="translatable:waterframes.gui.tab.redstone.empty", align=CENTER]
+Spacer[width=FILL, height=FILL]

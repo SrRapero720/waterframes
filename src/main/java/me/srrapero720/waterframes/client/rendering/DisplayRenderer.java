@@ -1,7 +1,6 @@
 package me.srrapero720.waterframes.client.rendering;
 
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.blaze3d.vertex.Tesselator;
 import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
@@ -16,11 +15,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import team.creative.creativecore.common.util.math.base.Axis;
-import team.creative.creativecore.common.util.math.base.Facing;
-import team.creative.creativecore.common.util.math.box.AlignedBox;
-import team.creative.creativecore.common.util.math.box.BoxCorner;
-import team.creative.creativecore.common.util.math.box.BoxFace;
+import me.srrapero720.waterframes.common.util.geo.Axis;
+import me.srrapero720.waterframes.common.util.geo.Facing;
+import me.srrapero720.waterframes.common.util.geo.AlignedBox;
+import me.srrapero720.waterframes.common.util.geo.BoxCorner;
+import me.srrapero720.waterframes.common.util.geo.BoxFace;
 
 import java.util.function.Function;
 
@@ -31,10 +30,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         return RenderType.create("block_translucent_cull_custom_texture", DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 256, true, true, rendertype$compositestate);
     });
 
-    private final BlockEntityRendererProvider.Context context;
-    public DisplayRenderer(BlockEntityRendererProvider.Context context) {
-        this.context = context;
-    }
+    public DisplayRenderer(BlockEntityRendererProvider.Context context) {}
 
     @Override
     public boolean shouldRenderOffScreen(DisplayTile tile) {
@@ -49,7 +45,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
     @Override
     public AABB getRenderBoundingBox(DisplayTile tile) {
-        return tile.getRenderBox().getBB(tile.getBlockPos());
+        return tile.getRenderBox().aabb(tile.getBlockPos());
     }
 
     @Override
@@ -60,18 +56,15 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
         var direction = tile.getDirection();
         var box = tile.getRenderBox();
         var invertedFace = tile.caps.invertedFace(tile);
-        var boxFace = BoxFace.get(Facing.get(invertedFace ? direction.getOpposite() : direction));
+        var boxFace = BoxFace.of(Facing.of(invertedFace ? direction.getOpposite() : direction));
         var facing = boxFace.facing;
-        packedLight = LightTexture.FULL_BRIGHT;
-
 
         boolean front = !tile.caps.projects() || tile.data.renderBothSides;
         boolean back = tile.caps.projects() || tile.data.renderBothSides;
         boolean flipX = tile.caps.projects() != tile.data.flipX;
         boolean flipY = tile.data.flipY;
-        int r, b, g;
-        r = g = b = tile.data.brightness;
-        int a = tile.data.alpha;
+        int brightness = tile.data.brightness;
+        int alpha = tile.data.alpha;
 
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
@@ -80,90 +73,85 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
         // TWEAK FOR "EXTRA-RESIZING"
         if (tile.caps.growMax(tile, facing, invertedFace)) {
-            box.setMax(facing.axis,box.getMax(facing.axis) + tile.caps.growSize());
+            box.max(facing.axis, box.max(facing.axis) + tile.caps.growSize());
         } else {
-            box.setMin(facing.axis, box.getMin(facing.axis) - tile.caps.growSize());
+            box.min(facing.axis, box.min(facing.axis) - tile.caps.growSize());
         }
 
         // RENDERING
         if (display.isLoading()) {
             // TODO: Loading animation rendering
-//            this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing, packedLight, packedOverlay,
-//                    front, back, flipX, flipY, r, g, b, a, WaterFrames.LOADING_ANIMATION);
+//            this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing,
+//                    front, back, flipX, flipY, brightness, alpha, WaterFrames.LOADING_ANIMATION);
         } else if (display.canRender()) {
             var tex = display.textureId();
             if (tex != null) {
-                this.vertex(pose, bufferSource, box, boxFace, facing, packedLight, packedOverlay,
-                        front, back, flipX, flipY, r, g, b, a, tex);
+                this.vertex(pose, bufferSource, box, boxFace, facing,
+                        front, back, flipX, flipY, brightness, alpha, tex);
             }
 
-            if (display.isBuffering()) {
-                this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing, packedLight, packedOverlay,
-                        front, back, flipX, flipY, r, g, b, a, WaterFrames.LOADING_ANIMATION);
-            }
+            // TODO: Buffering strip waits on the same loading animation; the texture behind
+            //  WaterFrames.LOADING_ANIMATION does not exist yet and rendered as missing squares
+//            if (display.isBuffering()) {
+//                this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing,
+//                        front, back, flipX, flipY, brightness, alpha, WaterFrames.LOADING_ANIMATION);
+//            }
         }
 
         pose.popPose();
     }
 
-    public void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing, int packedLight, int packedOverlay,
-                       boolean front, boolean back, boolean flipX, boolean flipY, int r, int g, int b, int a, ResourceLocation texture) {
+    private void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing,
+                        boolean front, boolean back, boolean flipX, boolean flipY, int brightness, int alpha, ResourceLocation texture) {
 
         VertexConsumer builder = source.getBuffer(DisplaysConfig.shaderMode() ? RenderType.entityTranslucentCull(texture) : BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE.apply(texture));
+        Vec3i normal = facing.normal;
         if (front) {
-            for (int i = 0; i < boxface.corners.length; i++) {
-                BoxCorner corner = boxface.corners[i];
-                this.vertex(pose, builder, box, boxface, corner, facing, packedLight, packedOverlay, flipX, flipY, r, g, b, a);
+            for (BoxCorner corner: boxface.corners) {
+                this.vertex(pose, builder, box, boxface, corner, normal.getX(), normal.getY(), normal.getZ(), flipX, flipY, brightness, alpha);
             }
         }
         if (back) {
             for (int i = boxface.corners.length - 1; i >= 0; i--) {
-                BoxCorner corner = boxface.corners[i];
-                this.vertex(pose, builder, box, boxface, corner, facing, packedLight, packedOverlay, flipX, flipY, r, g, b, a);
+                this.vertex(pose, builder, box, boxface, boxface.corners[i], -normal.getX(), -normal.getY(), -normal.getZ(), flipX, flipY, brightness, alpha);
             }
         }
     }
 
-    public void vertex(PoseStack pose, VertexConsumer builder, AlignedBox box, BoxFace boxface, BoxCorner corner, Facing facing, int packedLight, int packedOverlay, boolean flipX, boolean flipY, int r, int g, int b, int a) {
-        Vec3i normal = facing.normal;
-        builder.addVertex(pose.last().pose(), box.get(corner.x), box.get(corner.y), box.get(corner.z))
-                .setColor(r, g, b, a)
-                .setUv(corner.isFacing(boxface.getTexU()) != flipX ? 1f : 0f, corner.isFacing(boxface.getTexV()) != flipY ? 1f : 0f)
+    private void vertex(PoseStack pose, VertexConsumer builder, AlignedBox box, BoxFace boxface, BoxCorner corner,
+                        int nx, int ny, int nz, boolean flipX, boolean flipY, int brightness, int alpha) {
+        builder.addVertex(pose.last().pose(), box.edge(corner.x), box.edge(corner.y), box.edge(corner.z))
+                .setColor(brightness, brightness, brightness, alpha)
+                .setUv(corner.faces(boxface.texU) != flipX ? 1f : 0f, corner.faces(boxface.texV) != flipY ? 1f : 0f)
                 .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(packedLight)
-                .setNormal(pose.last(), normal.getX(), normal.getY(), normal.getZ());
+                .setLight(LightTexture.FULL_BRIGHT)
+                .setNormal(pose.last(), nx, ny, nz);
     }
 
-    public AlignedBox getLoadingBox(DisplayTile tile, AlignedBox parent, Facing facing) {
+    private AlignedBox getLoadingBox(DisplayTile tile, AlignedBox parent, Facing facing) {
         AlignedBox box = new AlignedBox(parent);
 
         Axis one = facing.one();
         Axis two = facing.two();
+        float width = box.size(one);
+        float height = box.size(two);
 
-        float width = box.getSize(one);
-        float height = box.getSize(two);
-
-        if (width > height) {
-            float subtracts = ((width - height) / 2f);
-            float marginSubstract = height / 4;
-            box.setMin(one, (box.getMin(one) + subtracts) + marginSubstract);
-            box.setMax(one, (box.getMax(one) - subtracts) - marginSubstract);
-            box.setMin(two, box.getMin(two) + marginSubstract);
-            box.setMax(two, box.getMax(two) - marginSubstract);
-        } else if (height > width) {
-            float subtracts = ((height - width) / 2f);
-            float marginSubstract = width / 4;
-            box.setMin(two, (box.getMin(two) + subtracts) + marginSubstract);
-            box.setMax(two, (box.getMax(two) - subtracts) - marginSubstract);
-            box.setMin(one, box.getMin(one) + marginSubstract);
-            box.setMax(one, box.getMax(one) - marginSubstract);
+        // SPINNER IS SQUARED TO THE SHORT SIDE AND KEEPS A QUARTER OF IT AS MARGIN ALL AROUND
+        if (width != height) {
+            Axis longAxis = width > height ? one : two;
+            Axis shortAxis = width > height ? two : one;
+            float centering = Math.abs(width - height) / 2f;
+            float margin = Math.min(width, height) / 4f;
+            box.min(longAxis, box.min(longAxis) + centering + margin);
+            box.max(longAxis, box.max(longAxis) - centering - margin);
+            box.min(shortAxis, box.min(shortAxis) + margin);
+            box.max(shortAxis, box.max(shortAxis) - margin);
         }
 
-        if (facing.positive) {
-            box.setMax(facing.axis, parent.getMax(facing.axis) + (tile.caps.projects() ? -0.001f : 0.001f));
-        } else {
-            box.setMin(facing.axis, parent.getMin(facing.axis) - (tile.caps.projects() ? -0.001f : 0.001f));
-        }
+        // NUDGED OFF THE MEDIA PLANE TOWARDS THE VIEWER SIDE, WHICH IS THE BACK ONE FOR PROJECTORS
+        float nudge = tile.caps.projects() ? -0.001f : 0.001f;
+        if (facing.positive) box.max(facing.axis, parent.max(facing.axis) + nudge);
+        else box.min(facing.axis, parent.min(facing.axis) - nudge);
 
         return box;
     }

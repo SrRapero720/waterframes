@@ -26,8 +26,8 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Minecraft face of a display's audio. The OpenAL source WaterMedia streams into is adopted by
  * the sound engine as a regular streaming sound, so category sliders, subtitles, sound events
- * and audio mods all act on the real source — the same road {@code TextureWrapper} walks for
- * the GL texture.
+ * and audio mods all act on the real source — the same road the display walks as a registered
+ * texture for its GL frame.
  */
 public class DisplaySound extends AbstractTickableSoundInstance {
     // MINECRAFT NEVER PULLS PCM FROM THIS: BUFFERS BELONG TO WATERMEDIA. IT ONLY EXISTS SO THE

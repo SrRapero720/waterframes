@@ -1,0 +1,49 @@
+// DISPLAY SETTINGS SCREEN — THE TAB STRIP HOLDS THE FOUR PAGES, THE TRANSPORT BAND STAYS PUT.
+// THE BLOCK EMBLEM RIDES OUTSIDE THE PANEL. TABS AND STATE COME FROM THE IMPORTED DOCUMENTS AND THE HOST.
+theme "waterui"
+
+import "tabs/sources" as sources
+import "tabs/render" as render
+import "tabs/media" as media
+import "tabs/redstone" as redstone
+import "constants/icons"
+
+// ---- LIVE CONTRACT: ONE @UIVar SUPPLIER PER USED var --------------------------------------
+var long time
+
+var long duration
+var loop
+var paused
+var loop_tooltip
+var playback_tooltip
+var reload_ready
+var Icon status_icon
+var status_tooltip
+
+// ---- BAKED CONTRACT: THE BLOCK EMBLEM STANDING OUTSIDE THE PANEL --------------------------
+final var ItemStack emblem_item
+final var String emblem_name
+
+root[frame=EDGE, spacing=0, padding=0]
+
+ParentTab[id="display/tabs", width=FILL, height=FILL, tabs={sources, render, media, redstone}]
+
+// TRANSPORT BAND — align=CENTER CENTRES EVERY CHILD ON THE CROSS AXIS, NO PER-CHILD ANCHOR
+Parent[id="display/transport", orientation=HORIZONTAL, align=CENTER, spacing=2, width=FILL, padding={4, 2}, face=field] {
+    ToggleButton[id="display/loop", width=20, height=20, iconOn=icon_loop_on, iconOff=icon_loop_off,
+                 value=loop, tooltip=loop_tooltip, onClick=toggleLoop()]
+    ToggleButton[
+                id="display/playback", width=24, height=20, iconOn=icon_play, iconOff=icon_pause,
+                value=paused, tooltip=playback_tooltip, onClick=togglePlayback()
+    ]
+    Button[id="display/stop", width=20, height=20, icon=icon_stop, onClick=stop()]
+    Seekbar[id="display/seekbar", width=FILL, height=FILL, time=time, duration=duration,
+            onSeekEnd=seek(), onScroll=skip()]
+    Button[id="display/reload", width=20, height=20, icon=icon_reload, enabled=reload_ready,
+           tooltip="translatable:waterframes.gui.reload", onClick=reload()]
+    Icon[id="display/status", width=18, height=18, icon=status_icon, tooltip=status_tooltip]
+}
+
+// BLOCK EMBLEM — LIFTED OUT OF THE FLOW, SEATED OUTSIDE THE PANEL'S RIGHT EDGE, BOTTOM-FLUSH (§9.5)
+ItemIcon[id="display/emblem", outsideAnchor=RIGHT|BOTTOM, width=62, height=62, margin=2,
+         item=emblem_item, flipX=true, tooltip=emblem_name]

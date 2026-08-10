@@ -57,7 +57,7 @@ repositories {
         url = 'https://api.modrinth.com/maven'
         content { includeGroup 'maven.modrinth' }
     }
-    maven { // CREATIVECORE AND WATERVISION
+    maven { // WATERVISION
         url = 'https://www.cursemaven.com'
         content { includeGroup 'curse.maven' }
     }
@@ -70,7 +70,6 @@ dependencies {
     implementation("com.github.WaterMediaTeam:watermedia-v3:$watermediaversion") { transitive = false }
     runtimeOnly("maven.modrinth:watermedia-binaries:$watermediabinariesversion") { transitive = false }
 
-    implementation "curse.maven:creativecore-257814:$creativecoreversion"
     // WATERVISION IS AN OPTIONAL INTEGRATION; WVCompat GUARDS EVERY CALL BEHIND isInstalled
     compileOnly "curse.maven:watervision-1167473:$watervisionversion"
 }
@@ -95,8 +94,7 @@ jar {
                 "Specification-Version"  : version,
                 "Implementation-Title"   : modname,
                 "Implementation-Version" : modversion,
-                "Implementation-Vendor"  : modauthor,
-                "MixinConfigs"           : "$modid.$mixin_file_suffix"
+                "Implementation-Vendor"  : modauthor
         ])
     }
     // COMPILE-ONLY STUBS OF THIRD PARTY APIS; SHIPPING THEM WOULD SHADOW THE REAL CLASSES
@@ -121,7 +119,7 @@ publishMods {
         javaVersions.add(JavaVersion.toVersion(javaversion))
         clientRequired = true
         serverRequired = true
-        requires('creativecore', 'watermedia')
+        requires('watermedia')
         optional('watervision')
     }
 
@@ -129,7 +127,7 @@ publishMods {
         accessToken = providers.environmentVariable('MODRINTH_TOKEN')
         projectId = modrinthid
         minecraftVersions.add(mcversion)
-        requires('creativecore', 'watermedia')
+        requires('watermedia')
         optional('watervision')
     }
 }
@@ -142,4 +140,33 @@ def getChangelogText() {
         result += line + '\n'
     }
     return result
+}
+
+
+// NORMALIZE ENHANCED-FOR COLONS IN JAVA SOURCES: "for (T x : xs)" -> "for (T x: xs)"
+// (GRADLE PORT OF THE OLD scripts/remove_semicolon_space.ps1)
+tasks.register('removeSemicolonSpace') {
+    group = 'formatting'
+    description = 'Removes the space before the enhanced-for colon across src/**/*.java'
+    doLast {
+        // (?m) ANCHORS ^ PER LINE; [ \t] AND [^:\r\n] KEEP EACH MATCH INSIDE ONE LINE SO LINE ENDINGS SURVIVE
+        def regex = ~/(?m)(^[ \t]*for[ \t]*\([^:\r\n]*\w)[ \t]+:/
+        fileTree(dir: 'src', include: '**/*.java').each { file ->
+            def text = file.getText('UTF-8')
+            def updated = text.replaceAll(regex, '$1:')
+            if (updated == text) return
+
+            def before = text.readLines()
+            def after = updated.readLines()
+            before.eachWithIndex { line, i ->
+                if (after[i] != line) {
+                    println "${file.path}:${i + 1}"
+                    println "  - ${line.stripLeading()}"
+                    println "  + ${after[i].stripLeading()}"
+                }
+            }
+            file.write(updated, 'UTF-8')
+        }
+        println 'Done.'
+    }
 }

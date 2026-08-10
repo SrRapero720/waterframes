@@ -4,11 +4,10 @@ import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.network.DisplayNetwork;
+import net.minecraft.server.level.ServerPlayer;
 import me.srrapero720.waterframes.common.item.data.RemoteData;
-import me.srrapero720.waterframes.common.screens.RemoteControlScreen;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -26,17 +25,11 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import team.creative.creativecore.common.gui.GuiLayer;
-import team.creative.creativecore.common.gui.creator.GuiCreator;
-import team.creative.creativecore.common.gui.creator.ItemGuiCreator;
-
 import java.util.List;
 
-public class RemoteControl extends Item implements ItemGuiCreator {
+public class RemoteControl extends Item {
     private static final String POSITION = "position";
     private static final String DIMENSION = "dimension";
     private static final Marker IT = MarkerManager.getMarker(RemoteControl.class.getSimpleName());
@@ -74,11 +67,7 @@ public class RemoteControl extends Item implements ItemGuiCreator {
         if (level.getBlockEntity(blockPos) instanceof DisplayTile tile) {
             double distance = WaterFrames.getDistance(tile, player.position());
             if (level.dimension().location().equals(dimension) && distance < DisplaysConfig.maxRcDis()) {
-                var tag = new CompoundTag();
-                tag.putString("dimension", data.dimension());
-                tag.putIntArray("position", data.getPos());
-
-                GuiCreator.ITEM_OPENER.open(tag, player, hand);
+                if (player instanceof ServerPlayer server) DisplayNetwork.openScreen(server, blockPos, true);
                 return InteractionResultHolder.success(stack);
             }
 
@@ -171,23 +160,15 @@ public class RemoteControl extends Item implements ItemGuiCreator {
     }
 
     @Override
-    public GuiLayer create(CompoundTag tag, Player player) {
-        int[] pos = this.getPosition(tag);
-        var blockPos = new BlockPos(pos[0], pos[1], pos[2]);
-        return new RemoteControlScreen(player, (DisplayTile) player.level.getBlockEntity(blockPos), tag, this);
-    }
-
-    @Override
     public Component getHighlightTip(ItemStack item, Component displayName) {
         return Component.literal(displayName.getString()).withStyle(ChatFormatting.AQUA);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public void appendHoverText(ItemStack pStack, TooltipContext pContext, List<Component> pTooltipComponents, TooltipFlag pTooltipFlag) {
         super.appendHoverText(pStack, pContext, pTooltipComponents, pTooltipFlag);
-        Options opts = Minecraft.getInstance().options;
-        pTooltipComponents.add(Component.translatable("waterframes.remote.description.1", opts.keyShift.getKey().getDisplayName(), opts.keyUse.getKey().getDisplayName()));
+        // KEYBIND COMPONENTS RESOLVE ON THE CLIENT AT RENDER TIME, SO TOOLTIPS STAY SERVER-SAFE
+        pTooltipComponents.add(Component.translatable("waterframes.remote.description.1", Component.keybind("key.sneak"), Component.keybind("key.use")));
     }
 
     @Override

@@ -1,30 +1,33 @@
 package me.srrapero720.waterframes.common.network.packets;
 
+import io.netty.buffer.ByteBuf;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.network.ControlPacket;
+import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-public class MutePacket extends DisplayControlPacket {
-    public boolean muted;
+public record MutePacket(BlockPos pos, boolean muted) implements ControlPacket {
+    public static final Type<MutePacket> TYPE = DisplayNetwork.type("mute");
+    public static final StreamCodec<ByteBuf, MutePacket> CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC, MutePacket::pos,
+            ByteBufCodecs.BOOL, MutePacket::muted,
+            MutePacket::new);
 
-    public MutePacket() {}
-    public MutePacket(BlockPos pos, boolean muted, boolean bounce) {
-        super(pos, bounce);
-        this.muted = muted;
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     @Override
-    public void execServer(DisplayTile tile) {
-
+    public void apply(DisplayTile tile) {
+        tile.data.muted = muted;
     }
 
     @Override
-    public void execClient(DisplayTile tile) {
-        if (tile.display != null) tile.display.setMuteMode(this.muted);
+    public void applyClient(DisplayTile tile) {
+        if (tile.display != null) tile.display.setMuteMode(muted);
     }
-
-    @Override
-    public void exec(DisplayTile tile) {
-        tile.data.muted = this.muted;
-    }
-
 }

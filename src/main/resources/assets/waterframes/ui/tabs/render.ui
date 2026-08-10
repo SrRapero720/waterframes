@@ -1,0 +1,71 @@
+// RENDER TAB — SIZE, ANCHOR, COLOUR LEVELS AND REACH; STATIC CONFIG AND INITIAL VALUES ARE BAKED.
+// ROOT PREFS SHAPE THE AUTO-GENERATED TAB BODY (§6.1, §10.3): tabIcon/tabTooltip GO TO THE STRIP, THE REST IS LAYOUT.
+import "constants/icons"
+
+// ---- LIVE CONTRACT: RATIO BUTTON TOOLTIPS FROM THE HOST -------------------------------------
+var resize_x_tooltip
+var resize_y_tooltip
+
+// ---- BAKED CONTRACT: CAPABILITIES, CONFIG BOUNDS AND INITIAL VALUES FROM THE HOST -----------
+final var resizes
+final var projects
+final var render_behind
+final var hide_model
+final var max_width
+final var max_height
+final var max_render_distance
+final var max_projection_distance
+final var width
+final var height
+final var rotation
+final var alpha
+final var brightness
+final var render_distance
+final var projection_distance
+final var lit
+final var mirror
+final var show_model
+final var flip_x
+final var flip_y
+final var shader_mode
+final var String pos_x
+final var String pos_y
+
+root[tabIcon=icon_render_distance, tabTooltip="translatable:waterframes.gui.tab.render",
+     orientation=VERTICAL, align=STRETCH, width=FILL, height=FILL, spacing=4]
+
+// EACH STEPPER PAIRS WITH A RATIO BUTTON MATCHING THE OTHER AXIS TO THE MEDIA'S NATIVE ASPECT;
+// THE CLICKS ARE WIRED BY id FROM THE SCREEN (§12.2 ELEMENT EVENTS)
+Parent[id="render/size", orientation=HORIZONTAL, spacing=2, width=FILL, visible=resizes] {
+    Parent[orientation=HORIZONTAL, width=FILL, spacing=0] {
+        Stepper[id="render/width", width=FILL, height=22, min=0.1, max=max_width, step=0.0625, value=width, onValueCommit=commit()]
+        Button[id="render/resize_y", width=20, height=22, padding=4, shadow=false, icon=icon_expand_y, tooltip=resize_y_tooltip]
+    }
+    Parent[orientation=HORIZONTAL, width=FILL, spacing=0] {
+        Stepper[id="render/height", width=FILL, height=22, min=0.1, max=max_height, step=0.0625, value=height, onValueCommit=commit()]
+        Button[id="render/resize_x", width=20, height=22, padding=4, shadow=false, icon=icon_expand_x, tooltip=resize_x_tooltip]
+    }
+}
+
+Parent[orientation=HORIZONTAL, spacing=6, width=FILL, height=FILL] {
+    Parent[orientation=VERTICAL, spacing=2, width=FILL, height=FILL] {
+        Slider[id="render/rotation", width=FILL, height=14, min=0, max=360, format=ANGLE, value=rotation, visible=resizes, icon=icon_rotation, tooltip="translatable:waterframes.gui.icon.rotation", onValueCommit=commit()]
+        Slider[id="render/alpha", width=FILL, height=14, min=0, max=255, stepped=true, format=PERCENT, value=alpha, icon=icon_transparency, tooltip="translatable:waterframes.gui.icon.alpha", onValueCommit=commit()]
+        Slider[id="render/brightness", width=FILL, height=14, min=0, max=255, stepped=true, format=PERCENT, value=brightness, icon=icon_brightness, tooltip="translatable:waterframes.gui.icon.brightness", onValueCommit=commit()]
+        Slider[id="render/contrast", width=FILL, height=14, icon=icon_contrast, enabled=false, formatKey="waterframes.gui.contrast"]
+        Slider[id="render/saturation", width=FILL, height=14, icon=icon_saturation, enabled=false, formatKey="waterframes.gui.saturation"]
+        Slider[id="render/overlay_alpha", width=FILL, height=14, icon=icon_overlay_alpha, enabled=false, formatKey="waterframes.gui.overlay_alpha"]
+        Slider[id="render/render_distance", width=FILL, height=14, min=4, max=max_render_distance, stepped=true, format=BLOCKS, value=render_distance, icon=icon_render_distance, tooltip="translatable:waterframes.gui.icon.render_distance", onValueCommit=commit()]
+        Slider[id="render/projection_distance", width=FILL, height=14, min=4, max=max_projection_distance, format=BLOCKS_DECIMAL, value=projection_distance, visible=projects, icon=icon_projection_distance, tooltip="translatable:waterframes.gui.icon.projection_distance", onValueCommit=commit()]
+    }
+    Parent[orientation=VERTICAL, spacing=2, width=78, height=FILL] {
+        AnchorPicker[id="render/position", width=64, height=64, align=CENTER, visible=resizes, x=pos_x, y=pos_y, onValueCommit=commit()]
+        Switch[id="render/lit", component="translatable:waterframes.gui.lit", value=lit, textScale=0.75, onToggle=commit()]
+        Switch[component="translatable:waterframes.gui.lit_image_only", enabled=false, textScale=0.75]
+        Switch[id="render/mirror", component="translatable:waterframes.gui.mirror.short", value=mirror, visible=render_behind, tooltip="translatable:waterframes.gui.mirror.1", textScale=0.75, onToggle=commit()]
+        Switch[id="render/show_model", component="translatable:waterframes.gui.show_model", value=show_model, visible=hide_model, textScale=0.75, onToggle=commit()]
+        Switch[id="render/flip_x", component="translatable:waterframes.gui.flip_x", value=flip_x, textScale=0.75, onToggle=commit()]
+        Switch[id="render/flip_y", component="translatable:waterframes.gui.flip_y", value=flip_y, textScale=0.75, onToggle=commit()]
+        Switch[id="render/shader_mode", component="translatable:waterframes.gui.shader_mode", value=shader_mode, textScale=0.75, onToggle=shaderMode()]
+    }
+}

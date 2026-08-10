@@ -1,0 +1,61 @@
+// WATERFRAMES REMOTE — STATUS ROW, ARROW PAD, FUSED VOLUME/CHANNEL ROCKERS OVER THE TRANSPORT KEYS.
+// justify=BETWEEN SPREADS THE SECTIONS; POWER | SIGNAL | MUTE SIT ACROSS THE STATUS GRID.
+theme "waterui"
+import "constants/icons"
+
+// ---- LIVE CONTRACT: COMPOSED GATES (RANGE + CAPABILITY) COME PRE-MIXED FROM THE HOST ---------
+var in_range
+var move_ready
+var channel_ready
+var Icon signal_icon
+var Icon mute_icon
+
+// ---- BAKED CONTRACT -------------------------------------------------------------------------
+final var cell = 18
+
+root[anchor=CENTER, spacing=4, padding=6, justify=BETWEEN]
+
+// STATUS — POWER LEFT, SIGNAL CENTER, MUTE RIGHT
+Grid[id="remote/status", columns=3, rows=1, width=FILL] {
+    Button[id="remote/power", width=cell, height=cell, anchor=LEFT|CENTER, border=1, face=danger, outline=dangerBorder,
+           icon=icon_off_on, enabled=in_range, onClick=power()]
+    Icon[id="remote/signal", width=12, height=12, anchor=CENTER, icon=signal_icon]
+    Button[id="remote/mute", width=cell, height=cell, anchor=RIGHT|CENTER, border=1, face=accent, outline=accentBorder,
+           icon=mute_icon, enabled=in_range, onClick=mute()]
+}
+
+// ARROW PAD — 3x3, A BARE Blank SKIPS A CELL
+Grid[id="remote/pad", columns=3, rows=3, width=FILL, spacing=2] {
+    Blank
+    Button[id="remote/arrow_up", width=cell, height=cell, anchor=CENTER, icon=icon_arrow_up, enabled=move_ready, onClick=arrowUp(), repeat={10, 3}]
+    Blank
+    Button[id="remote/arrow_left", width=cell, height=cell, anchor=CENTER, icon=icon_arrow_left, enabled=move_ready, onClick=arrowLeft(), repeat={10, 3}]
+    Button[id="remote/arrow_center", width=cell, height=cell, anchor=CENTER, icon=icon_arrow_center, enabled=move_ready, onClick=arrowCenter()]
+    Button[id="remote/arrow_right", width=cell, height=cell, anchor=CENTER, icon=icon_arrow_right, enabled=move_ready, onClick=arrowRight(), repeat={10, 3}]
+    Blank
+    Button[id="remote/arrow_down", width=cell, height=cell, anchor=CENTER, icon=icon_arrow_down, enabled=move_ready, onClick=arrowDown(), repeat={10, 3}]
+    Blank
+}
+
+// LEVELS — FUSED VERTICAL ROCKERS (UP OVER DOWN) FLANKING RELOAD; VOLUME HOLDS TO REPEAT, CHANNEL IS DISCRETE
+Parent[orientation=HORIZONTAL, align=CENTER, justify=BETWEEN, width=FILL] {
+    ComboButton[orientation=VERTICAL] {
+        Button[id="remote/volume_up", width=cell, height=cell, icon=icon_volume_up, enabled=in_range, onClick=volumeUp(), repeat={10, 3}]
+        Button[id="remote/volume_down", width=cell, height=cell, icon=icon_volume_down, enabled=in_range, onClick=volumeDown(), repeat={10, 3}]
+    }
+    Button[id="remote/reload", width=cell, height=cell, icon=icon_reload, enabled=in_range, onClick=reload()]
+    ComboButton[orientation=VERTICAL] {
+        Button[id="remote/channel_up", width=cell, height=cell, icon=icon_channel_up, enabled=channel_ready, onClick=channelUp()]
+        Button[id="remote/channel_down", width=cell, height=cell, icon=icon_channel_down, enabled=channel_ready, onClick=channelDown()]
+    }
+}
+
+// TRANSPORT — PLAY ROW OVER SKIP ROW
+Grid[id="remote/controls", columns=3, rows=2, width=FILL, spacing=2] {
+    Button[id="remote/pause", width=cell, height=cell, anchor=LEFT|CENTER, icon=icon_pause, enabled=in_range, onClick=pause()]
+    Button[id="remote/play", width=cell, height=cell, anchor=CENTER, icon=icon_play, enabled=in_range, onClick=play()]
+    Button[id="remote/stop", width=cell, height=cell, anchor=RIGHT|CENTER, icon=icon_stop, enabled=in_range, onClick=stop()]
+    Button[id="remote/rewind", width=cell, height=cell, anchor=LEFT|CENTER, icon=icon_rewind, enabled=in_range, onClick=rewind(), repeat={10, 3}]
+    Blank
+    Button[id="remote/fast_forward", width=cell, height=cell, anchor=RIGHT|CENTER, icon=icon_fast_forward, enabled=in_range, onClick=fastForward(), repeat={10, 3}]
+}

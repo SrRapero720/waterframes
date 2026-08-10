@@ -1,35 +1,39 @@
 package me.srrapero720.waterframes.common.network.packets;
 
+import io.netty.buffer.ByteBuf;
 import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.network.ControlPacket;
+import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import org.watermedia.api.media.players.ServerMediaPlayer;
 
-public class PausePacket extends DisplayControlPacket {
-    public boolean paused;
-    public int tick;
+/** Playback state of a display. A rewind is the stop button: it holds and goes back to zero. */
+public record PausePacket(BlockPos pos, boolean paused, boolean rewind) implements ControlPacket {
+    public static final Type<PausePacket> TYPE = DisplayNetwork.type("pause");
+    public static final StreamCodec<ByteBuf, PausePacket> CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC, PausePacket::pos,
+            ByteBufCodecs.BOOL, PausePacket::paused,
+            ByteBufCodecs.BOOL, PausePacket::rewind,
+            PausePacket::new);
 
-    public PausePacket(){}
-    public PausePacket(BlockPos pos, boolean paused, int tick, boolean bounce) {
-        super(pos, bounce);
-        this.paused = paused;
-        this.tick = tick;
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
     @Override
-    public void execServer(DisplayTile tile) {
-    }
+    public void apply(DisplayTile tile) {
+        tile.data.paused = (DisplaysConfig.useMasterModeRedstone() && tile.isPowered()) || paused;
 
-    @Override
-    public void execClient(DisplayTile tile) {
-        if (tile.display != null) { // TODO: this is redundant, but i have no time to debug this
-            tile.display.setPauseMode(this.paused);
-        }
+        // ORDINARY PAUSING IS RECONCILED BY THE TILE EVERY TICK; ONLY THE TWO ENDS NEED SAYING,
+        // BECAUSE A STOPPED OR FINISHED CLOCK REFUSES TO BE RESUMED AND HAS TO BE STARTED OVER
+        ServerMediaPlayer clock = tile.clock();
+        if (clock == null) return;
+        if (rewind) clock.stop();
+        else if (!tile.data.paused && (clock.stopped() || clock.ended())) clock.start();
     }
-
-    @Override
-    public void exec(DisplayTile tile) {
-        tile.data.paused = (DisplaysConfig.useMasterModeRedstone() && tile.isPowered()) || this.paused;
-        if (this.tick != -1) tile.data.tick = this.tick;
-    }
-
 }

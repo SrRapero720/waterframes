@@ -1,17 +1,14 @@
 package me.srrapero720.waterframes.client.display;
 
-import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPauseChangeEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID)
-@OnlyIn(Dist.CLIENT)
 public class DisplayList {
     public static final Integer DEFAULT_SIZE = 32;
 
@@ -38,7 +35,7 @@ public class DisplayList {
         }
 
         // pause the display when the pause event is fired even if was too late
-        if (paused) display.setPauseMode(true);
+        if (paused) display.gamePaused(true);
 
         displays[position++] = display;
     }
@@ -46,14 +43,14 @@ public class DisplayList {
     public static void pause() {
         paused = true;
         for (int i = 0; i < position; i++) {
-            if (displays[i] != null) displays[i].setPauseMode(true);
+            if (displays[i] != null) displays[i].gamePaused(true);
         }
     }
 
     public static void resume() {
         paused = false;
         for (int i = 0; i < position; i++) {
-            if (displays[i] != null) displays[i].setPauseMode(false);
+            if (displays[i] != null) displays[i].gamePaused(false);
         }
     }
 
@@ -101,9 +98,10 @@ public class DisplayList {
         if (level != null && level.isClientSide()) DisplayList.release();
     }
 
+    // THE TICK LOOP NO LONGER DECIDES PLAY STATE, THE SESSION DOES, SO RESUMING IS ON US NOW
     @SubscribeEvent
     public static void onClientPause(ClientPauseChangeEvent.Post event) {
         if (event.isPaused()) DisplayList.pause();
-        // else DisplayList.resume();
+        else DisplayList.resume();
     }
 }

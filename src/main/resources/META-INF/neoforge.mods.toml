@@ -16,8 +16,14 @@ license="${modlicense}"
 	side="BOTH"
 	description='''${mod_description}'''
 
-[[mixins]]
-	config="$modid.$mixin_file_suffix"
+[[mods]]
+	modId="${wateruimodid}"
+	version="${wateruiversion}"
+	displayName="${wateruiname}"
+	displayTest="IGNORE_ALL_VERSION"
+	side="CLIENT"
+	logoFile="pack.png"
+	description='''${waterui_description}'''
 
 [[accessTransformers]]
 	file="META-INF/accesstransformer.cfg"
@@ -30,13 +36,27 @@ license="${modlicense}"
 	side="BOTH"
 
 [[dependencies.${modid}]]
-	modId="creativecore"
+	modId="watermedia"
 	type="required"
 	ordering="AFTER"
-	side="BOTH"
-	versionRange="${creativecorerange}"
+	side="CLIENT"
+	versionRange="${watermediarange}"
 
 [[dependencies.${modid}]]
+	modId="${wateruimodid}"
+	type="required"
+	ordering="AFTER"
+	side="CLIENT"
+	versionRange="${wateruirange}"
+
+[[dependencies.${wateruimodid}]]
+	modId="neoforge"
+	type="required"
+	versionRange="${fgrange}"
+	ordering="NONE"
+	side="CLIENT"
+
+[[dependencies.${wateruimodid}]]
 	modId="watermedia"
 	type="required"
 	ordering="AFTER"

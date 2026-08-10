@@ -1,0 +1,51 @@
+// MEDIA TAB — AUDIO LEVELS, POSITION AND PLAYBACK; DECODING OPTIONS ARE PLACEHOLDERS FOR NOW.
+// ROOT PREFS SHAPE THE AUTO-GENERATED TAB BODY (§6.1, §10.3): tabIcon/tabTooltip GO TO THE STRIP, THE REST IS LAYOUT.
+import "constants/icons"
+
+// ---- LIVE CONTRACT --------------------------------------------------------------------------
+var muted
+var audio_pos_tooltip
+var watervision_ready
+
+// ---- BAKED CONTRACT: CONFIG BOUNDS, CAPABILITIES AND INITIAL VALUES FROM THE HOST -----------
+final var max_volume
+final var volume_min_max
+final var max_volume_distance
+final var volume
+final var volume_min
+final var volume_max
+final var projects
+final var watervision
+final var audio_offset
+
+root[tabIcon=icon_multimedia, tabTooltip="translatable:waterframes.gui.tab.media",
+     orientation=VERTICAL, align=STRETCH, width=FILL, height=FILL, spacing=4]
+
+Parent[orientation=VERTICAL, spacing=2, width=FILL] {
+    Slider[id="media/volume", width=FILL, height=14, min=0, max=max_volume, stepped=true, format=RAW_PERCENT, value=volume, icon=icon_volume, tooltip="translatable:waterframes.gui.icon.volume", onValueCommit=commit()]
+    Slider[id="media/volume_min", width=FILL, height=14, min=0, max=volume_min_max, stepped=true, format=BLOCKS, value=volume_min, icon=icon_volume_min, tooltip="translatable:waterframes.gui.icon.volume_min", onValueCommit=commit()]
+    Slider[id="media/volume_max", width=FILL, height=14, min=0, max=max_volume_distance, stepped=true, format=BLOCKS, value=volume_max, icon=icon_volume_max, tooltip="translatable:waterframes.gui.icon.volume_max", onValueCommit=commit()]
+    Parent[orientation=HORIZONTAL, align=CENTER, spacing=6, width=FILL] {
+        Switch[id="media/mute", component="translatable:waterframes.gui.mute", value=muted, textScale=0.75, onToggle=mute()]
+        StateButton[id="media/audio_offset", width=25, height=14, padding=0, shadow=false, visible=projects,
+                    tooltip=audio_pos_tooltip, states={icon_audio_block, icon_audio_picture, icon_audio_center},
+                    state=audio_offset, onClick=commit()]
+        Button[id="media/watervision", width=18, height=18, visible=watervision, enabled=watervision_ready,
+               icon=icon_videoplayer, tooltip="translatable:waterframes.gui.videoplayer", onClick=openWatervision()]
+    }
+}
+
+Parent[orientation=HORIZONTAL, spacing=6, width=FILL, height=FILL] {
+    Parent[orientation=VERTICAL, spacing=2, width=FILL] {
+        Button[component="translatable:waterframes.gui.media.video_quality", enabled=false, width=FILL]
+        Button[component="translatable:waterframes.gui.media.audio_quality", enabled=false, width=FILL]
+        Button[component="translatable:waterframes.gui.media.subtitles", enabled=false, width=FILL]
+        Slider[id="media/buffer_time", width=FILL, height=14, enabled=false, formatKey="waterframes.gui.media.buffer_time"]
+    }
+    Parent[orientation=VERTICAL, spacing=2, width=FILL] {
+        Slider[id="media/speed", width=FILL, height=14, enabled=false, formatKey="waterframes.gui.media.speed"]
+        Slider[id="media/pitch", width=FILL, height=14, enabled=false, formatKey="waterframes.gui.media.pitch"]
+        Button[component="translatable:waterframes.gui.media.chroma", enabled=false, width=FILL]
+        Switch[component="translatable:waterframes.gui.media.cache", enabled=false, textScale=0.75]
+    }
+}

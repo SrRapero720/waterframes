@@ -11,7 +11,7 @@ import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import net.neoforged.fml.loading.FMLLoader;
+import org.watermedia.api.media.players.ServerMediaPlayer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.commands.CommandSourceStack;
@@ -30,8 +30,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.server.command.EnumArgument;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -43,6 +41,8 @@ import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 import java.util.function.Supplier;
 public class WaterFramesCommand {
     private static final Marker IT = MarkerManager.getMarker("Commands");
+    /** Playback position is no display data anymore, the argument names itself. */
+    private static final String ARG_TIME = "time_ms";
     public static final Component ACTIVATED = Component.translatable("waterframes.common.activated");
     public static final Component DEACTIVATED = Component.translatable("waterframes.common.deactivated");
 
@@ -161,8 +161,8 @@ public class WaterFramesCommand {
         );
 
         edit.then(Commands.literal("time")
-                .then(Commands.argument(DisplayData.TIME, LongArgumentType.longArg())
-                        .executes(c -> setTimeTick(getTile(c), c.getSource(), getLong(c, DisplayData.TIME)))
+                .then(Commands.argument(ARG_TIME, LongArgumentType.longArg())
+                        .executes(c -> setTime(getTile(c), c.getSource(), getLong(c, ARG_TIME)))
                 )
         );
 
@@ -228,7 +228,6 @@ public class WaterFramesCommand {
         return 0;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void registerClient(CommandDispatcher<CommandSourceStack> dispatcher) {
         var waterframes = Commands.literal("waterframes");
         waterframes.then(Commands.literal("reload_all")
@@ -240,16 +239,13 @@ public class WaterFramesCommand {
     public static int setUrl(DisplayTile tile, CommandSourceStack source, String url) {
         if (tile == null) return 1;
 
-        if (!tile.data.urls.isEmpty()) {
+        if (!tile.data.playlist.isEmpty()) {
             source.sendFailure(msgFailed("waterframes.commands.edit.url.failed.experimental"));
             return 1;
         }
 
-        if (tile.data.hasUrl() && tile.data.getUrl().equals(url)) {
-            tile.data.tick = 0;
-            tile.data.tickMax = -1;
-        }
-
+        // THE SESSION RESTARTS EVEN WHEN THE URL DID NOT CHANGE, WHICH IS WHAT SETTING IT AGAIN MEANS
+        tile.restartClock();
         tile.data.url = url;
         tile.data.uuid = (source.getEntity() instanceof Player player) ? player.getUUID() : Util.NIL_UUID;
 
@@ -353,25 +349,24 @@ public class WaterFramesCommand {
     public static int setPauseState(DisplayTile tile, CommandSourceStack source, boolean pause) {
         if (tile == null) return 1;
 
-        tile.data.paused = pause;
+        // THROUGH THE PACKET SO THE SESSION CLOCK AND EVERY VIEWER HEAR ABOUT IT TOO
+        tile.setPause(false, pause);
 
         tile.setDirty();
         source.sendSuccess(msgSuccess("waterframes.commands.edit.pause.success"), true);
         return 0;
     }
 
-    public static int setTimeTick(DisplayTile tile, CommandSourceStack source, long time) {
+    public static int setTime(DisplayTile tile, CommandSourceStack source, long time) {
         if (tile == null) return 1;
 
-        int tickTime = (int) (time / 50L);
-
-        if (tickTime > tile.data.tickMax) {
+        ServerMediaPlayer clock = tile.clock();
+        if (clock == null || time > clock.duration()) {
             source.sendFailure(msgFailed("waterframes.commands.edit.settime.failed"));
             return 2;
         }
 
-        tile.syncTime(FMLLoader.getDist().isClient(), tickTime, -1);
-
+        clock.seek(time);
 
         source.sendSuccess(msgSuccess("waterframes.commands.edit.settime.success"), true);
         return 0;
@@ -465,7 +460,7 @@ public class WaterFramesCommand {
     }
 
     public static int giveKit(CommandSourceStack source, List<ServerPlayer> players) throws CommandSyntaxException {
-        for(ServerPlayer serverplayer : players) {
+        for(ServerPlayer serverplayer: players) {
             for (ItemInput input: DEFAULT_INPUTS) {
                 ItemStack itemstack = input.createItemStack(1, false);
                 boolean flag = serverplayer.getInventory().add(itemstack);
@@ -518,7 +513,6 @@ public class WaterFramesCommand {
         return 0;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static int watermedia$reloadAll(CommandSourceStack source) {
         source.sendSuccess(msgSuccess("waterframes.commands.reload_all.success"), true);
         return 0;

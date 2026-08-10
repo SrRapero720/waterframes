@@ -18,8 +18,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
 import org.jetbrains.annotations.NotNull;
-import team.creative.creativecore.common.util.math.base.Facing;
-import team.creative.creativecore.common.util.math.box.AlignedBox;
+import me.srrapero720.waterframes.common.util.geo.Facing;
+import me.srrapero720.waterframes.common.util.geo.AlignedBox;
 
 @SuppressWarnings("deprecation")
 @MethodsReturnNonnullByDefault
@@ -48,12 +48,12 @@ public class FrameBlock extends DisplayBlock {
 
     @Override
     public @NotNull VoxelShape getShape(@NotNull BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        var facing = Facing.get(state.getValue(getFacing()));
+        var facing = Facing.of(state.getValue(getFacing()));
         var box = new AlignedBox();
 
-        if (facing.positive) box.setMax(facing.axis, THICKNESS);
-        else box.setMin(facing.axis, 1 - THICKNESS);
-        return box.voxelShape();
+        if (facing.positive) box.max(facing.axis, THICKNESS);
+        else box.min(facing.axis, 1 - THICKNESS);
+        return box.shape();
     }
 
     @Override

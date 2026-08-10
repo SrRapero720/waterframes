@@ -39,3 +39,7 @@ runs/*
 
 # Claude memory
 MEMORY.md
+MEMORY-UI.md
+
+# Dev run logs
+logs/

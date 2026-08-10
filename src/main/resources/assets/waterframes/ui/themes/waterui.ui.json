@@ -1,0 +1,69 @@
+  {
+  "text": "#FFFFFFFF",
+  "textDisabled": "#FF646464",
+  "accent": { "color": "#FF2F8989" },
+  "accentBorder": { "color": "#FF48DCDB" },
+  "disabledOverlay": { "color": "#66000000" },
+  "field": { "color": "#FF1B2434" },
+  "fieldHover": { "color": "#FF2E3B50" },
+  "selection": { "color": "#FF364868" },
+  "danger": { "color": "#FF8C3834" },
+  "dangerBorder": { "color": "#FFFF3C3C" },
+  "panel": {
+    "border": 6,
+    "padding": 5,
+    "shadow": true,
+    "outline": { "color": "#FF171E2A" },
+    "face": { "color": "#FF253248" }
+  },
+  "clickable": {
+    "border": 1,
+    "padding": [6, 2],
+    "shadow": true,
+    "outline": { "color": "#FF000000" },
+    "face": { "color": "#FF666666" },
+    "hover": { "color": "#FF808080" }
+  },
+  "nested": {
+    "border": 1,
+    "padding": 2,
+    "shadow": true,
+    "outline": { "color": "#FF000000" },
+    "face": { "color": "#FF808080" }
+  },
+  "bar": {
+    "border": 1,
+    "shadow": true,
+    "outline": { "color": "#FF000000" },
+    "face": { "color": "#FF1A1A1A" }
+  },
+  "toggle": {
+    "trackWidth": 14,
+    "trackHeight": 8,
+    "border": 1,
+    "gap": 3,
+    "slideMs": 100,
+    "thumbWidth": 6,
+    "thumbHeight": 6,
+    "thumbMargin": 1,
+    "outline": { "color": "#FF000000" },
+    "off": { "color": "#FF666666" },
+    "on": { "color": "#FF2F8989" },
+    "thumb": { "color": "#FF808080" },
+    "thumbHover": { "color": "#FFFFFFFF" }
+  },
+  "slider": {
+    "height": 10,
+    "knobWidth": 4,
+    "knob": { "color": "#FF666666" }
+  },
+  "progress": {
+    "height": 14,
+    "fill": { "color": "#FF666666" }
+  },
+  "scroll": {
+    "width": 3,
+    "track": { "color": "#FF1A1A1A" },
+    "thumb": { "color": "#FF808080" }
+  }
+}

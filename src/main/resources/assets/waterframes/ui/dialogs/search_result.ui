@@ -1,0 +1,16 @@
+// SINGLE SEARCH HIT — BAKED-ONLY ROW FOR ParentList (UI-SPEC §10.6).
+// VISUAL MATCHES THE OLD SearchScreen.Result: THUMBNAIL + TITLE + PLATFORM, CENTER-ALIGNED.
+import "constants/icons"
+
+final var String key
+final var String title
+final var String platform
+final var String thumbnail
+
+root[width=FILL, align=CENTER, spacing=4, onClick=pick(key)]
+
+Thumbnail[width=18, height=18, source=thumbnail, fallback=icon_videoplayer]
+Parent[orientation=VERTICAL, width=FILL, spacing=1] {
+    Text[component=title, fontScale=0.75, ellipsize=true, lines=2, width=FILL]
+    Text[component=platform, fontScale=0.5, ellipsize=true, width=FILL]
+}
