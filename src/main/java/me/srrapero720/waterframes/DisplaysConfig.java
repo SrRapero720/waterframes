@@ -109,6 +109,14 @@ public class DisplaysConfig {
     private static final ModConfigSpec SERVER_SPEC;
     private static final ModConfigSpec CLIENT_SPEC;
 
+    private static <T> T safeGet(ModConfigSpec.ConfigValue<T> value) {
+        try {
+            return value.get();
+        } catch (IllegalStateException e) {
+            return value.getDefault();
+        }
+    }
+
     static {
         // WATERFRAMES -> rendering
         SERVER.comment("All configurations about rendering");
@@ -337,47 +345,47 @@ public class DisplaysConfig {
             container.registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC);
     }
 
-    public static float maxWidth() { return (float) (double) maxWidth.get(); }
-    public static float maxHeight() { return (float) (double) maxHeight.get(); }
+    public static float maxWidth() { return (float) (double) safeGet(maxWidth); }
+    public static float maxHeight() { return (float) (double) safeGet(maxHeight); }
     public static float maxWidth(float width) { return Math.min(width, maxWidth()); }
     public static float maxHeight(float height) { return Math.min(height, maxHeight()); }
 
-    public static int maxRenDis() { return maxRenderDistance.get(); }
+    public static int maxRenDis() { return safeGet(maxRenderDistance); }
     public static int maxRenDis(int value) { return Math.min(value, maxRenDis()); }
 
-    public static float maxProjDis() { return (float) (double) maxProjectionDistance.get(); }
+    public static float maxProjDis() { return (float) (double) safeGet(maxProjectionDistance); }
     public static float maxProjDis(float value) { return Math.min(value, maxProjDis()); }
 
-    public static boolean keepsRendering() { return overrideServerConfig.get() ? clientKeepsRendering.get() : keepRendering.get(); }
-    public static boolean useLightOnPlay() { return useLightsOnPlay.get(); }
-    public static boolean forceLightOnPlay() { return forceLightsOnPlay.get(); }
-    public static boolean useLagTickCorrection() { return useLagTickCorrection.get(); }
+    public static boolean keepsRendering() { return safeGet(overrideServerConfig) ? safeGet(clientKeepsRendering) : safeGet(keepRendering); }
+    public static boolean useLightOnPlay() { return safeGet(useLightsOnPlay); }
+    public static boolean forceLightOnPlay() { return safeGet(forceLightsOnPlay); }
+    public static boolean useLagTickCorrection() { return safeGet(useLagTickCorrection); }
 
     // MULTIMEDIA
-    public static int maxVolDis() { return maxVolumeDistance.get(); }
+    public static int maxVolDis() { return safeGet(maxVolumeDistance); }
     public static int maxVolDis(int value) { return Math.min(value, maxVolDis()); }
-    public static boolean useMasterVolume() { return useMasterVolume.get(); }
-    public static boolean soundIntegration() { return soundEngineIntegration.get(); }
-    public static boolean vsEurekaCompat() { return useVSEurekaCompat.get(); }
-    public static boolean sableCompat() { return useSableCompat.get(); }
+    public static boolean useMasterVolume() { return safeGet(useMasterVolume); }
+    public static boolean soundIntegration() { return safeGet(soundEngineIntegration); }
+    public static boolean vsEurekaCompat() { return safeGet(useVSEurekaCompat); }
+    public static boolean sableCompat() { return safeGet(useSableCompat); }
 
-    public static int maxVol() { return maxVolume.get(); }
+    public static int maxVol() { return safeGet(maxVolume); }
     public static int maxVol(int value) { return Math.max(Math.min(value, maxVol()), 0); }
 
-    public static boolean useMultimedia() { return overrideServerConfig.get() ? clientUseMultimedia.get() : useMultimedia.get(); }
+    public static boolean useMultimedia() { return safeGet(overrideServerConfig) ? safeGet(clientUseMultimedia) : safeGet(useMultimedia); }
 
     // BEHAVIOR
-    public static boolean useRedstone() { return useRedstone.get(); }
-    public static boolean useMasterModeRedstone() { return useRedstone() && useMasterModeOnRedstone.get(); }
-    public static int maxRcDis() { return remoteDistance.get(); }
-    public static boolean shaderMode() { return clientShaderMode.get(); }
+    public static boolean useRedstone() { return safeGet(useRedstone); }
+    public static boolean useMasterModeRedstone() { return useRedstone() && safeGet(useMasterModeOnRedstone); }
+    public static int maxRcDis() { return safeGet(remoteDistance); }
+    public static boolean shaderMode() { return safeGet(clientShaderMode); }
     public static void shaderMode(boolean value) { clientShaderMode.set(value); }
 
     // PERMISSIONS
-    public static boolean useInAdv() { return useInAdventure.get(); }
-    public static boolean useInSurv() { return useInSurvival.get(); }
-    public static boolean useForAnyone() { return useForAnyone.get(); }
-    public static boolean useWhitelist() { return useWhitelist.get(); }
+    public static boolean useInAdv() { return safeGet(useInAdventure); }
+    public static boolean useInSurv() { return safeGet(useInSurvival); }
+    public static boolean useForAnyone() { return safeGet(useForAnyone); }
+    public static boolean useWhitelist() { return safeGet(useWhitelist); }
     public static boolean useWhitelist(boolean state) {
         useWhitelist.set(state);
         useWhitelist.save();
@@ -388,13 +396,13 @@ public class DisplaysConfig {
     }
     public static void addOnWhitelist(String url) {
         @SuppressWarnings("unchecked")
-        var w = (Set<String>) mutableSet(whitelist.get().iterator());
+        var w = (Set<String>) mutableSet(safeGet(whitelist).iterator());
         w.add(url);
         whitelist.set(new ArrayList<>(w));
         whitelist.save();
     }
     public static boolean removeOnWhitelist(String url) {
-        var w = mutableSet(whitelist.get().iterator());
+        var w = mutableSet(safeGet(whitelist).iterator());
         boolean removed = false;
         try {
             return removed = w.remove(url);
@@ -422,12 +430,12 @@ public class DisplaysConfig {
             var host = uri.getHost();
             if (host == null) return false;
 
-            for (var s: whitelist.get()) {
+            for (var s: safeGet(whitelist)) {
                 if (host.endsWith("." + s) || host.equals(s)) {
-                    return !blackWhitelist.get();
+                    return !safeGet(blackWhitelist);
                 }
             }
-            return blackWhitelist.get();
+            return safeGet(blackWhitelist);
         } catch (Exception e) {
             return false;
         }
@@ -442,7 +450,7 @@ public class DisplaysConfig {
 
     public static boolean canSave(Player player, String url) {
         boolean valid = WaterFrames.isValidUrl(url) || url.isEmpty();
-        if (usePermissionsAPI.get()) {
+        if (safeGet(usePermissionsAPI)) {
             boolean canSave = DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_DISPLAYS_EDIT);
             boolean canBypass = DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_WHITELIST_BYPASS);
             boolean whitelisted = isWhiteListed(url);
@@ -453,7 +461,7 @@ public class DisplaysConfig {
 
             return false;
         } else {
-            boolean canSave = allowSaving.get();
+            boolean canSave = safeGet(allowSaving);
             if (isAdmin(player)) return valid;
             if (url.isEmpty()) return true;
             return valid && canSave && isWhiteListed(url);
@@ -461,7 +469,7 @@ public class DisplaysConfig {
     }
 
     public static boolean canInteractBlock(Player player, DisplayBlock block) {
-        if (usePermissionsAPI.get()) {
+        if (safeGet(usePermissionsAPI)) {
             PermissionNode<Boolean> NODE = block.getPermissionNode();
 
             return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_DISPLAYS_INTERACT) || DisplaysRegistry.getPermBoolean(player.getUUID(), NODE);
@@ -479,20 +487,20 @@ public class DisplaysConfig {
     }
 
     public static boolean canInteractRemote(Player player) {
-        if (usePermissionsAPI.get()) {
+        if (safeGet(usePermissionsAPI)) {
             return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_REMOTE_INTERACT) || isOwner(player);
         } else {
             if (isAdmin(player)) return true;
-            return useRemotes.get();
+            return safeGet(useRemotes);
         }
     }
 
     public static boolean canBindRemote(Player player) {
-        if (usePermissionsAPI.get()) {
+        if (safeGet(usePermissionsAPI)) {
             return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_REMOTE_BIND) || isOwner(player);
         } else {
             if (isAdmin(player)) return true;
-            return useBindingRemotes.get();
+            return safeGet(useBindingRemotes);
         }
     }
 
@@ -522,7 +530,7 @@ public class DisplaysConfig {
     }
 
     public static boolean isDevMode() {
-        return !FMLLoader.isProduction() || forceDevMode.get();
+        return !FMLLoader.isProduction() || safeGet(forceDevMode);
     }
 
     public static void setPlaylistMode(boolean v) {
