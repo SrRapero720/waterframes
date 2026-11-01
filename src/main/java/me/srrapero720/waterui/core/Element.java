@@ -94,7 +94,7 @@ public abstract class Element {
     // GENERIC POINTER LISTENERS (§13), LAZILY ALLOCATED: MOST ELEMENTS NEVER LISTEN
     private PointerEvents pointer;
 
-    // DRAG GESTURE THIS ELEMENT CARRIES AS THE GRAB SURFACE OF ITS OWNER (§8.7)
+    // DRAG GESTURE THIS ELEMENT CARRIES AS THE GRAB SURFACE OF ITS OWNER (§13.3)
     private DragThumb thumb;
 
     /**
@@ -166,14 +166,6 @@ public abstract class Element {
         return this;
     }
 
-    public Element margin(int all) {
-        return this.margin(Spacing.all(all));
-    }
-
-    public Element margin(int horizontal, int vertical) {
-        return this.margin(Spacing.hv(horizontal, vertical));
-    }
-
     /** Overrides the frame thickness the theme gives to this role. */
     public Element border(int pixels) {
         this.border = pixels;
@@ -234,10 +226,6 @@ public abstract class Element {
 
     public Element tooltip(List<Component> tooltip) {
         return this.tooltip(() -> tooltip);
-    }
-
-    public Element tooltip(String translationKey) {
-        return this.tooltip(List.of(Component.translatable(translationKey)));
     }
 
     public List<Component> tooltip() {
@@ -884,7 +872,7 @@ public abstract class Element {
         return Component.translatable(key, args);
     }
 
-    /** {@code .ui} text resolution (spec §4.2): a {@code translatable:} prefix selects i18n, anything else is literal. */
+    /** {@code .ui} text resolution (spec §4): a {@code translatable:} prefix selects i18n, anything else is literal. */
     public static Component component(String value) {
         return value.startsWith("translatable:")
                 ? Component.translatable(value.substring("translatable:".length()))

@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.layout;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.DragThumb;
 import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.format.DataContext;
@@ -23,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.IntConsumer;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * A vertical list whose rows are inflated from a shared {@code .ui} template, one per submitted key
@@ -250,7 +251,7 @@ public class ParentList extends ParentLinear {
             UIContract.Skeleton baked = UIContract.skeleton(doc);
             this.template = doc;
             this.skeleton = baked;
-            WaterUI.LOGGER.debug(IT, "template {} compiled", entryDoc);
+            LOGGER.debug(IT, "template {} compiled", entryDoc);
             return true;
         } catch (RuntimeException ex) {
             this.markBroken(String.valueOf(ex.getMessage()));
@@ -263,11 +264,11 @@ public class ParentList extends ParentLinear {
     private void markBroken(String message) {
         this.broken = true;
         this.abandon();
-        WaterUI.LOGGER.error(IT, "ParentList template '{}' is broken: {}", entryDoc, message);
+        LOGGER.error(IT, "ParentList template '{}' is broken: {}", entryDoc, message);
         this.clear();
         store.dispose();
         Text error = new Text().text(Component.literal("LIST ERROR: " + message));
-        error.color = 0xFFFF5555;
+        error.color(0xFFFF5555);
         this.add(error);
     }
 
@@ -291,16 +292,15 @@ public class ParentList extends ParentLinear {
             if (carrier != null) attachThumb(row, carrier);
             return row;
         } catch (RuntimeException ex) {
-            WaterUI.LOGGER.error(IT, "ParentList row '{}' failed to build: {}", key, ex.getMessage());
+            LOGGER.error(IT, "ParentList row '{}' failed to build: {}", key, ex.getMessage());
             return null;
         }
     }
 
     // ---- INTEGRATED DRAG (§10.6): SESSION DRIVEN BY THE TEMPLATE'S dragThumbId CARRIER --------
 
-    // WEARS THE THUMB ON THE DECLARED CARRIER; A SHORT TAP FIRES THE CARRIER'S OWN DECLARED onClick
-    // (E.G. SELECT). GRAB/SLIDE/DROP ROUTE THROUGH THE ROW'S CURRENT LIST, NEVER A CAPTURED ONE:
-    // A RE-ADOPTED ROW (RE-INIT) MUST DRIVE THE LIVE LIST, NOT THE DETACHED ONE THAT BUILT IT
+    // WEARS THE THUMB ON THE DECLARED CARRIER; A SHORT TAP FIRES THE CARRIER'S OWN onClick (E.G. SELECT).
+    // GRAB/SLIDE/DROP ROUTE THROUGH THE ROW'S CURRENT LIST, SO A RE-ADOPTED ROW DRIVES THE LIVE ONE
     private static void attachThumb(ListRow row, Element carrier) {
         DragThumb thumb = new DragThumb()
                 .onGrab((x, y) -> { if (row.parent() instanceof ParentList list) list.grab(row, x, y); })

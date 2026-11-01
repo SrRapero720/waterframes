@@ -14,9 +14,10 @@ import me.srrapero720.waterui.core.Spacing;
 import me.srrapero720.waterui.layout.ParentList;
 import me.srrapero720.waterui.widget.ParentTab;
 import me.srrapero720.waterui.widget.Slider;
-import me.srrapero720.waterui.widget.State;
+import me.srrapero720.waterui.widget.StateButton;
 import me.srrapero720.waterui.widget.Stepper;
 import me.srrapero720.waterui.widget.Switch;
+import me.srrapero720.waterui.widget.UIMediaPlayer;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.data.DisplayData.Entry;
 import me.srrapero720.waterframes.common.block.data.types.AudioPosition;
@@ -35,6 +36,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
+import org.watermedia.api.media.MRL;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,6 +44,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static me.srrapero720.waterui.core.Element.translatable;
+import static me.srrapero720.waterui.core.Element.translate;
 
 /**
  * Settings of a display, split into tabs. The strip on top picks the page, the transport bar
@@ -52,14 +57,16 @@ import java.util.Map;
  * variables and events, dresses the resolved widgets and owns the working playlist.
  */
 public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
-    private static final int WIDTH = 267;
+    private static final int WIDTH = 391;
     private static final int HEIGHT = 227;
     /** How far a scroll over the bar jumps, in milliseconds. */
     private static final int SKIP = 5000;
 
-    // BAKED ROW GEOMETRY: A MEDIA HEAD IS FULL SIZE, AN EXPANDED SUB-SOURCE IS COMPACT AND LEFT-INSET
-    private static final int THUMB = 27;
-    private static final int THUMB_SUB = 16;
+    // BAKED ROW GEOMETRY (3:2 THUMBS): A MEDIA HEAD IS FULL SIZE, AN EXPANDED SUB-SOURCE IS COMPACT AND LEFT-INSET
+    private static final int THUMB_W = 42;
+    private static final int THUMB_H = 28;
+    private static final int THUMB_SUB_W = 24;
+    private static final int THUMB_SUB_H = 16;
     private static final float TITLE = 0.75f;
     private static final float TITLE_SUB = 0.6f;
     private static final int SUB_INSET = 8;
@@ -106,10 +113,14 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     private Slider rotation, alpha, brightness, renderDistance, projectionDistance;
     private Switch lit, mirror, showModel, flipX, flipY;
     private Slider volume, volumeMin, volumeMax;
-    private State audioOffset;
+    private StateButton audioOffset;
+    /** Video surface mirroring the tile's own player; the document only places it (§13.2). */
+    private UIMediaPlayer preview;
+    // PLAYER THE PREVIEW IS WRAPPED AROUND, HELD AS Object THE WAY UIMediaPlayer TAKES IT
+    private Object previewOf;
 
     public DisplayScreen(DisplayTile tile) {
-        super(WaterFrames.asResource("display"), WIDTH, HEIGHT);
+        super(WaterFrames.asResource("display_preview"), WIDTH, HEIGHT);
         this.tile = tile;
         this.playlist = new ArrayList<>(tile.data.playlist);
 
@@ -120,9 +131,16 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerVar("muted", () -> tile.data.muted);
         this.registerVar("reload_ready", () -> tile.mrl != null && tile.data.hasUrl());
         this.registerVar("watervision_ready", () -> tile.data.hasUrl() && tile.mrl != null && tile.mrl.status().loaded());
+        // THUMBNAIL URL OF THE MEDIA ON AIR; LIVE BECAUSE THE MRL RESOLVES ASYNC AFTER THE SCREEN OPENS
+        this.registerVar("media_source", () -> {
+            if (tile.mrl == null || !tile.mrl.status().loaded()) return "";
+            MRL.Source source = tile.mrl.source(tile.data.getSource());
+            return source != null && source.thumbnail() != null ? source.thumbnail().toString() : "";
+        });
         // ACTIVE-SOURCE STATE FOR THE TRANSPORT BADGE: THE SAME MAPPING THE PLAYLIST ROWS USE, OVER tile.mrl/tile.display
         this.registerVar("status_icon", () -> SourceRow.statusIcon(tile.mrl, tile, this.missing()));
         this.registerVar("status_tooltip", () -> SourceRow.describe(tile.mrl, tile, this.missing()));
+        this.registerVar("transport_ready", () -> tile.follower() != null);
         this.registerVar("submit_enabled", () -> cachedLink || cachedQuery);
         this.registerVar("submit_icon", () -> cachedLink ? Icons.ADD : Icons.SEARCH);
         this.registerVar("delete_enabled", () -> selectedEntry != null && selectedEntry.source() == 0);
@@ -131,7 +149,12 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
 
         this.registerUIEvent("toggleLoop", () -> tile.loop(true, !tile.data.loop));
         this.registerUIEvent("togglePlayback", () -> tile.setPause(true, !tile.data.paused));
+        this.registerUIEvent("play", () -> tile.setPause(true, false));
+        this.registerUIEvent("pause", () -> tile.setPause(true, true));
         this.registerUIEvent("stop", () -> tile.setStop(true));
+        // SKIPPING IS A SESSION COMMAND: THE FOLLOWER FORWARDS IT TO THE SERVER CLOCK ON ITS OWN
+        this.registerUIEvent("rewind", () -> { if (tile.follower() != null) tile.follower().rewind(); });
+        this.registerUIEvent("fastForward", () -> { if (tile.follower() != null) tile.follower().forward(); });
         // REFETCH THE MRL AND DROP THE PLAYER SO THE NEXT TICK REBUILDS IT FROM THE FRESH SOURCES
         this.registerUIEvent("reload", () -> { if (tile.mrl != null) tile.mrl.reload(); tile.cleanDisplay(); });
         // HANDS THE MEDIA TO WATERVISION'S OWN SCREEN AND PAUSES THE DISPLAY MEANWHILE
@@ -174,8 +197,8 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         // MUTABLE TILE STATE AS SUPPLIERS: THE final vars OF THE DOCS SNAPSHOT THEM FRESH ON EVERY
         // RE-INFLATE (§5.6), SO A RESIZE RE-SEEDS THE KNOBS FROM THE CURRENT DATA, NOT THE OPEN-TIME ONE
         this.registerVar("volume_min_max", () -> Math.min(tile.data.maxVolumeDistance, DisplaysConfig.maxVolDis()));
-        this.registerVar("width", () -> tile.data.getWidth());
-        this.registerVar("height", () -> tile.data.getHeight());
+        this.registerVar("width", tile.data::getWidth);
+        this.registerVar("height", tile.data::getHeight);
         this.registerVar("rotation", () -> tile.data.rotation);
         this.registerVar("alpha", () -> tile.data.alpha);
         this.registerVar("brightness", () -> tile.data.brightness);
@@ -190,7 +213,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerVar("show_model", () -> tile.canHideModel() && tile.isVisible());
         this.registerVar("flip_x", () -> tile.data.flipX);
         this.registerVar("flip_y", () -> tile.data.flipY);
-        this.registerVar("shader_mode", () -> DisplaysConfig.shaderMode());
+        this.registerVar("shader_mode", DisplaysConfig::shaderMode);
         this.registerVar("pos_x", () -> tile.data.getPosX().name());
         this.registerVar("pos_y", () -> tile.data.getPosY().name());
     }
@@ -243,9 +266,8 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
 
     @Override
     protected void build() {
-        // WIDGETS RESOLVE FIRST, ALWAYS: A BROKEN DOCUMENT NULLS EVERY FIELD INSTEAD OF LEAVING THE
-        // PREVIOUS TREE'S WIDGETS BEHIND, SO A LATER flush() NEVER READS A DISCONNECTED KNOB.
-        // A PACK DROPPING AN id LEAVES ITS FIELD NULL AND ITS PATCH SECTION CONTRIBUTES NOTHING (H4)
+        // WIDGETS RESOLVE FIRST, ALWAYS: A BROKEN DOCUMENT NULLS EVERY FIELD SO flush() NEVER READS A
+        // DISCONNECTED KNOB; A PACK DROPPING AN id LEAVES ITS PATCH SECTION CONTRIBUTING NOTHING (H4)
         this.widthField = this.get(WaterFrames.asResource("render/width")) instanceof Stepper s ? s : null;
         this.heightField = this.get(WaterFrames.asResource("render/height")) instanceof Stepper s ? s : null;
         this.position = this.get(WaterFrames.asResource("render/position")) instanceof AnchorPicker p ? p : null;
@@ -262,7 +284,10 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.volume = this.slider("media/volume");
         this.volumeMin = this.slider("media/volume_min");
         this.volumeMax = this.slider("media/volume_max");
-        this.audioOffset = this.get(WaterFrames.asResource("media/audio_offset")) instanceof State s ? s : null;
+        this.audioOffset = this.get(WaterFrames.asResource("media/audio_offset")) instanceof StateButton s ? s : null;
+        // A RE-INFLATE HANDS OUT A FRESH SURFACE: FORGET THE OLD WRAP SO THE NEXT TICK BINDS THIS ONE
+        this.preview = this.get(WaterFrames.asResource("display/preview")) instanceof UIMediaPlayer p ? p : null;
+        this.previewOf = null;
         // VOLUME RANGE COUPLING: THE MIN SLIDER'S CEILING FOLLOWS THE MAX SLIDER LIVE
         if (volumeMin != null && volumeMax != null) volumeMax.onChange(volumeMin::max);
 
@@ -549,7 +574,8 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         // DRAG-BLOCK TOKEN (§10.6): A MEDIA HEAD AND ITS EXPANDED SOURCES SHARE THE URL, SO THEY TRAVEL WHOLE
         row.put("group", entry.url());
         row.put("uuid", (entry.owner() != null ? entry.owner() : Util.NIL_UUID).toString());
-        row.put("thumb_size", media ? THUMB : THUMB_SUB);
+        row.put("thumb_width", media ? THUMB_W : THUMB_SUB_W);
+        row.put("thumb_height", media ? THUMB_H : THUMB_SUB_H);
         row.put("title_scale", media ? TITLE : TITLE_SUB);
         // A SUB-SOURCE IS INSET SO IT READS AS THE TAIL OF ITS MEDIA HEAD; A HEAD SITS FLUSH
         row.put("row_inset", media ? Spacing.ZERO : new Spacing(0, 0, 0, SUB_INSET));
@@ -579,6 +605,15 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         if (tile.isRemoved()) {
             this.close();
             return;
+        }
+        // THE PREVIEW MIRRORS THE BLOCK'S OWN PLAYER INSTEAD OF OPENING A SECOND SESSION, SO IT COSTS
+        // NOTHING TO DECODE; A RELOAD OR A SOURCE SWAP BUILDS A NEW PLAYER AND THE WRAP FOLLOWS IT
+        if (preview != null) {
+            Object player = tile.follower();
+            if (player != previewOf) {
+                this.previewOf = player;
+                this.preview.wrap(player);
+            }
         }
         // THE PLAYLIST PAGE IS THE ONLY ONE WITH TICK WORK; GATED SO ITS CACHES COST NOTHING ELSEWHERE
         if (parentTab != null && parentTab.active() == sourcesTab) this.sourcesTick();

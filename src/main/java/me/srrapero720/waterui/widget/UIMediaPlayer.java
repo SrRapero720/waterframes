@@ -1,12 +1,9 @@
 package me.srrapero720.waterui.widget;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.Element;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.watermedia.api.media.MRL;
@@ -16,6 +13,8 @@ import org.watermedia.api.media.engines.SFXEngine;
 import org.watermedia.api.media.players.MediaPlayer;
 
 import java.net.URI;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * Renders a media player's video frame, letterboxed to its content box. Two creation modes:
@@ -42,14 +41,14 @@ public class UIMediaPlayer extends Element {
         this.close();
         if (player == null) return this;
         if (!READY) {
-            WaterUI.LOGGER.warn(IT, "WATERMedia is not present; UIMediaPlayer cannot wrap a player");
+            LOGGER.warn(IT, "WATERMedia is not present; UIMediaPlayer cannot wrap a player");
             return this;
         }
         try {
             this.media = Media.wrap(player);
-            WaterUI.LOGGER.debug(IT, "media player wrapped");
+            LOGGER.debug(IT, "media player wrapped");
         } catch (Throwable t) {
-            WaterUI.LOGGER.error(IT, "UIMediaPlayer wrap failed", t);
+            LOGGER.error(IT, "UIMediaPlayer wrap failed", t);
             this.media = null;
         }
         return this;
@@ -60,14 +59,14 @@ public class UIMediaPlayer extends Element {
         this.close();
         if (uri == null) return this;
         if (!READY) {
-            WaterUI.LOGGER.warn(IT, "WATERMedia is not present; UIMediaPlayer cannot create a player");
+            LOGGER.warn(IT, "WATERMedia is not present; UIMediaPlayer cannot create a player");
             return this;
         }
         try {
             this.media = Media.own(uri, sourceIndex);
-            WaterUI.LOGGER.debug(IT, "media session created for {} (source {})", uri, sourceIndex);
+            LOGGER.debug(IT, "media session created for {} (source {})", uri, sourceIndex);
         } catch (Throwable t) {
-            WaterUI.LOGGER.error(IT, "UIMediaPlayer creation failed for {}", uri, t);
+            LOGGER.error(IT, "UIMediaPlayer creation failed for {}", uri, t);
             this.media = null;
         }
         return this;
@@ -79,7 +78,7 @@ public class UIMediaPlayer extends Element {
         try {
             return this.source(URI.create(url.trim()), sourceIndex);
         } catch (IllegalArgumentException e) {
-            WaterUI.LOGGER.warn(IT, "UIMediaPlayer invalid URL: {}", url);
+            LOGGER.warn(IT, "UIMediaPlayer invalid URL: {}", url);
             return this;
         }
     }
@@ -104,7 +103,7 @@ public class UIMediaPlayer extends Element {
             try {
                 media.release();
             } catch (Throwable t) {
-                WaterUI.LOGGER.error(IT, "UIMediaPlayer release failed", t);
+                LOGGER.error(IT, "UIMediaPlayer release failed", t);
             }
             this.media = null;
         }
@@ -117,7 +116,7 @@ public class UIMediaPlayer extends Element {
             media.box(contentWidth(), contentHeight());
             media.tick();
         } catch (Throwable t) {
-            WaterUI.LOGGER.error(IT, "UIMediaPlayer tick failed", t);
+            LOGGER.error(IT, "UIMediaPlayer tick failed", t);
             this.close();
         }
     }
@@ -148,20 +147,14 @@ public class UIMediaPlayer extends Element {
         try {
             texture = media != null ? media.texture() : null;
         } catch (Throwable t) {
-            WaterUI.LOGGER.error(IT, "UIMediaPlayer texture failed", t);
+            LOGGER.error(IT, "UIMediaPlayer texture failed", t);
             this.close();
             texture = null;
         }
         if (texture == null) return;
 
-        // LETTERBOXED: KEEP ASPECT, NEVER STRETCH
-        int mediaWidth = Math.max(1, media.width());
-        int mediaHeight = Math.max(1, media.height());
-        float scale = Math.min(contentWidth() / (float) mediaWidth, contentHeight() / (float) mediaHeight);
-        int width = Math.max(1, Math.round(mediaWidth * scale));
-        int height = Math.max(1, Math.round(mediaHeight * scale));
-        graphics.blit(texture, contentX() + (contentWidth() - width) / 2, contentY() + (contentHeight() - height) / 2,
-                0, 0, width, height, width, height);
+        MediaTexture.blit(graphics, texture, contentX(), contentY(), contentWidth(), contentHeight(),
+                media.width(), media.height());
     }
 
     private static boolean probe() {
@@ -169,7 +162,7 @@ public class UIMediaPlayer extends Element {
             Class.forName("org.watermedia.api.media.MediaAPI");
             return true;
         } catch (Throwable t) {
-            WaterUI.LOGGER.warn(IT, "WATERMedia is not present; UIMediaPlayer will draw nothing");
+            LOGGER.warn(IT, "WATERMedia is not present; UIMediaPlayer will draw nothing");
             return false;
         }
     }
@@ -183,9 +176,8 @@ public class UIMediaPlayer extends Element {
         private boolean owned;
         private GFXEngine gfx;
         private SFXEngine sfx;
-        // THE RL THIS SESSION REGISTERED ITS CURRENT GL TEXTURE UNDER, AND THE ID BEHIND IT
-        private ResourceLocation location;
-        private int glId;
+        // GL TEXTURE REGISTRATION SHARED WITH Thumbnail: SWAP-AWARE, FREES ONLY ITS OWN
+        private final MediaTexture managed = new MediaTexture("media_");
         private boolean released;
 
         // WIDGET CONTENT BOX IN GUI PIXELS, PUSHED BY THE OWNER EACH TICK; DRIVES THE UPLOAD CAP
@@ -237,22 +229,15 @@ public class UIMediaPlayer extends Element {
             }
             this.applyCap();
             this.player.start();
-            WaterUI.LOGGER.debug(IT, "media player started (source {}) capped at {}x{}", sourceIndex, cropW, cropH);
+            LOGGER.debug(IT, "media player started (source {}) capped at {}x{}", sourceIndex, cropW, cropH);
         }
 
-        /** Texture to blit, or null while loading or unavailable. */
+        // TEXTURE TO BLIT, OR NULL WHILE LOADING OR UNAVAILABLE
         ResourceLocation texture() {
             if (released || player == null || !player.canPlay()) return null;
             int id = (int) player.texture();
             if (id <= 0) return null;
-            // RE-REGISTER WHEN THE PLAYER SWAPS ITS GL TEXTURE, DROP THE STALE ONE
-            if (location == null || glId != id) {
-                this.free();
-                this.glId = id;
-                this.location = WaterUI.id("media_" + id);
-                Minecraft.getInstance().getTextureManager().register(location, new GlTexture(id));
-            }
-            return location;
+            return managed.locate(id);
         }
 
         int width() {
@@ -279,43 +264,20 @@ public class UIMediaPlayer extends Element {
         void release() {
             if (released) return;
             this.released = true;
-            WaterUI.LOGGER.debug(IT, "media session released ({})", owned ? "owned" : "wrapped");
+            LOGGER.debug(IT, "media session released ({})", owned ? "owned" : "wrapped");
             this.mrl = null;
             if (owned && player != null) {
                 try {
                     // THE PLAYER OWNS THE ENGINES: THIS RELEASE FREES BOTH
                     player.release();
                 } catch (Throwable t) {
-                    WaterUI.LOGGER.error(IT, "media player failed to release", t);
+                    LOGGER.error(IT, "media player failed to release", t);
                 }
             }
             this.player = null;
             this.gfx = null;
             this.sfx = null;
-            this.free();
-        }
-
-        // DROPS EXACTLY THE TEXTURE THIS SESSION REGISTERED
-        private void free() {
-            if (location == null) return;
-            Minecraft.getInstance().getTextureManager().release(location);
-            this.location = null;
-            this.glId = 0;
-        }
-
-        // GL TEXTURE THE MEDIA PLAYER ALREADY OWNS, WRAPPED FOR THE TEXTURE MANAGER
-        private static final class GlTexture extends AbstractTexture {
-            GlTexture(int id) {
-                this.id = id;
-            }
-
-            @Override public int getId() {
-                return this.id;
-            }
-
-            @Override public void load(ResourceManager manager) { /* NO OP */ }
-            @Override public void releaseId() { /* NO OP */ }
-            @Override public void close() { /* NO OP */ }
+            this.managed.free();
         }
     }
 }

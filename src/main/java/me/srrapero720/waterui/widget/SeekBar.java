@@ -8,6 +8,8 @@ import java.util.function.LongSupplier;
 /**
  * Playback scrubber over the progress track, in milliseconds. It mirrors the media while idle
  * and takes over only while dragging, so the session moving underneath does not fight the cursor.
+ * The {@code time}/{@code duration} pair is the media-domain alias of {@link ProgressBar}'s
+ * {@code value}/{@code max}; the {@code .ui} properties follow the alias.
  */
 public class SeekBar extends ProgressBar {
     private DoubleConsumer onSeekStart;
@@ -34,18 +36,6 @@ public class SeekBar extends ProgressBar {
 
     public SeekBar duration(LongSupplier duration) {
         this.max = duration;
-        return this;
-    }
-
-    @Override
-    public SeekBar format(ValueFormat format) {
-        super.format(format);
-        return this;
-    }
-
-    @Override
-    public SeekBar textScale(float textScale) {
-        super.textScale(textScale);
         return this;
     }
 

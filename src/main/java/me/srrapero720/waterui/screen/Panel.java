@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.screen;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.Anchor;
 import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.format.UIHost;
@@ -18,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static me.srrapero720.waterui.WaterUI.LOGGER;
+
 /**
  * Themed content slab: a bordered, centred panel. It is the root a {@link WaterScreen} owns, and
  * the base of every {@link Dialog} overlay. The design size is the outer box; the thick border
@@ -28,10 +29,14 @@ public class Panel extends ParentLinear {
 
     public final String name;
 
-    WaterScreen screen;
     // SCREEN HOSTING THIS PANEL, OR NULL BEFORE IT IS ATTACHED
-    public WaterScreen screen() { return screen; }
+    WaterScreen screen;
     private boolean edged;
+    // BUILDER-OWNED DISPOSABLES: THE FORMAT BUILDER REGISTERS ELEMENTS IT CREATED, SO THE
+    // PANEL CAN RELEASE THEIR RESOURCES ON SCREEN CLOSE WITHOUT TOUCHING HOST-CACHED ONES
+    private List<Element> disposables;
+
+    public WaterScreen screen() { return screen; }
 
     /** Takes its look from the screen it is opened on. */
     public Panel(String name, int width, int height) {
@@ -60,10 +65,6 @@ public class Panel extends ParentLinear {
         return super.borderDisplay();
     }
 
-    // BUILDER-OWNED DISPOSABLES: THE FORMAT BUILDER REGISTERS ELEMENTS IT CREATED, SO THE
-    // PANEL CAN RELEASE THEIR RESOURCES ON SCREEN CLOSE WITHOUT TOUCHING HOST-CACHED ONES
-    private List<Element> disposables;
-
     /** Registers a builder-created element whose resources this panel will release on dispose. */
     public void disposable(Element element) {
         if (disposables == null) disposables = new ArrayList<>();
@@ -89,17 +90,17 @@ public class Panel extends ParentLinear {
                         ? ResourceLocation.fromNamespaceAndPath(key.substring(0, colon), key.substring(colon + 1))
                         : ResourceLocation.fromNamespaceAndPath(namespace, key);
             } catch (RuntimeException e) {
-                WaterUI.LOGGER.error(IT, "[{}] registered element event has an invalid id '{}'", name, key);
+                LOGGER.error(IT, "[{}] registered element event has an invalid id '{}'", name, key);
                 continue;
             }
             // THE SCREEN FALLBACK REACHES THE OUTSIDE ELEMENTS (§9.5), WHICH ARE LIFTED OUT OF THE ROOT
             Element element = this.get(id);
             if (element == null && screen != null && screen.base(this)) element = screen.get(id);
             if (element == null) {
-                WaterUI.LOGGER.error(IT, "[{}] registered element event '{}' resolves to nothing", name, id);
+                LOGGER.error(IT, "[{}] registered element event '{}' resolves to nothing", name, id);
                 continue;
             }
-            if (element.hasClick()) WaterUI.LOGGER.warn(IT, "[{}] element event '{}' replaces a declared onClick", name, id);
+            if (element.hasClick()) LOGGER.warn(IT, "[{}] element event '{}' replaces a declared onClick", name, id);
             Element target = element;
             Consumer<Element> callback = entry.getValue();
             element.onClick(() -> callback.accept(target));

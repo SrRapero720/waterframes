@@ -44,15 +44,6 @@ public class Switch extends Element {
         this.width(FILL);
     }
 
-    public static Switch translated(String key, boolean value) {
-        return new Switch(Component.translatable(key), value);
-    }
-
-    /** Mirrors state owned by someone else instead of holding its own. */
-    public static Switch live(String key, BooleanSupplier source) {
-        return new Switch(Component.translatable(key), source.getAsBoolean()).source(source);
-    }
-
     public Switch text(Component text) {
         this.text = text;
         this.dirty();
@@ -119,12 +110,12 @@ public class Switch extends Element {
             int scaledGlyph = Math.round(GLYPH_HEIGHT * textScale);
             int y = contentY() + Math.max(0, (contentHeight() - scaledGlyph + 1) / 2);
             if (textScale == 1f) {
-                graphics.drawString(font(), text, contentX(), y, textColor(), true);
+                graphics.drawString(font(), text, contentX(), y, textColor(), shadow());
             } else {
                 graphics.pose().pushPose();
                 graphics.pose().translate(contentX(), y, 0);
                 graphics.pose().scale(textScale, textScale, 1f);
-                graphics.drawString(font(), text, 0, 0, textColor(), true);
+                graphics.drawString(font(), text, 0, 0, textColor(), shadow());
                 graphics.pose().popPose();
             }
         }

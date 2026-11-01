@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.format;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.AbstractParent;
 import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.layout.FrameLayout;
@@ -28,6 +27,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static me.srrapero720.waterui.WaterUI.LOGGER;
+
 /**
  * Turns a parsed {@link UIDocument} into a live {@link Element} tree under a {@link Panel} root
  * (UI-SPEC.md §6, §8-§13), depth-first. It resolves the variable contract, the theme fallback chain
@@ -49,7 +50,7 @@ public final class UIBuilder {
     /** Loads {@code ui}, wires it against {@code host} and populates {@code root} (§6, §13). */
     public static void inflate(ResourceLocation ui, Panel root, Object host, Map<String, Object> vars) {
         UIRegistry.bootstrap();
-        WaterUI.LOGGER.debug(IT, "inflating {} into {}", ui, root.name);
+        LOGGER.debug(IT, "inflating {} into {}", ui, root.name);
         // DIALOGS OWN THEIR CONTEXT; THE ROOT PANEL USES THE SCREEN'S SHARED ONE
         DataContext data = root instanceof Dialog d && d.context() != null ? d.context() : (root.screen() != null ? root.screen().context() : null);
         if (data != null) data.host(host);
@@ -87,7 +88,7 @@ public final class UIBuilder {
                     root.add(element);
                 }
             }
-            WaterUI.LOGGER.debug(IT, "inflated {} ({} root node(s))", doc.source(), doc.tree().size());
+            LOGGER.debug(IT, "inflated {} ({} root node(s))", doc.source(), doc.tree().size());
         } catch (UIFormatException ex) {
             String file = ex.file != null ? ex.file : (doc != null ? doc.source().toString() : ui.toString());
             error(root, file, ex.line, rawMessage(ex));
@@ -126,13 +127,12 @@ public final class UIBuilder {
         return thumbRef != null ? dragThumb(thumbRef, row, doc.source()) : null;
     }
 
-    // RESOLVES THE ROOT'S dragThumbId WITHIN THE ROW'S OWN SUBTREE (§10.6): TEMPLATE IDS REPEAT
-    // ACROSS ROWS, SO THE LOOKUP IS ROW-SCOPED AND THE LIST KEEPS THEM ENCAPSULATED.
-    // A TEMPLATE-AUTHORED SLIP MUST NOT KILL EVERY ROW (§13.4): THE ROWS BUILD WITHOUT A DRAG HANDLE
+    // RESOLVES THE ROOT'S dragThumbId WITHIN THE ROW'S OWN SUBTREE (§10.6): TEMPLATE IDS REPEAT PER ROW,
+    // SO THE LOOKUP IS ROW-SCOPED; A TEMPLATE-AUTHORED SLIP JUST BUILDS THE ROWS WITHOUT A HANDLE (§13.4)
     private static Element dragThumb(UIValue ref, ParentLinear row, ResourceLocation file) {
         ResourceLocation base = resolveId(ref, file);
         Element thumb = row.get(base);
-        if (thumb == null) WaterUI.LOGGER.error(IT, "{} dragThumbId '{}' resolves to nothing in the template (§10.6)", file, base.getPath());
+        if (thumb == null) LOGGER.error(IT, "{} dragThumbId '{}' resolves to nothing in the template (§10.6)", file, base.getPath());
         return thumb;
     }
 
@@ -309,7 +309,7 @@ public final class UIBuilder {
             UIRegistry.EventBinder binder = UIRegistry.eventBinder(tag, entry.getKey());
             if (binder == null) {
                 // AN UNKNOWN EVENT IS A RECOVERABLE SLIP (§13.4): LOG AND NO-OP, THE SCREEN STILL OPENS
-                WaterUI.LOGGER.error(IT, "{}:{} unknown event '{}' on '{}'", file, line, entry.getKey(), tag);
+                LOGGER.error(IT, "{}:{} unknown event '{}' on '{}'", file, line, entry.getKey(), tag);
                 continue;
             }
             UIValue.Call call = (UIValue.Call) entry.getValue();
@@ -333,7 +333,7 @@ public final class UIBuilder {
         UIDocument imported = UILoader.document(ref);
         if (imported == null) throw new UIFormatException(node.source().toString(), node.line(), "import '" + imp.alias() + "' references unknown/unloaded document '" + ref + "'");
         if (ancestry.contains(ref)) throw new UIFormatException(node.source().toString(), node.line(), "recursive import '" + ref + "'");
-        WaterUI.LOGGER.debug(IT, "inserting import {} as '{}'", ref, imp.alias());
+        LOGGER.debug(IT, "inserting import {} as '{}'", ref, imp.alias());
 
         ParentLinear container = new ParentLinear(ParentLinear.Orientation.VERTICAL);
         // IMPORTED ROOT PREFS SHAPE THE CONTAINER FOR EVERY KEY THE ALIAS BAG DID NOT SET; THE BAG WINS (§6.1, §7.2)
@@ -359,7 +359,7 @@ public final class UIBuilder {
     private static Element buildTabs(UINode node, UIContract contract, DataContext data, Object host, Consumer<Element> disposables, ArrayDeque<ResourceLocation> ancestry) {
         UIValue tabsValue = node.props().get("tabs");
         if (!(tabsValue instanceof UIValue.Tuple tabs)) throw new UIFormatException(node.source().toString(), node.line(), "ParentTab needs a 'tabs' tuple of import aliases");
-        WaterUI.LOGGER.debug(IT, "building tab strip with {} tab(s)", tabs.items().size());
+        LOGGER.debug(IT, "building tab strip with {} tab(s)", tabs.items().size());
 
         ParentTab tabbed = new ParentTab();
         UIValue idv = node.props().get("id");
@@ -454,7 +454,7 @@ public final class UIBuilder {
         try {
             if (colon >= 0) {
                 String otherNs = raw.substring(0, colon);
-                if (!otherNs.equals(docNs)) WaterUI.LOGGER.warn(IT, "id '{}' uses a foreign namespace (document is '{}')", raw, docNs);
+                if (!otherNs.equals(docNs)) LOGGER.warn(IT, "id '{}' uses a foreign namespace (document is '{}')", raw, docNs);
                 return ResourceLocation.fromNamespaceAndPath(otherNs, raw.substring(colon + 1));
             }
             return ResourceLocation.fromNamespaceAndPath(docNs, raw);
@@ -483,9 +483,9 @@ public final class UIBuilder {
 
     // THE §13.4 SURFACE: ONE RED LABEL INSIDE THE ROOT PLUS AN ERROR LOG LINE, SO A BROKEN DOCUMENT STILL OPENS
     private static void error(Panel root, String file, int line, String message) {
-        WaterUI.LOGGER.error(IT, "{}:{} {}", file, line, message);
+        LOGGER.error(IT, "{}:{} {}", file, line, message);
         Text fallback = new Text().text(Component.literal("UI ERROR: " + file + ":" + line + " " + message));
-        fallback.color = 0xFFFF5555;
+        fallback.color(0xFFFF5555);
         root.add(fallback);
     }
 }

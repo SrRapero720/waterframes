@@ -273,7 +273,7 @@ public final class DebugOverlay {
             if (ts > 0 && ts != 1f) state += " textScale " + ts;
 
             if (hovered instanceof Text txt) {
-                if (txt.fontScale() != 1f) state += " fontScale " + txt.fontScale();
+                if (txt.textScale() != 1f) state += " textScale " + txt.textScale();
                 if (txt.maxLines() > 1) state += " lines " + txt.maxLines();
                 if (txt.ellipsized()) state += " ellipsize";
             }

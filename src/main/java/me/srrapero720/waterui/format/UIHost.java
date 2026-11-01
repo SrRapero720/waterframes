@@ -1,7 +1,7 @@
 package me.srrapero720.waterui.format;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.Element;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * A host carrying programmatic registrations in three registries (UI-SPEC.md §5.6, §12.2): DYNAMIC
@@ -20,6 +22,51 @@ public interface UIHost {
 
     /** The host's registration store; never null. */
     Store uiStore();
+
+    /** Registers an inflatable constant fed to the contract on every inflate; register in the constructor (§5.6). */
+    default void registerVar(String key, boolean value) {
+        this.uiStore().inflatable(key, value);
+    }
+
+    /** Registers an inflatable numeric constant; {@code int} widens here (§5.6). */
+    default void registerVar(String key, long value) {
+        this.uiStore().inflatable(key, value);
+    }
+
+    /** Registers an inflatable numeric constant; {@code float} widens here (§5.6). */
+    default void registerVar(String key, double value) {
+        this.uiStore().inflatable(key, value);
+    }
+
+    /** Registers an inflatable String/Icon/ItemStack constant (§5.6). */
+    default void registerVar(String key, Object value) {
+        this.uiStore().inflatable(key, value);
+    }
+
+    /** Registers a dynamic variable read live like a {@code @UIVar} method; a {@code final var} snapshots it per inflate (§5.6). */
+    default void registerVar(String key, Supplier<?> value) {
+        this.uiStore().dynamic(key, value);
+    }
+
+    /** Registers a named handler for the document's {@code on<Event>=key(...)} calls, receiving id + baked args + payload (§12.2). */
+    default void registerUIEvent(String key, UIEvents.Handler handler) {
+        this.uiStore().event(key, handler);
+    }
+
+    /** Registers a payload-blind named handler (§12.2). */
+    default void registerUIEvent(String key, Runnable handler) {
+        this.uiStore().event(key, payload -> handler.run());
+    }
+
+    /** Binds {@code callback} straight to the element's click by id; the namespace is the inflated document's (§12.2). */
+    default void registerEvent(String elementId, Consumer<Element> callback) {
+        this.uiStore().element(elementId, callback);
+    }
+
+    /** Same as {@link #registerEvent(String, Consumer)} with an explicit {@code ns:path} id, for foreign elements. */
+    default void registerEvent(ResourceLocation elementId, Consumer<Element> callback) {
+        this.uiStore().element(elementId.toString(), callback);
+    }
 
     /**
      * The three registries of one host, filled in its constructor and living as long as the instance:
@@ -38,7 +85,7 @@ public interface UIHost {
         private boolean inflated;
 
         public void dynamic(String key, Supplier<?> value) {
-            if (inflated) WaterUI.LOGGER.warn(IT, "dynamic var '{}' registered after the inflate; it binds nothing until a re-init", key);
+            if (inflated) LOGGER.warn(IT, "dynamic var '{}' registered after the inflate; it binds nothing until a re-init", key);
             this.dynamic.put(key, value);
         }
 
@@ -47,13 +94,8 @@ public interface UIHost {
         }
 
         public void inflatable(String key, Object value) {
-            if (inflated) WaterUI.LOGGER.warn(IT, "inflatable var '{}' registered after the inflate; it feeds nothing until a re-init", key);
+            if (inflated) LOGGER.warn(IT, "inflatable var '{}' registered after the inflate; it feeds nothing until a re-init", key);
             this.inflatable.put(key, value);
-        }
-
-        /** The baked host map the internal inflate hands to the contract (§5.1). */
-        public Map<String, Object> inflatable() {
-            return inflatable;
         }
 
         /**
@@ -83,7 +125,7 @@ public interface UIHost {
         }
 
         public void element(String key, Consumer<Element> callback) {
-            if (inflated) WaterUI.LOGGER.warn(IT, "element event '{}' registered after the inflate; it wires nothing until a re-init", key);
+            if (inflated) LOGGER.warn(IT, "element event '{}' registered after the inflate; it wires nothing until a re-init", key);
             this.elements.put(key, callback);
         }
 

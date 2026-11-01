@@ -9,10 +9,10 @@ import java.util.List;
 
 public class Text extends Element {
     private Component text = Component.empty();
-    /** 0 falls back to the theme colour. */
-    public int color;
+    // 0 FALLS BACK TO THE THEME COLOUR
+    private int color;
     // GLYPH SCALE, FOR SECONDARY LINES THAT READ AS FINE PRINT
-    private float fontScale = 1f;
+    private float textScale = 1f;
     // TRIMS THE TEXT TO THE BOX AND MARKS THE CUT WITH AN ELLIPSIS
     private boolean ellipsize;
     // HOW MANY LINES THE TEXT MAY WRAP OVER; OVERFLOW IS CUT
@@ -33,17 +33,13 @@ public class Text extends Element {
         this.text = text;
     }
 
-    public static Text translated(String key) {
-        return new Text(Component.translatable(key));
-    }
-
     public Text color(int color) {
         this.color = color;
         return this;
     }
 
-    public Text fontScale(float fontScale) {
-        this.fontScale = fontScale;
+    public Text textScale(float textScale) {
+        this.textScale = textScale;
         this.wrapCount = 0;
         this.dirty();
         return this;
@@ -75,17 +71,12 @@ public class Text extends Element {
         return this;
     }
 
-    /** Alias for the format layer's {@code component} property name. */
-    public Text component(Component text) {
-        return this.text(text);
-    }
-
     public Component text() {
         return text;
     }
 
-    public float fontScale() {
-        return fontScale;
+    public float textScale() {
+        return textScale;
     }
 
     public int maxLines() {
@@ -98,12 +89,12 @@ public class Text extends Element {
 
     @Override
     protected int prefContentWidth(int available) {
-        return Math.round(font().width(text) * fontScale);
+        return Math.round(font().width(text) * textScale);
     }
 
     @Override
     protected int prefContentHeight(int width, int available) {
-        int line = Math.round(font().lineHeight * fontScale);
+        int line = Math.round(font().lineHeight * textScale);
         if (maxLines == 1) return line;
         // ACTUAL WRAP AT THE GIVEN WIDTH, CAPPED AT maxLines, AT LEAST 1 LINE
         return line * Math.max(1, Math.min(maxLines, this.wrap(this.room(width)).size()));
@@ -112,18 +103,18 @@ public class Text extends Element {
     // THE TEXT CAN SHRINK DOWN TO A SINGLE LINE ON ANY WIDTH
     @Override
     protected int minContentHeight(int width, int available) {
-        return Math.round(font().lineHeight * fontScale);
+        return Math.round(font().lineHeight * textScale);
     }
 
     // A LINE THAT MAY BE CUT SHORT CAN SHRINK DOWN TO ITS ELLIPSIS MARK
     @Override
     protected int minContentWidth(int available) {
-        return ellipsize || maxLines > 1 ? Math.round(font().width("...") * fontScale) : prefContentWidth(available);
+        return ellipsize || maxLines > 1 ? Math.round(font().width("...") * textScale) : prefContentWidth(available);
     }
 
     // BOX WIDTH BACK IN GLYPH SPACE, WHERE THE FONT MEASURES
     private int room(int width) {
-        return Math.max(1, Math.round(width / fontScale));
+        return Math.max(1, Math.round(width / textScale));
     }
 
     // THE STRING AS IT FITS THE ROOM: WHOLE, CUT WITH AN ELLIPSIS MARKER, OR HARD-CUT
@@ -179,11 +170,11 @@ public class Text extends Element {
 
         // THE BLOCK CENTRES ON THE GLYPH HEIGHT OF ITS LAST LINE, WHICH KEEPS THE SINGLE LINE
         // CASE SITTING EXACTLY WHERE IT ALWAYS DID
-        int step = Math.round(font().lineHeight * fontScale);
-        int block = step * (lines.size() - 1) + Math.round(GLYPH_HEIGHT * fontScale);
+        int step = Math.round(font().lineHeight * textScale);
+        int block = step * (lines.size() - 1) + Math.round(GLYPH_HEIGHT * textScale);
         int y = contentY() + Math.max(0, (contentHeight() - block) / 2);
 
-        if (fontScale == 1f) {
+        if (textScale == 1f) {
             for (String line: lines) {
                 graphics.drawString(font(), line, contentX(), y, color, shadow());
                 y += step;
@@ -194,7 +185,7 @@ public class Text extends Element {
         // SCALING HAS TO GO THROUGH THE POSE, drawString ONLY TAKES WHOLE PIXELS
         graphics.pose().pushPose();
         graphics.pose().translate(contentX(), y, 0);
-        graphics.pose().scale(fontScale, fontScale, 1f);
+        graphics.pose().scale(textScale, textScale, 1f);
         for (int i = 0; i < lines.size(); i++) {
             graphics.drawString(font(), lines.get(i), 0, i * font().lineHeight, color, shadow());
         }

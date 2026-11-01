@@ -1,13 +1,10 @@
 package me.srrapero720.waterui.widget;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.theme.Icon;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.watermedia.api.media.MRL;
@@ -19,6 +16,8 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * Preview picture of a media, falling back to a plain icon while there is nothing to show.
@@ -56,7 +55,7 @@ public class Thumbnail extends Element {
         // WEB SCHEMES ONLY (L6): SOURCES ARRIVE FROM REMOTE METADATA AND DOCUMENTS, SO A file:
         // VALUE MUST NEVER OPEN A LOCAL PATH; EVERY REAL THUMBNAIL IS AN http(s) PLATFORM URI
         if (uri != null && !"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme())) {
-            WaterUI.LOGGER.warn(IT, "thumbnail scheme rejected: {}", uri);
+            LOGGER.warn(IT, "thumbnail scheme rejected: {}", uri);
             uri = null;
         }
         if (Objects.equals(uri, source)) return this;
@@ -73,9 +72,9 @@ public class Thumbnail extends Element {
             this.media = new Media(uri);
             this.media.onLoaded = () -> { if (loadListener != null) loadListener.run(); };
             this.media.onError = this::error;
-            WaterUI.LOGGER.debug(IT, "thumbnail session opened for {}", uri);
+            LOGGER.debug(IT, "thumbnail session opened for {}", uri);
         } catch (Throwable t) {
-            WaterUI.LOGGER.error(IT, "thumbnail media session failed for {}", uri, t);
+            LOGGER.error(IT, "thumbnail media session failed for {}", uri, t);
             this.media = null;
             this.error("Media session failed: " + t.getMessage());
         }
@@ -159,7 +158,7 @@ public class Thumbnail extends Element {
                 media.box(contentWidth(), contentHeight());
                 media.tick();
             } catch (Throwable t) {
-                WaterUI.LOGGER.error(IT, "thumbnail media tick failed", t);
+                LOGGER.error(IT, "thumbnail media tick failed", t);
                 this.close();
                 this.error("Media backend failed: " + t.getMessage());
             }
@@ -194,7 +193,7 @@ public class Thumbnail extends Element {
         try {
             texture = media != null ? media.texture() : null;
         } catch (Throwable t) {
-            WaterUI.LOGGER.error(IT, "thumbnail texture failed", t);
+            LOGGER.error(IT, "thumbnail texture failed", t);
             this.close();
             this.error("Media backend failed: " + t.getMessage());
             texture = null;
@@ -207,15 +206,8 @@ public class Thumbnail extends Element {
             return;
         }
 
-        // LETTERBOXED, LIKE EVERY OTHER SQUARED DRAW HERE: A 16:9 PREVIEW IN A SQUARE BOX KEEPS
-        // ITS SHAPE INSTEAD OF BEING STRETCHED INTO ONE
-        int mediaWidth = Math.max(1, media.width());
-        int mediaHeight = Math.max(1, media.height());
-        float scale = Math.min(contentWidth() / (float) mediaWidth, contentHeight() / (float) mediaHeight);
-        int width = Math.max(1, Math.round(mediaWidth * scale));
-        int height = Math.max(1, Math.round(mediaHeight * scale));
-        graphics.blit(texture, contentX() + (contentWidth() - width) / 2, contentY() + (contentHeight() - height) / 2,
-                0, 0, width, height, width, height);
+        MediaTexture.blit(graphics, texture, contentX(), contentY(), contentWidth(), contentHeight(),
+                media.width(), media.height());
     }
 
     private static boolean probe() {
@@ -223,7 +215,7 @@ public class Thumbnail extends Element {
             Class.forName("org.watermedia.api.media.MediaAPI");
             return true;
         } catch (Throwable t) {
-            WaterUI.LOGGER.warn(IT, "WATERMedia is not present; thumbnails will only show their fallback");
+            LOGGER.warn(IT, "WATERMedia is not present; thumbnails will only show their fallback");
             return false;
         }
     }
@@ -234,10 +226,8 @@ public class Thumbnail extends Element {
         private MRL mrl;
         private MediaPlayer player;
         private GFXEngine gfx;
-        // THE RL THIS SESSION REGISTERED ITS CURRENT GL TEXTURE UNDER, AND THE ID BEHIND IT, SO A
-        // SWAPPED TEXTURE RE-REGISTERS AND FREES THE STALE ONE INSTEAD OF LEAKING OR FREEING ANOTHER'S
-        private ResourceLocation location;
-        private int glId;
+        // GL TEXTURE REGISTRATION SHARED WITH UIMediaPlayer: SWAP-AWARE, FREES ONLY ITS OWN
+        private final MediaTexture managed = new MediaTexture("thumbnail_");
         private boolean released;
 
         // COMPLETION CALLBACKS: FIRED ONCE ON THE RENDER/TICK THREAD, NEVER ON THE WORKER
@@ -297,7 +287,7 @@ public class Thumbnail extends Element {
             this.player.repeat(true);
             this.applyCap();
             this.player.start();
-            WaterUI.LOGGER.debug(IT, "thumbnail player started for {} capped at {}x{}", mrl, cropW, cropH);
+            LOGGER.debug(IT, "thumbnail player started for {} capped at {}x{}", mrl, cropW, cropH);
         }
 
         // CAPS THE UPLOAD TO THE WIDGET'S OWN BOX AT FRAMEBUFFER RESOLUTION: THE PER-AXIS CAPS
@@ -313,7 +303,7 @@ public class Thumbnail extends Element {
             player.maxSize(cw, ch);
         }
 
-        /** Texture to blit, or null while it is still loading or if it never will. */
+        // TEXTURE TO BLIT, OR NULL WHILE IT IS STILL LOADING OR IF IT NEVER WILL
         ResourceLocation texture() {
             if (released || player == null || !player.canPlay()) return null;
             // GL TEXTURE 0 IS "NONE"; DRAWING IT WOULD SHARE ONE DEAD ID BETWEEN EVERY LOADING PLAYER
@@ -324,14 +314,7 @@ public class Thumbnail extends Element {
                 this.loadFired = true;
                 if (onLoaded != null) onLoaded.run();
             }
-            // THE PLAYER MAY SWAP ITS GL TEXTURE OVER ITS LIFE; RE-REGISTER AND DROP THE STALE ONE WHEN IT DOES
-            if (location == null || glId != id) {
-                this.free();
-                this.glId = id;
-                this.location = WaterUI.id("thumbnail_" + id);
-                Minecraft.getInstance().getTextureManager().register(location, new GlTexture(id));
-            }
-            return location;
+            return managed.locate(id);
         }
 
         int width() {
@@ -345,7 +328,7 @@ public class Thumbnail extends Element {
         void release() {
             if (released) return;
             this.released = true;
-            WaterUI.LOGGER.debug(IT, "thumbnail session released");
+            LOGGER.debug(IT, "thumbnail session released");
             this.mrl = null;
             this.gfx = null;
             if (this.player != null) {
@@ -355,35 +338,11 @@ public class Thumbnail extends Element {
                 } catch (Throwable t) {
                     // A BACKEND THAT DIES ON ITS WAY OUT MUST NOT TAKE THE SCREEN WITH IT, AND MUST NOT
                     // LEAVE THE ROW HALF RELEASED EITHER: THE TEXTURE STILL FOLLOWS
-                    WaterUI.LOGGER.error(IT, "thumbnail player failed to release", t);
+                    LOGGER.error(IT, "thumbnail player failed to release", t);
                 }
                 this.player = null;
             }
-            this.free();
-        }
-
-        // DROPS EXACTLY THE TEXTURE THIS SESSION REGISTERED, NEVER ANOTHER ROW'S THAT SHARES A GL ID
-        private void free() {
-            if (location == null) return;
-            Minecraft.getInstance().getTextureManager().release(location);
-            this.location = null;
-            this.glId = 0;
-        }
-
-        // A GL TEXTURE ID THE MEDIA PLAYER ALREADY OWNS, WRAPPED SO THE TEXTURE MANAGER CAN HOLD IT
-        // WITHOUT LOADING OR RELEASING ANYTHING: THE PLAYER STAYS THE SOLE OWNER OF THE GL RESOURCE
-        private static final class GlTexture extends AbstractTexture {
-            GlTexture(int id) {
-                this.id = id;
-            }
-
-            @Override public int getId() {
-                return this.id;
-            }
-
-            @Override public void load(ResourceManager manager) { /* NO OP */ }
-            @Override public void releaseId() { /* NO OP */ }
-            @Override public void close() { /* NO OP */ }
+            this.managed.free();
         }
     }
 }

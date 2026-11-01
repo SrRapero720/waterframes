@@ -5,32 +5,32 @@ import me.srrapero720.waterui.theme.Icon;
 import java.util.function.IntConsumer;
 
 /** Cycles through a fixed list of icons, one per state, reporting the state it lands on. */
-public class State extends Button {
+public class StateButton extends Button {
     private Icon[] states;
     private int state;
     private IntConsumer onChange;
 
-    public State() {
+    public StateButton() {
         this(new Icon[0]);
     }
 
-    public State(Icon... states) {
+    public StateButton(Icon... states) {
         super(null);
         this.states = states;
     }
 
-    public State states(Icon... states) {
+    public StateButton states(Icon... states) {
         this.states = states;
         return this.state(state);
     }
 
     /** Called with the new state index every time a click advances the cycle. */
-    public State onChange(IntConsumer onChange) {
+    public StateButton onChange(IntConsumer onChange) {
         this.onChange = onChange;
         return this;
     }
 
-    public State state(int state) {
+    public StateButton state(int state) {
         this.state = states.length == 0 ? 0 : Math.clamp(state, 0, states.length - 1);
         return this;
     }

@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.format;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.screen.WaterScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +14,8 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * Discovers every {@code .ui} layout and {@code .ui.json} theme under {@code assets/<modid>/ui} on
@@ -48,9 +49,9 @@ public class UILoader implements ResourceManagerReloadListener {
             try (Reader reader = entry.getValue().openAsReader()) {
                 UIThemes.put(id, UIThemeLoader.load(loc, reader));
                 themes++;
-                WaterUI.LOGGER.debug(IT, "parsed theme {} from {}", id, loc);
+                LOGGER.debug(IT, "parsed theme {} from {}", id, loc);
             } catch (Exception e) {
-                WaterUI.LOGGER.error(IT, "failed to load theme '{}': {}", loc, e.getMessage());
+                LOGGER.error(IT, "failed to load theme '{}': {}", loc, e.getMessage());
             }
         }
 
@@ -64,21 +65,21 @@ public class UILoader implements ResourceManagerReloadListener {
                 String text = new String(bytes, StandardCharsets.UTF_8);
                 DOCUMENTS.put(source, UIParser.parse(UILexer.tokenize(text, source.toString()), source));
                 uis++;
-                WaterUI.LOGGER.debug(IT, "parsed document {} from {}", source, loc);
+                LOGGER.debug(IT, "parsed document {} from {}", source, loc);
             } catch (Exception e) {
-                WaterUI.LOGGER.error(IT, "failed to load ui '{}': {}", loc, e.getMessage());
+                LOGGER.error(IT, "failed to load ui '{}': {}", loc, e.getMessage());
             }
         }
 
-        WaterUI.LOGGER.info(IT, "loaded {} ui document(s), {} theme(s)", uis, themes);
+        LOGGER.info(IT, "loaded {} ui document(s), {} theme(s)", uis, themes);
 
         // F3+T REBUILDS AN OPEN SCREEN THROUGH ITS theme() SETTER; A THROWING build() MUST NOT FAIL THE WHOLE RELOAD
         if (Minecraft.getInstance().screen instanceof WaterScreen w) {
-            WaterUI.LOGGER.debug(IT, "reload rebuilding open screen {}", w.getClass().getSimpleName());
+            LOGGER.debug(IT, "reload rebuilding open screen {}", w.getClass().getSimpleName());
             try {
                 w.theme(w.theme);
             } catch (Exception e) {
-                WaterUI.LOGGER.error(IT, "failed to rebuild the open screen after reload: {}", e.getMessage());
+                LOGGER.error(IT, "failed to rebuild the open screen after reload: {}", e.getMessage());
             }
         }
     }

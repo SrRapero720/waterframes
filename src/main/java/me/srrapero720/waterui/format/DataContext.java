@@ -1,11 +1,9 @@
 package me.srrapero720.waterui.format;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.theme.Icon;
 import me.srrapero720.waterui.widget.Text;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -15,9 +13,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * Per-screen live-binding context. Resolves a host's registered {@link UIHost} entries and
@@ -94,23 +93,6 @@ public final class DataContext {
         return () -> { try { return (int) h.invokeExact(); } catch (Throwable t) { return 0L; } };
     }
 
-    /** Live double for {@code name} ({@code float} widened), or a constant {@code 0} when missing/mismatched. */
-    public DoubleSupplier doubleOr(String name) {
-        Supplier<?> reg = registered(name);
-        if (reg != null) {
-            probe(name, reg, Number.class);
-            return () -> { try { return reg.get() instanceof Number n ? n.doubleValue() : 0d; } catch (Throwable t) { return 0d; } };
-        }
-        Method m = resolve(name);
-        if (m == null) return () -> 0d;
-        Class<?> ret = m.getReturnType();
-        if (ret != double.class && ret != float.class) return mismatch(name, m, "double/float", () -> 0d);
-        MethodHandle h = handle(m);
-        if (h == null) return () -> 0d;
-        if (ret == double.class) return () -> { try { return (double) h.invokeExact(); } catch (Throwable t) { return 0d; } };
-        return () -> { try { return (float) h.invokeExact(); } catch (Throwable t) { return 0d; } };
-    }
-
     /** Live String for {@code name}, or a constant {@code ""} when missing/mismatched. */
     public Supplier<String> stringOr(String name) {
         Supplier<?> reg = registered(name);
@@ -124,21 +106,6 @@ public final class DataContext {
         MethodHandle h = handle(m);
         if (h == null) return () -> "";
         return () -> { try { Object o = h.invoke(); return o != null ? o.toString() : ""; } catch (Throwable t) { return ""; } };
-    }
-
-    /** Live {@link ItemStack} for {@code name}, or {@link ItemStack#EMPTY} when missing/mismatched. */
-    public Supplier<ItemStack> itemOr(String name) {
-        Supplier<?> reg = registered(name);
-        if (reg != null) {
-            probe(name, reg, ItemStack.class);
-            return () -> { try { return reg.get() instanceof ItemStack stack ? stack : ItemStack.EMPTY; } catch (Throwable t) { return ItemStack.EMPTY; } };
-        }
-        Method m = resolve(name);
-        if (m == null) return () -> ItemStack.EMPTY;
-        if (!ItemStack.class.isAssignableFrom(m.getReturnType())) return mismatch(name, m, "ItemStack", () -> ItemStack.EMPTY);
-        MethodHandle h = handle(m);
-        if (h == null) return () -> ItemStack.EMPTY;
-        return () -> { try { return (ItemStack) h.invoke(); } catch (Throwable t) { return ItemStack.EMPTY; } };
     }
 
     /** Live {@link Icon} for {@code name}, or a constant {@code null} when missing/mismatched. */
@@ -190,7 +157,7 @@ public final class DataContext {
             String s = src.get();
             if (!s.equals(shown[0])) {
                 shown[0] = s;
-                text.component(Component.literal(s));
+                text.text(Component.literal(s));
             }
         };
         eval.run();
@@ -206,7 +173,7 @@ public final class DataContext {
             // THE ELEMENT TYPE IS DOUBLY ERASED: PEEK THE FIRST ENTRY SO A List<String> SURFACES AT BIND
             try {
                 if (reg.get() instanceof List<?> l && !l.isEmpty() && !(l.get(0) instanceof Component))
-                    WaterUI.LOGGER.error(IT, "registered var '{}' supplies a List of {}, expected Component", name, l.get(0).getClass().getSimpleName());
+                    LOGGER.error(IT, "registered var '{}' supplies a List of {}, expected Component", name, l.get(0).getClass().getSimpleName());
             } catch (Throwable ignored) {}
             return () -> {
                 try {
@@ -265,7 +232,7 @@ public final class DataContext {
         Supplier<?> found = stored(name);
         if (found == null) return null;
         Method annotated = hostClass != null ? UIBindings.var(hostClass, name) : null;
-        if (annotated != null) WaterUI.LOGGER.warn(IT, "registered var '{}' shadows @UIVar on {}", name, annotated.getDeclaringClass().getSimpleName());
+        if (annotated != null) LOGGER.warn(IT, "registered var '{}' shadows @UIVar on {}", name, annotated.getDeclaringClass().getSimpleName());
         return found;
     }
 
@@ -275,29 +242,29 @@ public final class DataContext {
         try {
             Object o = s.get();
             if (o != null && !expected.isInstance(o))
-                WaterUI.LOGGER.error(IT, "registered var '{}' supplies {}, expected {}", name, o.getClass().getSimpleName(), expected.getSimpleName());
+                LOGGER.error(IT, "registered var '{}' supplies {}, expected {}", name, o.getClass().getSimpleName(), expected.getSimpleName());
         } catch (Throwable t) {
-            WaterUI.LOGGER.debug(IT, "registered var '{}' probe threw: {}", name, t.toString());
+            LOGGER.debug(IT, "registered var '{}' probe threw: {}", name, t.toString());
         }
     }
 
     // A MISSING @UIVar IS AN AUTHORING ERROR, NOT A CRASH: LOG ONCE AT BIND TIME AND FALL BACK TO A SAFE DEFAULT
     private Method resolve(String name) {
         if (name == null || hostClass == null) {
-            WaterUI.LOGGER.error(IT, "live binding '{}' has no host to resolve against", name);
+            LOGGER.error(IT, "live binding '{}' has no host to resolve against", name);
             return null;
         }
         Method found = UIBindings.var(hostClass, name);
         if (found == null) {
-            WaterUI.LOGGER.error(IT, "no @UIVar or registered var '{}' on {}", name, hostClass.getName());
+            LOGGER.error(IT, "no @UIVar or registered var '{}' on {}", name, hostClass.getName());
             return null;
         }
-        WaterUI.LOGGER.debug(IT, "bound live var '{}' -> {} on {}", name, found.getName(), hostClass.getSimpleName());
+        LOGGER.debug(IT, "bound live var '{}' -> {} on {}", name, found.getName(), hostClass.getSimpleName());
         return found;
     }
 
     private <T> T mismatch(String name, Method m, String expected, T fallback) {
-        WaterUI.LOGGER.error(IT, "@UIVar '{}' on {} returns {}, expected {}", name, hostClass.getName(), m.getReturnType().getSimpleName(), expected);
+        LOGGER.error(IT, "@UIVar '{}' on {} returns {}, expected {}", name, hostClass.getName(), m.getReturnType().getSimpleName(), expected);
         return fallback;
     }
 
@@ -305,7 +272,7 @@ public final class DataContext {
         try {
             return LOOKUP.unreflect(m).bindTo(host);
         } catch (IllegalAccessException e) {
-            WaterUI.LOGGER.error(IT, "@UIVar '{}' on {} is not accessible", m.getName(), hostClass.getName(), e);
+            LOGGER.error(IT, "@UIVar '{}' on {} is not accessible", m.getName(), hostClass.getName(), e);
             return null;
         }
     }

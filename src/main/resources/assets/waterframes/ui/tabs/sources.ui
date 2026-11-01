@@ -1,7 +1,6 @@
 // SOURCES TAB — URL ENTRY AND THE PLAYLIST BEHIND IT; LIST ROWS ARE DYNAMIC (DisplayScreen BINDS THEM).
 // ROOT PREFS SHAPE THE AUTO-GENERATED TAB BODY (§6.1, §10.3): tabIcon/tabTooltip GO TO THE STRIP, THE REST IS LAYOUT.
 import "constants/icons"
-import "me.srrapero720.waterframes.client.ui.screen.widget.UrlField"
 
 // ---- LIVE CONTRACT: SUBMIT BUTTON STATE AND DELETE GATE FROM THE HOST -----------------------
 var Icon submit_icon

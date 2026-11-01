@@ -1,14 +1,9 @@
 package me.srrapero720.waterui.screen;
 
-import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.format.DataContext;
 import me.srrapero720.waterui.format.UIBuilder;
-import me.srrapero720.waterui.format.UIEvents;
 import me.srrapero720.waterui.format.UIHost;
 import net.minecraft.resources.ResourceLocation;
-
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 /**
  * A {@link Panel} that pops OVER a screen as a stacked layer, the way the playlist opens on top of
@@ -29,55 +24,9 @@ public abstract class Dialog extends Panel implements UIHost {
     /** The dialog's own live-binding context, or {@code null} before it is opened. */
     public DataContext context() { return context; }
 
-    /** The three registries behind {@link #registerVar}/{@link #registerUIEvent}/{@link #registerEvent} (§5.6, §12.2). */
     @Override
     public UIHost.Store uiStore() {
         return this.store;
-    }
-
-    /** Registers an inflatable constant fed to the contract on every inflate; register in the constructor (§5.6). */
-    protected final void registerVar(String key, boolean value) {
-        this.store.inflatable(key, value);
-    }
-
-    /** Registers an inflatable numeric constant; {@code int} widens here (§5.6). */
-    protected final void registerVar(String key, long value) {
-        this.store.inflatable(key, value);
-    }
-
-    /** Registers an inflatable numeric constant; {@code float} widens here (§5.6). */
-    protected final void registerVar(String key, double value) {
-        this.store.inflatable(key, value);
-    }
-
-    /** Registers an inflatable String/Icon/ItemStack constant (§5.6). */
-    protected final void registerVar(String key, Object value) {
-        this.store.inflatable(key, value);
-    }
-
-    /** Registers a dynamic variable read live like a {@code @UIVar} method; a {@code final var} snapshots it per inflate (§5.6). */
-    protected final void registerVar(String key, Supplier<?> value) {
-        this.store.dynamic(key, value);
-    }
-
-    /** Registers a named handler for the document's {@code on<Event>=key(...)} calls, receiving id + baked args + payload (§12.2). */
-    protected final void registerUIEvent(String key, UIEvents.Handler handler) {
-        this.store.event(key, handler);
-    }
-
-    /** Registers a payload-blind named handler (§12.2). */
-    protected final void registerUIEvent(String key, Runnable handler) {
-        this.store.event(key, payload -> handler.run());
-    }
-
-    /** Binds {@code callback} straight to the element's click by id; the namespace is the inflated document's (§12.2). */
-    protected final void registerEvent(String elementId, Consumer<Element> callback) {
-        this.store.element(elementId, callback);
-    }
-
-    /** Same as {@link #registerEvent(String, Consumer)} with an explicit {@code ns:path} id, for foreign elements. */
-    protected final void registerEvent(ResourceLocation elementId, Consumer<Element> callback) {
-        this.store.element(elementId.toString(), callback);
     }
 
     // INFLATES THE DIALOG'S OWN DOCUMENT INTO ITSELF, FEEDING THE BAKED VIEW AND WIRING THE

@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.format;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.AbstractParent;
 import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.layout.ParentLinear;
@@ -11,6 +10,8 @@ import org.apache.logging.log4j.MarkerManager;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * Resolves an {@code on<Event>} handler (UI-SPEC.md §12) against the host by reflection, once at
@@ -38,34 +39,33 @@ public final class UIEvents {
      * ERROR and returns a no-op — the screen still opens (§12.2, §13.4).
      */
     public static Handler resolve(Object host, String name, String[] baked, ResourceLocation file, int line) {
-        // A REGISTERED HANDLER (§12.2) OUTRANKS REFLECTION AND SEES id + BAKED + PAYLOAD LIKE AN ALL-VARARGS
-        // METHOD. LOOKED UP AT INVOKE TIME: A RE-ADOPTED TEMPLATED ROW FIRES THE CURRENT REGISTRATION,
-        // NEVER A PRE-CLEAR CAPTURE, AND THE TRY/CATCH MATCHES THE REFLECTIVE PATH'S BELT
+        // A REGISTERED HANDLER (§12.2) OUTRANKS REFLECTION AND SEES id + BAKED + PAYLOAD. LOOKED UP AT INVOKE
+        // TIME SO A RE-ADOPTED ROW FIRES THE CURRENT REGISTRATION; THE TRY/CATCH MATCHES THE REFLECTIVE BELT
         if (host instanceof UIHost provider && provider.uiStore().event(name) != null) {
             if (UIBindings.event(host.getClass(), name) != null)
-                WaterUI.LOGGER.warn(IT, "registered event '{}' shadows @UIEvent on {}", name, host.getClass().getSimpleName());
-            WaterUI.LOGGER.debug(IT, "resolved handler '{}' -> registered on {}", name, host.getClass().getSimpleName());
+                LOGGER.warn(IT, "registered event '{}' shadows @UIEvent on {}", name, host.getClass().getSimpleName());
+            LOGGER.debug(IT, "resolved handler '{}' -> registered on {}", name, host.getClass().getSimpleName());
             return payload -> {
                 Handler direct = provider.uiStore().event(name);
                 if (direct == null) {
-                    WaterUI.LOGGER.error(IT, "registered handler '{}' on {} is gone", name, host.getClass().getSimpleName());
+                    LOGGER.error(IT, "registered handler '{}' on {} is gone", name, host.getClass().getSimpleName());
                     return;
                 }
                 try {
                     direct.invoke(concat(baked, payload));
                 } catch (Throwable t) {
-                    WaterUI.LOGGER.error(IT, "registered handler '{}' on {} threw", name, host.getClass().getName(), t);
+                    LOGGER.error(IT, "registered handler '{}' on {} threw", name, host.getClass().getName(), t);
                 }
             };
         }
         Class<?> hostClass = host.getClass();
         Method method = findMethod(hostClass, name, baked.length);
         if (method == null) {
-            WaterUI.LOGGER.error(IT, "{}:{} no handler '{}' taking {}+ String args on {}", file, line, name, baked.length, hostClass.getName());
+            LOGGER.error(IT, "{}:{} no handler '{}' taking {}+ String args on {}", file, line, name, baked.length, hostClass.getName());
             return NOOP;
         }
         method.setAccessible(true);
-        WaterUI.LOGGER.debug(IT, "resolved handler '{}' -> {} on {}", name, method.getName(), hostClass.getSimpleName());
+        LOGGER.debug(IT, "resolved handler '{}' -> {} on {}", name, method.getName(), hostClass.getSimpleName());
         return payload -> invoke(method, host, baked, payload, hostClass, name);
     }
 
@@ -128,7 +128,7 @@ public final class UIEvents {
             if (method.isVarArgs()) {
                 int fixed = method.getParameterCount() - 1;
                 if (fixed > full.length) {
-                    WaterUI.LOGGER.error(IT, "handler '{}' on {} wants {} fixed args, event carries {}", name, hostClass.getName(), fixed, full.length);
+                    LOGGER.error(IT, "handler '{}' on {} wants {} fixed args, event carries {}", name, hostClass.getName(), fixed, full.length);
                     return;
                 }
                 Object[] packed = new Object[fixed + 1];
@@ -140,13 +140,13 @@ public final class UIEvents {
             } else {
                 int params = method.getParameterCount();
                 if (params > full.length) {
-                    WaterUI.LOGGER.error(IT, "handler '{}' on {} wants {} args, event carries {}", name, hostClass.getName(), params, full.length);
+                    LOGGER.error(IT, "handler '{}' on {} wants {} args, event carries {}", name, hostClass.getName(), params, full.length);
                     return;
                 }
                 method.invoke(host, (Object[]) (params == full.length ? full : Arrays.copyOf(full, params)));
             }
         } catch (InvocationTargetException | IllegalAccessException | IllegalArgumentException e) {
-            WaterUI.LOGGER.error(IT, "handler '{}' on {} threw", name, hostClass.getName(), e);
+            LOGGER.error(IT, "handler '{}' on {} threw", name, hostClass.getName(), e);
         }
     }
 }

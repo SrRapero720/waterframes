@@ -37,7 +37,7 @@ Parent[id="display/transport", orientation=HORIZONTAL, align=CENTER, spacing=2, 
                 value=paused, tooltip=playback_tooltip, onClick=togglePlayback()
     ]
     Button[id="display/stop", width=20, height=20, icon=icon_stop, onClick=stop()]
-    Seekbar[id="display/seekbar", width=FILL, height=FILL, time=time, duration=duration,
+    SeekBar[id="display/seekbar", width=FILL, height=FILL, time=time, duration=duration,
             onSeekEnd=seek(), onScroll=skip()]
     Button[id="display/reload", width=20, height=20, icon=icon_reload, enabled=reload_ready,
            tooltip="translatable:waterframes.gui.reload", onClick=reload()]

@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.layout;
 
-import me.srrapero720.waterui.core.Anchor;
 import me.srrapero720.waterui.core.Spacing;
 import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.core.AbstractParent;
@@ -54,17 +53,8 @@ public class FrameLayout extends AbstractParent {
         for (Element child: children) {
             if (!child.visible) continue;
             Spacing margin = child.margin();
-            int anchor = child.anchor();
-            int roomX = width - margin.horizontal();
-            int roomY = height - margin.vertical();
-
-            int childWidth = (anchor & Anchor.STRETCH_H) != 0 || child.width() == Element.FILL
-                    ? roomX : Math.min(roomX, child.layoutWidth(roomX));
-            int childHeight = (anchor & Anchor.STRETCH_V) != 0 || child.height() == Element.FILL
-                    ? roomY : Math.min(roomY, child.layoutHeight(childWidth, roomY));
-
-            child.layout(Anchor.x(anchor, x + margin.left(), roomX, childWidth),
-                    Anchor.y(anchor, y + margin.top(), roomY, childHeight), childWidth, childHeight);
+            placeFree(child, x + margin.left(), y + margin.top(),
+                    width - margin.horizontal(), height - margin.vertical());
         }
     }
 }

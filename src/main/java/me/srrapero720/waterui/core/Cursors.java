@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.core;
 
-import me.srrapero720.waterui.WaterUI;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -9,6 +8,8 @@ import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.system.MemoryUtil;
 
 import java.nio.ByteBuffer;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * Hardware mouse cursor of the game window. Widgets claim a shape on every frame they want it;
@@ -116,7 +117,7 @@ public final class Cursors {
         GLFWImage image = GLFWImage.malloc();
         image.set(SIZE, SIZE, pixels);
         long handle = GLFW.glfwCreateCursor(image, SIZE / 2, SIZE / 2);
-        if (handle == 0) WaterUI.LOGGER.warn(IT, "GLFW failed to create a hardware cursor, falling back to the arrow");
+        if (handle == 0) LOGGER.warn(IT, "GLFW failed to create a hardware cursor, falling back to the arrow");
         image.free();
         MemoryUtil.memFree(pixels);
         return handle;

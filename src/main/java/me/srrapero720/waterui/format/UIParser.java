@@ -35,10 +35,10 @@ public final class UIParser {
 
     /** Parses a full {@code .ui} token stream into its document model. */
     public static UIDocument parse(List<Token> tokens, ResourceLocation source) {
-        return new UIParser(tokens, source).document(source);
+        return new UIParser(tokens, source).document();
     }
 
-    private UIDocument document(ResourceLocation source) {
+    private UIDocument document() {
         ResourceLocation themeId = null;
         List<UIImport> imports = new ArrayList<>();
         List<UIDecl> decls = new ArrayList<>();

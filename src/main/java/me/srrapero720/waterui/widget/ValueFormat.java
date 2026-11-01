@@ -14,17 +14,16 @@ public interface ValueFormat {
     // THE RAW VALUE WITH A PERCENT SIGN (NOT value/max), FOR A CONTROL WHOSE UNIT ALREADY IS A PERCENT
     ValueFormat RAW_PERCENT = (value, max) -> (int) value + "%";
     ValueFormat ANGLE = (value, max) -> decimal(value) + "°";
-    ValueFormat BLOCKS = (value, max) -> Component.translatable("waterframes.gui.blocks", Math.round(value)).getString();
-    ValueFormat BLOCKS_DECIMAL = (value, max) -> Component.translatable("waterframes.gui.blocks", decimal(value)).getString();
+    ValueFormat BLOCKS = (value, max) -> Component.translatable("waterui.gui.blocks", Math.round(value)).getString();
+    ValueFormat BLOCKS_DECIMAL = (value, max) -> Component.translatable("waterui.gui.blocks", decimal(value)).getString();
+    /** Milliseconds in, {@code mm:ss/mm:ss} out, growing to hours only when the media needs it. */
+    ValueFormat DURATION = (value, max) -> timestamp((long) value) + "/" + timestamp((long) max);
 
     /** Two decimals, and no trailing ".00" when the value is whole. */
     static String decimal(double value) {
         // ROOT LOCALE: A COMMA SEPARATOR WOULD BE REJECTED BY THE NUMERIC FIELD PARSING IT BACK
         return value == Math.rint(value) ? String.valueOf((long) value) : String.format(Locale.ROOT, "%.2f", value);
     }
-
-    /** Milliseconds in, {@code mm:ss/mm:ss} out, growing to hours only when the media needs it. */
-    ValueFormat DURATION = (value, max) -> timestamp((long) value) + "/" + timestamp((long) max);
 
     static String timestamp(long millis) {
         if (millis < 0) millis = 0;

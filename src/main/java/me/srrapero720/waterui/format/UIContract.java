@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.format;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.core.Spacing;
 import me.srrapero720.waterui.theme.Icon;
@@ -16,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * The variable contract of a loaded document (UI-SPEC.md §5). It aggregates the declarations of the
@@ -46,7 +47,7 @@ public final class UIContract {
     /** Builds the aggregated contract for {@code root}, walking its import chain; throws on collisions and cycles. */
     public static UIContract build(UIDocument root, Map<String, Object> host) {
         Skeleton skeleton = skeleton(root);
-        WaterUI.LOGGER.debug(IT, "contract for {} built: {} decl(s), {} import(s)", root.source(), skeleton.decls.size(), skeleton.aliases.size());
+        LOGGER.debug(IT, "contract for {} built: {} decl(s), {} import(s)", root.source(), skeleton.decls.size(), skeleton.aliases.size());
         return of(skeleton, root.source(), host);
     }
 
@@ -314,7 +315,7 @@ public final class UIContract {
             return resolve(id.name());
         }
         if (v instanceof UIValue.Call c) {
-            // loadAtlas("path") YIELDS AN ATLAS HANDLE; EVERY OTHER CALL IS A HANDLE INVOCATION YIELDING AN ICON (§5.7)
+            // loadAtlas("path") YIELDS AN ATLAS; EVERY OTHER CALL IS AN ATLAS INVOCATION YIELDING AN ICON (§5.7)
             if ("loadAtlas".equals(c.name())) {
                 if (c.args().size() != 1 || !(c.args().get(0) instanceof UIValue.Str path)) throw fail("loadAtlas expects one string path");
                 return UIAtlases.load(path.text(), source.getNamespace());
@@ -325,15 +326,15 @@ public final class UIContract {
         return v;
     }
 
-    private Icon atlasIcon(String handleName, List<UIValue> args) {
-        Object o = resolve(handleName);
-        if (!(o instanceof UIAtlases.Handle handle)) throw fail("'" + handleName + "' is not an atlas handle");
+    private Icon atlasIcon(String atlasName, List<UIValue> args) {
+        Object o = resolve(atlasName);
+        if (!(o instanceof UIAtlases.Atlas atlas)) throw fail("'" + atlasName + "' is not an atlas");
         if (args.size() != 2 && args.size() != 4) throw fail("an atlas call needs (x, y) or (x, y, w, h)");
-        int cx = (int) number(literal(args.get(0)), handleName);
-        int cy = (int) number(literal(args.get(1)), handleName);
-        int cw = args.size() == 4 ? (int) number(literal(args.get(2)), handleName) : 1;
-        int ch = args.size() == 4 ? (int) number(literal(args.get(3)), handleName) : 1;
-        return handle.icon(cx, cy, cw, ch);
+        int cx = (int) number(literal(args.get(0)), atlasName);
+        int cy = (int) number(literal(args.get(1)), atlasName);
+        int cw = args.size() == 4 ? (int) number(literal(args.get(2)), atlasName) : 1;
+        int ch = args.size() == 4 ? (int) number(literal(args.get(3)), atlasName) : 1;
+        return atlas.icon(cx, cy, cw, ch);
     }
 
     // AN ATLAS CALL ARGUMENT IS A NUMBER LITERAL OR A NUMERIC VARIABLE
@@ -395,7 +396,7 @@ public final class UIContract {
             case "String" -> value instanceof CharSequence;
             case "Icon" -> value instanceof Icon;
             case "ItemStack" -> value instanceof ItemStack;
-            case "Atlas" -> value instanceof UIAtlases.Handle;
+            case "Atlas" -> value instanceof UIAtlases.Atlas;
             default -> true;
         };
         if (!ok) throw failAt(decl, "host value for '" + decl.name() + "' is " + value.getClass().getSimpleName() + ", declared type is " + type);

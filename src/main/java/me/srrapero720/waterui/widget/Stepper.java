@@ -1,7 +1,6 @@
 package me.srrapero720.waterui.widget;
 
 import me.srrapero720.waterui.core.Anchor;
-import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.layout.ParentLinear;
 import me.srrapero720.waterui.theme.Theme;
 import net.minecraft.network.chat.Component;

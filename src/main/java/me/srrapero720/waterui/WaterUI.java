@@ -1,11 +1,16 @@
 package me.srrapero720.waterui;
 
 import me.srrapero720.waterui.format.UIBindings;
+import me.srrapero720.waterui.format.UILoader;
 import me.srrapero720.waterui.format.UIRegistry;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -36,5 +41,14 @@ public class WaterUI {
     public static void bootstrap() {
         UIRegistry.bootstrap();
         UIBindings.bootstrap();
+    }
+
+    // THE TOOLKIT OWNS ITS DOCUMENT/THEME RELOADS: A HOST MOD EMBEDDING IT REGISTERS NOTHING (§7)
+    @EventBusSubscriber(modid = ID, value = Dist.CLIENT)
+    public static class ClientEvents {
+        @SubscribeEvent
+        public static void registerReloadListeners(RegisterClientReloadListenersEvent e) {
+            e.registerReloadListener(new UILoader());
+        }
     }
 }

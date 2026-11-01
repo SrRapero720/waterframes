@@ -9,8 +9,8 @@ final var String thumbnail
 
 root[width=FILL, align=CENTER, spacing=4, onClick=pick(key)]
 
-Thumbnail[width=18, height=18, source=thumbnail, fallback=icon_videoplayer]
+Thumbnail[width=27, height=18, source=thumbnail, fallback=icon_videoplayer]
 Parent[orientation=VERTICAL, width=FILL, spacing=1] {
-    Text[component=title, fontScale=0.75, ellipsize=true, lines=2, width=FILL]
-    Text[component=platform, fontScale=0.5, ellipsize=true, width=FILL]
+    Text[component=title, textScale=0.75, ellipsize=true, lines=2, width=FILL]
+    Text[component=platform, textScale=0.5, ellipsize=true, width=FILL]
 }

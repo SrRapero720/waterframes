@@ -65,8 +65,8 @@ public class PlayerHead extends Element {
         if (generic != null) return generic;
         PlayerInfo info = this.info();
         String name = info != null ? info.getProfile().getName() : null;
-        Component username = Component.literal(name != null ? name : translate("waterframes.gui.source.unknown"))
+        Component username = Component.literal(name != null ? name : translate("waterui.gui.unknown"))
                 .withStyle(ChatFormatting.AQUA);
-        return List.of(translatable("waterframes.gui.source.added_by", username));
+        return List.of(translatable("waterui.gui.added_by", username));
     }
 }

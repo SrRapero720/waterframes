@@ -16,6 +16,9 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static me.srrapero720.waterui.core.Element.translatable;
+import static me.srrapero720.waterui.core.Element.translate;
+
 /**
  * Model behind one templated playlist row: resolves the entry's media and feeds the row template's
  * live {@link UIVar} suppliers (title, byline, duration, thumbnail). No widgets here; the transport
@@ -115,7 +118,7 @@ public final class SourceRow {
         return byline;
     }
 
-    @UIVar("duration")
+    @UIVar("duration_text")
     public String duration() {
         this.compose();
         return duration;
@@ -182,11 +185,4 @@ public final class SourceRow {
         return translatable("waterframes.status", color + translate(key));
     }
 
-    private static Component translatable(String key, Object... args) {
-        return Component.translatable(key, args);
-    }
-
-    private static String translate(String key, Object... args) {
-        return Component.translatable(key, args).getString();
-    }
 }

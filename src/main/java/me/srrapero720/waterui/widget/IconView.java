@@ -1,38 +1,40 @@
 package me.srrapero720.waterui.widget;
 
 import me.srrapero720.waterui.core.Element;
+import me.srrapero720.waterui.theme.Icon;
 import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.function.Supplier;
 
-public class Icon extends Element {
+/** Plain picture element behind the {@code Icon} tag, fixed or mirroring a live icon source. */
+public class IconView extends Element {
     // INTRINSIC SIZE OF A PLAIN ICON IN GUI PIXELS
     private static final int DEFAULT_SIZE = 12;
 
-    protected me.srrapero720.waterui.theme.Icon icon;
+    protected Icon icon;
     // LIVE SOURCE READ ON EVERY DRAW; NULL FALLS BACK TO THE FIXED icon
-    private Supplier<me.srrapero720.waterui.theme.Icon> source;
+    private Supplier<Icon> source;
 
-    public Icon() {
+    public IconView() {
         this(null);
     }
 
-    public Icon(me.srrapero720.waterui.theme.Icon icon) {
+    public IconView(Icon icon) {
         this.icon = icon;
     }
 
-    public Icon icon(me.srrapero720.waterui.theme.Icon icon) {
+    public IconView icon(Icon icon) {
         this.icon = icon;
         return this;
     }
 
     /** Mirrors a live icon read on every draw instead of the fixed one. */
-    public Icon source(Supplier<me.srrapero720.waterui.theme.Icon> source) {
+    public IconView source(Supplier<Icon> source) {
         this.source = source;
         return this;
     }
 
-    public me.srrapero720.waterui.theme.Icon icon() {
+    public Icon icon() {
         return source != null ? source.get() : icon;
     }
 
@@ -59,7 +61,7 @@ public class Icon extends Element {
 
     @Override
     protected void draw(GuiGraphics graphics, int mouseX, int mouseY, float partial) {
-        me.srrapero720.waterui.theme.Icon current = this.icon();
+        Icon current = this.icon();
         if (current != null) current.drawSquared(graphics, contentX(), contentY(), contentWidth(), contentHeight(), shadow());
     }
 }

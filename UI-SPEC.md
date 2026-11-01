@@ -192,7 +192,7 @@ carry this meaning inside strings, so they never collide with tuples.
 
 | Mode       | Properties                                   | Cadence                        |
 |------------|----------------------------------------------|--------------------------------|
-| **direct** | `value` (boolean), `time`/`duration`/`value`/`max` (numbers), `icon`, `tooltip` | read at draw, never cached |
+| **direct** | `value` (`ToggleButton` boolean), `time`/`duration` (`SeekBar`) and `value`/`max` (`ProgressBar`) numbers, `icon`, `source` (`Thumbnail`), `tooltip` | read at draw, never cached |
 | **ticked** | `enabled`, `visible`, `component` (Text) | evaluated at the 20Hz screen tick, cached between ticks |
 
 Direct suppliers keep a seekbar's clock honest, and `tooltip` is read for the
@@ -212,8 +212,11 @@ ride the tick.
   §12.2).
 
 **The host store.** A host implementing `UIHost` carries three name-keyed
-registries, filled in one-line `protected final` calls **in its constructor**
-and living as long as the instance:
+registries behind `uiStore()` (a `UIHost.Store`), filled **in its constructor**
+through the interface's default sugar and living as long as the instance. Each
+facade call maps onto one store registry — `registerVar(key, supplier)` →
+`Store.dynamic`, `registerVar(key, value)` → `Store.inflatable`,
+`registerUIEvent` → `Store.event`, `registerEvent` → `Store.element`:
 
 - **Dynamic** — `registerVar(key, supplier)`: a live read resolved for `var`
   bindings before the `@UIVar` walk; shadowing an annotated method logs a
@@ -256,19 +259,19 @@ final var icon_reload = gui(1, 11)             // EVERY ICON AFTER IT IS COORDIN
 final var icon_wide   = gui(3, 13, 2, 1)       // OPTIONAL 2x1 CHUNK SPAN
 ```
 
-- `loadAtlas("<[ns:]path>")` produces an **atlas handle** (type `Atlas`), a
+- `loadAtlas("<[ns:]path>")` produces an **atlas** (type `Atlas`), a
   value like any other `final var`. The path carries **no `textures/` prefix
   and no extension**: `"screen_atlas"` expands to `textures/screen_atlas.<ext>`
   and resolves through the vanilla resource manager, so the texture format is
   whatever the runtime can decode (a texture pack shipping webp over png just
   works). Namespace omitted → the document's own.
-- **Calling the handle** — `<handle>(chunkX, chunkY [, chunksWide, chunksTall])`
+- **Calling the atlas** — `<atlas>(chunkX, chunkY [, chunksWide, chunksTall])`
   — yields an `Icon`. The atlas is square, its side divisible by 16, addressed
   in **16-px chunks**; `chunkX`/`chunkY` are chunk indices, the span defaults
   to `1,1`. The side is read from the texture itself, so the valid index range
   follows automatically (256 → 0–15, 512 → 0–31).
 
-Atlas handles and icons shadow and aggregate exactly like any other variable
+Atlases and icons shadow and aggregate exactly like any other variable
 (§5.3) — a root document can repaint an imported icon by redeclaring its name.
 
 ### 5.8 Constants documents
@@ -427,7 +430,7 @@ outranks the intrinsic minimum and maximum.
 | `margin`        | number or tuple              | Arity §8.3. |
 | `padding`       | number or tuple              | Arity §8.3. |
 | `border`        | px                           | **Width only.** Colour comes from `outline`. |
-| `align`         | side \| `CENTER` \| `STRETCH`| Cross-flow placement (§9.2). Containers: default for children. |
+| `align`         | side \| `CENTER` \| `STRETCH`| Cross-flow placement (§9.2). On a `Parent`: default for its children. |
 | `justify`       | `START`\|`CENTER`\|`END`\|`BETWEEN` | Containers only: flow-direction distribution (§9.4). |
 | `anchor`        | flags                        | Free-space attachment (§9.3). |
 | `outsideAnchor` | flags                        | Lifts the element outside the root (§9.5). |
@@ -437,7 +440,7 @@ outranks the intrinsic minimum and maximum.
 | `hidden`        | bool                         | Hidden → skips paint/input, keeps its room. |
 | `elevation`     | int                          | Z-lift over siblings. |
 | `scale`         | float                        | Uniform scale factor. |
-| `tooltip`       | String or variable           | Component resolution §4; a live variable ticks (§5.5). |
+| `tooltip`       | String or variable           | Component resolution §4; a live variable is read direct, hovered element only (§5.5). |
 | `face`          | `#hex` or role name          | Surface override (§8.4). |
 | `outline`       | `#hex` or role name          | Frame override (§8.4). |
 | `scrollX` / `scrollY` | bool                   | Containers: scroll that axis in place (§10.1). |
@@ -587,7 +590,7 @@ the document instead of code.
 
 A cell lattice. Children fill cells **left-to-right, top-to-bottom**.
 
-- `columns` (required) · `rows` (optional — grows from the child count) ·
+- `columns` (optional — default `1`) · `rows` (optional — grows from the child count) ·
   `spacing` · `justify` (§9.4, vertical distribution of rows).
 - Cell width is the grid width divided by `columns`; a row's height is its
   tallest cell.
@@ -726,10 +729,11 @@ setters exist for all of them but are never required.
 
 | Tag | Properties | Typed events (payload) |
 |---|---|---|
-| `Text` | `component` (baked or live), `color` (#hex), `fontScale`, `ellipsize` (bool), `lines` (int) | — |
-| `Button` | `component` \| `icon` (first-defined wins), `repeat` (`{delay, interval}` ticks — re-fires `onClick` while the left press is held, after `delay` then every `interval`; a single number sets both; `delay >= 0`, `interval > 0` or load error; re-fires are silent and keep firing with the cursor off the button; a disabled button stops without resuming; `Button` tag only — `ToggleButton`/`StateButton`/`TabButton` do not inherit it) | `onClick` (—) |
+| `Text` | `component` (baked or live), `color` (#hex), `textScale`, `ellipsize` (bool), `lines` (int) | — |
+| `Button` | `component` \| `icon` (first-defined wins; `icon` static or live), `repeat` (`{delay, interval}` ticks — re-fires `onClick` while the left press is held, after `delay` then every `interval`; a single number sets both; `delay >= 0`, `interval > 0` or load error; re-fires are silent and keep firing with the cursor off the button; a disabled button stops without resuming; `Button` tag only — `ToggleButton`/`StateButton`/`TabButton` do not inherit it) | `onClick` (—) |
 | `ToggleButton` | `iconOn`, `iconOff` (either alone is fine), `value` (live boolean) | `onClick` (—) |
 | `StateButton` | `states={icon, ...}`, `state` (initial index; clamps to `states`, author `states` first) | `onClick` (new index) |
+| `TabButton` | `component`, `icon` — the tab-strip button `ParentTab` generates (§10.3), also declarable standalone | `onClick` (—) |
 | `Icon` | `icon` (static or live) | — |
 | `ItemIcon` | `item` (`ItemStack` variable), `flipX` (bool, mirrors horizontally) | — |
 | `PlayerHead` | `uuid` (`String` variable) | — |
@@ -737,9 +741,10 @@ setters exist for all of them but are never required.
 | `Slider` | `min`, `max`, `value`, `stepped` (bool), `icon`, `format`, `formatKey` (baked translation key: the readout always shows that translation), `textScale` | `onValueChange` (value), `onValueCommit` (final value) |
 | `Stepper` | `min`, `max`, `step`, `value` (author bounds before `value`) | `onValueChange` (value), `onValueCommit` (value) |
 | `ProgressBar` | `value`, `max` (live numbers), `format`, `textScale` | — |
-| `Seekbar` | `time`, `duration` (live numbers), `format` (default `DURATION`), `textScale` | `onSeekStart` (start ms), `onSeek` (ms), `onSeekEnd` (final ms), `onScroll` (amount) |
+| `SeekBar` | `time`, `duration` (live numbers), `format` (default `DURATION`), `textScale` | `onSeekStart` (start ms), `onSeek` (ms), `onSeekEnd` (final ms), `onScroll` (amount) |
 | `InputText` | `value` (initial text — baked only; live text would fight the user's typing), `suggestion` (component string, §4), `maxLength` | `onTextChange` (text), `onSubmit` (text), `onValueCommit` (text) |
 | `Thumbnail` | `source` (`String` URL/URI, baked or live), `fallback` (icon) | `onLoad` (—, once), `onError` (error text, once) |
+| `MediaPlayer` | — (video surface, letterboxed: a player is a live session, not a value, so the host wires it by `id` in code, §13.2) | — |
 | `Frame` | — (overlay container, §10.5: children stack in free space, anchor-placed) | — |
 | `Spacer` | — | — |
 | `Blank` | — | — |

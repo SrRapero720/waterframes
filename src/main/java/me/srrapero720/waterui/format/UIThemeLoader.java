@@ -3,7 +3,6 @@ package me.srrapero720.waterui.format;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.Spacing;
 import me.srrapero720.waterui.theme.Color;
 import me.srrapero720.waterui.theme.Drawable;
@@ -23,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * Parses a {@code .ui.json} theme file into a {@link Theme} (UI-SPEC.md §14). A <b>Drawable</b> is an
@@ -169,12 +170,12 @@ public final class UIThemeLoader {
     private static Drawable icon(String spec, String ns) {
         String[] parts = spec.split(",");
         if (parts.length != 3 && parts.length != 5) throw new UIFormatException(null, -1, "theme icon needs '<atlas>, x, y' or '<atlas>, x, y, w, h'");
-        UIAtlases.Handle handle = UIAtlases.load(parts[0].trim(), ns);
+        UIAtlases.Atlas atlas = UIAtlases.load(parts[0].trim(), ns);
         int cx = intAtom(parts[1]);
         int cy = intAtom(parts[2]);
         int cw = parts.length == 5 ? intAtom(parts[3]) : 1;
         int ch = parts.length == 5 ? intAtom(parts[4]) : 1;
-        return handle.icon(cx, cy, cw, ch);
+        return atlas.icon(cx, cy, cw, ch);
     }
 
     private static int intAtom(String atom) {
@@ -222,13 +223,13 @@ public final class UIThemeLoader {
 
     // A DEFAULTED REQUIRED SLOT ALWAYS WARNS ONCE SO A THEME AUTHOR SEES WHAT WAS FILLED IN
     private static void warn(String file, String key) {
-        WaterUI.LOGGER.warn(IT, "{} missing theme key '{}', using default", file, key);
+        LOGGER.warn(IT, "{} missing theme key '{}', using default", file, key);
     }
 
     // §14.5 TYPO CATCHER: A PRESENT KEY THAT MATCHES NO SLOT OF THIS OBJECT WARNS; OMITTED KEYS STAY SILENT
     private static void unknownKeys(String file, String where, JsonObject obj, Set<String> known) {
         for (String key: obj.keySet()) {
-            if (!known.contains(key)) WaterUI.LOGGER.warn(IT, "{} unknown theme key '{}' in {}", file, key, where);
+            if (!known.contains(key)) LOGGER.warn(IT, "{} unknown theme key '{}' in {}", file, key, where);
         }
     }
 }

@@ -211,12 +211,6 @@ public class ParentLinear extends AbstractParent {
         return axisX == vertical() ? max : total + Math.max(0, count - 1) * spacing;
     }
 
-    private List<Element> shown() {
-        List<Element> shown = new ArrayList<>(children.size());
-        for (Element child: children) if (child.visible) shown.add(child);
-        return shown;
-    }
-
     @Override
     protected void arrange() {
         List<Element> shown = this.shown();
@@ -330,14 +324,7 @@ public class ParentLinear extends AbstractParent {
         if (scrollY) this.scrollOffsetY = Math.clamp(scrollOffsetY, 0, maxScrollY());
 
         // JUSTIFY OFFSET AND GAP
-        int justifyOffset = 0;
-        if (justifyLeftover > 0) {
-            justifyOffset = switch (justify) {
-                case CENTER -> justifyLeftover / 2;
-                case END -> justifyLeftover;
-                default -> 0;
-            };
-        }
+        int justifyOffset = justify.offset(justifyLeftover);
 
         this.positionChildren(shown, main, cross, count, vertical, originX, originY,
                 viewMain, boxWidth, boxHeight, justifyOffset, justifyLeftover, mainScrolls ? 0 : justifyLeftover);
@@ -373,10 +360,7 @@ public class ParentLinear extends AbstractParent {
             }
 
             // BETWEEN DISTRIBUTES EXTRA GAP EVENLY BETWEEN CHILDREN, NONE AT THE EDGES
-            if (justify == Justify.BETWEEN && count > 1 && betweenBudget > 0 && i < count - 1) {
-                int gaps = count - 1;
-                cursor += betweenBudget * (i + 1) / gaps - betweenBudget * i / gaps;
-            }
+            cursor += justify.gap(betweenBudget, i + 1, count - 1);
         }
     }
 

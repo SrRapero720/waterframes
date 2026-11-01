@@ -23,7 +23,7 @@ import me.srrapero720.waterui.core.Spacing;
  * @param clickable       role of anything that reacts to the cursor
  * @param nested          role of sunken surfaces: fields, sliders and lists
  * @param bar             role of progress tracks
- * @param toggle          theme of the switch control
+ * @param toggle          theme of the {@link me.srrapero720.waterui.widget.Switch} control; {@code toggle} is its JSON key and the name {@link SwitchTheme} answers to
  * @param slider          theme of the slider control
  * @param progress        theme of the progress and seek bars
  * @param scroll          theme of the viewport scrollbar

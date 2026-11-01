@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.core;
 
-import me.srrapero720.waterui.WaterUI;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.Marker;
@@ -8,6 +7,8 @@ import org.apache.logging.log4j.MarkerManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /** An element that owns children. Subclasses only decide how to measure and place them. */
 public abstract class AbstractParent extends Element {
@@ -56,7 +57,7 @@ public abstract class AbstractParent extends Element {
 
     @Override
     public void dispose() {
-        if (!children.isEmpty()) WaterUI.LOGGER.trace(IT, "disposing {} child element(s)", children.size());
+        if (!children.isEmpty()) LOGGER.trace(IT, "disposing {} child element(s)", children.size());
         for (Element child: children) child.dispose();
     }
 
@@ -160,5 +161,23 @@ public abstract class AbstractParent extends Element {
         if (!children.remove(child)) return;
         this.children.add(Math.clamp(index, 0, children.size()), child);
         this.dirty();
+    }
+
+    /** The visible children, in order; the invisible ones neither measure nor place. */
+    protected List<Element> shown() {
+        List<Element> shown = new ArrayList<>(children.size());
+        for (Element child: children) if (child.visible) shown.add(child);
+        return shown;
+    }
+
+    /** Free-space placement (§9.3): the child sizes by anchor/FILL and places by its anchor mask. */
+    protected static void placeFree(Element child, int x, int y, int roomX, int roomY) {
+        int anchor = child.anchor();
+        int childWidth = (anchor & Anchor.STRETCH_H) != 0 || child.width() == Element.FILL
+                ? roomX : Math.min(roomX, child.layoutWidth(roomX));
+        int childHeight = (anchor & Anchor.STRETCH_V) != 0 || child.height() == Element.FILL
+                ? roomY : Math.min(roomY, child.layoutHeight(childWidth, roomY));
+        child.layout(Anchor.x(anchor, x, roomX, childWidth), Anchor.y(anchor, y, roomY, childHeight),
+                childWidth, childHeight);
     }
 }

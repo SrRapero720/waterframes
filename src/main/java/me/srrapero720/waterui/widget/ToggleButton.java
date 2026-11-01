@@ -10,43 +10,28 @@ import java.util.function.IntConsumer;
  * icon is always the real value and never waits a tick to catch up. The click handler flips
  * the state at its source.
  */
-public class Toggle extends Button {
+public class ToggleButton extends Button {
     private Icon on;
     private Icon off;
     private BooleanSupplier value;
 
-    public Toggle() {}
-
-    public Toggle(Icon on, Icon off, BooleanSupplier value, IntConsumer onClick) {
-        super(onClick);
-        this.on = on;
-        this.off = off;
-        this.value = value;
-    }
-
-    public Toggle icons(Icon on, Icon off) {
-        this.on = on;
-        this.off = off;
-        return this;
-    }
-
-    public Toggle iconOn(Icon on) {
+    public ToggleButton iconOn(Icon on) {
         this.on = on;
         return this;
     }
 
-    public Toggle iconOff(Icon off) {
+    public ToggleButton iconOff(Icon off) {
         this.off = off;
         return this;
     }
 
-    public Toggle value(BooleanSupplier value) {
+    public ToggleButton value(BooleanSupplier value) {
         this.value = value;
         return this;
     }
 
     @Override
-    public Toggle onClick(IntConsumer onClick) {
+    public ToggleButton onClick(IntConsumer onClick) {
         super.onClick(onClick);
         return this;
     }

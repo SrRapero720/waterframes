@@ -34,9 +34,8 @@ public final class Palette {
     public static final int RED_BORDER = argb(255, 60, 60, 1f);
     public static final int RED_BACKGROUND = argb(140, 56, 52, 1f);
 
-    // VANILLA EMULATION: TONES THE GAME ITSELF PAINTS ITS WIDGETS AND LISTS WITH.
-    // THE PANEL IS THE SHADE BLUR PLUS VEIL PRODUCE; THE menu_background TEXTURES ARE PURE
-    // BLACK AT PARTIAL ALPHA, A VEIL FOR THE BLUR SHADER AND NEVER AN OPAQUE SURFACE
+    // VANILLA EMULATION: TONES THE GAME PAINTS ITS WIDGETS AND LISTS WITH. THE PANEL IS THE SHADE
+    // BLUR+VEIL PRODUCE; menu_background IS BLACK AT PARTIAL ALPHA FOR THE BLUR, NEVER AN OPAQUE SURFACE
     public static final int MC_PANEL = argb(30, 30, 30, 1f);
     public static final int MC_TEXT_DISABLED = argb(160, 160, 160, 1f);
     public static final int MC_GREEN = argb(98, 175, 68, 1f);

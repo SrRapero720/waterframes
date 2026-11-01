@@ -25,7 +25,7 @@ public sealed interface UIValue {
     /** A {@code {a, b, ...}} tuple; commas inside never leak into the enclosing bag (§4). */
     record Tuple(List<UIValue> items) implements UIValue {}
 
-    /** A {@code name(a, b, ...)} call: a handler, {@code loadAtlas(...)} or an atlas handle (§4, §5.7). */
+    /** A {@code name(a, b, ...)} call: a handler, {@code loadAtlas(...)} or an atlas call (§4, §5.7). */
     record Call(String name, List<UIValue> args) implements UIValue {}
 
     /** A {@code A|B|C} flag set of keywords (§4). */

@@ -154,22 +154,20 @@ public final class UIValues {
 
     public static ParentLinear.Orientation orientation(UIValue value) {
         String name = keyword(value, "orientation");
-        return switch (name) {
-            case "HORIZONTAL" -> ParentLinear.Orientation.HORIZONTAL;
-            case "VERTICAL" -> ParentLinear.Orientation.VERTICAL;
-            default -> throw new UIFormatException(null, -1, "unknown orientation '" + name + "'");
-        };
+        try {
+            return ParentLinear.Orientation.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            throw new UIFormatException(null, -1, "unknown orientation '" + name + "'");
+        }
     }
 
     public static Justify justify(UIValue value) {
         String name = keyword(value, "justify");
-        return switch (name) {
-            case "START" -> Justify.START;
-            case "CENTER" -> Justify.CENTER;
-            case "END" -> Justify.END;
-            case "BETWEEN" -> Justify.BETWEEN;
-            default -> throw new UIFormatException(null, -1, "unknown justify '" + name + "'");
-        };
+        try {
+            return Justify.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            throw new UIFormatException(null, -1, "unknown justify '" + name + "'");
+        }
     }
 
     public static ValueFormat format(UIValue value) {

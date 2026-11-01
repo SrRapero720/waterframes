@@ -4,7 +4,10 @@ import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterui.screen.Dialog;
 import me.srrapero720.waterui.format.UIVar;
 import me.srrapero720.waterui.theme.Palette;
-import me.srrapero720.waterui.widget.*;
+import me.srrapero720.waterui.widget.Button;
+import me.srrapero720.waterui.widget.InputText;
+import me.srrapero720.waterui.widget.ProgressBar;
+import me.srrapero720.waterui.widget.Text;
 import net.minecraft.network.chat.Component;
 import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
@@ -17,6 +20,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 /**
  * Sends a local file to the WaterMedia relay and hands back the url it answers with. The picker
@@ -83,7 +88,7 @@ public class UploadScreen extends Dialog {
         String missing = title == null ? "upload/title" : confirm == null ? "upload/confirm" : path == null ? "upload/path"
                 : progress == null ? "upload/progress" : browse == null ? "upload/browse" : null;
         if (missing != null) {
-            WaterFrames.LOGGER.error("[WaterFrames] upload screen missing id '{}', skipping wiring", missing);
+            LOGGER.error("upload screen missing id '{}', skipping wiring", missing);
             return;
         }
         this.wired = true;
@@ -91,7 +96,7 @@ public class UploadScreen extends Dialog {
         // init() RE-RUNS ON RESIZE: THE REBUILT CHROME MUST REGAIN THE STATE ITS UPLOAD LIFECYCLE IMPLIES
         if (failed) {
             this.title.text(translatable("waterframes.gui.upload.failed"));
-            this.title.color = Palette.RED_BORDER;
+            this.title.color(Palette.RED_BORDER);
             this.path.text(status != null && status.error() != null ? status.error() : "");
             this.confirm.text(Component.translatable("waterframes.gui.upload.accept"));
         } else if (uploaded != null) {
@@ -171,7 +176,7 @@ public class UploadScreen extends Dialog {
             if (failed) return;
             this.failed = true;
             this.title.text(translatable("waterframes.gui.upload.failed"));
-            this.title.color = Palette.RED_BORDER;
+            this.title.color(Palette.RED_BORDER);
             this.path.text(status.error() == null ? "" : status.error());
             this.confirm.text(Component.translatable("waterframes.gui.upload.accept"));
             this.dirty();

@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static me.srrapero720.waterframes.WaterFrames.LOGGER;
+
 /**
  * Panel that queries every platform and lists what comes back. Picking a result hands its url
  * to whoever opened the panel and closes it.
@@ -95,7 +97,7 @@ public class SearchScreen extends Dialog {
         // A BROKEN dialogs/search.ui LEAVES A LOOKUP NULL; NAME THE FIRST MISSING id AND SKIP THE WIRING
         String missing = query == null ? "search/query" : notice == null ? "search/notice" : results == null ? "search/results" : null;
         if (missing != null) {
-            WaterFrames.LOGGER.error("[WaterFrames] search screen missing id '{}', skipping wiring", missing);
+            LOGGER.error("search screen missing id '{}', skipping wiring", missing);
             return;
         }
         this.wired = true;

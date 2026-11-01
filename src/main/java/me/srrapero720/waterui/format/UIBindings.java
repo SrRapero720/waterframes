@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.format;
 
-import me.srrapero720.waterui.WaterUI;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforgespi.language.IModFileInfo;
 import net.neoforged.neoforgespi.language.ModFileScanData;
@@ -12,6 +11,8 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * Static index of {@link UIVar} / {@link UIEvent} handler methods, discovered once by scanning
@@ -74,7 +75,7 @@ public final class UIBindings {
             for (Map.Entry<String, String> e: members.entrySet()) {
                 Method m = bySig.get(e.getValue());
                 if (m == null) {
-                    WaterUI.LOGGER.error(IT, "handler '{}' -> no method '{}' on {}", e.getKey(), e.getValue(), clazz.getName());
+                    LOGGER.error(IT, "handler '{}' -> no method '{}' on {}", e.getKey(), e.getValue(), clazz.getName());
                     continue;
                 }
                 m.setAccessible(true);
@@ -109,7 +110,7 @@ public final class UIBindings {
                 raw.computeIfAbsent(ad.clazz().getClassName(), k -> new HashMap<>()).put(key, ad.memberName());
             }
         }
-        WaterUI.LOGGER.debug(IT, "scanned {} @UIVar and {} @UIEvent host class(es)", RAW_VAR.size(), RAW_EVENT.size());
+        LOGGER.debug(IT, "scanned {} @UIVar and {} @UIEvent host class(es)", RAW_VAR.size(), RAW_EVENT.size());
         scanned = true;
     }
 }

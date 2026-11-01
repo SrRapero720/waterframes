@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.format;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.layout.FrameLayout;
 import me.srrapero720.waterui.layout.Grid;
@@ -10,6 +9,7 @@ import me.srrapero720.waterui.theme.Icon;
 import me.srrapero720.waterui.widget.Blank;
 import me.srrapero720.waterui.widget.Button;
 import me.srrapero720.waterui.widget.ComboButton;
+import me.srrapero720.waterui.widget.IconView;
 import me.srrapero720.waterui.widget.InputText;
 import me.srrapero720.waterui.widget.ItemIcon;
 import me.srrapero720.waterui.widget.ParentTab;
@@ -18,13 +18,14 @@ import me.srrapero720.waterui.widget.ProgressBar;
 import me.srrapero720.waterui.widget.SeekBar;
 import me.srrapero720.waterui.widget.Slider;
 import me.srrapero720.waterui.widget.Spacer;
-import me.srrapero720.waterui.widget.State;
+import me.srrapero720.waterui.widget.StateButton;
 import me.srrapero720.waterui.widget.Stepper;
 import me.srrapero720.waterui.widget.Switch;
 import me.srrapero720.waterui.widget.Tab;
 import me.srrapero720.waterui.widget.Text;
 import me.srrapero720.waterui.widget.Thumbnail;
-import me.srrapero720.waterui.widget.Toggle;
+import me.srrapero720.waterui.widget.ToggleButton;
+import me.srrapero720.waterui.widget.UIMediaPlayer;
 import net.minecraft.locale.Language;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -34,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * Extensibility point of the {@code .ui} format (UI-SPEC.md §7.3, §11): maps a tag to an element
@@ -58,7 +61,8 @@ public final class UIRegistry {
     /** Attaches a live variable to a property, wiring its host supplier onto {@code e} through the context. */
     public interface Binding { void bind(Element e, String var, DataContext data); }
 
-    // GENERIC PROPERTY NAMES (§8.2): THE BUILDER OWNS THEM, SO NO TAG MAY REGISTER ONE
+    // GENERIC PROPERTY NAMES (§8.2): THE BUILDER OWNS THEM, SO NO TAG MAY REGISTER ONE.
+    // SOLE SOURCE OF THE LIST — KEEP IN SYNC WITH THE applyGeneric SWITCH IN UIBuilder
     private static final Set<String> RESERVED = Set.of(
             "id", "width", "height", "weight", "margin", "padding", "border", "align", "justify",
             "anchor", "outsideAnchor", "shadow", "enabled", "visible", "hidden", "elevation", "scale",
@@ -117,8 +121,6 @@ public final class UIRegistry {
         GENERIC_BINDINGS.put(name, binder);
     }
 
-    public static boolean reserved(String name) { return RESERVED.contains(name); }
-
     public static Factory factory(String tag) { return FACTORIES.get(tag); }
 
     public static boolean container(String tag) { return Boolean.TRUE.equals(CONTAINERS.get(tag)); }
@@ -158,6 +160,7 @@ public final class UIRegistry {
         EventBinder leftClick = (e, handler) -> ((Button) e).onClick(button -> { if (button == 0) handler.invoke(); });
 
         // ---- CONTAINERS (§10) ----------------------------------------------------------
+        // Parent/Frame ARE DELIBERATE TAG ALIASES OF ParentLinear/FrameLayout: THE TAG NAMES THE ROLE, NOT THE CLASS
         register("Parent", ParentLinear::new, true);
         property("Parent", "orientation", (e, v, c) -> ((ParentLinear) e).orientation(UIValues.orientation(v)));
         property("Parent", "spacing", (e, v, c) -> ((ParentLinear) e).spacing(c.intValue(v)));
@@ -202,8 +205,8 @@ public final class UIRegistry {
         // ---- TEXT & BUTTONS (§11) ------------------------------------------------------
         register("Text", Text::new, false);
         property("Text", "component", (e, v, c) -> ((Text) e).text(c.component(v)));
-        property("Text", "color", (e, v, c) -> ((Text) e).color = c.color(v));
-        property("Text", "fontScale", (e, v, c) -> ((Text) e).fontScale(c.floatValue(v)));
+        property("Text", "color", (e, v, c) -> ((Text) e).color(c.color(v)));
+        property("Text", "textScale", (e, v, c) -> ((Text) e).textScale(c.floatValue(v)));
         property("Text", "ellipsize", (e, v, c) -> { if (c.bool(v)) ((Text) e).ellipsize(); });
         property("Text", "lines", (e, v, c) -> ((Text) e).lines(c.intValue(v)));
         // LIVE component: A TICKED STRING SUPPLIER, WRAPPED TO A LITERAL AND PUSHED THROUGH Text.text ONLY ON CHANGE (§5.5)
@@ -231,19 +234,19 @@ public final class UIRegistry {
         event("Button", "onClick", leftClick);
         binding("Button", "icon", (e, name, data) -> { data.require(name, Icon.class); ((Button) e).source(data.iconOr(name)); });
 
-        register("ToggleButton", Toggle::new, false);
-        property("ToggleButton", "iconOn", (e, v, c) -> ((Toggle) e).iconOn(c.icon(v)));
-        property("ToggleButton", "iconOff", (e, v, c) -> ((Toggle) e).iconOff(c.icon(v)));
+        register("ToggleButton", ToggleButton::new, false);
+        property("ToggleButton", "iconOn", (e, v, c) -> ((ToggleButton) e).iconOn(c.icon(v)));
+        property("ToggleButton", "iconOff", (e, v, c) -> ((ToggleButton) e).iconOff(c.icon(v)));
         // A BAKED value= WRAPS THE CONSTANT IN A SUPPLIER, SO A LITERAL WORKS WITHOUT A @UIVar (§5.5, H7)
-        property("ToggleButton", "value", (e, v, c) -> { boolean b = c.bool(v); ((Toggle) e).value(() -> b); });
+        property("ToggleButton", "value", (e, v, c) -> { boolean b = c.bool(v); ((ToggleButton) e).value(() -> b); });
         event("ToggleButton", "onClick", leftClick);
-        binding("ToggleButton", "value", (e, name, data) -> { data.require(name, boolean.class); ((Toggle) e).value(data.boolOr(name)); });
+        binding("ToggleButton", "value", (e, name, data) -> { data.require(name, boolean.class); ((ToggleButton) e).value(data.boolOr(name)); });
 
         // state MUST FOLLOW states SO IT CLAMPS TO THE REAL LENGTH; THE CYCLE FIRES onChange(int), NOT onClick
-        register("StateButton", State::new, false);
-        property("StateButton", "states", (e, v, c) -> ((State) e).states(c.icons(v)));
-        property("StateButton", "state", (e, v, c) -> ((State) e).state(c.intValue(v)));
-        event("StateButton", "onClick", (e, handler) -> ((State) e).onChange(state -> handler.invoke(String.valueOf(state))));
+        register("StateButton", StateButton::new, false);
+        property("StateButton", "states", (e, v, c) -> ((StateButton) e).states(c.icons(v)));
+        property("StateButton", "state", (e, v, c) -> ((StateButton) e).state(c.intValue(v)));
+        event("StateButton", "onClick", (e, handler) -> ((StateButton) e).onChange(state -> handler.invoke(String.valueOf(state))));
 
         // A TAB STRIP BUTTON USABLE ON ITS OWN; ParentTab BUILDS ITS OWN FROM EACH TAB DOC'S tabIcon/tabTooltip
         register("TabButton", Tab::new, false);
@@ -252,9 +255,9 @@ public final class UIRegistry {
         event("TabButton", "onClick", leftClick);
 
         // ---- ICONS & EMBLEMS (§11) -----------------------------------------------------
-        register("Icon", me.srrapero720.waterui.widget.Icon::new, false);
-        property("Icon", "icon", (e, v, c) -> ((me.srrapero720.waterui.widget.Icon) e).icon(c.icon(v)));
-        binding("Icon", "icon", (e, name, data) -> { data.require(name, Icon.class); ((me.srrapero720.waterui.widget.Icon) e).source(data.iconOr(name)); });
+        register("Icon", IconView::new, false);
+        property("Icon", "icon", (e, v, c) -> ((IconView) e).icon(c.icon(v)));
+        binding("Icon", "icon", (e, name, data) -> { data.require(name, Icon.class); ((IconView) e).source(data.iconOr(name)); });
 
         register("ItemIcon", ItemIcon::new, false);
         property("ItemIcon", "item", (e, v, c) -> ((ItemIcon) e).stack(c.item(v)));
@@ -315,17 +318,17 @@ public final class UIRegistry {
         binding("ProgressBar", "value", (e, name, data) -> { data.require(name, long.class, int.class); ((ProgressBar) e).value(data.numberOr(name)); });
         binding("ProgressBar", "max", (e, name, data) -> { data.require(name, long.class, int.class); ((ProgressBar) e).max(data.numberOr(name)); });
 
-        register("Seekbar", SeekBar::new, false);
-        property("Seekbar", "format", (e, v, c) -> ((SeekBar) e).format(UIValues.format(v)));
-        property("Seekbar", "textScale", (e, v, c) -> ((SeekBar) e).textScale(c.floatValue(v)));
-        property("Seekbar", "time", (e, v, c) -> { long n = c.longValue(v); ((SeekBar) e).time(() -> n); });
-        property("Seekbar", "duration", (e, v, c) -> { long n = c.longValue(v); ((SeekBar) e).duration(() -> n); });
-        binding("Seekbar", "time", (e, name, data) -> { data.require(name, long.class, int.class); ((SeekBar) e).time(data.numberOr(name)); });
-        binding("Seekbar", "duration", (e, name, data) -> { data.require(name, long.class, int.class); ((SeekBar) e).duration(data.numberOr(name)); });
-        event("Seekbar", "onSeekStart", (e, handler) -> ((SeekBar) e).onSeekStart(x -> handler.invoke(UIValues.number(x))));
-        event("Seekbar", "onSeek", (e, handler) -> ((SeekBar) e).onSeek(x -> handler.invoke(UIValues.number(x))));
-        event("Seekbar", "onSeekEnd", (e, handler) -> ((SeekBar) e).onSeekEnd(x -> handler.invoke(UIValues.number(x))));
-        event("Seekbar", "onScroll", (e, handler) -> ((SeekBar) e).onScroll(x -> handler.invoke(UIValues.number(x))));
+        register("SeekBar", SeekBar::new, false);
+        property("SeekBar", "format", (e, v, c) -> ((SeekBar) e).format(UIValues.format(v)));
+        property("SeekBar", "textScale", (e, v, c) -> ((SeekBar) e).textScale(c.floatValue(v)));
+        property("SeekBar", "time", (e, v, c) -> { long n = c.longValue(v); ((SeekBar) e).time(() -> n); });
+        property("SeekBar", "duration", (e, v, c) -> { long n = c.longValue(v); ((SeekBar) e).duration(() -> n); });
+        binding("SeekBar", "time", (e, name, data) -> { data.require(name, long.class, int.class); ((SeekBar) e).time(data.numberOr(name)); });
+        binding("SeekBar", "duration", (e, name, data) -> { data.require(name, long.class, int.class); ((SeekBar) e).duration(data.numberOr(name)); });
+        event("SeekBar", "onSeekStart", (e, handler) -> ((SeekBar) e).onSeekStart(x -> handler.invoke(UIValues.number(x))));
+        event("SeekBar", "onSeek", (e, handler) -> ((SeekBar) e).onSeek(x -> handler.invoke(UIValues.number(x))));
+        event("SeekBar", "onSeekEnd", (e, handler) -> ((SeekBar) e).onSeekEnd(x -> handler.invoke(UIValues.number(x))));
+        event("SeekBar", "onScroll", (e, handler) -> ((SeekBar) e).onScroll(x -> handler.invoke(UIValues.number(x))));
 
         // ---- INPUT (§11): value IS BAKED ONLY, LIVE TEXT WOULD FIGHT THE USER'S TYPING -----
         register("InputText", InputText::new, false);
@@ -344,6 +347,10 @@ public final class UIRegistry {
         event("Thumbnail", "onLoad", (e, handler) -> ((Thumbnail) e).onLoad(handler::invoke));
         event("Thumbnail", "onError", (e, handler) -> ((Thumbnail) e).onError(handler::invoke));
         binding("Thumbnail", "source", (e, name, data) -> { data.require(name, String.class, CharSequence.class); ((Thumbnail) e).source(data.stringOr(name)); });
+
+        // ---- MEDIA PLAYER (§11): NO DECLARATIVE SOURCE. A PLAYER IS A LIVE SESSION, NOT A VALUE,
+        // SO THE DOCUMENT ONLY PLACES THE SURFACE AND THE HOST HANDS IT WHAT TO MIRROR (§13.2)
+        register("MediaPlayer", UIMediaPlayer::new, false);
 
         // ---- GENERIC POINTER EVENTS (§12.4): A TAG'S OWN SAME-NAME EVENT OUTRANKS THESE ----
         event("onClick", (e, handler) -> e.onClick(handler::invoke));
@@ -370,7 +377,7 @@ public final class UIRegistry {
         binding("enabled", (e, name, data) -> { data.require(name, boolean.class); data.enabled(e, name); });
         binding("visible", (e, name, data) -> { data.require(name, boolean.class); data.visible(e, name); });
 
-        WaterUI.LOGGER.info(IT, "registry bootstrap complete: {} element tag(s)", FACTORIES.size());
+        LOGGER.info(IT, "registry bootstrap complete: {} element tag(s)", FACTORIES.size());
         // PUBLISH ONLY ONCE EVERY CORE TAG IS IN THE MAPS, SO A RE-ENTRANT CALLER NEVER SEES A HALF-BUILT REGISTRY
         ready = true;
     }

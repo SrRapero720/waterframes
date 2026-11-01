@@ -1,17 +1,21 @@
 package me.srrapero720.waterframes.client.ui;
 
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterui.format.UIAtlases;
 import me.srrapero720.waterui.theme.Icon;
-import net.minecraft.resources.ResourceLocation;
 
 /**
  * The screen atlas icons Java picks at runtime, addressed by their 16px chunk coordinates.
  * Everything a document can name declaratively lives in {@code ui/constants/icons.ui} instead.
  */
-public class Icons {
-    public static final ResourceLocation ATLAS = WaterFrames.asResource("textures/screen_atlas.png");
+public final class Icons {
+    private Icons() {}
 
-    // VOLUME COLUM (chunk 0): PICKED BY LEVEL IN volume(int, boolean)
+    // RESOLVED THROUGH THE ATLAS PIPELINE (§5.7) LIKE icons.ui, SO A PACK'S REAL SIDE/ENCODING APPLIES;
+    // CLASS-INIT HAPPENS ON THE FIRST SCREEN OPEN, LONG AFTER RESOURCES LOADED
+    private static final UIAtlases.Atlas ATLAS = UIAtlases.load("screen_atlas", WaterFrames.ID);
+
+    // VOLUME COLUMN (chunk 0): PICKED BY LEVEL IN volume(int, boolean)
     public static final Icon VOLUME = icon(0, 0);
     public static final Icon VOLUME_0 = icon(0, 1);
     public static final Icon VOLUME_1 = icon(0, 2);
@@ -42,7 +46,7 @@ public class Icons {
     public static final Icon SIGNAL_1 = icon(5, 3);
     public static final Icon SIGNAL_0 = icon(5, 4);
 
-    // ACTION COLUM 1 (chunk 15)
+    // ACTION COLUMN 1 (chunk 15)
     public static final Icon ADD = icon(15, 7);
 
     private static Icon icon(int chunkX, int chunkY) {
@@ -50,7 +54,7 @@ public class Icons {
     }
 
     private static Icon icon(int chunkX, int chunkY, int chunksWide, int chunksTall) {
-        return new Icon(ATLAS, 16 * chunkX, 16 * chunkY, 16 * chunksWide, 16 * chunksTall);
+        return ATLAS.icon(chunkX, chunkY, chunksWide, chunksTall);
     }
 
     public static Icon volume(int volume, boolean muted) {

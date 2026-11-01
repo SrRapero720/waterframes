@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.format;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.theme.Theme;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.Marker;
@@ -10,6 +9,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /** Registry of loaded {@link Theme}s keyed by resource id, plus the §2 assignment fallback chain. */
 public final class UIThemes {
@@ -47,23 +48,23 @@ public final class UIThemes {
         if (declared != null) {
             Theme theme = THEMES.get(declared);
             if (theme != null) {
-                WaterUI.LOGGER.debug(IT, "theme resolved: declared '{}'", declared);
+                LOGGER.debug(IT, "theme resolved: declared '{}'", declared);
                 return theme;
             }
-            if (MISSING_LOGGED.add(declared)) WaterUI.LOGGER.error(IT, "theme '{}' is declared but missing or broken, using Theme.ERROR", declared);
+            if (MISSING_LOGGED.add(declared)) LOGGER.error(IT, "theme '{}' is declared but missing or broken, using Theme.ERROR", declared);
             return Theme.ERROR;
         }
         ResourceLocation pair = ResourceLocation.fromNamespaceAndPath(docSource.getNamespace(), stem(docSource.getPath()));
         Theme paired = THEMES.get(pair);
         if (paired != null) {
-            WaterUI.LOGGER.debug(IT, "theme resolved: paired '{}'", pair);
+            LOGGER.debug(IT, "theme resolved: paired '{}'", pair);
             return paired;
         }
         if (ATTEMPTED.contains(pair)) {
-            if (MISSING_LOGGED.add(pair)) WaterUI.LOGGER.error(IT, "paired theme '{}' failed to parse, using Theme.ERROR", pair);
+            if (MISSING_LOGGED.add(pair)) LOGGER.error(IT, "paired theme '{}' failed to parse, using Theme.ERROR", pair);
             return Theme.ERROR;
         }
-        WaterUI.LOGGER.debug(IT, "theme resolved: default WATERUI for {}", docSource);
+        LOGGER.debug(IT, "theme resolved: default WATERUI for {}", docSource);
         return Theme.WATERUI;
     }
 

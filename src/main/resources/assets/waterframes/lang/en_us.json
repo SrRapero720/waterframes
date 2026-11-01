@@ -89,8 +89,6 @@
     "waterframes.download.exception.notfound": "404 - Not found",
     "waterframes.download.exception.invalid": "Could not download image",
     "waterframes.download.exception.gif": "Failed to parse GIF",
-
-    "waterframes.gui.blocks": "%s Block(s)",
     "waterframes.gui.url": "URL",
     "waterframes.gui.url.tooltip.empty": "Type any media url",
     "waterframes.gui.url.tooltip.not_whitelisted": "URL not whitelisted, cannot save",
@@ -163,7 +161,6 @@
     "waterframes.gui.source.copy_from": "Copy a playlist from another display",
     "waterframes.gui.source.copy_to": "Copy this playlist to another display",
     "waterframes.gui.source.unknown": "unknown",
-    "waterframes.gui.source.added_by": "Added by %s",
 
     "waterframes.gui.mute": "mute",
     "waterframes.gui.mirror.short": "mirror",

@@ -1,6 +1,5 @@
 package me.srrapero720.waterui.screen;
 
-import me.srrapero720.waterui.WaterUI;
 import me.srrapero720.waterui.core.AbstractParent;
 import me.srrapero720.waterui.core.Anchor;
 import me.srrapero720.waterui.core.Cursors;
@@ -22,10 +21,11 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.lwjgl.glfw.GLFW;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+
+import static me.srrapero720.waterui.WaterUI.LOGGER;
 
 /**
  * Vanilla screen that owns a {@link Panel} root and hosts a stack of {@link Dialog}s over it:
@@ -46,7 +46,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
     private final List<Element> outside = new ArrayList<>();
     // LIVE-BINDING CONTEXT: RESET ON EVERY RE-INFLATE, DRAINED EACH TICK
     private final DataContext context = new DataContext();
-    // PROGRAMMATIC REGISTRATIONS (§5.6, §12.2): CLEARED ON EVERY RE-INIT LIKE THE CONTEXT
+    // PROGRAMMATIC REGISTRATIONS (§5.6, §12.2), FILLED IN THE SUBCLASS CONSTRUCTOR FOR THE INSTANCE'S LIFE
     private final UIHost.Store store = new UIHost.Store();
     private Element focused;
     // LAYER THAT CONSUMED THE LAST PRESS (OUTSIDE ELEMENT OR TOP PANEL) AND THE GLFW BUTTON THAT
@@ -89,60 +89,14 @@ public abstract class WaterScreen extends Screen implements UIHost {
         return this.root;
     }
 
-    /** The live-binding context the {@link me.srrapero720.waterui.format.UIBuilder} populates during inflate. */
+    /** The live-binding context the {@link UIBuilder} populates during inflate. */
     public DataContext context() {
         return this.context;
     }
 
-    /** The three registries behind {@link #registerVar}/{@link #registerUIEvent}/{@link #registerEvent} (§5.6, §12.2). */
     @Override
     public UIHost.Store uiStore() {
         return this.store;
-    }
-
-    /** Registers an inflatable constant fed to the contract on every inflate; register in the constructor (§5.6). */
-    protected final void registerVar(String key, boolean value) {
-        this.store.inflatable(key, value);
-    }
-
-    /** Registers an inflatable numeric constant; {@code int} widens here (§5.6). */
-    protected final void registerVar(String key, long value) {
-        this.store.inflatable(key, value);
-    }
-
-    /** Registers an inflatable numeric constant; {@code float} widens here (§5.6). */
-    protected final void registerVar(String key, double value) {
-        this.store.inflatable(key, value);
-    }
-
-    /** Registers an inflatable String/Icon/ItemStack constant (§5.6). */
-    protected final void registerVar(String key, Object value) {
-        this.store.inflatable(key, value);
-    }
-
-    /** Registers a dynamic variable read live like a {@code @UIVar} method; a {@code final var} snapshots it per inflate (§5.6). */
-    protected final void registerVar(String key, Supplier<?> value) {
-        this.store.dynamic(key, value);
-    }
-
-    /** Registers a named handler for the document's {@code on<Event>=key(...)} calls, receiving id + baked args + payload (§12.2). */
-    protected final void registerUIEvent(String key, UIEvents.Handler handler) {
-        this.store.event(key, handler);
-    }
-
-    /** Registers a payload-blind named handler (§12.2). */
-    protected final void registerUIEvent(String key, Runnable handler) {
-        this.store.event(key, payload -> handler.run());
-    }
-
-    /** Binds {@code callback} straight to the element's click by id; the namespace is the inflated document's (§12.2). */
-    protected final void registerEvent(String elementId, Consumer<Element> callback) {
-        this.store.element(elementId, callback);
-    }
-
-    /** Same as {@link #registerEvent(String, Consumer)} with an explicit {@code ns:path} id, for foreign elements. */
-    protected final void registerEvent(ResourceLocation elementId, Consumer<Element> callback) {
-        this.store.element(elementId.toString(), callback);
     }
 
     // INFLATES THE SCREEN'S OWN DOCUMENT INTO THE ROOT, FEEDING THE BAKED VIEW AND WIRING THE
@@ -196,7 +150,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
     }
 
     public void openDialog(Dialog dialog) {
-        WaterUI.LOGGER.debug(IT, "dialog {} opened", dialog.name);
+        LOGGER.debug(IT, "dialog {} opened", dialog.name);
         dialog.screen = this;
         dialog.context = new DataContext();
         this.dialogs.add(dialog);
@@ -210,7 +164,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
     }
 
     public void closeDialog(Dialog dialog) {
-        WaterUI.LOGGER.debug(IT, "dialog {} closed", dialog.name);
+        LOGGER.debug(IT, "dialog {} closed", dialog.name);
         this.dialogs.remove(dialog);
         this.stack.remove(dialog);
         dialog.closed();
@@ -263,7 +217,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
 
     @Override
     protected void init() {
-        WaterUI.LOGGER.debug(IT, "init screen {} ({} dialog(s))", root.name, dialogs.size());
+        LOGGER.debug(IT, "init screen {} ({} dialog(s))", root.name, dialogs.size());
         this.root.clear();
         // init() OWNS THE OUTSIDE LIFECYCLE: CLEARS THE LIST SO SUBCLASSES CANNOT FORGET
         this.clearOutside();
@@ -473,7 +427,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
                     this.focus(element.focusable() ? element : null);
                     this.pointerTarget = element;
                     this.pointerButton = button;
-                    WaterUI.LOGGER.trace(IT, "pointer captured by outside {}", element.id());
+                    LOGGER.trace(IT, "pointer captured by outside {}", element.id());
                     return true;
                 }
             }
@@ -486,7 +440,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
             if (top == root || dialogs.contains(top)) {
                 this.pointerTarget = top;
                 this.pointerButton = button;
-                WaterUI.LOGGER.trace(IT, "pointer captured by {}", top.name);
+                LOGGER.trace(IT, "pointer captured by {}", top.name);
             }
             return true;
         }
@@ -562,7 +516,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
     }
 
     @Override
-    public void onFilesDrop(List<java.nio.file.Path> files) {
+    public void onFilesDrop(List<Path> files) {
         Panel top = topDialog() != null ? topDialog() : root;
         // ROUTE TO THE DEEPEST ELEMENT UNDER THE LAST KNOWN CURSOR THAT LISTENS, FALLING BACK
         // TO THE PANEL'S OWN filesDropped SO UploadScreen AND ANYTHING ELSE THAT OVERRIDES IT KEEPS WORKING
@@ -573,7 +527,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
 
     @Override
     public void removed() {
-        WaterUI.LOGGER.trace(IT, "disposing screen {}: {} dialog(s), {} outside", root.name, dialogs.size(), outside.size());
+        LOGGER.trace(IT, "disposing screen {}: {} dialog(s), {} outside", root.name, dialogs.size(), outside.size());
         Cursors.reset();
         DebugOverlay.reset();
         for (Dialog dialog: List.copyOf(dialogs)) {
@@ -597,13 +551,5 @@ public abstract class WaterScreen extends Screen implements UIHost {
     @Override
     public boolean isPauseScreen() {
         return false;
-    }
-
-    protected static Component translatable(String key, Object... args) {
-        return Component.translatable(key, args);
-    }
-
-    protected static String translate(String key, Object... args) {
-        return Component.translatable(key, args).getString();
     }
 }

@@ -1,4 +1,4 @@
-// MEDIA TAB — AUDIO LEVELS, POSITION AND PLAYBACK; DECODING OPTIONS ARE PLACEHOLDERS FOR NOW.
+// MEDIA TAB — PREVIEW, AUDIO LEVELS, POSITION AND PLAYBACK; DECODING OPTIONS ARE PLACEHOLDERS FOR NOW.
 // ROOT PREFS SHAPE THE AUTO-GENERATED TAB BODY (§6.1, §10.3): tabIcon/tabTooltip GO TO THE STRIP, THE REST IS LAYOUT.
 import "constants/icons"
 
@@ -6,6 +6,7 @@ import "constants/icons"
 var muted
 var audio_pos_tooltip
 var watervision_ready
+var String media_source
 
 // ---- BAKED CONTRACT: CONFIG BOUNDS, CAPABILITIES AND INITIAL VALUES FROM THE HOST -----------
 final var max_volume
@@ -21,20 +22,25 @@ final var audio_offset
 root[tabIcon=icon_multimedia, tabTooltip="translatable:waterframes.gui.tab.media",
      orientation=VERTICAL, align=STRETCH, width=FILL, height=FILL, spacing=4]
 
-Parent[orientation=VERTICAL, spacing=2, width=FILL] {
-    Slider[id="media/volume", width=FILL, height=14, min=0, max=max_volume, stepped=true, format=RAW_PERCENT, value=volume, icon=icon_volume, tooltip="translatable:waterframes.gui.icon.volume", onValueCommit=commit()]
-    Slider[id="media/volume_min", width=FILL, height=14, min=0, max=volume_min_max, stepped=true, format=BLOCKS, value=volume_min, icon=icon_volume_min, tooltip="translatable:waterframes.gui.icon.volume_min", onValueCommit=commit()]
-    Slider[id="media/volume_max", width=FILL, height=14, min=0, max=max_volume_distance, stepped=true, format=BLOCKS, value=volume_max, icon=icon_volume_max, tooltip="translatable:waterframes.gui.icon.volume_max", onValueCommit=commit()]
-    Parent[orientation=HORIZONTAL, align=CENTER, spacing=6, width=FILL] {
-        Switch[id="media/mute", component="translatable:waterframes.gui.mute", value=muted, textScale=0.75, onToggle=mute()]
-        StateButton[id="media/audio_offset", width=25, height=14, padding=0, shadow=false, visible=projects,
-                    tooltip=audio_pos_tooltip, states={icon_audio_block, icon_audio_picture, icon_audio_center},
-                    state=audio_offset, onClick=commit()]
-        Button[id="media/watervision", width=18, height=18, visible=watervision, enabled=watervision_ready,
-               icon=icon_videoplayer, tooltip="translatable:waterframes.gui.videoplayer", onClick=openWatervision()]
+// PREVIEW + AUDIO CONTROLS: THE THUMBNAIL ANCHORS THE LEFT, SLIDERS AND SWITCHES FILL THE RIGHT
+Parent[orientation=HORIZONTAL, spacing=6, width=FILL, align=CENTER] {
+    Thumbnail[width=96, height=64, source=media_source, fallback=icon_multimedia, face=field]
+    Parent[orientation=VERTICAL, spacing=2, width=FILL] {
+        Slider[id="media/volume", width=FILL, height=14, min=0, max=max_volume, stepped=true, format=RAW_PERCENT, value=volume, icon=icon_volume, tooltip="translatable:waterframes.gui.icon.volume", onValueCommit=commit()]
+        Slider[id="media/volume_min", width=FILL, height=14, min=0, max=volume_min_max, stepped=true, format=BLOCKS, value=volume_min, icon=icon_volume_min, tooltip="translatable:waterframes.gui.icon.volume_min", onValueCommit=commit()]
+        Slider[id="media/volume_max", width=FILL, height=14, min=0, max=max_volume_distance, stepped=true, format=BLOCKS, value=volume_max, icon=icon_volume_max, tooltip="translatable:waterframes.gui.icon.volume_max", onValueCommit=commit()]
+        Parent[orientation=HORIZONTAL, align=CENTER, spacing=6, width=FILL] {
+            Switch[id="media/mute", component="translatable:waterframes.gui.mute", value=muted, textScale=0.75, onToggle=mute()]
+            StateButton[id="media/audio_offset", width=25, height=14, padding=0, shadow=false, visible=projects,
+                        tooltip=audio_pos_tooltip, states={icon_audio_block, icon_audio_picture, icon_audio_center},
+                        state=audio_offset, onClick=commit()]
+            Button[id="media/watervision", width=18, height=18, visible=watervision, enabled=watervision_ready,
+                   icon=icon_videoplayer, tooltip="translatable:waterframes.gui.videoplayer", onClick=openWatervision()]
+        }
     }
 }
 
+// DECODING OPTIONS — ALL PLACEHOLDERS, TWO SIDE-BY-SIDE COLUMNS FILLING THE REMAINING SPACE
 Parent[orientation=HORIZONTAL, spacing=6, width=FILL, height=FILL] {
     Parent[orientation=VERTICAL, spacing=2, width=FILL] {
         Button[component="translatable:waterframes.gui.media.video_quality", enabled=false, width=FILL]

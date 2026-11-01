@@ -1,11 +1,9 @@
 package me.srrapero720.waterui.layout;
 
-import me.srrapero720.waterui.core.Anchor;
 import me.srrapero720.waterui.core.Element;
 import me.srrapero720.waterui.core.AbstractParent;
 import me.srrapero720.waterui.core.Spacing;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,18 +42,6 @@ public class Grid extends AbstractParent {
     public int rows() { return rows; }
     public int spacing() { return spacing; }
     public Justify justify() { return justify; }
-
-    private int rowCount() {
-        List<Element> shown = this.shown();
-        if (rows > 0) return rows;
-        return Math.max(1, (shown.size() + columns - 1) / columns);
-    }
-
-    private List<Element> shown() {
-        List<Element> shown = new ArrayList<>(children.size());
-        for (Element child: children) if (child.visible) shown.add(child);
-        return shown;
-    }
 
     @Override
     protected int prefContentWidth(int available) {
@@ -138,21 +124,9 @@ public class Grid extends AbstractParent {
 
         // JUSTIFY: DISTRIBUTE LEFTOVER HEIGHT AMONG ROWS
         int leftover = Math.max(0, boxHeight - totalH);
-        int justifyOffset = 0;
-        if (leftover > 0) {
-            justifyOffset = switch (justify) {
-                case CENTER -> leftover / 2;
-                case END -> leftover;
-                default -> 0;
-            };
-        }
-
-        int cursorY = originY + justifyOffset;
+        int cursorY = originY + justify.offset(leftover);
         for (int row = 0; row < rCount; row++) {
-            // BETWEEN GAP FOR THIS ROW
-            if (justify == Justify.BETWEEN && rCount > 1 && leftover > 0 && row > 0) {
-                cursorY += leftover * row / (rCount - 1) - leftover * (row - 1) / (rCount - 1);
-            }
+            cursorY += justify.gap(leftover, row, rCount - 1);
 
             int cursorX = originX;
             for (int col = 0; col < columns; col++) {
@@ -161,21 +135,10 @@ public class Grid extends AbstractParent {
 
                 Element child = shown.get(idx);
                 Spacing margin = child.margin();
-                int anchor = child.anchor();
-
-                int roomX = cellW - margin.horizontal();
-                int roomY = rowH[row] - margin.vertical();
 
                 // INSIDE A CELL THE CHILD PLACES BY ITS ANCHOR MASK (FREE 2D SPACE)
-                int childWidth = (anchor & Anchor.STRETCH_H) != 0 || child.width() == Element.FILL
-                        ? roomX : Math.min(roomX, child.layoutWidth(roomX));
-                int childHeight = (anchor & Anchor.STRETCH_V) != 0 || child.height() == Element.FILL
-                        ? roomY : Math.min(roomY, child.layoutHeight(childWidth, roomY));
-
-                child.layout(
-                        Anchor.x(anchor, cursorX + margin.left(), roomX, childWidth),
-                        Anchor.y(anchor, cursorY + margin.top(), roomY, childHeight),
-                        childWidth, childHeight);
+                placeFree(child, cursorX + margin.left(), cursorY + margin.top(),
+                        cellW - margin.horizontal(), rowH[row] - margin.vertical());
 
                 cursorX += cellW + spacing;
             }
