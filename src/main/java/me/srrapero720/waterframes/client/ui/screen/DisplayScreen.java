@@ -60,7 +60,6 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     private static final int WIDTH = 391;
     private static final int HEIGHT = 227;
 
-
     // BAKED ROW GEOMETRY (3:2 THUMBS): A MEDIA HEAD IS FULL SIZE, AN EXPANDED SUB-SOURCE IS COMPACT AND LEFT-INSET
     private static final int THUMB_W = 42;
     private static final int THUMB_H = 28;
