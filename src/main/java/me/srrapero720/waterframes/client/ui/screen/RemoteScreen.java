@@ -45,9 +45,9 @@ public class RemoteScreen extends WaterScreen {
         this.registerUIEvent("volumeDown", () -> tile.volumeDown(true));
         this.registerUIEvent("channelUp", () -> tile.nextUrl(true));
         this.registerUIEvent("channelDown", () -> tile.prevUrl(true));
-        // SKIPPING IS A SESSION COMMAND: THE PLAYER FORWARDS IT TO THE SERVER CLOCK ON ITS OWN
-        this.registerUIEvent("rewind", () -> { if (tile.follower() != null) tile.follower().rewind(); });
-        this.registerUIEvent("fastForward", () -> { if (tile.follower() != null) tile.follower().forward(); });
+        // SKIPPING IS A SESSION COMMAND: IT TRAVELS TO THE SERVER CLOCK AND COMES BACK TO EVERY VIEWER
+        this.registerUIEvent("rewind", () -> tile.skip(true, -DisplayTile.SKIP_MS));
+        this.registerUIEvent("fastForward", () -> tile.skip(true, DisplayTile.SKIP_MS));
     }
 
     // SIGNAL BARS FADE WITH DISTANCE; OUT OF RANGE SHOWS THE DEAD ICON. THE ONE VAR WITH REAL

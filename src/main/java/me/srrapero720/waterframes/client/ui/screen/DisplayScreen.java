@@ -59,8 +59,7 @@ import static me.srrapero720.waterui.core.Element.translate;
 public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     private static final int WIDTH = 391;
     private static final int HEIGHT = 227;
-    /** How far a scroll over the bar jumps, in milliseconds. */
-    private static final int SKIP = 5000;
+
 
     // BAKED ROW GEOMETRY (3:2 THUMBS): A MEDIA HEAD IS FULL SIZE, AN EXPANDED SUB-SOURCE IS COMPACT AND LEFT-INSET
     private static final int THUMB_W = 42;
@@ -153,8 +152,8 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerUIEvent("pause", () -> tile.setPause(true, true));
         this.registerUIEvent("stop", () -> tile.setStop(true));
         // SKIPPING IS A SESSION COMMAND: IT TRAVELS TO THE SERVER CLOCK AND COMES BACK TO EVERY VIEWER
-        this.registerUIEvent("rewind", () -> tile.skip(true, -SKIP));
-        this.registerUIEvent("fastForward", () -> tile.skip(true, SKIP));
+        this.registerUIEvent("rewind", () -> tile.skip(true, -DisplayTile.SKIP_MS));
+        this.registerUIEvent("fastForward", () -> tile.skip(true, DisplayTile.SKIP_MS));
         // REFETCH THE MRL AND DROP THE PLAYER SO THE NEXT TICK REBUILDS IT FROM THE FRESH SOURCES
         this.registerUIEvent("reload", () -> { if (tile.mrl != null) tile.mrl.reload(); tile.cleanDisplay(); });
         // HANDS THE MEDIA TO WATERVISION'S OWN SCREEN AND PAUSES THE DISPLAY MEANWHILE
@@ -172,7 +171,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         // SCRUBBING IS A SESSION COMMAND, NOT DISPLAY STATE: IT TRAVELS TO THE SERVER CLOCK AND COMES
         // BACK TO EVERY VIEWER FROM THERE
         this.registerUIEvent("seek", args -> tile.seek(true, (long) Double.parseDouble(args[1])));
-        this.registerUIEvent("skip", args -> tile.skip(true, Double.parseDouble(args[1]) > 0 ? SKIP : -SKIP));
+        this.registerUIEvent("skip", args -> tile.skip(true, Double.parseDouble(args[1]) > 0 ? DisplayTile.SKIP_MS : -DisplayTile.SKIP_MS));
 
         // RATIO BUTTONS (§12.2 ELEMENT EVENTS): CLICK MATCHES THE OTHER AXIS TO THE MEDIA'S NATIVE ASPECT
         this.registerEvent("render/resize_y", el -> { double v = this.heightRatio(); if (v > 0 && heightField != null) heightField.value(v); });

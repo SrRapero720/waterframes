@@ -39,6 +39,8 @@ import me.srrapero720.waterframes.common.util.geo.AlignedBox;
 public class DisplayTile extends BlockEntity {
     /** Ticks between two snapshots of an unchanged clock; it covers a viewer that loaded the chunk in between. */
     private static final int SYNC_HEARTBEAT = 20;
+    /** How far the transport keys and a scroll over the seek bar jump, in milliseconds. */
+    public static final long SKIP_MS = 5000;
 
     public final DisplayData data;
     public final DisplayCaps caps;
