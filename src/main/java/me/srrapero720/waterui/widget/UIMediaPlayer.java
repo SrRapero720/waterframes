@@ -6,11 +6,11 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import org.watermedia.api.media.MRL;
-import org.watermedia.api.media.MediaAPI;
-import org.watermedia.api.media.engines.GFXEngine;
-import org.watermedia.api.media.engines.SFXEngine;
-import org.watermedia.api.media.players.MediaPlayer;
+import org.watermedia.api.player.GFXEngine;
+import org.watermedia.api.player.MRL;
+import org.watermedia.api.player.MediaPlayer;
+import org.watermedia.api.player.PlayerAPI;
+import org.watermedia.api.player.SFXEngine;
 
 import java.net.URI;
 
@@ -35,7 +35,7 @@ public class UIMediaPlayer extends Element {
     /**
      * Wraps an existing media player. The element renders its texture but never releases it;
      * dispose only drops the texture registration. The argument must be a
-     * {@code org.watermedia.api.media.players.MediaPlayer} passed as Object for isolation.
+     * {@code org.watermedia.api.player.MediaPlayer} passed as Object for isolation.
      */
     public UIMediaPlayer wrap(Object player) {
         this.close();
@@ -159,7 +159,7 @@ public class UIMediaPlayer extends Element {
 
     private static boolean probe() {
         try {
-            Class.forName("org.watermedia.api.media.MediaAPI");
+            Class.forName("org.watermedia.api.player.PlayerAPI");
             return true;
         } catch (Throwable t) {
             LOGGER.warn(IT, "WATERMedia is not present; UIMediaPlayer will draw nothing");
@@ -182,7 +182,7 @@ public class UIMediaPlayer extends Element {
 
         // WIDGET CONTENT BOX IN GUI PIXELS, PUSHED BY THE OWNER EACH TICK; DRIVES THE UPLOAD CAP
         private int boxW, boxH;
-        // LAST APPLIED maxSize SO REDUNDANT CALLS ARE SKIPPED
+        // LAST APPLIED scale SO REDUNDANT CALLS ARE SKIPPED
         private int cropW, cropH;
 
         static Media wrap(Object wrapped) {
@@ -194,7 +194,7 @@ public class UIMediaPlayer extends Element {
 
         static Media own(URI uri, int sourceIndex) {
             Media m = new Media();
-            m.mrl = MediaAPI.mrl(uri);
+            m.mrl = PlayerAPI.mrl(uri);
             m.sourceIndex = sourceIndex;
             m.owned = true;
             return m;
@@ -215,13 +215,14 @@ public class UIMediaPlayer extends Element {
             }
             if (mrl == null || mrl.status().failed()) return;
             if (!mrl.status().loaded()) return;
-            // WAIT FOR THE FIRST LAYOUT: TxMediaPlayer RESOLVES maxSize ONLY AT PREPARE, SO A STILL
-            // IMAGE MUST KNOW ITS CAP BEFORE start() OR IT UPLOADS FULL-SIZE FOREVER
+            // WAIT FOR THE FIRST LAYOUT: THE CAP MUST BE KNOWN BEFORE start() SO THE FIRST FRAME IS
+            // ALREADY DECODED AT THE WIDGET'S SIZE INSTEAD OF AT FULL SIZE
             if (boxW <= 0 || boxH <= 0) return;
             // PER-INSTANCE GFX AND SFX ENGINES; THE PLAYER OWNS THEM FROM BIRTH
-            this.player = MediaAPI.createPlayer(mrl, sourceIndex,
-                    () -> this.gfx = MediaAPI.glEngine(Minecraft.getInstance().gameThread, Minecraft.getInstance()),
-                    () -> this.sfx = MediaAPI.alEngine());
+            Minecraft client = Minecraft.getInstance();
+            this.player = PlayerAPI.player(mrl, sourceIndex,
+                    () -> this.gfx = PlayerAPI.glEngine(client.gameThread, client),
+                    () -> this.sfx = PlayerAPI.alEngine());
             if (this.player == null) {
                 this.gfx = null;
                 this.sfx = null;
@@ -258,7 +259,7 @@ public class UIMediaPlayer extends Element {
             if (cw == cropW && ch == cropH) return;
             this.cropW = cw;
             this.cropH = ch;
-            player.maxSize(cw, ch);
+            player.scale(cw, ch);
         }
 
         void release() {

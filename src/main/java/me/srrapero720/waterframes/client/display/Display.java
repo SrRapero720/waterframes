@@ -3,15 +3,17 @@ package me.srrapero720.waterframes.client.display;
 import me.srrapero720.waterframes.*;
 import me.srrapero720.waterframes.client.sound.DisplaySound;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.media.DisplayBridge;
-import org.watermedia.api.media.MRL;
-import org.watermedia.api.media.MediaAPI;
-import org.watermedia.api.media.engines.GFXEngine;
-import org.watermedia.api.media.engines.SFXEngine;
-import org.watermedia.api.media.players.MediaPlayer;
+import me.srrapero720.waterframes.common.network.DisplayNetwork;
+import me.srrapero720.waterframes.common.network.packets.MediaReportPacket;
+import org.watermedia.api.player.GFXEngine;
+import org.watermedia.api.player.MRL;
+import org.watermedia.api.player.MediaPlayer;
+import org.watermedia.api.player.PlayerAPI;
+import org.watermedia.api.player.SFXEngine;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.renderer.texture.AbstractTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.sounds.SoundSource;
@@ -37,6 +39,8 @@ public class Display extends AbstractTexture {
     // PLAYBACK STATE
     private int currentVolume = 0;
     private boolean released = false;
+    // WHETHER THE SERVER CLOCK ALREADY HEARD FROM THIS VIEWER WHAT THE MEDIA IS
+    private boolean reported;
 
     // TEXTURE REGISTRATION, THE DISPLAY IS THE TEXTURE: ONE LOCATION PER BLOCK POSITION FOR ITS WHOLE LIFE
     private final ResourceLocation location;
@@ -48,8 +52,9 @@ public class Display extends AbstractTexture {
     public Display(DisplayTile tile) {
         this.tile = tile;
         this.sourceIndex = tile.data.getSource();
-        // THE BLOCK POSITION IS THE DISPLAY'S IDENTITY, THE TEXTURE REGISTERS UNDER THE SAME NAME AS THE SESSION
-        this.location = DisplayBridge.session(tile.getBlockPos());
+        // THE BLOCK POSITION IS THE DISPLAY'S IDENTITY: ONE TEXTURE NAME PER BLOCK FOR ITS WHOLE LIFE
+        BlockPos pos = tile.getBlockPos();
+        this.location = WaterFrames.asResource("display_at_" + pos.getX() + "_" + pos.getY() + "_" + pos.getZ());
         DisplaysRegistry.registerTexture(this.location, this);
         DisplayList.add(this);
         this.openPlayer();
@@ -61,16 +66,16 @@ public class Display extends AbstractTexture {
         this.currentSource = tile.mrl.source(this.sourceIndex);
         if (this.currentSource == null) {
             this.noEngine = true;
-            WaterFrames.LOGGER.warn(IT, "Source {} is not part of {}", sourceIndex, tile.mrl.uri);
+            WaterFrames.LOGGER.warn(IT, "Source {} is not part of {}", sourceIndex, tile.mrl.uri());
             return;
         }
 
-        // THE BRIDGE MAKES THIS PLAYER A FOLLOWER OF THE SERVER SESSION: TIME, PLAY STATE AND LOOP
-        // ARRIVE FROM THERE, AND THE DRIFT CORRECTION IS WATERMEDIA'S FROM HERE ON
-        this.mediaPlayer = MediaAPI.createPlayer(tile.mrl, sourceIndex,
-                () -> this.gfx = MediaAPI.glEngine(Minecraft.getInstance().gameThread, Minecraft.getInstance()),
-                () -> this.sfx = MediaAPI.alEngine(),
-                new DisplayBridge(tile.getLevel(), tile.getBlockPos()));
+        // THE PLAYER FOLLOWS THE SERVER SESSION: TIME, PLAY STATE AND LOOP ARRIVE AS SNAPSHOTS OVER
+        // THE NETWORK, AND THE DRIFT CORRECTION IS WATERMEDIA'S FROM HERE ON
+        Minecraft client = Minecraft.getInstance();
+        this.mediaPlayer = PlayerAPI.player(tile.mrl, sourceIndex,
+                () -> this.gfx = PlayerAPI.glEngine(client.gameThread, client),
+                () -> this.sfx = PlayerAPI.alEngine());
 
         if (this.mediaPlayer == null) {
             this.noEngine = true;
@@ -170,6 +175,17 @@ public class Display extends AbstractTexture {
     public void tick() {
         if (this.mediaPlayer == null || !this.mediaPlayer.canPlay()) return;
 
+        // THE SERVER CLOCK DECODES NOTHING: THE FIRST VIEWER TO LEARN THE LENGTH OF THE MEDIA TELLS
+        // IT, AND A LIVE STREAM SAYS SO INSTEAD
+        if (!this.reported) {
+            long duration = this.mediaPlayer.duration();
+            boolean live = this.mediaPlayer.live();
+            if (duration > 0 || live) {
+                this.reported = true;
+                DisplayNetwork.sendServer(new MediaReportPacket(this.tile.getBlockPos(), duration, live));
+            }
+        }
+
         if (!DisplaysConfig.soundIntegration()) {
             if (this.sound != null) {
                 this.sound.drop();
@@ -196,7 +212,7 @@ public class Display extends AbstractTexture {
         }
         if (--this.soundRetry > 0) return;
         this.soundRetry = 20;
-        if (!this.mediaPlayer.withAudio()) return;
+        if (!this.mediaPlayer.audio()) return;
 
         int source = this.mediaPlayer.audioSource();
         Options options = Minecraft.getInstance().options;
@@ -243,7 +259,7 @@ public class Display extends AbstractTexture {
     }
 
     public boolean isStream() {
-        return this.mediaPlayer != null && this.mediaPlayer.liveSource();
+        return this.mediaPlayer != null && this.mediaPlayer.live();
     }
 
     public MediaPlayer.Status status() {

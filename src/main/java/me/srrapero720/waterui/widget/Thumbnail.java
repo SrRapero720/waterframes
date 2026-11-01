@@ -7,10 +7,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-import org.watermedia.api.media.MRL;
-import org.watermedia.api.media.MediaAPI;
-import org.watermedia.api.media.engines.GFXEngine;
-import org.watermedia.api.media.players.MediaPlayer;
+import org.watermedia.api.player.GFXEngine;
+import org.watermedia.api.player.MRL;
+import org.watermedia.api.player.MediaPlayer;
+import org.watermedia.api.player.PlayerAPI;
 
 import java.net.URI;
 import java.util.Objects;
@@ -212,7 +212,7 @@ public class Thumbnail extends Element {
 
     private static boolean probe() {
         try {
-            Class.forName("org.watermedia.api.media.MediaAPI");
+            Class.forName("org.watermedia.api.player.PlayerAPI");
             return true;
         } catch (Throwable t) {
             LOGGER.warn(IT, "WATERMedia is not present; thumbnails will only show their fallback");
@@ -238,11 +238,11 @@ public class Thumbnail extends Element {
 
         // WIDGET CONTENT BOX IN GUI PIXELS, PUSHED BY THE OWNER EACH TICK; DRIVES THE UPLOAD CAP
         private int boxW, boxH;
-        // LAST APPLIED maxSize SO REDUNDANT CALLS ARE SKIPPED
+        // LAST APPLIED scale SO REDUNDANT CALLS ARE SKIPPED
         private int cropW, cropH;
 
         Media(URI uri) {
-            this.mrl = MediaAPI.mrl(uri);
+            this.mrl = PlayerAPI.mrl(uri);
         }
 
         void box(int width, int height) {
@@ -270,15 +270,16 @@ public class Thumbnail extends Element {
                 return;
             }
             if (!mrl.status().loaded()) return;
-            // WAIT FOR THE FIRST LAYOUT: TxMediaPlayer RESOLVES maxSize ONLY AT PREPARE, SO A STILL
-            // IMAGE MUST KNOW ITS CAP BEFORE start() OR IT UPLOADS FULL-SIZE FOREVER
+            // WAIT FOR THE FIRST LAYOUT: THE CAP MUST BE KNOWN BEFORE start() SO THE FIRST FRAME IS
+            // ALREADY DECODED AT THE WIDGET'S SIZE INSTEAD OF AT FULL SIZE
             if (boxW <= 0 || boxH <= 0) return;
             // ONE EXCLUSIVE GFX ENGINE PER ELEMENT, NO SFX: PREVIEWS ARE PICTURE-ONLY
-            this.player = MediaAPI.createPlayer(mrl,
-                    () -> this.gfx = MediaAPI.glEngine(Minecraft.getInstance().gameThread, Minecraft.getInstance()),
+            Minecraft client = Minecraft.getInstance();
+            this.player = PlayerAPI.player(mrl,
+                    () -> this.gfx = PlayerAPI.glEngine(client.gameThread, client),
                     () -> null);
             if (this.player == null) {
-                // A FAILED CONSTRUCTION ALREADY RELEASED WHATEVER ENGINE IT OBTAINED (MediaAPI CLEANUP)
+                // A FAILED CONSTRUCTION ALREADY RELEASED WHATEVER ENGINE IT OBTAINED (PlayerAPI CLEANUP)
                 this.gfx = null;
                 this.errorFired = true;
                 if (onError != null) onError.accept("Player creation failed");
@@ -300,7 +301,7 @@ public class Thumbnail extends Element {
             if (cw == cropW && ch == cropH) return;
             this.cropW = cw;
             this.cropH = ch;
-            player.maxSize(cw, ch);
+            player.scale(cw, ch);
         }
 
         // TEXTURE TO BLIT, OR NULL WHILE IT IS STILL LOADING OR IF IT NEVER WILL

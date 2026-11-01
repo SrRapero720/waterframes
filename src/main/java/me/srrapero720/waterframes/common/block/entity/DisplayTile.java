@@ -10,7 +10,6 @@ import me.srrapero720.waterframes.common.block.data.DisplayCaps;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
-import me.srrapero720.waterframes.common.media.DisplayBridge;
 import me.srrapero720.waterframes.common.network.ControlPacket;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.*;
@@ -23,30 +22,35 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
-import org.watermedia.api.media.MRL;
-import org.watermedia.api.media.MediaAPI;
-import org.watermedia.api.media.players.MediaPlayer;
-import org.watermedia.api.media.players.ServerMediaPlayer;
-import org.watermedia.api.media.players.sync.Config;
+import org.watermedia.api.player.MRL;
+import org.watermedia.api.player.MediaPlayer;
+import org.watermedia.api.player.PlayerAPI;
+import org.watermedia.api.player.ServerMediaPlayer;
 import me.srrapero720.waterframes.common.util.geo.Axis;
 import me.srrapero720.waterframes.common.util.geo.Facing;
 import me.srrapero720.waterframes.common.util.geo.AlignedBox;
 
 public class DisplayTile extends BlockEntity {
+    /** Ticks between two snapshots of an unchanged clock; it covers a viewer that loaded the chunk in between. */
+    private static final int SYNC_HEARTBEAT = 20;
+
     public final DisplayData data;
     public final DisplayCaps caps;
     public MRL mrl;
     public Display display;
     private boolean isReleased;
 
-    // SERVER SIDE CLOCK: WATERMEDIA OWNS THE TIMELINE AND BROADCASTS IT, THE TILE OWNS ITS LIFE
+    // SERVER SIDE CLOCK: WATERMEDIA OWNS THE TIMELINE, THE TILE OWNS ITS LIFE AND CARRIES IT TO THE VIEWERS
     private ServerMediaPlayer clock;
     private String clockKey;
+    private int clockRevision;
+    private int clockHeartbeat;
 
     // this is more a runtime-block calculation variables, doesn't fit on DisplayData
     private int lightLevel = 0;
@@ -88,11 +92,10 @@ public class DisplayTile extends BlockEntity {
         if (!key.equals(this.clockKey)) {
             this.cleanClock();
             this.clockKey = key;
-            DisplayBridge bridge = new DisplayBridge(this.level, this.getBlockPos());
-            this.clock = MediaAPI.createPlayer(bridge, Config.Capability.CONTROLS);
+            this.clock = PlayerAPI.serverPlayer();
             this.clock.repeat(this.data.loop);
             this.clock.start();
-            WaterFrames.LOGGER.debug("Opened media session {} on {}", bridge.session(), key);
+            WaterFrames.LOGGER.debug("Opened media session at {} on {}", this.getBlockPos(), key);
         }
 
         // A PAUSED OR SWITCHED OFF DISPLAY HOLDS ITS SESSION INSTEAD OF LOSING IT, AND THE POSITION
@@ -100,6 +103,22 @@ public class DisplayTile extends BlockEntity {
         boolean hold = this.data.paused || !this.data.active;
         if (hold && this.clock.playing()) this.clock.pause(true);
         else if (!hold && this.clock.paused()) this.clock.pause(false);
+
+        // THE VIEWERS FOLLOW SNAPSHOTS: EVERY STATE CHANGE SHIPS AT ONCE AND A STEADY CLOCK REPEATS
+        // ITSELF ON THE HEARTBEAT, SINCE THE FOLLOWERS EXTRAPOLATE THE TIME ON THEIR OWN IN BETWEEN
+        int revision = this.clock.revision();
+        if (revision != this.clockRevision || ++this.clockHeartbeat >= SYNC_HEARTBEAT) {
+            this.clockRevision = revision;
+            this.clockHeartbeat = 0;
+            DisplayNetwork.sendChunk((ServerLevel) this.level, this.getBlockPos(), new MediaSyncPacket(this.getBlockPos(), this.clock.snapshot()));
+        }
+    }
+
+    /** A viewer learned what the media is; the clock latches the first length it hears and follows the live flag. */
+    public void report(long duration, boolean live) {
+        if (this.clock == null) return;
+        if (duration > 0) this.clock.syncDuration(duration);
+        this.clock.live(live);
     }
 
     /**
@@ -118,6 +137,8 @@ public class DisplayTile extends BlockEntity {
             this.clock = null;
         }
         this.clockKey = null;
+        // THE NEXT CLOCK ANNOUNCES ITSELF ON ITS FIRST TICK, WHATEVER REVISION IT STARTS FROM
+        this.clockHeartbeat = SYNC_HEARTBEAT;
     }
 
     public Display requestDisplay() {
@@ -136,8 +157,8 @@ public class DisplayTile extends BlockEntity {
             return null;
         }
 
-        if (this.mrl == null || !this.mrl.uri.toString().equals(currentUrl)) {
-            this.mrl = MediaAPI.mrl(currentUrl);
+        if (this.mrl == null || !this.mrl.uri().toString().equals(currentUrl)) {
+            this.mrl = PlayerAPI.mrl(currentUrl);
             this.cleanDisplay();
         }
 
@@ -260,6 +281,14 @@ public class DisplayTile extends BlockEntity {
 
     public void loop(boolean clientSide, boolean loop) {
         this.send(clientSide, new LoopPacket(this.getBlockPos(), loop));
+    }
+
+    public void seek(boolean clientSide, long time) {
+        this.send(clientSide, new SeekPacket(this.getBlockPos(), time, false));
+    }
+
+    public void skip(boolean clientSide, long delta) {
+        this.send(clientSide, new SeekPacket(this.getBlockPos(), delta, true));
     }
 
     public void position(boolean clientSide, PositionHorizontal horizontal, PositionVertical vertical) {

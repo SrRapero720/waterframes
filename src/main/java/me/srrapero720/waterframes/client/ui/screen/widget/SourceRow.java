@@ -8,8 +8,8 @@ import me.srrapero720.waterui.theme.Icon;
 import me.srrapero720.waterui.widget.ValueFormat;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import org.watermedia.api.media.MRL;
-import org.watermedia.api.media.MediaAPI;
+import org.watermedia.api.player.MRL;
+import org.watermedia.api.player.PlayerAPI;
 import org.watermedia.api.util.Metadata;
 
 import java.time.ZoneId;
@@ -51,7 +51,7 @@ public final class SourceRow {
 
     private void resolve() {
         try {
-            this.mrl = MediaAPI.mrl(entry.url());
+            this.mrl = PlayerAPI.mrl(entry.url());
         } catch (Exception ignored) {
             // A LINE THAT IS NOT A URI AT ALL; THE ROW JUST STAYS IDLE
         }
@@ -60,7 +60,7 @@ public final class SourceRow {
     // THE ACTIVE MEDIA MIRRORS THE REAL PIPELINE: THE MRL WHILE IT RESOLVES, THE PLAYER AFTERWARDS.
     // FOR A TICK AFTER A PICK THE TILE STILL POINTS AT THE PREVIOUS ONE, WHICH WOULD FLASH ITS TITLE HERE
     private MRL media() {
-        if (this.playing() && tile.mrl != null && tile.mrl.uri.toString().equals(entry.url())) return tile.mrl;
+        if (this.playing() && tile.mrl != null && tile.mrl.uri().toString().equals(entry.url())) return tile.mrl;
         return this.mrl;
     }
 
@@ -102,7 +102,7 @@ public final class SourceRow {
         String date = data != null && data.postedAt() != null ? DATE.format(data.postedAt()) : null;
         // COMPOSED "<AUTHOR> (<DATE>)"; THE DATE JOINS ONLY ONCE THE MEDIA REPORTS IT
         this.byline = date == null ? author : author + " (" + date + ")";
-        this.duration = data != null && data.duration() > 0 ? ValueFormat.timestamp(data.duration()) : "??:??";
+        this.duration = data != null && data.durationMs() > 0 ? ValueFormat.timestamp(data.durationMs()) : "??:??";
         this.thumbnail = source != null && source.thumbnail() != null ? source.thumbnail().toString() : "";
     }
 

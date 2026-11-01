@@ -52,10 +52,9 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
     maven { url = 'https://maven.neoforged.net/releases' }
-    maven { url = 'https://jitpack.io' } // WATERMEDIA
-    maven { // WATERMEDIA BINARIES — MODRINTH IS A UNIVERSAL PROXY, SO FILTER IT TO ITS OWN GROUP
-        url = 'https://api.modrinth.com/maven'
-        content { includeGroup 'maven.modrinth' }
+    exclusiveContent { // WATERMEDIA AND ITS BINARIES: LOCAL BUILDS IN libs/ UNTIL 3.0.0 IS PUBLISHED
+        forRepository { flatDir { dirs 'libs' } }
+        filter { includeGroup 'local' }
     }
     maven { // WATERVISION
         url = 'https://www.cursemaven.com'
@@ -65,10 +64,9 @@ repositories {
 
 dependencies {
     // WATERMEDIA V3 UNIVERSAL JAR PLUS ITS PREBUILT FFMPEG NATIVES (RUNTIME-ONLY COMPANION MOD).
-    // NON-TRANSITIVE: ITS POM PINS LWJGL 3.3.6 AND JOML 1.10.8, WHICH CLASH WITH THE VERSIONS
-    // MINECRAFT DECLARES AS STRICT; THE GAME ALREADY SUPPLIES BOTH AT RUNTIME
-    implementation("com.github.WaterMediaTeam:watermedia-v3:$watermediaversion") { transitive = false }
-    runtimeOnly("maven.modrinth:watermedia-binaries:$watermediabinariesversion") { transitive = false }
+    // THE CORE JAR IS TRACKED IN libs/; THE BINARIES JAR IS COPIED THERE BY HAND AND STAYS OUT OF GIT
+    implementation "local:watermedia:$watermediaversion"
+    runtimeOnly "local:watermedia_binaries:$watermediabinariesversion"
 
     // WATERVISION IS AN OPTIONAL INTEGRATION; WVCompat GUARDS EVERY CALL BEHIND isInstalled
     compileOnly "curse.maven:watervision-1167473:$watervisionversion"

@@ -39,7 +39,7 @@ license="${modlicense}"
 	modId="watermedia"
 	type="required"
 	ordering="AFTER"
-	side="CLIENT"
+	side="BOTH"
 	versionRange="${watermediarange}"
 
 [[dependencies.${modid}]]

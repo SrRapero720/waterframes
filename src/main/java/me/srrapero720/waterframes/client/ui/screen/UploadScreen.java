@@ -13,8 +13,6 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.system.MemoryStack;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import org.watermedia.api.network.NetworkAPI;
-import org.watermedia.api.platform.internal.WaterPlatform;
-import org.watermedia.api.network.NetworkServer;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -45,7 +43,7 @@ public class UploadScreen extends Dialog {
     private volatile String chosen;
     private volatile boolean browsing;
 
-    private NetworkServer.UploadStatus status;
+    private NetworkAPI.UploadStatus status;
     private String uploaded;
     private boolean failed;
 
@@ -186,7 +184,7 @@ public class UploadScreen extends Dialog {
         if (!status.completed()) return;
 
         if (uploaded == null) {
-            this.uploaded = NetworkAPI.PROTOCOL_WATER + "://" + WaterPlatform.HOST_REMOTE + "/" + status.id();
+            this.uploaded = status.uri().toString();
             this.confirm.text(Component.translatable("waterframes.gui.upload.add"));
         }
     }

@@ -6,20 +6,31 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import org.watermedia.api.player.MediaPlayer.PlayerState;
+
+import java.nio.ByteBuffer;
 
 /**
- * Raw session traffic, straight from WaterMedia and never read by the mod. It travels both ways:
- * the server clock broadcasts where playback stands, every viewer reports and asks back.
+ * Snapshot of a display's session clock, straight from WaterMedia and never read by the mod. It
+ * travels one way: the server broadcasts where playback stands and every viewer follows it.
  */
 public record MediaSyncPacket(BlockPos pos, byte[] payload) implements CustomPacketPayload {
-    /** The largest packet of the protocol is 29 bytes; the rest is room for a future revision. */
-    private static final int MAX_PAYLOAD = 64;
-
     public static final Type<MediaSyncPacket> TYPE = DisplayNetwork.type("media_sync");
     public static final StreamCodec<ByteBuf, MediaSyncPacket> CODEC = StreamCodec.composite(
             BlockPos.STREAM_CODEC, MediaSyncPacket::pos,
-            ByteBufCodecs.byteArray(MAX_PAYLOAD), MediaSyncPacket::payload,
+            ByteBufCodecs.byteArray(PlayerState.BYTES), MediaSyncPacket::payload,
             MediaSyncPacket::new);
+
+    public MediaSyncPacket(BlockPos pos, PlayerState state) {
+        this(pos, bytes(state));
+    }
+
+    private static byte[] bytes(PlayerState state) {
+        ByteBuffer buffer = state.toBytes();
+        byte[] payload = new byte[buffer.remaining()];
+        buffer.get(payload);
+        return payload;
+    }
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

@@ -36,7 +36,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
-import org.watermedia.api.media.MRL;
+import org.watermedia.api.player.MRL;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -91,7 +91,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     // ROW CACHE OWNED ACROSS RE-INITS: A FRESH list RE-ADOPTS IT SO A PREVIEW PLAYER OUTLIVES A RESIZE (§10.6)
     private final ParentList.RowStore rowStore = new ParentList.RowStore();
 
-    // CACHED ONCE PER TICK FOR THE LIVE BINDINGS; field.valid() TRIGGERS MediaAPI.mrl(), SO IT RUNS ONCE NOT THREE TIMES
+    // CACHED ONCE PER TICK FOR THE LIVE BINDINGS; field.valid() TRIGGERS PlayerAPI.mrl(), SO IT RUNS ONCE NOT THREE TIMES
     private boolean cachedLink;
     private boolean cachedQuery;
 
@@ -152,9 +152,9 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerUIEvent("play", () -> tile.setPause(true, false));
         this.registerUIEvent("pause", () -> tile.setPause(true, true));
         this.registerUIEvent("stop", () -> tile.setStop(true));
-        // SKIPPING IS A SESSION COMMAND: THE FOLLOWER FORWARDS IT TO THE SERVER CLOCK ON ITS OWN
-        this.registerUIEvent("rewind", () -> { if (tile.follower() != null) tile.follower().rewind(); });
-        this.registerUIEvent("fastForward", () -> { if (tile.follower() != null) tile.follower().forward(); });
+        // SKIPPING IS A SESSION COMMAND: IT TRAVELS TO THE SERVER CLOCK AND COMES BACK TO EVERY VIEWER
+        this.registerUIEvent("rewind", () -> tile.skip(true, -SKIP));
+        this.registerUIEvent("fastForward", () -> tile.skip(true, SKIP));
         // REFETCH THE MRL AND DROP THE PLAYER SO THE NEXT TICK REBUILDS IT FROM THE FRESH SOURCES
         this.registerUIEvent("reload", () -> { if (tile.mrl != null) tile.mrl.reload(); tile.cleanDisplay(); });
         // HANDS THE MEDIA TO WATERVISION'S OWN SCREEN AND PAUSES THE DISPLAY MEANWHILE
@@ -169,10 +169,10 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerUIEvent("remove", args -> this.remove(args[1]));
         // DRAG DROP FROM THE PLAYLIST (§10.6): THE LIST FIRES BLOCK-NORMALIZED ROW INDEXES
         this.registerUIEvent("moveEntry", args -> this.move(Integer.parseInt(args[1]), Integer.parseInt(args[2])));
-        // SCRUBBING IS A SESSION COMMAND, NOT DISPLAY STATE: IT GOES STRAIGHT TO THE PLAYER, WHICH HANDS
-        // IT TO THE SERVER CLOCK AND COMES BACK TO EVERY VIEWER FROM THERE
-        this.registerUIEvent("seek", args -> { if (tile.follower() != null) tile.follower().seek((long) Double.parseDouble(args[1])); });
-        this.registerUIEvent("skip", args -> { if (tile.follower() != null) tile.follower().skipTime(Double.parseDouble(args[1]) > 0 ? SKIP : -SKIP); });
+        // SCRUBBING IS A SESSION COMMAND, NOT DISPLAY STATE: IT TRAVELS TO THE SERVER CLOCK AND COMES
+        // BACK TO EVERY VIEWER FROM THERE
+        this.registerUIEvent("seek", args -> tile.seek(true, (long) Double.parseDouble(args[1])));
+        this.registerUIEvent("skip", args -> tile.skip(true, Double.parseDouble(args[1]) > 0 ? SKIP : -SKIP));
 
         // RATIO BUTTONS (§12.2 ELEMENT EVENTS): CLICK MATCHES THE OTHER AXIS TO THE MEDIA'S NATIVE ASPECT
         this.registerEvent("render/resize_y", el -> { double v = this.heightRatio(); if (v > 0 && heightField != null) heightField.value(v); });

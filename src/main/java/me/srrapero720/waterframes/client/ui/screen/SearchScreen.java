@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 import org.watermedia.api.platform.PlatformAPI;
 import org.watermedia.api.platform.PlatformResult;
-import org.watermedia.api.platform.PlatformSearch;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -47,7 +46,7 @@ public class SearchScreen extends Dialog {
             return Map.of(
                     "key", key,
                     "title", literal(r.title()),
-                    "platform", literal(r.platform()),
+                    "platform", literal(r.platform().name()),
                     "thumbnail", r.thumbnail() != null ? r.thumbnail().toString() : ""
             );
         }
@@ -72,7 +71,9 @@ public class SearchScreen extends Dialog {
     // TRUE ONLY AFTER init() RESOLVED EVERY WIDGET, SO A BROKEN DOCUMENT NEVER NPEs A LATER PATH
     private boolean wired;
 
-    private PlatformSearch search;
+    // THE QUERY IN FLIGHT AND ITS LIVE RESULT LIST, WHICH WATERMEDIA FILLS AS THE PLATFORMS ANSWER
+    private String terms;
+    private List<PlatformResult> found;
     private int shown;
     private int ticks;
     private int dots;
@@ -124,7 +125,7 @@ public class SearchScreen extends Dialog {
         PlatformResult result = tokens.get(key);
         if (result == null) return;
         playClick();
-        onPick.accept(result.url().toString());
+        onPick.accept(result.uri().toString());
         close();
     }
 
@@ -144,9 +145,10 @@ public class SearchScreen extends Dialog {
         }
 
         try {
-            this.search = PlatformAPI.search(terms);
+            this.terms = terms;
+            this.found = PlatformAPI.search(terms);
         } catch (Exception e) {
-            this.search = null;
+            this.found = null;
             if (wired) this.notice.text(translatable("waterframes.gui.search.failed"));
         }
         this.dirty();
@@ -155,10 +157,11 @@ public class SearchScreen extends Dialog {
     @Override
     public void tick() {
         super.tick();
-        if (!wired || search == null) return;
+        if (!wired || found == null) return;
 
         // ANIMATED DOTS WHILE THE PLATFORMS ANSWER
-        if (!search.done() && notice.visible) {
+        boolean searching = PlatformAPI.searching(terms);
+        if (searching && notice.visible) {
             int next = (++ticks / 8) % 4;
             if (next != dots) {
                 this.dots = next;
@@ -167,7 +170,6 @@ public class SearchScreen extends Dialog {
         }
 
         // ASSIGN TOKENS TO NEW RESULTS AND SUBMIT THE UPDATED KEY LIST
-        List<PlatformResult> found = search.results();
         if (found.size() > shown) {
             for (int i = shown; i < found.size(); i++) {
                 String token = String.valueOf(tokenCounter++);
@@ -179,7 +181,7 @@ public class SearchScreen extends Dialog {
             this.dirty();
         }
 
-        if (search.done() && found.isEmpty()) this.notice.text(translatable("waterframes.gui.search.none"));
+        if (!searching && found.isEmpty()) this.notice.text(translatable("waterframes.gui.search.none"));
     }
 
     @Override

@@ -16,7 +16,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import org.watermedia.api.media.players.MediaPlayer;
+import org.watermedia.api.player.MediaPlayer;
 
 import java.nio.ByteBuffer;
 
@@ -25,7 +25,7 @@ import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 @EventBusSubscriber(modid = WaterFrames.ID)
 public class DisplayNetwork {
     // BUMP ON ANY PAYLOAD OR CODEC CHANGE; MISMATCHED CLIENTS ARE REJECTED WHILE JOINING
-    private static final String VERSION = "4";
+    private static final String VERSION = "5";
 
     public static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> type(String name) {
         return new CustomPacketPayload.Type<>(WaterFrames.asResource(name));
@@ -43,10 +43,12 @@ public class DisplayNetwork {
         control(registrar, PausePacket.TYPE, PausePacket.CODEC);
         control(registrar, PositionPacket.TYPE, PositionPacket.CODEC);
         control(registrar, PreviousPacket.TYPE, PreviousPacket.CODEC);
+        control(registrar, SeekPacket.TYPE, SeekPacket.CODEC);
         control(registrar, VolumePacket.TYPE, VolumePacket.CODEC);
         control(registrar, VolumeRangePacket.TYPE, VolumeRangePacket.CODEC);
 
-        registrar.playBidirectional(MediaSyncPacket.TYPE, MediaSyncPacket.CODEC, DisplayNetwork::onMediaSync);
+        registrar.playToClient(MediaSyncPacket.TYPE, MediaSyncPacket.CODEC, DisplayNetwork::onMediaSync);
+        registrar.playToServer(MediaReportPacket.TYPE, MediaReportPacket.CODEC, DisplayNetwork::onMediaReport);
         registrar.playToServer(DataSyncPacket.TYPE, DataSyncPacket.CODEC, DisplayNetwork::onData);
         registrar.playToServer(DataListSyncPacket.TYPE, DataListSyncPacket.CODEC, DisplayNetwork::onData);
         registrar.playToClient(OpenScreenPacket.TYPE, OpenScreenPacket.CODEC, DisplayNetwork::onOpenScreen);
@@ -54,19 +56,24 @@ public class DisplayNetwork {
 
     /**
      * Session traffic is routed, never applied: the clock lives on the server and the players
-     * that follow it on the clients, and each side hands the bytes to the one it owns.
+     * that follow it on the clients. Downstream the snapshot reaches the follower, upstream the
+     * viewer's report reaches the clock.
      */
     private static void onMediaSync(MediaSyncPacket packet, IPayloadContext context) {
         // A SESSION OUTLIVING ITS DISPLAY IS ORDINARY (A BROKEN BLOCK, AN UNLOADED CHUNK), NOT AN ERROR
         if (!(context.player().level().getBlockEntity(packet.pos()) instanceof DisplayTile tile)) return;
-        MediaPlayer player = context.flow().isServerbound() ? tile.clock() : tile.follower();
-        if (player == null) return;
+        MediaPlayer follower = tile.follower();
+        if (follower == null) return;
 
         try {
-            player.sync(ByteBuffer.wrap(packet.payload()));
+            follower.sync(ByteBuffer.wrap(packet.payload()));
         } catch (IllegalArgumentException e) {
             LOGGER.debug("Dropped a malformed media session payload for {}", packet.pos());
         }
+    }
+
+    private static void onMediaReport(MediaReportPacket packet, IPayloadContext context) {
+        if (context.player().level().getBlockEntity(packet.pos()) instanceof DisplayTile tile) tile.report(packet.duration(), packet.live());
     }
 
     // tile.openScreen IS CLIENT-ONLY, SO THE UI CLASSES ARE NEVER LINKED ON A DEDICATED SERVER
@@ -113,11 +120,7 @@ public class DisplayNetwork {
         PacketDistributor.sendToPlayersTrackingChunk(level, new ChunkPos(pos), payload);
     }
 
-    public static void sendServer(ControlPacket packet) {
-        PacketDistributor.sendToServer(packet);
-    }
-
-    public static void sendServer(DataPacket packet) {
+    public static void sendServer(CustomPacketPayload packet) {
         PacketDistributor.sendToServer(packet);
     }
 

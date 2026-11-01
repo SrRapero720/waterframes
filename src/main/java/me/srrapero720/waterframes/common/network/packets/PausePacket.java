@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import org.watermedia.api.media.players.ServerMediaPlayer;
+import org.watermedia.api.player.ServerMediaPlayer;
 
 /** Playback state of a display. A rewind is the stop button: it holds and goes back to zero. */
 public record PausePacket(BlockPos pos, boolean paused, boolean rewind) implements ControlPacket {

@@ -6,8 +6,8 @@ import me.srrapero720.waterui.widget.InputText;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import org.watermedia.api.media.MRL;
-import org.watermedia.api.media.MediaAPI;
+import org.watermedia.api.player.MRL;
+import org.watermedia.api.player.PlayerAPI;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,7 +49,7 @@ public class UrlField extends InputText {
     private boolean resolve() {
         String url = this.url();
         if (url == null || !absolute(url)) return false;
-        MRL mrl = MediaAPI.mrl(url);
+        MRL mrl = PlayerAPI.mrl(url);
         return mrl != null && (mrl.status() == MRL.Status.FETCHING || mrl.status().loaded());
     }
 
