@@ -2,6 +2,7 @@ package me.srrapero720.waterframes.common.util.geo;
 
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import org.joml.Quaternionf;
 
 /**
  * Sugar over {@link Direction}: keeps the vanilla identity but exposes the axis split
@@ -51,15 +52,8 @@ public enum Facing {
         return axis.two();
     }
 
-    /** Rotation axis matching this direction's normal, for {@code PoseStack.mulPose}. */
-    public com.mojang.math.Axis rotation() {
-        return switch (this) {
-            case DOWN -> com.mojang.math.Axis.YN;
-            case UP -> com.mojang.math.Axis.YP;
-            case NORTH -> com.mojang.math.Axis.ZN;
-            case SOUTH -> com.mojang.math.Axis.ZP;
-            case WEST -> com.mojang.math.Axis.XN;
-            case EAST -> com.mojang.math.Axis.XP;
-        };
+    /** Rotation of the given angle around this direction's normal, for {@code PoseStack.mulPose}. */
+    public Quaternionf rotation(final float radians) {
+        return new Quaternionf().rotationAxis(radians, this.normal.getX(), this.normal.getY(), this.normal.getZ());
     }
 }

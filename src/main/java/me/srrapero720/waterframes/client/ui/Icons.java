@@ -28,7 +28,7 @@ public final class Icons {
     public static final Icon POS_BASE = icon(0, 13, 3, 3);
 
     // SOURCE ACTIONS (chunk 6): THE SUBMIT BUTTON SWAPS BETWEEN THEM BY URL VALIDITY
-    public static final Icon SEARCH = icon(6, 6);
+    public static final Icon SEARCH = icon(6, 4);
 
     // STATUS ICONS (chunk 3-4): PICKED FROM THE MEDIA AND PLAYER STATE
     public static final Icon STATUS_OK = icon(3, 0);

@@ -26,7 +26,6 @@ public class WaterFrames {
     public static final String ID = "waterframes";
     public static final String NAME = "WATERFrAMES";
     public static final Logger LOGGER = LogManager.getLogger(ID);
-    public static final ResourceLocation LOADING_ANIMATION = WaterFrames.asResource("loading_animation");
 
     // BOOTSTRAP
     public WaterFrames(IEventBus bus, ModContainer container) {
@@ -36,10 +35,6 @@ public class WaterFrames {
 
     public static ResourceLocation asResource(String id) {
         return Objects.requireNonNull(ResourceLocation.tryBuild(ID, id));
-    }
-
-    public static ResourceLocation asResource(int texture) {
-        return Objects.requireNonNull(ResourceLocation.tryBuild(ID, "dynamic_texture_" + texture));
     }
 
     public static boolean isInstalled(String modId) {
@@ -60,15 +55,6 @@ public class WaterFrames {
 
         // Basic URL validation - let MRL handle detailed validation
         return url.contains("://") || url.startsWith("water://");
-    }
-
-    public static boolean isInstalled(String... mods) {
-        for (String id: mods) {
-            if (FMLLoader.getLoadingModList().getModFileById(id) != null) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static double getDistance(DisplayTile tile, Position playerPos) {

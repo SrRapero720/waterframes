@@ -4,15 +4,14 @@ import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.network.DisplayNetwork;
-import net.minecraft.server.level.ServerPlayer;
 import me.srrapero720.waterframes.common.item.data.RemoteData;
+import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -25,164 +24,120 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.MarkerManager;
+
 import java.util.List;
 
+/**
+ * Hand-held control of one display. Sneak-use on a display binds it, use opens the remote
+ * screen while in range and in the same dimension, sneak-use in the air unbinds it.
+ */
 public class RemoteControl extends Item {
-    private static final String POSITION = "position";
-    private static final String DIMENSION = "dimension";
-    private static final Marker IT = MarkerManager.getMarker(RemoteControl.class.getSimpleName());
-    public RemoteControl(Properties pProperties) {
-        super(pProperties);
+    public RemoteControl(final Properties properties) {
+        super(properties);
+    }
+
+    /** Whether the stack is a remote bound to that block of that level. */
+    public static boolean bound(final ItemStack stack, final Level level, final BlockPos pos) {
+        final RemoteData data = stack.get(DisplaysRegistry.REMOTE_DATA);
+        return data != null && data.matches(level, pos);
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(final Level level, final Player player, final InteractionHand hand) {
         final ItemStack stack = player.getItemInHand(hand);
-        if (hand == InteractionHand.OFF_HAND) {
-            return InteractionResultHolder.fail(stack);
-        }
+        if (hand == InteractionHand.OFF_HAND) return InteractionResultHolder.fail(stack);
 
         if (!DisplaysConfig.canInteractRemote(player)) {
-            this.sendFatal(player, Component.translatable("waterframes.common.access.denied"));
+            feedback(player, "waterframes.common.access.denied", ChatFormatting.DARK_RED, 0.5f);
             return InteractionResultHolder.fail(stack);
         }
 
-        var data = stack.get(DisplaysRegistry.REMOTE_DATA);
+        final RemoteData data = stack.get(DisplaysRegistry.REMOTE_DATA);
         if (data == null) {
-            this.sendFailed(player, Component.translatable("waterframes.remote.bound.failed"));
+            feedback(player, "waterframes.remote.bound.failed", ChatFormatting.RED, 0.75f);
             return InteractionResultHolder.pass(stack);
         }
 
         if (player.isCrouching()) {
             stack.set(DisplaysRegistry.REMOTE_DATA, null);
-            this.sendSuccess(player, Component.translatable("waterframes.remote.unbound.success"));
+            feedback(player, "waterframes.remote.unbound.success", ChatFormatting.AQUA, 1.25f);
             return InteractionResultHolder.success(stack);
         }
 
-        var blockPos = new BlockPos(data.x(), data.y(), data.z());
-        var dimension = ResourceLocation.parse(data.dimension());
-
-        if (level.getBlockEntity(blockPos) instanceof DisplayTile tile) {
-            double distance = WaterFrames.getDistance(tile, player.position());
-            if (level.dimension().location().equals(dimension) && distance < DisplaysConfig.maxRcDis()) {
-                if (player instanceof ServerPlayer server) DisplayNetwork.openScreen(server, blockPos, true);
+        // RANGE FIRST: A FAR AWAY BINDING MUST NOT MAKE THE SERVER LOAD A CHUNK JUST TO SAY NO
+        final BlockPos pos = data.pos();
+        if (data.matches(level, pos) && WaterFrames.getDistance(level, pos, player.position()) < DisplaysConfig.maxRcDis()) {
+            if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof DisplayTile) {
+                if (player instanceof final ServerPlayer server) DisplayNetwork.openScreen(server, pos, true);
                 return InteractionResultHolder.success(stack);
             }
-
-            this.sendFailed(player, Component.translatable("waterframes.remote.distance.failed"));
+            feedback(player, "waterframes.remote.distance.failed", ChatFormatting.RED, 0.75f);
             return InteractionResultHolder.fail(stack);
         }
 
-        // FALLBACK UNBIND
-        player.getItemInHand(hand).set(DisplaysRegistry.REMOTE_DATA, null);
-        this.sendFailed(player, Component.translatable("waterframes.remote.display.failed"));
+        // THE DISPLAY IS GONE OR LIVES IN ANOTHER DIMENSION: THE BINDING IS WORTHLESS, DROP IT
+        stack.set(DisplaysRegistry.REMOTE_DATA, null);
+        feedback(player, "waterframes.remote.display.failed", ChatFormatting.RED, 0.75f);
         return InteractionResultHolder.fail(stack);
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
-        var pos = context.getClickedPos();
-        var level = context.getLevel();
-        var player = context.getPlayer();
-        var data = context.getItemInHand().get(DisplaysRegistry.REMOTE_DATA);
-
-        if (player == null || context.getHand() == InteractionHand.OFF_HAND || data != null || !player.isCrouching()) {
+    public InteractionResult useOn(final UseOnContext context) {
+        final Player player = context.getPlayer();
+        final ItemStack stack = context.getItemInHand();
+        if (player == null || context.getHand() == InteractionHand.OFF_HAND || stack.has(DisplaysRegistry.REMOTE_DATA) || !player.isCrouching())
             return InteractionResult.PASS;
-        }
 
         if (!DisplaysConfig.canBindRemote(player)) {
-            this.sendFatal(player, Component.translatable("waterframes.common.access.denied"));
+            feedback(player, "waterframes.common.access.denied", ChatFormatting.DARK_RED, 0.5f);
             return InteractionResult.FAIL;
         }
 
+        final Level level = context.getLevel();
+        final BlockPos pos = context.getClickedPos();
         if (level.getBlockEntity(pos) instanceof DisplayTile) {
-            var item = context.getItemInHand();
-
-            item.set(DisplaysRegistry.REMOTE_DATA, new RemoteData(level.dimension().location().toString(), pos.getX(), pos.getY(), pos.getZ()));
-
-            this.sendSuccess(player, Component.translatable("waterframes.remote.bound.success"));
+            stack.set(DisplaysRegistry.REMOTE_DATA, new RemoteData(level, pos));
+            feedback(player, "waterframes.remote.bound.success", ChatFormatting.AQUA, 1.25f);
             return InteractionResult.SUCCESS;
         }
 
-        this.sendFailed(player, Component.translatable("waterframes.remote.display.invalid"));
+        feedback(player, "waterframes.remote.display.invalid", ChatFormatting.RED, 0.75f);
         return InteractionResult.FAIL;
     }
 
-    private void sendSuccess(Player player, MutableComponent component) {
-        if (player.level.isClientSide) {
-            player.displayClientMessage(component.withStyle(ChatFormatting.AQUA), true);
-            player.playSound(NoteBlockInstrument.BELL.getSoundEvent().value(), 1.0f, 1.25f);
-        }
-    }
-
-    private void sendFailed(Player player, MutableComponent component) {
-        if (player.level.isClientSide) {
-            player.displayClientMessage(component.withStyle(ChatFormatting.RED), true);
-            player.playSound(NoteBlockInstrument.HARP.getSoundEvent().value(), 1.0f, 0.75f);
-        }
-    }
-
-    private void sendFatal(Player player, MutableComponent component) {
-        if (player.level.isClientSide) {
-            player.displayClientMessage(component.withStyle(ChatFormatting.DARK_RED), true);
-            player.playSound(NoteBlockInstrument.HARP.getSoundEvent().value(), 1.0f, 0.5f);
-        }
-    }
-
-    public boolean hasPosition(CompoundTag tag) {
-        return tag.contains(POSITION);
-    }
-
-    public boolean hasDimension(CompoundTag tag) {
-        return tag.contains(DIMENSION);
-    }
-
-    public int[] getPosition(CompoundTag data) {
-        return data.getIntArray(POSITION);
-    }
-
-    public int[] getPosition(RemoteData data) {
-        return data.getPos();
-    }
-
-    public String getDimension(RemoteData data) {
-        return data.dimension();
-    }
-
-    public void setPosition(CompoundTag tag, BlockPos pos) {
-        tag.putIntArray(POSITION, new int[] { pos.getX(), pos.getY(), pos.getZ() });
-    }
-
-    public void setDimension(CompoundTag tag, Level level) {
-        tag.putString(DIMENSION, level.dimension().location().toString());
+    // ACTION BAR LINE PLUS A NOTE: A BELL ABOVE NORMAL PITCH FOR GOOD NEWS, A HARP BELOW IT FOR BAD ONES
+    private static void feedback(final Player player, final String key, final ChatFormatting color, final float pitch) {
+        if (!player.level().isClientSide) return;
+        final MutableComponent message = Component.translatable(key).withStyle(color);
+        player.displayClientMessage(message, true);
+        final NoteBlockInstrument instrument = pitch > 1f ? NoteBlockInstrument.BELL : NoteBlockInstrument.HARP;
+        player.playSound(instrument.getSoundEvent().value(), 1.0f, pitch);
     }
 
     @Override
-    public Component getHighlightTip(ItemStack item, Component displayName) {
+    public Component getHighlightTip(final ItemStack item, final Component displayName) {
         return Component.literal(displayName.getString()).withStyle(ChatFormatting.AQUA);
     }
 
     @Override
-    public void appendHoverText(ItemStack pStack, TooltipContext pContext, List<Component> pTooltipComponents, TooltipFlag pTooltipFlag) {
-        super.appendHoverText(pStack, pContext, pTooltipComponents, pTooltipFlag);
+    public void appendHoverText(final ItemStack stack, final TooltipContext context, final List<Component> tooltip, final TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
         // KEYBIND COMPONENTS RESOLVE ON THE CLIENT AT RENDER TIME, SO TOOLTIPS STAY SERVER-SAFE
-        pTooltipComponents.add(Component.translatable("waterframes.remote.description.1", Component.keybind("key.sneak"), Component.keybind("key.use")));
+        tooltip.add(Component.translatable("waterframes.remote.description.1", Component.keybind("key.sneak"), Component.keybind("key.use")));
     }
 
     @Override
-    public boolean isFoil(ItemStack pStack) {
-        return pStack.get(DisplaysRegistry.REMOTE_DATA) != null;
+    public boolean isFoil(final ItemStack stack) {
+        return stack.has(DisplaysRegistry.REMOTE_DATA);
     }
 
     @Override
-    public boolean canAttackBlock(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
+    public boolean canAttackBlock(final BlockState state, final Level level, final BlockPos pos, final Player player) {
         return false;
     }
 
     @Override
-    public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
+    public boolean canDisableShield(final ItemStack stack, final ItemStack shield, final LivingEntity entity, final LivingEntity attacker) {
         return true;
     }
 }

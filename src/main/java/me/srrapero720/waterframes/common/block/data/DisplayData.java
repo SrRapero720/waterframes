@@ -1,7 +1,10 @@
 package me.srrapero720.waterframes.common.block.data;
 
 import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import me.srrapero720.waterframes.common.block.data.types.AudioPosition;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
@@ -12,8 +15,11 @@ import net.minecraft.world.entity.player.Player;
 import org.joml.Vector2f;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class DisplayData {
@@ -48,6 +54,7 @@ public class DisplayData {
     public static final String VOL_RANGE_MAX = "volume_max_range";
     public static final String LOOP = "loop";
     public static final String PAUSED = "paused";
+    public static final String REDSTONE_PAUSED = "redstone_paused";
     public static final String MUTED = "muted";
     public static final String LIT = "lit";
     public static final String DATA_V = "data_v";
@@ -60,6 +67,10 @@ public class DisplayData {
     public static final String AUDIO_OFFSET = "audio_offset";
 
     public static final short V = 2;
+
+    // A PLAYLIST FROM THE WIRE IS CAPPED BEFORE IT IS PARSED: A HUGE ONE WOULD STALL THE SERVER TICK ON WHITELIST CHECKS
+    public static final int MAX_PLAYLIST = 128;
+    public static final int MAX_PLAYLIST_BYTES = 64 * 1_024;
 
     /**
      * One playlist line. A media is a gallery of sources and every one of them stands on its
@@ -105,6 +116,8 @@ public class DisplayData {
 
     public boolean loop = true;
     public boolean paused = false;
+    // WHETHER THE CURRENT PAUSE CAME FROM A REDSTONE SIGNAL, SO ITS FALLING EDGE KNOWS WHAT TO UNDO
+    public boolean redstonePaused = false;
     public boolean muted = false;
     public boolean lit = true;
 
@@ -200,43 +213,12 @@ public class DisplayData {
         return out.toString();
     }
 
-    /**
-     * Moves the whole run of entries sharing a url over the run beside it. Reordering works on
-     * media, not on sources: a media that resolved into several travels in one piece.
-     *
-     * @param playlist the list to reorder in place
-     * @param index any entry of the media to move
-     * @param delta negative to move it up, positive to move it down
-     * @return true when the list changed
-     */
-    public static boolean moveMedia(List<Entry> playlist, int index, int delta) {
-        if (index < 0 || index >= playlist.size()) return false;
-        Entry moved = playlist.get(index);
-
-        int start = index, end = index + 1;
-        while (start > 0 && playlist.get(start - 1).sameMedia(moved)) start--;
-        while (end < playlist.size() && playlist.get(end).sameMedia(moved)) end++;
-
-        // ROTATING OVER BOTH RUNS AT ONCE PUTS ONE GROUP WHERE THE OTHER WAS, WHOLE AND IN ORDER
-        if (delta < 0) {
-            if (start == 0) return false;
-            int from = start - 1;
-            while (from > 0 && playlist.get(from - 1).sameMedia(playlist.get(start - 1))) from--;
-            Collections.rotate(playlist.subList(from, end), from - start);
-        } else {
-            if (end == playlist.size()) return false;
-            int to = end + 1;
-            while (to < playlist.size() && playlist.get(to).sameMedia(playlist.get(end))) to++;
-            Collections.rotate(playlist.subList(start, to), start - end);
-        }
-        return true;
-    }
-
     /** Reads back what {@link #composePlaylist} wrote, tolerating every older shape of a line. */
     public static List<Entry> decomposePlaylist(String str) {
         List<Entry> playlist = new ArrayList<>();
         if (str == null || str.isEmpty()) return playlist;
 
+        Set<String> seen = new HashSet<>();
         for (String line: str.split("\n")) {
             String[] column = line.trim().split("\t", 3);
             String url = column[0].trim();
@@ -252,8 +234,7 @@ public class DisplayData {
             }
 
             // AN ENTRY IS A SOURCE OF A MEDIA AND THE LIST INDEXES IT; THE SAME ONE TWICE IS A LIE
-            Entry entry = new Entry(url, source, owner);
-            if (playlist.stream().noneMatch(entry::same)) playlist.add(entry);
+            if (seen.add(url + '#' + source)) playlist.add(new Entry(url, source, owner));
         }
         return playlist;
     }
@@ -289,6 +270,7 @@ public class DisplayData {
         nbt.putInt(VOL_RANGE_MIN, minVolumeDistance);
         nbt.putInt(VOL_RANGE_MAX, maxVolumeDistance);
         nbt.putBoolean(PAUSED, paused);
+        nbt.putBoolean(REDSTONE_PAUSED, redstonePaused);
         nbt.putBoolean(MUTED, muted);
         nbt.putBoolean(LIT, lit);
         nbt.putBoolean(LOOP, loop);
@@ -339,6 +321,7 @@ public class DisplayData {
         this.maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? DisplaysConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX)) : this.maxVolumeDistance;
         this.minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), this.maxVolumeDistance) : this.minVolumeDistance;
         this.paused = nbt.getBoolean(PAUSED);
+        this.redstonePaused = nbt.getBoolean(REDSTONE_PAUSED);
         this.muted = nbt.getBoolean(MUTED);
         this.lit = !nbt.contains(LIT) || nbt.getBoolean(LIT);
         this.loop = nbt.getBoolean(LOOP);
@@ -458,11 +441,6 @@ public class DisplayData {
         }
     }
 
-    public DisplayData setProjectionDistance(float projectionDistance) {
-        this.projectionDistance = projectionDistance;
-        return this;
-    }
-
     private void restrictHeight() {
         float maxHeight = DisplaysConfig.maxHeight();
         if (getHeight() > maxHeight) {
@@ -484,11 +462,40 @@ public class DisplayData {
         }
     }
 
-    public static void syncList(DisplayTile tile, Player player, CompoundTag tag) {
-        tile.data.playlist = decomposePlaylist(tag.getString(URL_LIST));
-        tile.data.entryIndex = tag.getInt(URL_INDEX);
-        Entry entry = tile.data.entry();
+    /**
+     * Replaces the playlist whole. Every line must pass the same gate a single url does and the list must fit
+     * {@link #MAX_PLAYLIST}, or nothing is written; owners are never taken from the wire, an entry keeps the owner
+     * the display already knew for it and a new one is stamped with the sender.
+     */
+    public static void syncList(final DisplayTile tile, final Player player, final CompoundTag tag) {
+        final String lines = tag.getString(URL_LIST);
+        final List<Entry> received = lines.length() > MAX_PLAYLIST_BYTES ? null : decomposePlaylist(lines);
+        if (received == null || received.size() > MAX_PLAYLIST) {
+            reject(tile, player, "");
+            return;
+        }
+        String rejected = received.isEmpty() && !DisplaysConfig.canSave(player, "") ? "" : null;
+        for (final Entry entry: received) {
+            if (rejected == null && !DisplaysConfig.canSave(player, entry.url())) rejected = entry.url();
+        }
+        if (rejected != null) {
+            reject(tile, player, rejected);
+            return;
+        }
+
+        final Map<String, UUID> known = new HashMap<>();
+        for (final Entry entry: tile.data.playlist) known.put(entry.url() + '#' + entry.source(), entry.owner());
+        final List<Entry> playlist = new ArrayList<>(received.size());
+        for (final Entry entry: received) {
+            final UUID owner = known.containsKey(entry.url() + '#' + entry.source()) ? known.get(entry.url() + '#' + entry.source()) : player.getUUID();
+            playlist.add(new Entry(entry.url(), entry.source(), owner));
+        }
+
+        tile.data.playlist = playlist;
+        tile.data.entryIndex = Math.clamp(tag.getInt(URL_INDEX), 0, Math.max(0, playlist.size() - 1));
+        final Entry entry = tile.data.entry();
         tile.data.url = entry != null ? entry.url() : null;
+        tile.data.uuid = entry == null ? Util.NIL_UUID : entry.owner() != null ? entry.owner() : player.getUUID();
         tile.setDirty();
     }
 
@@ -508,7 +515,10 @@ public class DisplayData {
         DisplayData data = tile.data;
         // THE PERMISSION GATE CHECKS THE INCOMING URL, OR THE ONE ON AIR WHEN THE PATCH HAS NONE
         String gate = nbt.contains(URL) ? nbt.getString(URL) : data.getUrl();
-        if (!DisplaysConfig.canSave(player, gate == null ? "" : gate)) return;
+        if (!DisplaysConfig.canSave(player, gate == null ? "" : gate)) {
+            reject(tile, player, gate == null ? "" : gate);
+            return;
+        }
 
         if (nbt.contains(URL)) {
             String url = nbt.getString(URL);
@@ -527,20 +537,20 @@ public class DisplayData {
                 float height = nbt.contains(HEIGHT) ? DisplaysConfig.maxHeight(nbt.getFloat(HEIGHT)) : data.getHeight();
                 data.setHeight(nbt.contains(POS_Y) ? enumOf(PositionVertical.VALUES, nbt.getInt(POS_Y)) : data.getPosY(), height);
             }
-            if (nbt.contains(ROTATION)) data.rotation = nbt.getFloat(ROTATION);
+            if (nbt.contains(ROTATION) && Float.isFinite(nbt.getFloat(ROTATION))) data.rotation = nbt.getFloat(ROTATION);
         }
 
         if (nbt.contains(FLIP_X)) data.flipX = nbt.getBoolean(FLIP_X);
         if (nbt.contains(FLIP_Y)) data.flipY = nbt.getBoolean(FLIP_Y);
-        if (nbt.contains(ALPHA)) data.alpha = nbt.getInt(ALPHA);
-        if (nbt.contains(BRIGHTNESS)) data.brightness = nbt.getInt(BRIGHTNESS);
+        if (nbt.contains(ALPHA)) data.alpha = Math.clamp(nbt.getInt(ALPHA), 0, 255);
+        if (nbt.contains(BRIGHTNESS)) data.brightness = Math.clamp(nbt.getInt(BRIGHTNESS), 0, 255);
         if (nbt.contains(RENDER_DISTANCE)) data.renderDistance = DisplaysConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
 
         if (nbt.contains(VOLUME)) data.volume = DisplaysConfig.maxVol(nbt.getInt(VOLUME));
         if (nbt.contains(VOL_RANGE_MAX) || nbt.contains(VOL_RANGE_MIN)) {
             if (nbt.contains(VOL_RANGE_MAX)) data.maxVolumeDistance = DisplaysConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX));
             if (nbt.contains(VOL_RANGE_MIN)) data.minVolumeDistance = nbt.getInt(VOL_RANGE_MIN);
-            data.minVolumeDistance = Math.clamp(data.minVolumeDistance, 0, data.maxVolumeDistance);
+            data.minVolumeDistance = Math.clamp(data.minVolumeDistance, 0, Math.max(0, data.maxVolumeDistance));
         }
 
         if (nbt.contains(VISIBLE) && tile.canHideModel()) tile.setVisibility(nbt.getBoolean(VISIBLE));
@@ -553,6 +563,14 @@ public class DisplayData {
             if (nbt.contains(AUDIO_OFFSET)) data.setAudioPosition(enumOf(AudioPosition.VALUES, nbt.getInt(AUDIO_OFFSET)));
         }
 
+        tile.setDirty();
+    }
+
+    // A REFUSED WRITE IS ANSWERED, NOT SWALLOWED: THE SENDER HEARS WHY AND GETS THE AUTHORITATIVE DATA
+    // BACK, SO ITS SCREEN SNAPS OUT OF THE OPTIMISTIC STATE IT SHOWED WHILE THE PACKET TRAVELLED
+    private static void reject(final DisplayTile tile, final Player player, final String url) {
+        final String key = url.isEmpty() || WaterFrames.isValidUrl(url) ? "waterframes.gui.url.tooltip.not_whitelisted" : "waterframes.gui.url.tooltip.invalid_url";
+        player.displayClientMessage(Component.translatable(key).withStyle(ChatFormatting.RED), true);
         tile.setDirty();
     }
 

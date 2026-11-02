@@ -1,107 +1,56 @@
 package me.srrapero720.waterframes.client.display;
 
 import me.srrapero720.waterframes.WaterFrames;
-import net.minecraft.world.level.LevelAccessor;
+import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.server.IntegratedServer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientPauseChangeEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/** Every display alive on this client, for the operations that reach all of them at once. */
 @EventBusSubscriber(value = Dist.CLIENT, modid = WaterFrames.ID)
-public class DisplayList {
-    public static final Integer DEFAULT_SIZE = 32;
+public final class DisplayList {
+    private static final List<Display> DISPLAYS = new ArrayList<>();
 
-    private static volatile Display[] displays = new Display[DEFAULT_SIZE];
-    private static int position = 0;
-    private static boolean checkSize = false;
-    private static boolean paused;
+    private DisplayList() {}
 
-    public static void add(Display display) {
-        if (checkSize) {
-            if (((float) position / displays.length) <= 0.25f) {
-                Display[] freshMeal = new Display[displays.length / 2]; // free unused memory
-                System.arraycopy(displays, 0, freshMeal, 0, position);
-                displays = freshMeal;
-            }
-            checkSize = false;
-        }
-
-        if (position >= displays.length) { // position never should be major than length
-            Display[] freshMeal = new Display[displays.length * 2];
-            position = copyData$resetPosition(displays, freshMeal);
-            displays = freshMeal;
-            checkSize = true;
-        }
-
-        // pause the display when the pause event is fired even if was too late
-        if (paused) display.gamePaused(true);
-
-        displays[position++] = display;
+    public static void add(final Display display) {
+        DISPLAYS.add(display);
     }
 
-    public static void pause() {
-        paused = true;
-        for (int i = 0; i < position; i++) {
-            if (displays[i] != null) displays[i].gamePaused(true);
-        }
+    public static void remove(final Display display) {
+        DISPLAYS.remove(display);
     }
 
-    public static void resume() {
-        paused = false;
-        for (int i = 0; i < position; i++) {
-            if (displays[i] != null) displays[i].gamePaused(false);
-        }
+    /** Refetches every media on screen and rebuilds its player. */
+    public static void reloadAll() {
+        for (final Display display: List.copyOf(DISPLAYS)) display.tile().reload();
     }
 
-    public static void remove(int i) {
-        if (i > displays.length) return; // 'i' cannot be over position
-        displays[i] = null;
-    }
-
-    public static void remove(Display obj) {
-        if (obj == null) return; // null cannot be removed, duh
-        for (int i = 0; i < position; i++) {
-            if (obj == displays[i]) {
-                displays[i] = null;
-                break;
-            }
-        }
-    }
-
+    // RELEASING A DISPLAY REMOVES IT FROM THE LIST, SO THE WALK GOES OVER A COPY
     public static void release() {
-        for (int i = 0; i < position; i++) {
-            if (displays[i] != null) {
-                displays[i].release();
-                displays[i] = null;
-            }
-        }
-
-        displays = new Display[DEFAULT_SIZE];
-        position = 0;
-    }
-
-    private static int copyData$resetPosition(Display[] current, Display[] target) {
-        int freshPosition = 0;
-        for (int i = 0; i < current.length; i++) { // tries to ignore all null pos to stack all instanced objects, spend less memory
-            if (current[i] != null) {
-                target[freshPosition++] = current[i];
-                current[i] = null;
-            }
-        }
-        return freshPosition;
+        for (final Display display: List.copyOf(DISPLAYS)) display.release();
+        DISPLAYS.clear();
     }
 
     @SubscribeEvent
-    public static void onUnloadingLevel(LevelEvent.Unload event) {
-        LevelAccessor level = event.getLevel();
-        if (level != null && level.isClientSide()) DisplayList.release();
+    public static void onUnloadingLevel(final LevelEvent.Unload event) {
+        if (event.getLevel().isClientSide()) release();
     }
 
-    // THE TICK LOOP NO LONGER DECIDES PLAY STATE, THE SESSION DOES, SO RESUMING IS ON US NOW
+    // THE PAUSE MENU FREEZES THE INTEGRATED SERVER, SO ITS SESSION CLOCKS MUST FREEZE WITH IT; THE
+    // EVENT ONLY EVER FIRES IN TRUE SINGLEPLAYER, A REMOTE SERVER NEVER STOPS FOR ONE PLAYER
     @SubscribeEvent
-    public static void onClientPause(ClientPauseChangeEvent.Post event) {
-        if (event.isPaused()) DisplayList.pause();
-        else DisplayList.resume();
+    public static void onClientPause(final ClientPauseChangeEvent.Post event) {
+        final IntegratedServer server = Minecraft.getInstance().getSingleplayerServer();
+        if (server == null) return;
+        final boolean paused = event.isPaused();
+        server.execute(() -> DisplayTile.holdSessions(paused));
     }
 }

@@ -35,6 +35,8 @@ public class SourceWrapper extends Channel {
      * multichannel media to obey the model too, downmixed onto the block it plays from.
      */
     public void linearRange(int min, int max) {
+        // THE SOURCE MAY ARRIVE HEAD-LOCKED (DIRECT PATH, OR A PREVIOUS EMULATED RANGE); WORLD POSITIONS NEED IT ABSOLUTE
+        this.setRelative(false);
         // AL_DISTANCE_MODEL (0xD000) IS THE PER-SOURCE PROPERTY; EXTSourceDistanceModel's
         // CONSTANT (0x200) IS THE alEnable CAPABILITY TOKEN AND RAISES AL_INVALID_ENUM HERE
         AL10.alSourcei(this.source, AL11.AL_DISTANCE_MODEL, AL11.AL_LINEAR_DISTANCE_CLAMPED);

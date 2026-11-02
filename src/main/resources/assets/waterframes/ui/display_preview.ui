@@ -1,5 +1,5 @@
-// WIDE DISPLAY SCREEN — LEFT COLUMN HOLDS TABS AND TRANSPORT, RIGHT COLUMN SHOWS A LIVE PREVIEW WITH DEDICATED CONTROLS.
-// NO BLOCK EMBLEM IN THIS VARIANT. TABS AND STATE COME FROM THE IMPORTED DOCUMENTS AND THE HOST.
+// PLAYER PANE DISPLAY SCREEN: TABS FILL THE LEFT COLUMN; THE RIGHT COLUMN STACKS THE 16:9 PREVIEW WITH ITS STATUS
+// BADGE, THE NOW PLAYING TEXT, THE SEEKBAR AND THE KEYPAD. THE BLOCK EMBLEM RIDES OUTSIDE THE PANEL (§9.5).
 theme "waterui"
 
 import "tabs/sources" as sources
@@ -8,50 +8,68 @@ import "tabs/media" as media
 import "tabs/redstone" as redstone
 import "constants/icons"
 
-// ---- LIVE CONTRACT: ONE @UIVar SUPPLIER PER USED var ----------------------------------------
+// ---- LIVE CONTRACT: ONE @UIVar OR REGISTERED SUPPLIER PER USED var --------------------------
 var long time
 var long duration
 var loop
+var paused
+var muted
 var loop_tooltip
+var playback_tooltip
+var mute_tooltip
 var reload_ready
 var Icon status_icon
 var status_tooltip
 var transport_ready
+var String now_title
+var String now_byline
+
+// ---- BAKED CONTRACT: THE BLOCK EMBLEM STANDING OUTSIDE THE PANEL -----------------------------
+final var ItemStack emblem_item
+final var String emblem_name
 
 root[frame=EDGE, orientation=HORIZONTAL, spacing=4, padding=0]
 
-// LEFT COLUMN — TABS AND TRANSPORT, SAME CONTENT AS display.ui MINUS THE MOVED CONTROLS
-Parent[orientation=VERTICAL, width=FILL, height=FILL, spacing=0] {
-    ParentTab[id="display/tabs", width=FILL, height=FILL, tabs={sources, render, media, redstone}]
+// LEFT COLUMN: THE TABS ALONE, SO THE PLAYLIST GETS THE FULL HEIGHT
+ParentTab[id="display/tabs", width=FILL, height=FILL, tabs={sources, render, media, redstone}]
 
-    // TRANSPORT BAND — LOOP, SEEKBAR, RELOAD AND STATUS; PLAYBACK CONTROLS MOVED TO THE RIGHT KEYPAD
-    Parent[id="display/transport", orientation=HORIZONTAL, align=CENTER, spacing=2, width=FILL, padding={4, 2}, face=field] {
-        ToggleButton[id="display/loop", width=20, height=20, iconOn=icon_loop_on, iconOff=icon_loop_off,
-                     value=loop, tooltip=loop_tooltip, onClick=toggleLoop()]
-        SeekBar[id="display/seekbar", width=FILL, height=FILL, time=time, duration=duration,
-                onSeekEnd=seek(), onScroll=skip()]
-        Button[id="display/reload", width=20, height=20, icon=icon_reload, enabled=reload_ready,
-               tooltip="translatable:waterframes.gui.reload", onClick=reload()]
-        Icon[id="display/status", width=18, height=18, icon=status_icon, tooltip=status_tooltip]
+// RIGHT COLUMN: PLAYER PANE; THE SPACER PUSHES THE CONTROLS DOWN TO THE BOTTOM EDGE
+Parent[orientation=VERTICAL, width=120, height=FILL, spacing=4] {
+    // 16:9 PREVIEW (120x68) WITH THE STATUS BADGE OVER ITS TOP-RIGHT CORNER
+    Frame[width=FILL, height=68, face=field] {
+        MediaPlayer[id="display/preview", anchor=STRETCH]
+        Icon[id="display/status", anchor=TOP|RIGHT, margin=2, width=12, height=12, icon=status_icon, tooltip=status_tooltip]
     }
-}
 
-// RIGHT COLUMN — LIVE 4:3 PREVIEW ON TOP, KEYPAD PUSHED DOWN TO THE TRANSPORT LINE
-Parent[orientation=VERTICAL, width=120, height=FILL, spacing=4, justify=BETWEEN] {
-    MediaPlayer[id="display/preview", width=120, height=90, face=field]
+    // NOW PLAYING: TITLE OVER THE BYLINE OF THE MEDIA ON AIR, EMPTY WHEN NOTHING PLAYS
+    Text[component=now_title, textScale=0.6, ellipsize=true, lines=2, width=FILL]
+    Text[component=now_byline, textScale=0.5, ellipsize=true, width=FILL]
 
-    // TRANSPORT KEYPAD — REWIND, PLAY, PAUSE, STOP, FAST FORWARD; THE {0, 2} PADDING MATCHES THE
-    // LEFT BAND'S HEIGHT SO BOTH SIT ON THE SAME BOTTOM LINE AND READ AS ONE STRIP
-    Parent[orientation=HORIZONTAL, align=CENTER, width=FILL, padding={0, 2}, spacing=2, justify=CENTER, face=field] {
-        Button[id="display/rewind", width=20, height=20, icon=icon_rewind, enabled=transport_ready,
+    Spacer[width=FILL, height=FILL]
+
+    SeekBar[id="display/seekbar", width=FILL, height=14, time=time, duration=duration,
+            onSeekEnd=seek(), onScroll=skip()]
+
+    // KEYPAD: ONE GRID SO BOTH ROWS SHARE COLUMNS. TRANSPORT ON TOP (THE PLAYBACK TOGGLE SHOWS PLAY
+    // WHILE PAUSED AND PAUSE WHILE PLAYING), THEN LOOP, MUTE (CROSSED SPEAKER WHILE MUTED) AND RELOAD
+    Grid[columns=4, rows=2, width=FILL, spacing=2] {
+        Button[id="display/rewind", anchor=CENTER, width=20, height=20, icon=icon_rewind, enabled=transport_ready,
                onClick=rewind(), repeat={10, 3}]
-        Button[id="display/play", width=20, height=20, icon=icon_play, enabled=transport_ready,
-               onClick=play()]
-        Button[id="display/pause", width=20, height=20, icon=icon_pause, enabled=transport_ready,
-               onClick=pause()]
-        Button[id="display/stop", width=20, height=20, icon=icon_stop, enabled=transport_ready,
-               onClick=stop()]
-        Button[id="display/fast_forward", width=20, height=20, icon=icon_fast_forward, enabled=transport_ready,
-               onClick=fastForward()]
+        ToggleButton[id="display/playback", anchor=CENTER, width=24, height=20, iconOn=icon_play, iconOff=icon_pause,
+                     value=paused, enabled=transport_ready, tooltip=playback_tooltip, onClick=togglePlayback()]
+        Button[id="display/stop", anchor=CENTER, width=20, height=20, icon=icon_stop, enabled=transport_ready, onClick=stop()]
+        Button[id="display/fast_forward", anchor=CENTER, width=20, height=20, icon=icon_fast_forward, enabled=transport_ready,
+               onClick=fastForward(), repeat={10, 3}]
+        ToggleButton[id="display/loop", anchor=CENTER, width=20, height=20, iconOn=icon_loop_on, iconOff=icon_loop_off,
+                     value=loop, tooltip=loop_tooltip, onClick=toggleLoop()]
+        ToggleButton[id="display/mute", anchor=CENTER, width=20, height=20, iconOn=icon_volume_0, iconOff=icon_volume,
+                     value=muted, tooltip=mute_tooltip, onClick=toggleMute()]
+        Blank
+        Button[id="display/reload", anchor=CENTER, width=20, height=20, icon=icon_reload, enabled=reload_ready,
+               tooltip="translatable:waterframes.gui.reload", onClick=reload()]
     }
 }
+
+// BLOCK EMBLEM: LIFTED OUT OF THE FLOW, SEATED OUTSIDE THE PANEL'S RIGHT EDGE, BOTTOM-FLUSH (§9.5)
+ItemIcon[id="display/emblem", outsideAnchor=RIGHT|BOTTOM, width=62, height=62, margin=2,
+         item=emblem_item, flipX=true, tooltip=emblem_name]

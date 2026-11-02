@@ -5,11 +5,9 @@ import me.srrapero720.waterframes.client.sound.DisplaySound;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.MediaReportPacket;
-import org.watermedia.api.player.GFXEngine;
 import org.watermedia.api.player.MRL;
 import org.watermedia.api.player.MediaPlayer;
 import org.watermedia.api.player.PlayerAPI;
-import org.watermedia.api.player.SFXEngine;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -26,15 +24,9 @@ public class Display extends AbstractTexture {
 
     // MEDIA AND DATA
     private MediaPlayer mediaPlayer;
-    // ENGINES ARE EXCLUSIVE TO THIS DISPLAY: BUILT INSIDE THE PLAYER SUPPLIERS (INVOKED AT MOST
-    // ONCE) AND OWNED BY THE PLAYER FROM BIRTH, SO RELEASING THE PLAYER FREES THEM TOO
-    private GFXEngine gfx;
-    private SFXEngine sfx;
-    private MRL.Source currentSource;
     private final DisplayTile tile;
     /** Which source of the media this player opened; the playlist entry decides it. */
     private final int sourceIndex;
-    private boolean noEngine;
 
     // PLAYBACK STATE
     private int currentVolume = 0;
@@ -63,23 +55,19 @@ public class Display extends AbstractTexture {
     private void openPlayer() {
         // THE PLAYLIST ENTRY NAMES THE SOURCE; ONE THAT IS NOT THERE ANYMORE PLAYS NOTHING, AND THE
         // ROW THAT POINTS AT IT SAYS SO INSTEAD OF QUIETLY SHOWING SOMETHING ELSE
-        this.currentSource = tile.mrl.source(this.sourceIndex);
-        if (this.currentSource == null) {
-            this.noEngine = true;
+        final MRL.Source source = tile.mrl.source(this.sourceIndex);
+        if (source == null) {
             WaterFrames.LOGGER.warn(IT, "Source {} is not part of {}", sourceIndex, tile.mrl.uri());
             return;
         }
 
-        // THE PLAYER FOLLOWS THE SERVER SESSION: TIME, PLAY STATE AND LOOP ARRIVE AS SNAPSHOTS OVER
-        // THE NETWORK, AND THE DRIFT CORRECTION IS WATERMEDIA'S FROM HERE ON
+        // THE PLAYER FOLLOWS THE SERVER SESSION: TIME, PLAY STATE AND LOOP ARRIVE AS SNAPSHOTS OVER THE NETWORK,
+        // AND THE DRIFT CORRECTION IS WATERMEDIA'S. THE ENGINES ARE BUILT INSIDE THE SUPPLIERS AND OWNED BY THE PLAYER
         Minecraft client = Minecraft.getInstance();
-        this.mediaPlayer = PlayerAPI.player(tile.mrl, sourceIndex,
-                () -> this.gfx = PlayerAPI.glEngine(client.gameThread, client),
-                () -> this.sfx = PlayerAPI.alEngine());
+        this.mediaPlayer = PlayerAPI.player(tile.mrl, sourceIndex, () -> PlayerAPI.glEngine(client.gameThread, client), PlayerAPI::alEngine);
 
         if (this.mediaPlayer == null) {
-            this.noEngine = true;
-            WaterFrames.LOGGER.warn(IT, "Failed to create media player for source {} - no engine available", sourceIndex);
+            WaterFrames.LOGGER.warn(IT, "Failed to create media player for source {}, no engine available", sourceIndex);
             return;
         }
 
@@ -91,15 +79,15 @@ public class Display extends AbstractTexture {
         } else {
             // A RAW SOURCE SITS AT THE WORLD ORIGIN UNDER OPENAL'S DEFAULT DISTANCE MODEL; MADE
             // LISTENER-RELATIVE SO MONO MEDIA DOESN'T FADE AND PAN AGAINST THE SPAWN COORDINATES
-            int source = this.mediaPlayer.audioSource();
-            if (source != MediaPlayer.NO_SOURCE) AL10.alSourcei(source, AL10.AL_SOURCE_RELATIVE, AL10.AL_TRUE);
+            final int alSource = this.mediaPlayer.audioSource();
+            if (alSource != MediaPlayer.NO_SOURCE) AL10.alSourcei(alSource, AL10.AL_SOURCE_RELATIVE, AL10.AL_TRUE);
 
             this.currentVolume = this.rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
             this.mediaPlayer.volume(this.currentVolume);
             this.mediaPlayer.mute(this.tile.data.muted);
         }
 
-        WaterFrames.LOGGER.debug(IT, "Created media player for source type: {}", this.currentSource.type());
+        WaterFrames.LOGGER.debug(IT, "Created media player for source type: {}", source.type());
     }
 
     // =========================================================================
@@ -156,6 +144,11 @@ public class Display extends AbstractTexture {
         return this.mediaPlayer != null ? this.mediaPlayer.duration() : 0;
     }
 
+    /** The tile this display draws for. */
+    public DisplayTile tile() {
+        return this.tile;
+    }
+
     public boolean canTick() {
         return this.mediaPlayer != null && this.mediaPlayer.canPlay();
     }
@@ -192,14 +185,11 @@ public class Display extends AbstractTexture {
                 this.sound = null;
             }
 
-            int volume = this.rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
-            if (this.currentVolume != volume) {
-                this.mediaPlayer.volume(this.currentVolume = volume);
-            }
-
-            if (this.mediaPlayer.mute() != tile.data.muted) {
-                this.mediaPlayer.mute(tile.data.muted);
-            }
+            // A MUTED PLAYER GETS NO GAIN UPDATES; THE BACKEND RESTARTS ITS BUFFERS ON EVERY GAIN WRITE
+            if (this.mediaPlayer.mute() != this.tile.data.muted) this.mediaPlayer.mute(this.tile.data.muted);
+            if (this.tile.data.muted) return;
+            final int volume = this.rangedVol(this.tile.data.volume, this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
+            if (this.currentVolume != volume) this.mediaPlayer.volume(this.currentVolume = volume);
             return;
         }
 
@@ -220,8 +210,9 @@ public class Display extends AbstractTexture {
                 || options.getSoundSourceVolume(SoundSource.MASTER) <= 0
                 || options.getSoundSourceVolume(SoundSource.RECORDS) <= 0) return;
 
-        // THE PLAYER STAYS FLAGGED MUTED FOR ITS WHOLE LIFE: WATERMEDIA NEVER TOUCHES THE GAIN
-        // AGAIN AND THE ENGINE BECOMES ITS ONLY WRITER, STARTING WITH THE SWAP SETUP PASS
+        // THE PLAYER STAYS FLAGGED MUTED FOR ITS WHOLE LIFE: WATERMEDIA NEVER TOUCHES THE GAIN AGAIN AND THE
+        // ENGINE BECOMES ITS ONLY WRITER; A LIVE TOGGLE INTO INTEGRATION ARRIVES HERE WITH THE GAIN STILL DIRECT
+        this.mediaPlayer.mute(true);
         this.sound = DisplaySound.create(this, this.tile, source);
     }
 
@@ -238,7 +229,7 @@ public class Display extends AbstractTexture {
     }
 
     public boolean isNoEngine() {
-        return this.noEngine || this.mediaPlayer == null;
+        return this.mediaPlayer == null;
     }
 
     public boolean isLoading() {
@@ -274,16 +265,6 @@ public class Display extends AbstractTexture {
     // EXTERNAL CONTROL
     // =========================================================================
 
-    /**
-     * The pause menu holds the whole session, not just this screen. Only true singleplayer ever
-     * gets here, a remote server never stops for one player, and a display already paused by
-     * hand stays that way when the game resumes.
-     */
-    public void gamePaused(boolean paused) {
-        if (this.mediaPlayer == null) return;
-        this.mediaPlayer.pause(paused || this.tile.data.paused);
-    }
-
     public void setMuteMode(boolean mute) {
         // UNDER ENGINE INTEGRATION THE PACKET'S DATA CHANGE ALREADY DRIVES THE INSTANCE GAIN
         if (this.mediaPlayer == null || DisplaysConfig.soundIntegration()) return;
@@ -315,7 +296,6 @@ public class Display extends AbstractTexture {
         }
 
         DisplaysRegistry.unregisterTexture(this.location);
-        this.currentSource = null;
         DisplayList.remove(this);
     }
 

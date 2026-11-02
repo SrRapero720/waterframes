@@ -28,6 +28,8 @@ public record PausePacket(BlockPos pos, boolean paused, boolean rewind) implemen
     @Override
     public void apply(DisplayTile tile) {
         tile.data.paused = (DisplaysConfig.useMasterModeRedstone() && tile.isPowered()) || paused;
+        // A RESUME BY HAND ENDS THE REDSTONE PAUSE TOO; THE SIGNAL DROPPING LATER HAS NOTHING LEFT TO UNDO
+        if (!tile.data.paused) tile.data.redstonePaused = false;
 
         // ORDINARY PAUSING IS RECONCILED BY THE TILE EVERY TICK; ONLY THE TWO ENDS NEED SAYING,
         // BECAUSE A STOPPED OR FINISHED CLOCK REFUSES TO BE RESUMED AND HAS TO BE STARTED OVER

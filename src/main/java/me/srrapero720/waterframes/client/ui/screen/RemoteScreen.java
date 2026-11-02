@@ -37,7 +37,7 @@ public class RemoteScreen extends WaterScreen {
         this.registerUIEvent("arrowLeft", () -> tile.position(true, tile.data.getPosX().left(), null));
         this.registerUIEvent("arrowRight", () -> tile.position(true, tile.data.getPosX().right(), null));
         this.registerUIEvent("arrowCenter", () -> tile.position(true, PositionHorizontal.CENTER, PositionVertical.CENTER));
-        this.registerUIEvent("reload", this::reload);
+        this.registerUIEvent("reload", tile::reload);
         this.registerUIEvent("play", () -> tile.setPause(true, false));
         this.registerUIEvent("pause", () -> tile.setPause(true, true));
         this.registerUIEvent("stop", () -> tile.setStop(true));
@@ -70,12 +70,6 @@ public class RemoteScreen extends WaterScreen {
     protected void build() {
         // PRIME THE TICKED BINDINGS SO THE FIRST FRAME SHOWS THE CORRECT ENABLED STATE
         this.tick();
-    }
-
-    private void reload() {
-        if (tile.mrl == null) return;
-        tile.mrl.reload();
-        tile.cleanDisplay();
     }
 
     @Override

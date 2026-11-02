@@ -49,11 +49,11 @@ import static me.srrapero720.waterui.core.Element.translatable;
 import static me.srrapero720.waterui.core.Element.translate;
 
 /**
- * Settings of a display, split into tabs. The strip on top picks the page, the transport bar
- * at the bottom stays put whichever page is open, and the screen writes itself once the
+ * Settings of a display, split into tabs. The strip on top picks the page, the player pane
+ * on the right stays put whichever page is open, and the screen writes itself once the
  * player stops turning knobs, so there is no save button to forget. Saves travel as partial
  * tags: only what actually differs from the tile leaves the client. The tree lives in
- * {@code display.ui} (plus one imported {@code .ui} per tab); this class registers the
+ * {@code display_preview.ui} (plus one imported {@code .ui} per tab); this class registers the
  * variables and events, dresses the resolved widgets and owns the working playlist.
  */
 public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
@@ -76,6 +76,10 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     private final List<Entry> playlist;
     /** Entry the player picked in the list, which becomes the one on air on the next write. */
     private Entry active;
+    // SCREEN TICKS, AND THE ONE THE WORKING LIST LAST LEFT FOR THE SERVER: A LIST STILL DIFFERING
+    // FROM THE TILE A SECOND LATER WAS REFUSED THERE (OR CHANGED BY SOMEONE ELSE) AND IS ADOPTED BACK
+    private int ticks;
+    private int listSent = Integer.MIN_VALUE / 2;
     /** Entry currently selected (accent border); null when the pick left the playlist. */
     private Entry selectedEntry;
 
@@ -85,6 +89,8 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     private final Map<Entry, String> tokenByEntry = new HashMap<>();
     private final Map<String, Entry> entryByToken = new HashMap<>();
     private int tokenSeq;
+    // MODEL OF THE URL ON AIR WHEN NO PLAYLIST ENTRY MATCHES IT; KEPT OUT OF models, WHICH refresh() PRUNES
+    private SourceRow loose;
 
     // ROW CACHE OWNED ACROSS RE-INITS: A FRESH list RE-ADOPTS IT SO A PREVIEW PLAYER OUTLIVES A RESIZE (§10.6)
     private final ParentList.RowStore rowStore = new ParentList.RowStore();
@@ -96,7 +102,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     // ---- WIDGETS RESOLVED PER INFLATE (§13.2): THE DOCUMENT POSITIONS, THE SCREEN DRESSES.
     // A DOCUMENT A PACK BROKE RESOLVES NULL AND ITS SECTION CONTRIBUTES NOTHING (H4)
 
-    /** The declarative tab container from display.ui; owns the strip, the bodies and the switch. */
+    /** The declarative tab container from display_preview.ui; owns the strip, the bodies and the switch. */
     private ParentTab parentTab;
     /** Which tab is open, kept across the re-inflate a resize triggers so the page does not reset. */
     private int activeTab;
@@ -139,6 +145,15 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerVar("status_icon", () -> SourceRow.statusIcon(tile.mrl, tile, this.missing()));
         this.registerVar("status_tooltip", () -> SourceRow.describe(tile.mrl, tile, this.missing()));
         this.registerVar("transport_ready", () -> tile.follower() != null);
+        // NOW PLAYING TEXT OF THE PLAYER PANE: THE ON-AIR ROW MODEL, EMPTY WHEN NOTHING IS ON AIR
+        this.registerVar("now_title", () -> {
+            final SourceRow row = this.onAir();
+            return row != null ? row.title() : "";
+        });
+        this.registerVar("now_byline", () -> {
+            final SourceRow row = this.onAir();
+            return row != null ? row.byline() : "";
+        });
         this.registerVar("submit_enabled", () -> cachedLink || cachedQuery);
         this.registerVar("submit_icon", () -> cachedLink ? Icons.ADD : Icons.SEARCH);
         this.registerVar("delete_enabled", () -> selectedEntry != null && selectedEntry.source() == 0);
@@ -147,14 +162,13 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
 
         this.registerUIEvent("toggleLoop", () -> tile.loop(true, !tile.data.loop));
         this.registerUIEvent("togglePlayback", () -> tile.setPause(true, !tile.data.paused));
-        this.registerUIEvent("play", () -> tile.setPause(true, false));
-        this.registerUIEvent("pause", () -> tile.setPause(true, true));
+        this.registerUIEvent("toggleMute", () -> tile.setMute(true, !tile.data.muted));
         this.registerUIEvent("stop", () -> tile.setStop(true));
         // SKIPPING IS A SESSION COMMAND: IT TRAVELS TO THE SERVER CLOCK AND COMES BACK TO EVERY VIEWER
         this.registerUIEvent("rewind", () -> tile.skip(true, -DisplayTile.SKIP_MS));
         this.registerUIEvent("fastForward", () -> tile.skip(true, DisplayTile.SKIP_MS));
         // REFETCH THE MRL AND DROP THE PLAYER SO THE NEXT TICK REBUILDS IT FROM THE FRESH SOURCES
-        this.registerUIEvent("reload", () -> { if (tile.mrl != null) tile.mrl.reload(); tile.cleanDisplay(); });
+        this.registerUIEvent("reload", tile::reload);
         // HANDS THE MEDIA TO WATERVISION'S OWN SCREEN AND PAUSES THE DISPLAY MEANWHILE
         this.registerUIEvent("openWatervision", () -> { WVCompat.openScreen(tile.data.getUrl(), tile.data.volume); tile.setPause(true, true); });
         // TOGGLE PAYLOADS AND ROW TOKENS ARRIVE AT args[1], AFTER THE ELEMENT id (§12.1, §12.2)
@@ -188,7 +202,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerVar("max_projection_distance", DisplaysConfig.maxProjDis());
         this.registerVar("max_volume", DisplaysConfig.maxVol());
         this.registerVar("max_volume_distance", DisplaysConfig.maxVolDis());
-        // THE EMBLEM IS AUTHORED IN display.ui AS AN outsideAnchor ItemIcon; JAVA ONLY SUPPLIES THE STACK
+        // THE EMBLEM IS AUTHORED IN display_preview.ui AS AN outsideAnchor ItemIcon; JAVA ONLY SUPPLIES THE STACK
         this.registerVar("emblem_item", new ItemStack(tile.getBlockState().getBlock()));
         this.registerVar("emblem_name", tile.getBlockState().getBlock().getName().getString());
 
@@ -238,6 +252,12 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     public List<Component> playbackTooltip() {
         return List.of(translatable("waterframes.gui.playback",
                 ChatFormatting.AQUA + translate("waterframes.common." + (tile.data.paused ? "paused" : "playing"))));
+    }
+
+    @UIVar("mute_tooltip")
+    public List<Component> muteTooltip() {
+        return List.of(translatable("waterframes.gui.mute.state",
+                (this.tile.data.muted ? ChatFormatting.RED : ChatFormatting.GREEN) + translate("waterframes.common." + this.tile.data.muted)));
     }
 
     @UIVar("submit_tooltip")
@@ -420,6 +440,19 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         return null;
     }
 
+    // ROW MODEL OF WHAT THE TILE PLAYS: THE PLAYLIST ROW'S OWN, ELSE ONE BUILT ONCE PER LOOSE URL, ELSE null
+    private SourceRow onAir() {
+        if (!this.tile.data.hasUrl()) return null;
+        final Entry entry = this.playingEntry();
+        if (entry != null) return this.models.computeIfAbsent(entry, e -> new SourceRow(this.tile, e));
+        final String url = this.tile.data.getUrl();
+        final int source = this.tile.data.getSource();
+        if (this.loose == null || this.loose.entry.source() != source || !this.loose.entry.url().equals(url)) {
+            this.loose = new SourceRow(this.tile, new Entry(url, source, null));
+        }
+        return this.loose;
+    }
+
     public void append(String url) {
         if (url == null || url.isBlank()) return;
 
@@ -468,6 +501,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         tile.data.entryIndex = playlist.indexOf(active);
         tile.data.url = active.url();
         tile.cleanDisplay();
+        this.listSent = this.ticks;
         DisplayNetwork.sendServer(new DataListSyncPacket(tile.getBlockPos(), this.listNbt()));
         this.flush();
     }
@@ -554,6 +588,15 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         return !playlist.equals(tile.data.playlist) || this.index() != tile.data.entryIndex;
     }
 
+    // THE TILE IS THE AUTHORITY: ITS LIST REPLACES THE WORKING COPY AND THE PICK THAT WAS NOT ACCEPTED IS DROPPED
+    private void adopt() {
+        this.playlist.clear();
+        this.playlist.addAll(this.tile.data.playlist);
+        this.active = null;
+        this.listSent = this.ticks;
+        this.refresh();
+    }
+
     // THE PLAYLIST TRAVELS IN ITS OWN PACKET; THE SERVER REBUILDS THE LIST FROM THIS TAG
     private CompoundTag listNbt() {
         return DisplayData.listTag(playlist, this.index());
@@ -604,6 +647,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
             this.close();
             return;
         }
+        if (++this.ticks - this.listSent > 20 && this.listChanged() && (this.list == null || !this.list.dragging())) this.adopt();
         // THE PREVIEW MIRRORS THE BLOCK'S OWN PLAYER INSTEAD OF OPENING A SECOND SESSION, SO IT COSTS
         // NOTHING TO DECODE; A RELOAD OR A SOURCE SWAP BUILDS A NEW PLAYER AND THE WRAP FOLLOWS IT
         if (preview != null) {
@@ -631,8 +675,9 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     // PLAYLIST FIRST (THE SERVER PICKS THE URL OUT OF IT), THEN THE DATA PATCH; ONLY KEYS DIFFERING
     // FROM THE TILE TRAVEL, AND A SECTION WHOSE WIDGETS RESOLVED NULL CONTRIBUTES NOTHING (H4)
     private void flush() {
-        if (!DisplaysConfig.canSave(Minecraft.getInstance().player, this.url())) return;
+        if (tile.isRemoved() || !DisplaysConfig.canSave(Minecraft.getInstance().player, this.url())) return;
         if (this.listChanged()) {
+            this.listSent = this.ticks;
             DisplayNetwork.sendServer(new DataListSyncPacket(tile.getBlockPos(), this.listNbt()));
         }
 
@@ -652,7 +697,11 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         if (volumeMin != null && volumeMax != null) patch.volumeRange(volumeMin.intValue(), volumeMax.intValue());
         // CLAMPED: A PACK DECLARING EXTRA StateButton ICONS MUST NOT INDEX PAST THE REAL ENUM
         if (audioOffset != null) patch.audioPosition(AudioPosition.VALUES[Math.clamp(audioOffset.state(), 0, AudioPosition.VALUES.length - 1)]);
-        patch.url(this.url()).active(true);
+        // PUTTING NEW MEDIA ON AIR SWITCHES THE DISPLAY ON; A KNOB TURN ON A SWITCHED OFF ONE LEAVES IT OFF
+        String url = this.url();
+        String current = tile.data.getUrl();
+        patch.url(url);
+        if (!url.equals(current == null ? "" : current)) patch.active(true);
         if (!patch.empty()) DisplayNetwork.sendServer(new DataSyncPacket(tile.getBlockPos(), patch.nbt()));
     }
 

@@ -39,8 +39,9 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
     @Override
     public boolean shouldRender(DisplayTile tile, @NotNull Vec3 cameraPos) {
-        BlockPos tilePos = tile.getBlockPos().relative(tile.getDirection(), (int) tile.data.projectionDistance);
-        return Vec3.atCenterOf(tilePos).closerThan(cameraPos, tile.data.renderDistance);
+        // MEASURED FROM WHERE THE PICTURE ENDS UP, WHICH FOR A PROJECTOR IS AWAY FROM THE BLOCK
+        final Vec3 anchor = Vec3.atCenterOf(tile.getBlockPos()).add(Vec3.atLowerCornerOf(tile.getDirection().getNormal()).scale(tile.data.projectionDistance));
+        return anchor.closerThan(cameraPos, tile.data.renderDistance);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
     @Override
     public void render(DisplayTile tile, float partialTicks, PoseStack pose, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        var display = tile.activeDisplay();
+        var display = tile.display;
         if (display == null || !DisplaysConfig.keepsRendering()) return;
 
         var direction = tile.getDirection();
@@ -68,7 +69,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
 
         pose.pushPose();
         pose.translate(0.5, 0.5, 0.5);
-        pose.mulPose(facing.rotation().rotation((float) Math.toRadians(-tile.data.rotation)));
+        pose.mulPose(facing.rotation((float) Math.toRadians(-tile.data.rotation)));
         pose.translate(-0.5, -0.5, -0.5);
 
         // TWEAK FOR "EXTRA-RESIZING"
@@ -78,25 +79,9 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
             box.min(facing.axis, box.min(facing.axis) - tile.caps.growSize());
         }
 
-        // RENDERING
-        if (display.isLoading()) {
-            // TODO: Loading animation rendering
-//            this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing,
-//                    front, back, flipX, flipY, brightness, alpha, WaterFrames.LOADING_ANIMATION);
-        } else if (display.canRender()) {
-            var tex = display.textureId();
-            if (tex != null) {
-                this.vertex(pose, bufferSource, box, boxFace, facing,
-                        front, back, flipX, flipY, brightness, alpha, tex);
-            }
-
-            // TODO: Buffering strip waits on the same loading animation; the texture behind
-            //  WaterFrames.LOADING_ANIMATION does not exist yet and rendered as missing squares
-//            if (display.isBuffering()) {
-//                this.vertex(pose, bufferSource, getLoadingBox(tile, box, facing), boxFace, facing,
-//                        front, back, flipX, flipY, brightness, alpha, WaterFrames.LOADING_ANIMATION);
-//            }
-        }
+        // TODO: LOADING AND BUFFERING SPINNERS OVER getLoadingBox ONCE THE MOD SHIPS AN ANIMATION TEXTURE
+        var tex = display.canRender() ? display.textureId() : null;
+        if (tex != null) this.vertex(pose, bufferSource, box, boxFace, facing, front, back, flipX, flipY, brightness, alpha, tex);
 
         pose.popPose();
     }

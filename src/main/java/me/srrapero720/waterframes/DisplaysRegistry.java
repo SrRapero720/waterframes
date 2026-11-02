@@ -2,8 +2,9 @@ package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.client.rendering.DisplayRenderer;
 import me.srrapero720.waterframes.client.ui.screen.widget.ScreenWidgets;
-import me.srrapero720.waterframes.common.block.*;
-import me.srrapero720.waterframes.common.block.entity.*;
+import me.srrapero720.waterframes.common.block.DisplayBlock;
+import me.srrapero720.waterframes.common.block.data.DisplayCaps;
+import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.commands.WaterFramesCommand;
 import me.srrapero720.waterframes.common.item.RemoteControl;
 import me.srrapero720.waterframes.common.item.data.CodecManager;
@@ -21,6 +22,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -33,7 +35,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -66,12 +68,11 @@ public class DisplaysRegistry {
 
     /* BLOCKS */
     public static final DeferredBlock<DisplayBlock>
-            FRAME = BLOCKS.register("frame", () -> new FrameBlock()),
-            PROJECTOR = BLOCKS.register("projector", () -> new ProjectorBlock()),
-            TV = BLOCKS.register("tv", () -> new TvBlock()),
-            BIG_TV = BLOCKS.register("big_tv", () -> new BigTvBlock()),
-            TV_BOX = BLOCKS.register("tv_box", () -> new TVBoxBlock());
-//            GOLDEN_PROJECTOR = BLOCKS.register("golden_projector", ProjectorBlock::new);
+            FRAME = BLOCKS.register("frame", () -> DisplayBlock.of(DisplayCaps.FRAME)),
+            PROJECTOR = BLOCKS.register("projector", () -> DisplayBlock.of(DisplayCaps.PROJECTOR)),
+            TV = BLOCKS.register("tv", () -> DisplayBlock.of(DisplayCaps.TV)),
+            BIG_TV = BLOCKS.register("big_tv", () -> DisplayBlock.of(DisplayCaps.BIG_TV)),
+            TV_BOX = BLOCKS.register("tv_box", () -> DisplayBlock.of(DisplayCaps.TV_BOX));
 
     /* ITEMS */
     public static final DeferredItem<Item>
@@ -81,16 +82,14 @@ public class DisplaysRegistry {
             TV_ITEM = ITEMS.register("tv", () -> new BlockItem(TV.get(), prop())),
             BIG_TV_ITEM = ITEMS.register("big_tv", () -> new BlockItem(BIG_TV.get(), prop())),
             TV_BOX_ITEM = ITEMS.register("tv_box", () -> new BlockItem(TV_BOX.get(), prop()));
-//            GOLDEN_PROJECTOR_ITEM = ITEMS.register("golden_projector", () -> new BlockItem(GOLDEN_PROJECTOR.get(), prop().tab(null)));
 
-    /* TILES */
+    /* TILES: ONE CLASS, ONE TYPE PER BLOCK SO SAVED WORLDS KEEP THEIR DISPLAYS */
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<DisplayTile>>
-            TILE_FRAME = tile("frame", FrameTile::new, FRAME),
-            TILE_PROJECTOR = tile("projector", ProjectorTile::new, PROJECTOR),
-            TILE_TV = tile("tv", TvTile::new, TV),
-            TILE_BIG_TV = tile("big_tv", BigTvTile::new, BIG_TV),
-            TILE_TV_BOX = tile("tv_box", TVBoxTile::new, TV_BOX);
-//            TILE_GOLDEN_PROJECTOR = tile("golden_projector", ProjectorTile::new, GOLDEN_PROJECTOR);
+            TILE_FRAME = tile("frame", FRAME),
+            TILE_PROJECTOR = tile("projector", PROJECTOR),
+            TILE_TV = tile("tv", TV),
+            TILE_BIG_TV = tile("big_tv", BIG_TV),
+            TILE_TV_BOX = tile("tv_box", TV_BOX);
 
     /* TABS */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> WATERTAB = TABS.register("tab", () -> new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
@@ -104,8 +103,8 @@ public class DisplaysRegistry {
             PERM_DISPLAYS_EDIT = permission("waterframes.displays.save", false, "Save changes on displays", "Allows saving whitelisted URLs"),
             PERM_DISPLAYS_INTERACT = permission("waterframes.displays.interact", true, "Interact with displays", "Allows interact (open) the Gui of all displays"),
             PERM_DISPLAYS_INTERACT_FRAME = permission("waterframes.displays.interact.frame", true, "Interact with frame display", "Allows interact (open) the Gui of frame display"),
-            PERM_DISPLAYS_INTERACT_PROJECTOR = permission("waterframes.displays.interact.projector", true, "Interact with frame display", "Allows interact (open) the Gui of projector display"),
-            PERM_DISPLAYS_INTERACT_TV = permission("waterframes.displays.interact.tv", true, "Interact with frame display", "Allows interact (open) the Gui of tv display"),
+            PERM_DISPLAYS_INTERACT_PROJECTOR = permission("waterframes.displays.interact.projector", true, "Interact with projector display", "Allows interact (open) the Gui of projector display"),
+            PERM_DISPLAYS_INTERACT_TV = permission("waterframes.displays.interact.tv", true, "Interact with tv display", "Allows interact (open) the Gui of tv display"),
             PERM_REMOTE_INTERACT = permission("waterframes.remote.interact", true, "Interact with remotes", "Allows interact (open) the Gui of remotes"),
             PERM_REMOTE_BIND = permission("waterframes.remote.bind", true, "Bind remotes to displays", "Allows bind displays on remotes"),
             PERM_WHITELIST_BYPASS = permission("waterframes.whitelist.bypass", false, "Bypass whitelisted URLS", "Allows to bypass whitelisted URLS");
@@ -120,8 +119,19 @@ public class DisplaysRegistry {
         return PermissionAPI.getOfflinePermission(player, node);
     }
 
-    private static DeferredHolder<BlockEntityType<?>, BlockEntityType<DisplayTile>> tile(String name, BlockEntityType.BlockEntitySupplier<DisplayTile> creator, Supplier<DisplayBlock> block) {
-        return TILES.register(name, () -> BlockEntityType.Builder.of(creator, block.get()).build(null));
+    /** The block entity type of a display kind; the tile looks its own up here when the block creates it. */
+    public static BlockEntityType<DisplayTile> tileType(final DisplayCaps caps) {
+        return switch (caps) {
+            case FRAME -> TILE_FRAME.get();
+            case PROJECTOR -> TILE_PROJECTOR.get();
+            case TV -> TILE_TV.get();
+            case BIG_TV -> TILE_BIG_TV.get();
+            case TV_BOX -> TILE_TV_BOX.get();
+        };
+    }
+
+    private static DeferredHolder<BlockEntityType<?>, BlockEntityType<DisplayTile>> tile(final String name, final Supplier<DisplayBlock> block) {
+        return TILES.register(name, () -> BlockEntityType.Builder.of((pos, state) -> new DisplayTile(tileType(((DisplayBlock) state.getBlock()).caps), pos, state), block.get()).build(null));
     }
 
     private static Item.Properties remoteProp() {
@@ -158,6 +168,12 @@ public class DisplaysRegistry {
     @SubscribeEvent
     public static void registerCommands(RegisterCommandsEvent event) {
         WaterFramesCommand.register(event.getDispatcher());
+    }
+
+    // A SERVER LEVEL GOING AWAY TAKES ITS MEDIA SESSIONS WITH IT; THE TILES THEMSELVES MAY NEVER HEAR ABOUT IT
+    @SubscribeEvent
+    public static void onLevelUnload(final LevelEvent.Unload event) {
+        if (event.getLevel() instanceof final Level level && !level.isClientSide) DisplayTile.releaseSessions(level);
     }
 
     @SubscribeEvent
@@ -202,14 +218,6 @@ public class DisplaysRegistry {
             BlockEntityRenderers.register(TILE_TV.get(), DisplayRenderer::new);
             BlockEntityRenderers.register(TILE_BIG_TV.get(), DisplayRenderer::new);
             BlockEntityRenderers.register(TILE_TV_BOX.get(), DisplayRenderer::new);
-        }
-    }
-
-    public static class UnsupportedModException extends UnsupportedOperationException {
-        private static final String MSG_REASON = "§fMod §6'%s' §fis not compatible with §e'%s' §fbecause §c%s §fplease remove it";
-
-        public UnsupportedModException(String modid, String reason) {
-            super(String.format(MSG_REASON, modid, NAME, reason));
         }
     }
 }

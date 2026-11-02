@@ -1,19 +1,20 @@
 package me.srrapero720.waterframes;
 
 import me.srrapero720.waterframes.common.block.DisplayBlock;
+import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import me.srrapero720.waterframes.common.item.RemoteControl;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.client.server.IntegratedServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
-import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.*;
-import net.neoforged.neoforge.server.permission.nodes.PermissionNode;
 
 import java.net.URI;
 import java.util.*;
@@ -73,15 +74,12 @@ public class DisplaysConfig {
     private static final BooleanValue useMasterVolume;
     private static final BooleanValue useVSEurekaCompat;
     private static final BooleanValue useSableCompat;
-    private static final BooleanValue useMultimedia;
     private static final BooleanValue keepRendering;
     // BEHAVIOR
     private static final BooleanValue useLightsOnPlay;
     private static final BooleanValue forceLightsOnPlay;
-    private static final BooleanValue useLagTickCorrection;
     private static final BooleanValue useRedstone;
     private static final BooleanValue useMasterModeOnRedstone;
-    public static final BooleanValue useExperimentalPlaylistMode;
     // REMOTE CONTROL
     private static final IntValue remoteDistance;
 
@@ -99,11 +97,9 @@ public class DisplaysConfig {
     private static final ConfigValue<List<? extends String>> whitelist;
 
     // OVERRIDES (client)
-    private final static BooleanValue overrideServerConfig;
-    private static final BooleanValue clientUseMultimedia;
+    private static final BooleanValue overrideServerConfig;
     private static final BooleanValue clientKeepsRendering;
     private static final BooleanValue clientShaderMode;
-    private static final BooleanValue forceDevMode;
     private static final BooleanValue soundEngineIntegration;
 
     private static final ModConfigSpec SERVER_SPEC;
@@ -143,8 +139,8 @@ public class DisplaysConfig {
                 .defineInRange("maxVolumeDistance", 64, 8, 512);
 
         maxVolume = SERVER
-                .comment("Max volume value", "values over 100 uses VLC überVolume")
-                .defineInRange("maxVolume", 100, 10, 120);
+                .comment("Max volume value")
+                .defineInRange("maxVolume", 100, 10, 100);
 
         useMasterVolume = SERVER
                 .comment("Makes Minecraft master volume affects waterframes volume")
@@ -167,16 +163,9 @@ public class DisplaysConfig {
                 )
                 .define("sableCompat", true);
 
-        // WATERFRAMES -> multimedia -> watermedia
-        SERVER.push("watermedia");
-
-        useMultimedia = SERVER
-                .comment("Enables VLC/FFMPEG usage for multimedia processing like videos and music (support added by WATERMeDIA)")
-                .define("enable", true);
-
         // WATERFRAMES -> block_behavior
         SERVER.comment("Configuration related to interactions with vanilla and modded features");
-        SERVER.pop(2).push("block_behavior");
+        SERVER.pop().push("block_behavior");
 
         useLightsOnPlay = SERVER
                 .comment("Enable light feature on frames while is playing")
@@ -185,10 +174,6 @@ public class DisplaysConfig {
         forceLightsOnPlay = SERVER
                 .comment("Forces light feature on frames while is playing", "Requires lightOnPlay be true")
                 .define("forceLightOnPlay", false);
-
-        useLagTickCorrection = SERVER
-                .comment("Enable lag tick time correction", "Helps when server is too laggy and playback is regressing in time", "Disable if causes problems")
-                .define("lagTickCorrection", true);
 
         SERVER.comment("Redstone interaction options");
         SERVER.push("redstone");
@@ -200,10 +185,6 @@ public class DisplaysConfig {
         useMasterModeOnRedstone = SERVER
                 .comment("Redstone inputs forces paused playback and ignores any other control sources")
                 .define("masterMode", false);
-
-        useExperimentalPlaylistMode = SERVER
-                .comment("Experimental playlist mode, this will make the display to play a list of videos")
-                .define("experimentalPlaylistMode", false);
 
         SERVER.pop();
 
@@ -284,13 +265,6 @@ public class DisplaysConfig {
                 .comment("Enables the option")
                 .define("enable", false);
 
-        clientUseMultimedia = CLIENT
-                .comment(
-                        "Overrides 'waterframes.watermedia.enable' option",
-                        "Enables VLC/FFMPEG usage for multimedia processing (support added by WATERMeDIA)"
-                )
-                .define("useMultimedia", false);
-
         clientKeepsRendering = CLIENT
                 .comment(
                         "overrides 'waterframes.rendering.keepRendering'",
@@ -304,15 +278,6 @@ public class DisplaysConfig {
                         "This is not enabled by default because i am tired"
                 )
                 .define("shaderMode", false);
-
-        forceDevMode = CLIENT
-                .comment(
-                        "WARNING: DO NOT CHANGE IT EXCEPT IF YOU KNOW WHAT ARE YOU DOING, TOGGLING IT ON MAY CAUSE CORRUPTIONS, UNEXPECTED BEHAVIORS OR WORLD DESTRUCTION",
-                        "forces WATERMeDIA and WATERFrAMES to run in developer mode",
-                        "This is was done for developers who has mods that causes compatibilities with waterframes (or watermedia)",
-                        "Let those modders test waterframes x incompatible mods (i see you stellarity owner)"
-                )
-                .define("forceDevMode", false);
 
         CLIENT.pop();
 
@@ -339,23 +304,23 @@ public class DisplaysConfig {
 
     public static float maxWidth() { return (float) (double) maxWidth.get(); }
     public static float maxHeight() { return (float) (double) maxHeight.get(); }
-    public static float maxWidth(float width) { return Math.min(width, maxWidth()); }
-    public static float maxHeight(float height) { return Math.min(height, maxHeight()); }
+    // EVERY CLAMP ALSO REFUSES NaN, INFINITIES AND NEGATIVES: A FORGED VALUE MUST NEVER MAKE A DISPLAY VANISH
+    public static float maxWidth(float width) { return Float.isFinite(width) ? Math.clamp(width, 0.1f, maxWidth()) : maxWidth(); }
+    public static float maxHeight(float height) { return Float.isFinite(height) ? Math.clamp(height, 0.1f, maxHeight()) : maxHeight(); }
 
     public static int maxRenDis() { return maxRenderDistance.get(); }
-    public static int maxRenDis(int value) { return Math.min(value, maxRenDis()); }
+    public static int maxRenDis(int value) { return Math.clamp(value, 0, maxRenDis()); }
 
     public static float maxProjDis() { return (float) (double) maxProjectionDistance.get(); }
-    public static float maxProjDis(float value) { return Math.min(value, maxProjDis()); }
+    public static float maxProjDis(float value) { return Float.isFinite(value) ? Math.clamp(value, 0f, maxProjDis()) : maxProjDis(); }
 
     public static boolean keepsRendering() { return overrideServerConfig.get() ? clientKeepsRendering.get() : keepRendering.get(); }
     public static boolean useLightOnPlay() { return useLightsOnPlay.get(); }
     public static boolean forceLightOnPlay() { return forceLightsOnPlay.get(); }
-    public static boolean useLagTickCorrection() { return useLagTickCorrection.get(); }
 
     // MULTIMEDIA
     public static int maxVolDis() { return maxVolumeDistance.get(); }
-    public static int maxVolDis(int value) { return Math.min(value, maxVolDis()); }
+    public static int maxVolDis(int value) { return Math.clamp(value, 0, maxVolDis()); }
     public static boolean useMasterVolume() { return useMasterVolume.get(); }
     public static boolean soundIntegration() { return soundEngineIntegration.get(); }
     public static boolean vsEurekaCompat() { return useVSEurekaCompat.get(); }
@@ -364,14 +329,15 @@ public class DisplaysConfig {
     public static int maxVol() { return maxVolume.get(); }
     public static int maxVol(int value) { return Math.max(Math.min(value, maxVol()), 0); }
 
-    public static boolean useMultimedia() { return overrideServerConfig.get() ? clientUseMultimedia.get() : useMultimedia.get(); }
-
     // BEHAVIOR
     public static boolean useRedstone() { return useRedstone.get(); }
     public static boolean useMasterModeRedstone() { return useRedstone() && useMasterModeOnRedstone.get(); }
     public static int maxRcDis() { return remoteDistance.get(); }
     public static boolean shaderMode() { return clientShaderMode.get(); }
-    public static void shaderMode(boolean value) { clientShaderMode.set(value); }
+    public static void shaderMode(boolean value) {
+        clientShaderMode.set(value);
+        clientShaderMode.save();
+    }
 
     // PERMISSIONS
     public static boolean useInAdv() { return useInAdventure.get(); }
@@ -386,12 +352,14 @@ public class DisplaysConfig {
     public static boolean toggleWhitelist() {
         return useWhitelist(!useWhitelist());
     }
-    public static void addOnWhitelist(String url) {
-        @SuppressWarnings("unchecked")
-        var w = (Set<String>) mutableSet(whitelist.get().iterator());
+    /** Adds a host to the whitelist; false when it is not a bare host name, the same rule the config file enforces. */
+    public static boolean addOnWhitelist(String url) {
+        if (!HOSTS_PATTERN.matcher(url).find()) return false;
+        Set<String> w = new HashSet<>(whitelist.get());
         w.add(url);
         whitelist.set(new ArrayList<>(w));
         whitelist.save();
+        return true;
     }
     public static boolean removeOnWhitelist(String url) {
         var w = mutableSet(whitelist.get().iterator());
@@ -440,12 +408,29 @@ public class DisplaysConfig {
         return list;
     }
 
+    /**
+     * Whether a player may use a display from where they stand: the display's own permission, or a
+     * remote bound to it in hand, and either way within remote range. Every command and data packet
+     * from a client goes through here before it touches the block.
+     */
+    public static boolean canControl(final ServerPlayer player, final DisplayTile tile) {
+        // REMOTE RANGE OR ARM REACH, WHICHEVER IS LONGER: A SHORT REMOTE RANGE MUST NOT REFUSE A HAND ON THE BLOCK
+        final double reach = Math.max(maxRcDis(), player.blockInteractionRange() + 3);
+        if (tile.getLevel() != player.level() || WaterFrames.getDistance(tile, player.position()) >= reach) return false;
+        if (canInteractBlock(player, tile.getDisplayBlock())) return true;
+        final BlockPos pos = tile.getBlockPos();
+        return canInteractRemote(player) && (RemoteControl.bound(player.getMainHandItem(), player.level(), pos) || RemoteControl.bound(player.getOffhandItem(), player.level(), pos));
+    }
+
     public static boolean canSave(Player player, String url) {
         boolean valid = WaterFrames.isValidUrl(url) || url.isEmpty();
         if (usePermissionsAPI.get()) {
+            // THE PERMISSION HANDLER ONLY EXISTS ON THE SERVER; A CLIENT ASKING IS OPTIMISTIC AND THE SERVER DECIDES
+            if (player.level().isClientSide) return valid;
             boolean canSave = DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_DISPLAYS_EDIT);
             boolean canBypass = DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_WHITELIST_BYPASS);
-            boolean whitelisted = isWhiteListed(url);
+            // CLEARING A DISPLAY NEEDS NO WHITELIST, THERE IS NO HOST TO JUDGE
+            boolean whitelisted = url.isEmpty() || isWhiteListed(url);
 
             if (canSave && (whitelisted || canBypass)) {
                 return valid;
@@ -462,11 +447,10 @@ public class DisplaysConfig {
 
     public static boolean canInteractBlock(Player player, DisplayBlock block) {
         if (usePermissionsAPI.get()) {
-            PermissionNode<Boolean> NODE = block.getPermissionNode();
-
-            return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_DISPLAYS_INTERACT) || DisplaysRegistry.getPermBoolean(player.getUUID(), NODE);
+            if (player.level().isClientSide) return true;
+            return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_DISPLAYS_INTERACT) || DisplaysRegistry.getPermBoolean(player.getUUID(), block.caps.permission());
         } else {
-            GameType gameType = (player instanceof ServerPlayer serverPlayer)
+            GameType gameType = (player instanceof final ServerPlayer serverPlayer)
                     ? serverPlayer.gameMode.getGameModeForPlayer()
                     : Minecraft.getInstance().gameMode.getPlayerMode();
 
@@ -480,6 +464,7 @@ public class DisplaysConfig {
 
     public static boolean canInteractRemote(Player player) {
         if (usePermissionsAPI.get()) {
+            if (player.level().isClientSide) return true;
             return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_REMOTE_INTERACT) || isOwner(player);
         } else {
             if (isAdmin(player)) return true;
@@ -489,6 +474,7 @@ public class DisplaysConfig {
 
     public static boolean canBindRemote(Player player) {
         if (usePermissionsAPI.get()) {
+            if (player.level().isClientSide) return true;
             return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_REMOTE_BIND) || isOwner(player);
         } else {
             if (isAdmin(player)) return true;
@@ -496,37 +482,17 @@ public class DisplaysConfig {
         }
     }
 
+    /** Operators and the owner of a singleplayer world, judged the same way on both sides so the screen never promises what the server refuses. */
     public static boolean isAdmin(Player player) {
-        Level level = player.level;
-
-        // OWNER
-        boolean owner = isOwner(player);
-        if (owner) return true;
-
-        if (level.isClientSide()) { // validate if was singleplayer and if was the admin
-            IntegratedServer integrated = Minecraft.getInstance().getSingleplayerServer();
-            if (integrated != null) {
-                return integrated.isSingleplayerOwner(player.getGameProfile()) || player.hasPermissions(integrated.getOperatorUserPermissionLevel());
-            } else { // its a guest, check perms
-                return player.hasPermissions(4);
-            }
-        } else {
-            return player.hasPermissions(4);
-        }
+        if (isOwner(player)) return true;
+        if (player instanceof final ServerPlayer server) return server.hasPermissions(4) || server.server.isSingleplayerOwner(server.getGameProfile());
+        IntegratedServer integrated = Minecraft.getInstance().getSingleplayerServer();
+        return integrated != null ? integrated.isSingleplayerOwner(player.getGameProfile()) : player.hasPermissions(4);
     }
 
     public static boolean isOwner(Player player) {
         // OWNER
         String name = player.getGameProfile().getName();
         return name.equals("SrRaapero720") || name.equals("SrRapero720");
-    }
-
-    public static boolean isDevMode() {
-        return !FMLLoader.isProduction() || forceDevMode.get();
-    }
-
-    public static void setPlaylistMode(boolean v) {
-        DisplaysConfig.useExperimentalPlaylistMode.set(v);
-        DisplaysConfig.useExperimentalPlaylistMode.save();
     }
 }

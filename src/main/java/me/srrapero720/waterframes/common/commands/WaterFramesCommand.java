@@ -7,6 +7,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import me.srrapero720.waterframes.DisplaysConfig;
 import me.srrapero720.waterframes.DisplaysRegistry;
 import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.client.display.DisplayList;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
@@ -148,7 +149,7 @@ public class WaterFramesCommand {
 
         // VOLUME
         edit.then(Commands.literal("volume")
-                .then(Commands.argument(DisplayData.VOLUME, IntegerArgumentType.integer(0, 120))
+                .then(Commands.argument(DisplayData.VOLUME, IntegerArgumentType.integer(0, 100))
                         .executes(c -> setVolume(getTile(c), c.getSource(), getInt(c, DisplayData.VOLUME), -1, -1))
                         .then(volumeDistance)
                 )
@@ -179,11 +180,6 @@ public class WaterFramesCommand {
                         )
                 )
         );
-
-        waterframes.then(Commands.literal("experiments")
-                .then(Commands.literal("playlistMode")
-                        .then(Commands.argument("enable", BoolArgumentType.bool())
-                                .executes(c -> enablePlaylistMode(c.getSource(), BoolArgumentType.getBool(c, "enable"))))));
 
         waterframes.then(Commands.literal("give")
                 .executes(c -> giveSelfKit(c.getSource()))
@@ -217,17 +213,6 @@ public class WaterFramesCommand {
         dispatcher.register(waterframes);
     }
 
-    private static int enablePlaylistMode(CommandSourceStack source, boolean enable) {
-        if (enable) {
-            DisplaysConfig.setPlaylistMode(true);
-            source.sendSuccess(msgSuccess("waterframes.commands.experiments.playlist_mode.enabled"), true);
-        } else {
-            DisplaysConfig.setPlaylistMode(false);
-            source.sendSuccess(msgSuccess("waterframes.commands.experiments.playlist_mode.disabled"), true);
-        }
-        return 0;
-    }
-
     public static void registerClient(CommandDispatcher<CommandSourceStack> dispatcher) {
         var waterframes = Commands.literal("waterframes");
         waterframes.then(Commands.literal("reload_all")
@@ -239,14 +224,10 @@ public class WaterFramesCommand {
     public static int setUrl(DisplayTile tile, CommandSourceStack source, String url) {
         if (tile == null) return 1;
 
-        if (!tile.data.playlist.isEmpty()) {
-            source.sendFailure(msgFailed("waterframes.commands.edit.url.failed.experimental"));
-            return 1;
-        }
-
-        // THE SESSION RESTARTS EVEN WHEN THE URL DID NOT CHANGE, WHICH IS WHAT SETTING IT AGAIN MEANS
+        // A SINGLE URL REPLACES THE WHOLE PLAYLIST, AND THE SESSION RESTARTS EVEN WHEN THE URL DID
+        // NOT CHANGE, WHICH IS WHAT SETTING IT AGAIN MEANS
+        tile.data.setUrl(url);
         tile.restartClock();
-        tile.data.url = url;
         tile.data.uuid = (source.getEntity() instanceof Player player) ? player.getUUID() : Util.NIL_UUID;
 
         tile.setDirty();
@@ -262,8 +243,9 @@ public class WaterFramesCommand {
             return 2;
         }
 
-        tile.data.setWidth(width);
-        tile.data.setHeight(height);
+        // THE CONFIG CAPS APPLY HERE AS THEY DO TO SCREEN EDITS, AND A MISSING HEIGHT KEEPS THE CURRENT ONE
+        tile.data.setWidth(DisplaysConfig.maxWidth(width));
+        if (height > 0) tile.data.setHeight(DisplaysConfig.maxHeight(height));
 
         tile.setDirty();
         source.sendSuccess(msgSuccess("waterframes.commands.edit.size.success"), true);
@@ -324,7 +306,7 @@ public class WaterFramesCommand {
     public static int setRenderDistance(DisplayTile tile, CommandSourceStack source, int renderDistance) {
         if (tile == null) return 1;
 
-        tile.data.renderDistance = renderDistance;
+        tile.data.renderDistance = DisplaysConfig.maxRenDis(renderDistance);
 
         tile.setDirty();
         source.sendSuccess(msgSuccess("waterframes.commands.edit.render_distance.success"), true);
@@ -339,7 +321,7 @@ public class WaterFramesCommand {
             return 2;
         }
 
-        tile.data.projectionDistance = projectionDistance;
+        tile.data.projectionDistance = DisplaysConfig.maxProjDis(projectionDistance);
 
         tile.setDirty();
         source.sendSuccess(msgSuccess("waterframes.commands.edit.projection.success"), true);
@@ -361,7 +343,7 @@ public class WaterFramesCommand {
         if (tile == null) return 1;
 
         ServerMediaPlayer clock = tile.clock();
-        if (clock == null || time > clock.duration()) {
+        if (clock == null || time < 0 || time > clock.duration()) {
             source.sendFailure(msgFailed("waterframes.commands.edit.settime.failed"));
             return 2;
         }
@@ -375,7 +357,7 @@ public class WaterFramesCommand {
     public static int auditURLAuthor(DisplayTile tile, CommandSourceStack source) {
         if (tile == null) return 1;
 
-        if (tile.data.uuid == Util.NIL_UUID) {
+        if (Util.NIL_UUID.equals(tile.data.uuid)) {
             source.sendSuccess(msgSuccess("waterframes.commands.audit.author.console"), true);
         } else {
             var profiler = source.getServer().getProfileCache().get(tile.data.uuid);
@@ -394,8 +376,8 @@ public class WaterFramesCommand {
 
         Set<DisplayTile> displayTiles = new HashSet<>();
 
-        for (int x = chunkX - chunkRange; x < chunkX + chunkRange; x++) {
-            for (int z = chunkZ - chunkRange; z < chunkZ + chunkRange; z++) {
+        for (int x = chunkX - chunkRange; x <= chunkX + chunkRange; x++) {
+            for (int z = chunkZ - chunkRange; z <= chunkZ + chunkRange; z++) {
                 Map<BlockPos, BlockEntity> chunk = player.level.getChunk(x, z).getBlockEntities();
                 chunk.forEach((pos1, blockEntity) -> {
                     if (blockEntity instanceof DisplayTile tile) {
@@ -423,7 +405,7 @@ public class WaterFramesCommand {
             Component z = Component.literal("Z: " + pos.getZ()).withStyle(ChatFormatting.AQUA);
 
             String playerAuthor;
-            if (tile.data.uuid == Util.NIL_UUID) {
+            if (Util.NIL_UUID.equals(tile.data.uuid)) {
                 playerAuthor = "console/unknown";
             } else {
                 var profiler = source.getServer().getProfileCache().get(tile.data.uuid);
@@ -446,9 +428,9 @@ public class WaterFramesCommand {
     public static int setVolume(DisplayTile tile, CommandSourceStack source, int volume, int min, int max) {
         if (tile == null) return 1;
 
-        if (volume != -1) tile.data.volume = volume;
-        if (min != -1) tile.data.minVolumeDistance = min;
-        if (max != -1) tile.data.maxVolumeDistance = max;
+        if (volume != -1) tile.data.volume = DisplaysConfig.maxVol(volume);
+        if (max != -1) tile.data.maxVolumeDistance = DisplaysConfig.maxVolDis(max);
+        if (min != -1) tile.data.minVolumeDistance = Math.clamp(min, 0, tile.data.maxVolumeDistance);
 
         tile.setDirty();
         source.sendSuccess(msgSuccess("waterframes.commands.edit.volume.success"), true);
@@ -508,12 +490,14 @@ public class WaterFramesCommand {
     }
 
     public static int whitelist$add(CommandSourceStack source, String value) {
-        DisplaysConfig.addOnWhitelist(value);
-        source.sendSuccess(msgSuccess("waterframes.commands.whitelist.add", value), true);
+        if (DisplaysConfig.addOnWhitelist(value)) source.sendSuccess(msgSuccess("waterframes.commands.whitelist.add", value), true);
+        else source.sendFailure(msgFailed("waterframes.commands.whitelist.add.failed", value));
         return 0;
     }
 
+    // CLIENT COMMAND: EVERY DISPLAY ON SCREEN REFETCHES ITS MEDIA AND REBUILDS ITS PLAYER
     public static int watermedia$reloadAll(CommandSourceStack source) {
+        DisplayList.reloadAll();
         source.sendSuccess(msgSuccess("waterframes.commands.reload_all.success"), true);
         return 0;
     }
@@ -524,14 +508,6 @@ public class WaterFramesCommand {
 
     public static String getStr(CommandContext<CommandSourceStack> context, String name) {
         return context.getArgument(name, String.class);
-    }
-
-    public static byte getByte(CommandContext<CommandSourceStack> context, String name) {
-        return context.getArgument(name, byte.class);
-    }
-
-    public static double getShort(CommandContext<CommandSourceStack> context, String name) {
-        return context.getArgument(name, short.class);
     }
 
     public static int getInt(CommandContext<CommandSourceStack> context, String name) {
@@ -556,10 +532,6 @@ public class WaterFramesCommand {
 
     public static float getFloat(CommandContext<CommandSourceStack> context, String name) {
         return context.getArgument(name, float.class);
-    }
-
-    public static double getDouble(CommandContext<CommandSourceStack> context, String name) {
-        return context.getArgument(name, double.class);
     }
 
     private static DisplayTile getTile(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {

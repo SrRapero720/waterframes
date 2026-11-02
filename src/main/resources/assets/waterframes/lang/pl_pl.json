@@ -38,7 +38,6 @@
     "waterframes.commands.invalid_block": "Blok nie był prawidłowym wyświetlaczem",
     "waterframes.commands.edit.url.success": "Adres URL został pomyślnie zaktualizowany",
     "waterframes.commands.edit.url.failed": "Nie można zaktualizować adresu URL dla tego wyświetlacza",
-    "waterframes.commands.edit.url.failed.experimental": "Nie można zaktualizować URI w eksperymentalnym trybie playlisty",
     "waterframes.commands.edit.size.success": "Rozmiar został pomyślnie zaktualizowany",
     "waterframes.commands.edit.size.failed": "Nie można zaktualizować rozmiaru tego wyświetlacza",
     "waterframes.commands.edit.position.failed": "Nie można zaktualizować położenia dla tego typu wyświetlacza",
@@ -63,9 +62,6 @@
     "waterframes.commands.audit.in_range.tooltip.position": "Teleportuj się do %s %s %s",
     "waterframes.commands.audit.in_range.failed": "Nie znaleziono żadnego wyświetlacza w zasięgu",
     "waterframes.commands.reload_all.success": "Wszystkie multimedia zostały pomyślnie przeładowane",
-
-    "waterframes.commands.experiments.playlist_mode.enabled": "Włączono tryb playlisty\n\nOSTRZEŻENIE: Ten tryb jest eksperymentalny i może USZKODZIĆ twoje wyświetlacze. Wyłącz go, jeśli używasz go na istniejącym świecie z wieloma wyświetlaczami",
-    "waterframes.commands.experiments.playlist_mode.disabled": "Wyłączono tryb playlisty, teraz jesteś bezpieczny",
 
     "waterframes.status": "Status: %s",
     "waterframes.status.off": "Wyłączone",

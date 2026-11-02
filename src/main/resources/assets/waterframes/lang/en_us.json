@@ -34,12 +34,12 @@
     "waterframes.commands.give.multiple": "Gave Displays set to %s players",
     "waterframes.commands.whitelist.toggle": "Whitelist is now ",
     "waterframes.commands.whitelist.add": "Added new entry \"%s\" on the whitelist",
+    "waterframes.commands.whitelist.add.failed": "%s is not a valid host name",
     "waterframes.commands.whitelist.remove": "Removed entry \"%s\" from the whitelist",
     "waterframes.commands.whitelist.remove.failed": "Failed to remove entry; it doesn't exists",
     "waterframes.commands.invalid_block": "Block was not a valid display",
     "waterframes.commands.edit.url.success": "URL updated successfully",
     "waterframes.commands.edit.url.failed": "Cannot update the URL for this Display",
-    "waterframes.commands.edit.url.failed.experimental": "Cannot update the URI in experimental playlist mode",
     "waterframes.commands.edit.size.success": "Size updated successfully",
     "waterframes.commands.edit.size.failed": "Cannot update the Size for this Display",
     "waterframes.commands.edit.position.failed": "Cannot update the Position for this Display type",
@@ -64,9 +64,6 @@
     "waterframes.commands.audit.in_range.tooltip.position": "Teleport to %s %s %s",
     "waterframes.commands.audit.in_range.failed": "No display founded in range",
     "waterframes.commands.reload_all.success": "All media reloaded successfully",
-
-    "waterframes.commands.experiments.playlist_mode.enabled": "Enabled playlist mode\n\nWARNING: This mode is experimental and may BREAK your displays. Turn it off if you're using it on a existing world with a lot of displays",
-    "waterframes.commands.experiments.playlist_mode.disabled": "Disabled playlist mode, you're safe now",
 
     "waterframes.status": "Status: %s",
     "waterframes.status.off": "Off",
@@ -109,6 +106,7 @@
 
     "waterframes.gui.loop": "Loop: %s",
     "waterframes.gui.playback": "Playback: %s",
+    "waterframes.gui.mute.state": "Mute: %s",
 
     "waterframes.gui.icon.volume": "Volume",
     "waterframes.gui.icon.rotation": "Image rotation",

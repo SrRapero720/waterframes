@@ -34,6 +34,7 @@
     "waterframes.commands.give.multiple": "%s jugadores recibieron el set de Displays",
     "waterframes.commands.whitelist.toggle": "La whitelist se encuentra ",
     "waterframes.commands.whitelist.add": "Se agrego \"%s\" a la whitelist",
+    "waterframes.commands.whitelist.add.failed": "%s no es un nombre de host válido",
     "waterframes.commands.whitelist.remove": "Se elimino \"%s\" de la whitelist",
     "waterframes.commands.whitelist.remove.failed": "No se pudo eliminar la URL; no existe",
     "waterframes.commands.invalid_block": "El bloque no es un display valido",
@@ -98,6 +99,7 @@
 
     "waterframes.gui.loop": "Repetir: %s",
     "waterframes.gui.playback": "Playback: %s",
+    "waterframes.gui.mute.state": "Silenciar: %s",
 
     "waterframes.gui.icon.volume": "Volumen",
     "waterframes.gui.icon.rotation": "Rotation de la imagen",

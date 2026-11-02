@@ -26,6 +26,6 @@ public record VolumeRangePacket(BlockPos pos, int min, int max) implements Contr
     @Override
     public void apply(DisplayTile tile) {
         tile.data.maxVolumeDistance = DisplaysConfig.maxVolDis(max);
-        tile.data.minVolumeDistance = Math.min(tile.data.maxVolumeDistance, min);
+        tile.data.minVolumeDistance = Math.clamp(min, 0, tile.data.maxVolumeDistance);
     }
 }

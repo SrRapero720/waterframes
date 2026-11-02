@@ -25,8 +25,5 @@ public class CodecManager {
             RemoteData::new
     );
 
-
-    // Unit stream codec if nothing should be sent across the network
-    public static final StreamCodec<ByteBuf, RemoteData> UNIT_STREAM_CODEC = StreamCodec.unit(new RemoteData("", 0, 0, 0));
 }
 
