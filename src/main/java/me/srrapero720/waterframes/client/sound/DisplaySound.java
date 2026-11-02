@@ -14,10 +14,10 @@ import net.minecraft.client.sounds.AudioStream;
 import net.minecraft.client.sounds.ChannelAccess;
 import net.minecraft.client.sounds.SoundBufferLibrary;
 import net.minecraft.client.sounds.SoundEngine;
-import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.watermedia.api.player.ALEngine;
 
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
@@ -41,6 +41,7 @@ public class DisplaySound extends AbstractTickableSoundInstance {
 
     private final Display display;
     private final DisplayTile tile;
+    private final ALEngine.Mix side;
     private final SourceWrapper channel;
     private final CompletableFuture<AudioStream> stream = new CompletableFuture<>();
     private ChannelAccess.ChannelHandle handle;
@@ -48,10 +49,11 @@ public class DisplaySound extends AbstractTickableSoundInstance {
     private int rangeMin = Integer.MIN_VALUE;
     private int rangeMax = Integer.MIN_VALUE;
 
-    private DisplaySound(Display display, DisplayTile tile, int source) {
+    private DisplaySound(Display display, DisplayTile tile, int source, ALEngine.Mix side) {
         super(DisplaysRegistry.DISPLAY_SOUND.get(), SoundSource.RECORDS, SoundInstance.createUnseededRandom());
         this.display = display;
         this.tile = tile;
+        this.side = side;
         this.channel = new SourceWrapper(source, this);
         // DISTANCE FALLOFF IS THE DISPLAY'S OWN MIN/MAX RANGE; THE ENGINE ONLY PANS THE POSITION
         this.attenuation = Attenuation.NONE;
@@ -59,15 +61,16 @@ public class DisplaySound extends AbstractTickableSoundInstance {
     }
 
     /**
-     * Plays a sound through the vanilla pipeline and adopts WaterMedia's source as its channel.
+     * Plays a sound through the vanilla pipeline and adopts WaterMedia's source as its channel; {@code side} is
+     * which edge of the picture this source speaks from (MONO for the centre).
      *
      * @return the registered sound, or {@code null} when the engine refused it (event cancelled
      *         or replaced, master volume at zero, channel pool exhausted); callers may retry.
      */
-    public static DisplaySound create(Display display, DisplayTile tile, int source) {
+    public static DisplaySound create(Display display, DisplayTile tile, int source, ALEngine.Mix side) {
         Minecraft mc = Minecraft.getInstance();
         SoundEngine engine = mc.getSoundManager().soundEngine;
-        DisplaySound sound = new DisplaySound(display, tile, source);
+        DisplaySound sound = new DisplaySound(display, tile, source, side);
         mc.getSoundManager().play(sound);
 
         ChannelAccess.ChannelHandle handle = engine.instanceToChannel.get(sound);
@@ -138,10 +141,10 @@ public class DisplaySound extends AbstractTickableSoundInstance {
             this.volume = this.display.soundVol(true);
             this.range(-1, -1);
         } else {
-            BlockPos pos = this.tile.getBlockPos().relative(this.tile.getDirection(), (int) this.tile.data.audioOffset);
-            this.x = pos.getX() + 0.5d;
-            this.y = pos.getY() + 0.5d;
-            this.z = pos.getZ() + 0.5d;
+            final Vec3 pos = this.display.soundPos(this.side);
+            this.x = pos.x;
+            this.y = pos.y;
+            this.z = pos.z;
             this.volume = this.display.soundVol(false);
             int min = Math.min(this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);
             int max = Math.max(this.tile.data.minVolumeDistance, this.tile.data.maxVolumeDistance);

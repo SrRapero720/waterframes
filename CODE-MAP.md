@@ -232,9 +232,14 @@ Legend: ⚠ gotcha or hard rule, ↪ reuse pointer ("to do X use Y").
   `PlayerAPI.player(mrl, sourceIndex, () -> PlayerAPI.glEngine(gameThread, mc), PlayerAPI::alEngine)` (engines built in
   the suppliers, owned by the player). It never calls `start` or `seek`: time, state, loop and speed arrive as session
   snapshots and WaterMedia's follower engine mirrors them (`seekQuick` past the 1 s tolerance).
+- The engine is `PlayerAPI.alEngine(true)` (spatial, positional mono sinks) and the player gets `audioLanguage` from the
+  game language (`es_mx` → `es-MX`); WaterMedia still prefers the original track when nothing matches.
 - `tick()`: reports duration/live once (`MediaReportPacket`), then audio. Sound integration on (default): the player
-  stays `mute(true)` and `DisplaySound.create` adopts the AL source (retried every 20 ticks after a drop; needs MASTER and
-  RECORDS above zero). Integration off: direct `mute`/`volume` with `rangedVol` (muted players get no gain updates).
+  stays `mute(true)` and a stereo pair is registered: the primary sink switched to `Mix.LEFT`, a second sink added with
+  `Mix.RIGHT`, one `DisplaySound` each positioned by `soundPos(side)` at that edge of the picture (mirrored for
+  projectors, centred for vertical frames; mono media plays the same signal on both). A refused side drops the pair and
+  retries every 20 ticks; without sinks the single source plays centred. Needs MASTER and RECORDS above zero.
+  Integration off: direct `mute`/`volume` with `rangedVol` on the primary only (muted players get no gain updates).
 - Queries: `player()`, `sourceIndex()`, `tile()`, `width()/height()`, `texture()` (0 and negatives → -1),
   `textureId()`, `time()`, `duration()`, `canTick()`, `canRender()`, status predicates, `status()`, `isReleased()`.
   `release()` is idempotent and catches a dying backend. Gain helpers `rangedVol`, `soundVol(ranged)`, `falloffVol`
@@ -453,10 +458,15 @@ Legend: ⚠ gotcha or hard rule, ↪ reuse pointer ("to do X use Y").
   extends Panel implements UIHost` (own `DataContext`, `init()`, `closed()`, `closeable()`, `close()`), `ScreenStack`
   (layer host).
 
-## 7. Audio and stereo roadmap
-- Today one AL source per display: WaterMedia's `ALEngine(spatial)` negotiates mono, so stereo media is downmixed before
-  OpenAL. Stereo L/R at the picture edges and Speaker blocks need a multi-sink `ALEngine` from WaterMedia (one decoded
-  stream, N positionable sources) plus audio track selection for dubbed YouTube videos; both were requested from the
-  WaterMedia session on 2026-11-01 and nothing in WaterFrames consumes them yet. When they land: one `DisplaySound`/
-  `SourceWrapper` per sink, positions from `DisplayCaps.box` edges, and a track selector where the Media tab's disabled
-  "Audio quality" button sits.
+## 7. Audio: sinks and tracks
+- WaterMedia 3.0.0 (local build of 2026-11-01, `libs/watermedia-3.0.0.jar`) gives every spatial `ALEngine` sinks:
+  `player.sinks()` (primary first), `player.addSink(ALEngine.Mix)` (`MONO`, `LEFT`, `RIGHT`), `Sink.source()/mix(Mix)/
+  spatialAudio()/release()`. Every sink queues the same buffers and plays in step; the host adopts the source id but never
+  plays, queues or deletes it (`SourceWrapper` fits). Surround is folded to stereo by FFmpeg.
+- WaterFrames uses two sinks per display (left and right picture edges). ↪ A Speaker block is one more
+  `addSink(mix)` registered as its own `DisplaySound` at the speaker's position and `sink.release()` when it goes.
+- Audio tracks: `player.audioTracks()`, `audioTrack()`, `audioTrack(AudioTrack)` (hot switch, viewer-local) and
+  `audioLanguage(bcp47)`; priority is explicit pick > language preference > original/default > first. The Media tab's
+  `media/audio_track` button cycles the tracks (`nextAudioTrack`, tooltip `audio_track_tooltip`).
+- ⚠ Not yet validated in game by WaterMedia itself (their PENDING H16); WaterFrames only checked that a stereo video
+  registers without OpenAL errors.

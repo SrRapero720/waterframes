@@ -5,6 +5,8 @@ import "constants/icons"
 // ---- LIVE CONTRACT --------------------------------------------------------------------------
 var muted
 var audio_pos_tooltip
+var audio_tracks_ready
+var audio_track_tooltip
 var watervision_ready
 var String media_source
 
@@ -44,7 +46,9 @@ Parent[orientation=HORIZONTAL, spacing=6, width=FILL, align=CENTER] {
 Parent[orientation=HORIZONTAL, spacing=6, width=FILL, height=FILL] {
     Parent[orientation=VERTICAL, spacing=2, width=FILL] {
         Button[component="translatable:waterframes.gui.media.video_quality", enabled=false, width=FILL]
-        Button[component="translatable:waterframes.gui.media.audio_quality", enabled=false, width=FILL]
+        // CYCLES THE AUDIO TRACKS OF THE MEDIA ON AIR (DUBS, COMMENTARY); THE TOOLTIP NAMES THE ONE PLAYING
+        Button[id="media/audio_track", component="translatable:waterframes.gui.media.audio_track", enabled=audio_tracks_ready,
+               tooltip=audio_track_tooltip, width=FILL, onClick=nextAudioTrack()]
         Button[component="translatable:waterframes.gui.media.subtitles", enabled=false, width=FILL]
         Slider[id="media/buffer_time", width=FILL, height=14, enabled=false, formatKey="waterframes.gui.media.buffer_time"]
     }

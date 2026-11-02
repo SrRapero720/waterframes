@@ -37,12 +37,14 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.watermedia.api.player.MRL;
+import org.watermedia.api.player.MediaPlayer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import static me.srrapero720.waterui.core.Element.translatable;
@@ -57,7 +59,7 @@ import static me.srrapero720.waterui.core.Element.translate;
  * variables and events, dresses the resolved widgets and owns the working playlist.
  */
 public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
-    private static final int WIDTH = 391;
+    private static final int WIDTH = 300;
     private static final int HEIGHT = 227;
 
     // BAKED ROW GEOMETRY (3:2 THUMBS): A MEDIA HEAD IS FULL SIZE, AN EXPANDED SUB-SOURCE IS COMPACT AND LEFT-INSET
@@ -121,10 +123,10 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     /** Video surface mirroring the tile's own player; the document only places it (§13.2). */
     private UIMediaPlayer preview;
     // PLAYER THE PREVIEW IS WRAPPED AROUND, HELD AS Object THE WAY UIMediaPlayer TAKES IT
-    private Object previewOf;
+    private MediaPlayer previewOf;
 
     public DisplayScreen(DisplayTile tile) {
-        super(WaterFrames.asResource("display_preview"), WIDTH, HEIGHT);
+        super(WaterFrames.asResource("display"), WIDTH, HEIGHT);
         this.tile = tile;
         this.playlist = new ArrayList<>(tile.data.playlist);
 
@@ -135,6 +137,15 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerVar("muted", () -> tile.data.muted);
         this.registerVar("reload_ready", () -> tile.mrl != null && tile.data.hasUrl());
         this.registerVar("watervision_ready", () -> tile.data.hasUrl() && tile.mrl != null && tile.mrl.status().loaded());
+        this.registerVar("audio_tracks_ready", () -> tile.follower() != null && tile.follower().audioTracks().size() > 1);
+        // THE PICK IS THIS VIEWER'S: AUDIO IS NEVER SESSION STATE, EVERY CLIENT HEARS ITS OWN TRACK
+        this.registerUIEvent("nextAudioTrack", () -> {
+            final MediaPlayer follower = tile.follower();
+            if (follower == null) return;
+            final List<MediaPlayer.AudioTrack> tracks = follower.audioTracks();
+            if (tracks.size() < 2) return;
+            follower.audioTrack(tracks.get((tracks.indexOf(follower.audioTrack()) + 1) % tracks.size()));
+        });
         // THUMBNAIL URL OF THE MEDIA ON AIR; LIVE BECAUSE THE MRL RESOLVES ASYNC AFTER THE SCREEN OPENS
         this.registerVar("media_source", () -> {
             if (tile.mrl == null || !tile.mrl.status().loaded()) return "";
@@ -265,6 +276,21 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         String key = cachedLink ? "waterframes.gui.source.add"
                 : cachedQuery ? "waterframes.gui.source.search" : "waterframes.gui.source.hint";
         return List.of(translatable(key));
+    }
+
+    @UIVar("audio_track_tooltip")
+    public List<Component> audioTrackTooltip() {
+        final MediaPlayer follower = tile.follower();
+        final List<MediaPlayer.AudioTrack> tracks = follower != null ? follower.audioTracks() : List.of();
+        if (tracks.size() < 2) return List.of(translatable("waterframes.gui.media.audio_track.none"));
+        final MediaPlayer.AudioTrack current = follower.audioTrack();
+        // A TRACK NAMES ITSELF, ELSE ITS LANGUAGE SPELLS IT OUT, ELSE ITS POSITION IN THE LIST
+        final int index = Math.max(0, tracks.indexOf(current));
+        final String name = current != null && current.name() != null ? current.name()
+                : current != null && current.lang() != null ? Locale.forLanguageTag(current.lang()).getDisplayLanguage()
+                : "#" + (index + 1);
+        return List.of(translatable("waterframes.gui.media.audio_track.current", ChatFormatting.AQUA + name),
+                translatable("waterframes.gui.media.audio_track.switch", index + 1, tracks.size()));
     }
 
     @UIVar("audio_pos_tooltip")
@@ -651,7 +677,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         // THE PREVIEW MIRRORS THE BLOCK'S OWN PLAYER INSTEAD OF OPENING A SECOND SESSION, SO IT COSTS
         // NOTHING TO DECODE; A RELOAD OR A SOURCE SWAP BUILDS A NEW PLAYER AND THE WRAP FOLLOWS IT
         if (preview != null) {
-            Object player = tile.follower();
+            MediaPlayer player = tile.follower();
             if (player != previewOf) {
                 this.previewOf = player;
                 this.preview.wrap(player);

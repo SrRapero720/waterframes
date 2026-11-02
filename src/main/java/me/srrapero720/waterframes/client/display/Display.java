@@ -5,6 +5,9 @@ import me.srrapero720.waterframes.client.sound.DisplaySound;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.MediaReportPacket;
+import me.srrapero720.waterframes.common.util.geo.AlignedBox;
+import me.srrapero720.waterframes.common.util.geo.Axis;
+import org.watermedia.api.player.ALEngine;
 import org.watermedia.api.player.MRL;
 import org.watermedia.api.player.MediaPlayer;
 import org.watermedia.api.player.PlayerAPI;
@@ -12,12 +15,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.lwjgl.openal.AL10;
+
+import java.util.List;
+import java.util.Locale;
 
 public class Display extends AbstractTexture {
     private static final Marker IT = MarkerManager.getMarker("Display");
@@ -33,12 +41,13 @@ public class Display extends AbstractTexture {
     private boolean released = false;
     // WHETHER THE SERVER CLOCK ALREADY HEARD FROM THIS VIEWER WHAT THE MEDIA IS
     private boolean reported;
+    private boolean sinkWarned;
 
     // TEXTURE REGISTRATION, THE DISPLAY IS THE TEXTURE: ONE LOCATION PER BLOCK POSITION FOR ITS WHOLE LIFE
     private final ResourceLocation location;
 
-    // SOUND REGISTRATION, THE AL SOURCE ADOPTED BY MINECRAFT'S ENGINE THE WAY THE TEXTURE IS
-    private DisplaySound sound;
+    // SOUND REGISTRATION, ONE AL SINK PER SIDE ADOPTED BY MINECRAFT'S ENGINE THE WAY THE TEXTURE IS
+    private DisplaySound[] sounds;
     private int soundRetry;
 
     public Display(DisplayTile tile) {
@@ -63,13 +72,19 @@ public class Display extends AbstractTexture {
 
         // THE PLAYER FOLLOWS THE SERVER SESSION: TIME, PLAY STATE AND LOOP ARRIVE AS SNAPSHOTS OVER THE NETWORK,
         // AND THE DRIFT CORRECTION IS WATERMEDIA'S. THE ENGINES ARE BUILT INSIDE THE SUPPLIERS AND OWNED BY THE PLAYER
-        Minecraft client = Minecraft.getInstance();
-        this.mediaPlayer = PlayerAPI.player(tile.mrl, sourceIndex, () -> PlayerAPI.glEngine(client.gameThread, client), PlayerAPI::alEngine);
+        // A SPATIAL ENGINE PLAYS THROUGH POSITIONAL MONO SINKS, WHICH IS WHAT THE STEREO PAIR BELOW NEEDS
+        final Minecraft client = Minecraft.getInstance();
+        this.mediaPlayer = PlayerAPI.player(tile.mrl, sourceIndex, () -> PlayerAPI.glEngine(client.gameThread, client), () -> PlayerAPI.alEngine(true));
 
         if (this.mediaPlayer == null) {
             WaterFrames.LOGGER.warn(IT, "Failed to create media player for source {}, no engine available", sourceIndex);
             return;
         }
+
+        // DUBBED MEDIA FOLLOWS THE GAME LANGUAGE (es_mx BECOMES es-MX); WATERMEDIA STILL PREFERS THE ORIGINAL TRACK
+        // WHEN NOTHING MATCHES, AND A PICK FROM THE MEDIA TAB OUTRANKS BOTH
+        final String[] language = client.getLanguageManager().getSelected().split("_", 2);
+        this.mediaPlayer.audioLanguage(language.length > 1 ? language[0] + '-' + language[1].toUpperCase(Locale.ROOT) : language[0]);
 
         // VOLUME AND MUTE STAY PRIVATE TO THIS VIEWER, THE SESSION GRANTS NO SAY OVER THEM. NOTHING
         // IS STARTED HERE EITHER: A START REQUEST WOULD REWIND THE MEDIA FOR EVERYONE WATCHING
@@ -180,10 +195,7 @@ public class Display extends AbstractTexture {
         }
 
         if (!DisplaysConfig.soundIntegration()) {
-            if (this.sound != null) {
-                this.sound.drop();
-                this.sound = null;
-            }
+            this.dropSounds();
 
             // A MUTED PLAYER GETS NO GAIN UPDATES; THE BACKEND RESTARTS ITS BUFFERS ON EVERY GAIN WRITE
             if (this.mediaPlayer.mute() != this.tile.data.muted) this.mediaPlayer.mute(this.tile.data.muted);
@@ -193,27 +205,85 @@ public class Display extends AbstractTexture {
             return;
         }
 
-        // MINECRAFT OWNS THE GAIN WHILE THE SOUND IS REGISTERED; A DROPPED ONE (STOPSOUND,
-        // CATEGORY AT ZERO, ENGINE RELOAD) LEAVES THE PLAYER MUTED AND RETRIES EVERY SECOND
-        if (this.sound != null && !this.sound.dropped()) return;
-        if (this.sound != null) {
-            this.sound = null;
+        // MINECRAFT OWNS THE GAIN WHILE THE SOUNDS ARE REGISTERED; ONE DROPPED SIDE (STOPSOUND, CATEGORY AT
+        // ZERO, ENGINE RELOAD) TAKES THE PAIR DOWN, LEAVES THE PLAYER MUTED AND RETRIES EVERY SECOND
+        if (this.sounds != null) {
+            boolean alive = true;
+            for (final DisplaySound sound: this.sounds) alive &= !sound.dropped();
+            if (alive) return;
+            this.dropSounds();
             this.mediaPlayer.mute(true);
         }
         if (--this.soundRetry > 0) return;
         this.soundRetry = 20;
         if (!this.mediaPlayer.audio()) return;
 
-        int source = this.mediaPlayer.audioSource();
-        Options options = Minecraft.getInstance().options;
-        if (source == MediaPlayer.NO_SOURCE
+        final Options options = Minecraft.getInstance().options;
+        if (this.mediaPlayer.audioSource() == MediaPlayer.NO_SOURCE
                 || options.getSoundSourceVolume(SoundSource.MASTER) <= 0
                 || options.getSoundSourceVolume(SoundSource.RECORDS) <= 0) return;
 
         // THE PLAYER STAYS FLAGGED MUTED FOR ITS WHOLE LIFE: WATERMEDIA NEVER TOUCHES THE GAIN AGAIN AND THE
         // ENGINE BECOMES ITS ONLY WRITER; A LIVE TOGGLE INTO INTEGRATION ARRIVES HERE WITH THE GAIN STILL DIRECT
         this.mediaPlayer.mute(true);
-        this.sound = DisplaySound.create(this, this.tile, source);
+
+        // STEREO: THE PRIMARY SINK TAKES THE LEFT CHANNEL AND A SECOND ONE THE RIGHT, EACH REGISTERED AS ITS OWN
+        // GAME SOUND AT ITS EDGE OF THE PICTURE; MONO MEDIA PLAYS THE SAME SIGNAL ON BOTH. WITHOUT SINKS (OR WHEN
+        // THE ENGINE REFUSES ONE) THE SINGLE SOURCE PLAYS CENTRED
+        List<ALEngine.Sink> sinks = this.mediaPlayer.sinks();
+        try {
+            if (!sinks.isEmpty() && sinks.size() < 2 && this.mediaPlayer.addSink(ALEngine.Mix.RIGHT) != null) sinks = this.mediaPlayer.sinks();
+            if (sinks.size() >= 2) sinks.get(0).mix(ALEngine.Mix.LEFT);
+        } catch (final IllegalStateException e) {
+            if (!this.sinkWarned) WaterFrames.LOGGER.warn(IT, "Stereo sinks unavailable for {}, playing centred", this.tile.getBlockPos(), e);
+            this.sinkWarned = true;
+            sinks = List.of();
+        }
+
+        final DisplaySound[] created = sinks.size() >= 2
+                ? new DisplaySound[] {
+                        DisplaySound.create(this, this.tile, sinks.get(0).source(), ALEngine.Mix.LEFT),
+                        DisplaySound.create(this, this.tile, sinks.get(1).source(), ALEngine.Mix.RIGHT) }
+                : new DisplaySound[] { DisplaySound.create(this, this.tile, this.mediaPlayer.audioSource(), ALEngine.Mix.MONO) };
+        for (final DisplaySound sound: created) {
+            if (sound != null) continue;
+            // THE ENGINE REFUSED A SIDE: NEITHER PLAYS ALONE, THE NEXT RETRY REGISTERS THE PAIR AGAIN
+            for (final DisplaySound other: created) if (other != null) other.drop();
+            return;
+        }
+        this.sounds = created;
+    }
+
+    /**
+     * World position of one side of the picture's audio, in blocks. The base is the block (plus the projector's
+     * audio offset along its facing); a side moves to that edge of the picture as the viewer sees it, which is
+     * the mirror image for projectors since they are watched from behind. Vertical frames have no left or right.
+     */
+    public Vec3 soundPos(final ALEngine.Mix side) {
+        final Direction direction = this.tile.getDirection();
+        final BlockPos base = this.tile.getBlockPos().relative(direction, (int) this.tile.data.audioOffset);
+        final Vec3 center = Vec3.atCenterOf(base);
+        if (side == ALEngine.Mix.MONO || direction.getAxis().isVertical()) return center;
+
+        final Direction right = this.tile.caps.projects() ? direction.getClockWise() : direction.getCounterClockWise();
+        final Axis across = Axis.of(right.getAxis());
+        final AlignedBox box = this.tile.getRenderBox();
+        // THE PICTURE MAY BE ANCHORED OFF THE BLOCK CENTRE, SO THE EDGE IS READ FROM THE BOX ITSELF
+        final double edge = side == ALEngine.Mix.RIGHT
+                ? (right.getAxisDirection().getStep() > 0 ? box.max(across) : box.min(across))
+                : (right.getAxisDirection().getStep() > 0 ? box.min(across) : box.max(across));
+        final double along = this.tile.getBlockPos().get(right.getAxis()) + edge;
+        return switch (right.getAxis()) {
+            case X -> new Vec3(along, center.y, center.z);
+            case Z -> new Vec3(center.x, center.y, along);
+            case Y -> center;
+        };
+    }
+
+    private void dropSounds() {
+        if (this.sounds == null) return;
+        for (final DisplaySound sound: this.sounds) sound.drop();
+        this.sounds = null;
     }
 
     // =========================================================================
@@ -278,11 +348,7 @@ public class Display extends AbstractTexture {
     public void release() {
         if (this.isReleased()) return;
         this.released = true;
-
-        if (this.sound != null) {
-            this.sound.drop();
-            this.sound = null;
-        }
+        this.dropSounds();
 
         if (this.mediaPlayer != null) {
             try {

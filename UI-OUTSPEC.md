@@ -57,6 +57,10 @@ widgets actuales salvo lo marcado como **Propuesta**.
   pueden ir alineados a la izquierda dentro de su caja `FILL`; centrados bajo la preview leerían mejor.
 - **Colapso automático de `Text` vacío** (o `visible` derivado de un `String` vacío): hoy requeriría un
   `var boolean` extra en el host por cada texto.
-- **Idioma de la pista de audio:** el pane no puede elegir la pista de audio (vídeos de YouTube doblados suenan
-  en otro idioma). Depende de que WaterMedia exponga `audioTracks()`/`audioTrack(int)`; ya pedido a esa sesión.
-  Cuando llegue, la pestaña Media debería estrenar el botón "Audio quality" (hoy deshabilitado) como selector.
+- **Selector de pista de audio como botón cíclico:** `tabs/media.ui` estrena `Button[id="media/audio_track"]`
+  (sustituye al placeholder "Audio quality"): `enabled=audio_tracks_ready` (más de una pista), el tooltip vivo
+  `audio_track_tooltip` nombra la pista actual y su posición, y `onClick=nextAudioTrack()` pasa a la siguiente. Es un
+  ciclo porque el toolkit no tiene desplegable; **propuesta**: un widget `Dropdown`/`Select` con opciones vivas para
+  este y para la calidad de vídeo.
+- **Estéreo:** no toca la UI, pero cambia qué se oye: cada display registra dos sonidos (izquierda y derecha en los
+  bordes de la imagen). La pestaña Media sigue mostrando un solo volumen y un solo mute, que aplican al par.
