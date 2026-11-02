@@ -5,6 +5,7 @@ import me.srrapero720.waterui.core.Anchor;
 import me.srrapero720.waterui.core.Cursors;
 import me.srrapero720.waterui.core.DebugOverlay;
 import me.srrapero720.waterui.core.Element;
+import me.srrapero720.waterui.core.Popup;
 import me.srrapero720.waterui.core.Spacing;
 import me.srrapero720.waterui.format.DataContext;
 import me.srrapero720.waterui.format.UIBuilder;
@@ -61,6 +62,8 @@ public abstract class WaterScreen extends Screen implements UIHost {
     // ELEMENT FLOATING AT THE CURSOR OVER EVERY LAYER; THE GRAB POINT KEEPS IT UNDER THE HAND
     private Element dragged;
     private int dragGrabX, dragGrabY;
+    // TRANSIENT LAYER OVER EVERY PANEL (A DROPDOWN LIST): ONE AT A TIME, IT OWNS THE POINTER WHILE OPEN
+    private Popup popup;
 
     /** Root of the theme chain: the root and every dialog without one of its own paints with this. */
     public Theme theme = Theme.ERROR;
@@ -151,6 +154,8 @@ public abstract class WaterScreen extends Screen implements UIHost {
 
     public void openDialog(Dialog dialog) {
         LOGGER.debug(IT, "dialog {} opened", dialog.name);
+        // A DIALOG TAKES THE SCREEN: AN OPEN LIST UNDER IT WOULD FLOAT OVER THE VEIL
+        this.popup(null);
         dialog.screen = this;
         dialog.context = new DataContext();
         this.dialogs.add(dialog);
@@ -198,6 +203,23 @@ public abstract class WaterScreen extends Screen implements UIHost {
         this.dragGrabY = grabY;
     }
 
+    /** Opens {@code popup} over every layer, closing the one open before; {@code null} just closes. */
+    public void popup(Popup popup) {
+        Popup previous = this.popup;
+        if (previous == popup) return;
+        this.popup = popup;
+        if (previous != null) previous.closedPopup();
+    }
+
+    /** Closes {@code popup} only while it is the open one, so a stale close never drops a newer layer. */
+    public void closePopup(Popup popup) {
+        if (this.popup == popup) this.popup(null);
+    }
+
+    public Popup popup() {
+        return popup;
+    }
+
     /** Dresses the freshly inflated tree: resolves widgets, couplings and whatever code-side wiring remains. */
     protected abstract void build();
 
@@ -225,6 +247,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
         this.pointerTarget = null;
         this.pointerButton = -1;
         this.dragged = null;
+        this.popup(null);
         // DROP STALE TICKED EVALUATORS BEFORE THE RE-INFLATE; THE STORE LIVES WITH THE INSTANCE (§5.6)
         this.context.reset();
         this.inflate();
@@ -289,7 +312,8 @@ public abstract class WaterScreen extends Screen implements UIHost {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partial) {
         if (reflowQueued) this.reflow();
-        boolean rootIsTop = dialogs.isEmpty();
+        // AN OPEN POPUP OWNS THE CURSOR LIKE A DIALOG: EVERY PANEL UNDER IT PAINTS UNHOVERED
+        boolean rootIsTop = dialogs.isEmpty() && popup == null;
 
         // THE ROOT IS THE BASE LAYER AT DEPTH ZERO; ONLY THE TOP LAYER SEES THE REAL CURSOR
         root.elevation = 0;
@@ -307,7 +331,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
         // COVERS WHAT WHEN THE TEXT AND THE RECTANGLES OF A FRAME TRAVEL IN SEPARATE BATCHES
         for (int i = 0; i < dialogs.size(); i++) {
             Dialog dialog = dialogs.get(i);
-            boolean top = i == dialogs.size() - 1;
+            boolean top = i == dialogs.size() - 1 && popup == null;
             dialog.elevation = (i + 1) * LAYER_DEPTH;
             // AN OPEN POPUP OWNS THE SCREEN: EVERYTHING UNDER IT DIMS, RIDING A DEPTH BETWEEN
             // BOTH LAYERS SO THE VEIL COVERS THE LOWER ONES WITHOUT TOUCHING THE TOP
@@ -319,6 +343,15 @@ public abstract class WaterScreen extends Screen implements UIHost {
             }
             dialog.render(graphics, top ? mouseX : -10000, top ? mouseY : -10000, partial);
             graphics.flush();
+        }
+
+        // THE POPUP RIDES ONE DEPTH OVER THE TOP PANEL AND UNDER THE DRAGGED COPY
+        if (popup != null) {
+            graphics.pose().pushPose();
+            graphics.pose().translate(0f, 0f, LAYER_DEPTH * (dialogs.size() + 1));
+            popup.paintPopup(graphics, mouseX, mouseY, partial);
+            graphics.flush();
+            graphics.pose().popPose();
         }
 
         this.afterRender(graphics, mouseX, mouseY, partial);
@@ -346,6 +379,8 @@ public abstract class WaterScreen extends Screen implements UIHost {
             DebugOverlay.render(graphics, top, mouseX, mouseY, width, height);
             return;
         }
+        // AN OPEN POPUP COVERS THE TOOLTIPS OF WHATEVER IT FLOATS OVER
+        if (popup != null) return;
         // NO DIALOG OWNS THE SCREEN: OUTSIDE, THEN THE ROOT'S OUT-OF-FLOW EXTRAS, WIN BEFORE THE ROOT
         Element hovered = null;
         if (topDialog() == null) {
@@ -417,6 +452,12 @@ public abstract class WaterScreen extends Screen implements UIHost {
             stale.release(stale.toLocalX(mouseX), stale.toLocalY(mouseY), button);
         }
 
+        // THE POPUP SEES EVERY PRESS FIRST: ONE OUTSIDE IT CLOSES IT AND GOES NO FURTHER
+        if (popup != null) {
+            if (!popup.pressPopup(mouseX, mouseY, button)) this.popup(null);
+            return true;
+        }
+
         Panel top = topDialog() != null ? topDialog() : root;
 
         // A DIALOG OWNS THE SCREEN: OUTSIDE ELEMENTS NEVER SEE A CLICK WHILE ONE IS OPEN
@@ -482,6 +523,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (popup != null && popup.scrollPopup(mouseX, mouseY, scrollY)) return true;
         if (dialogs.isEmpty()) {
             for (int i = outside.size() - 1; i >= 0; i--) {
                 Element element = outside.get(i);
@@ -495,6 +537,11 @@ public abstract class WaterScreen extends Screen implements UIHost {
     @Override
     public boolean keyPressed(int key, int scan, int modifiers) {
         if (DebugOverlay.chord(key)) return true;
+        // ESCAPE DISMISSES THE POPUP BEFORE IT CAN CLOSE THE SCREEN
+        if (popup != null && key == GLFW.GLFW_KEY_ESCAPE) {
+            this.popup(null);
+            return true;
+        }
         if (focused != null && focused.keyDown(key, scan, modifiers)) return true;
         Panel top = topDialog() != null ? topDialog() : root;
         if (top.keyDown(key, scan, modifiers)) return true;
@@ -530,6 +577,7 @@ public abstract class WaterScreen extends Screen implements UIHost {
         LOGGER.trace(IT, "disposing screen {}: {} dialog(s), {} outside", root.name, dialogs.size(), outside.size());
         Cursors.reset();
         DebugOverlay.reset();
+        this.popup(null);
         for (Dialog dialog: List.copyOf(dialogs)) {
             dialog.closed();
             dialog.disposeInflated();

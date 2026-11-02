@@ -100,10 +100,9 @@
     "waterframes.gui.loop": "Repetir: %s",
     "waterframes.gui.playback": "Playback: %s",
     "waterframes.gui.mute.state": "Silenciar: %s",
+    "waterframes.gui.media.video_quality": "Calidad de video",
+    "waterframes.gui.media.video_quality.auto": "Automática",
     "waterframes.gui.media.audio_track": "Pista de audio",
-    "waterframes.gui.media.audio_track.none": "Este medio tiene una sola pista de audio",
-    "waterframes.gui.media.audio_track.current": "Pista de audio: %s",
-    "waterframes.gui.media.audio_track.switch": "%s de %s, clic para cambiar",
 
     "waterframes.gui.icon.volume": "Volumen",
     "waterframes.gui.icon.rotation": "Rotation de la imagen",

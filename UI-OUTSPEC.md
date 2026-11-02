@@ -57,10 +57,60 @@ widgets actuales salvo lo marcado como **Propuesta**.
   pueden ir alineados a la izquierda dentro de su caja `FILL`; centrados bajo la preview leerían mejor.
 - **Colapso automático de `Text` vacío** (o `visible` derivado de un `String` vacío): hoy requeriría un
   `var boolean` extra en el host por cada texto.
-- **Selector de pista de audio como botón cíclico:** `tabs/media.ui` estrena `Button[id="media/audio_track"]`
-  (sustituye al placeholder "Audio quality"): `enabled=audio_tracks_ready` (más de una pista), el tooltip vivo
-  `audio_track_tooltip` nombra la pista actual y su posición, y `onClick=nextAudioTrack()` pasa a la siguiente. Es un
-  ciclo porque el toolkit no tiene desplegable; **propuesta**: un widget `Dropdown`/`Select` con opciones vivas para
-  este y para la calidad de vídeo.
 - **Estéreo:** no toca la UI, pero cambia qué se oye: cada display registra dos sonidos (izquierda y derecha en los
   bordes de la imagen). La pestaña Media sigue mostrando un solo volumen y un solo mute, que aplican al par.
+
+## 6. Widget nuevo: `Dropdown` (implementado)
+
+Campo cerrado que muestra la opción elegida y, al hacer clic, abre una lista de texto por encima de todas las capas.
+Entra en el catálogo §11 así:
+
+| Tag | Propiedades | Eventos tipados (payload) |
+|---|---|---|
+| `Dropdown` | `options` (tupla de strings/números fijos, o `List` vivo), `enum` (nombre de clase enum, baked), `selected` (índice inicial o `int`/`long` vivo), `placeholder` (component), `textScale` | `onSelect` (índice elegido) |
+
+- **Fuentes de opciones:** en `.ui` una tupla fija (`options={"A", "B"}`), una clase enum por nombre
+  (`enum="org.watermedia.api.util.MediaQuality"`, se cargan sin inicializar y se rechaza una clase que no sea enum), un
+  `List` vivo del host (`options=audio_tracks`, cualquier `List`: los elementos se muestran con `toString()`, los
+  `Component` con su texto) o nada (campo solo de estilo hasta que el código le dé datos con `options(List|Object...|Class)`
+  o `source(Supplier)`).
+- **Cadencia:** la lista viva se lee **una vez por tick** (no por frame, porque el host suele construirla); un cambio
+  re-mide el campo para que quepa la opción más larga. El índice vivo (`selected`) se lee por frame como `Switch.source`.
+  Con `selected` vivo el host manda: elegir una opción dispara `onSelect` y el campo muestra lo que el host devuelva.
+- **Selección:** `selected()` se recorta a la lista actual; `-1` o lista vacía pintan el `placeholder` en el color
+  deshabilitado. Un campo con lista vacía no abre nada.
+- **Lista abierta:** se despliega bajo el campo (o encima si no cabe en la ventana), 8 filas máximo con rueda para
+  desplazar y chevrones de aviso; la fila bajo el cursor usa `fieldHover`, la seleccionada `selection`. Clic en una fila
+  elige y cierra; clic fuera cierra y **se consume** (no llega al elemento de abajo); `Esc` cierra la lista antes que
+  la pantalla. Cambiar de pestaña, `visible=false`, `enabled=false`, abrir un diálogo o `dispose()` también la cierran.
+- **Tooltips y hover:** mientras hay una lista abierta ningún otro elemento muestra tooltip ni hover (la lista posee el
+  cursor, como un diálogo).
+- **Límite:** la lista se pinta en coordenadas de pantalla a partir de `bounds`, así que un `Dropdown` bajo un ancestro con
+  `scale != 1` colocaría mal su lista (misma limitación que el scissor).
+
+### 6.1 Capa popup en el toolkit (código)
+
+- `core/Popup`: interfaz (`paintPopup`, `pressPopup`, `scrollPopup`, `closedPopup`) para capas transitorias.
+- `Element.openPopup(Popup)`/`closePopup(Popup)` burbujean por el árbol como `floatDragged`; `Panel` las entrega a
+  `WaterScreen.popup(Popup)`/`closePopup(Popup)`. La pantalla guarda **un** popup: abrir otro cierra el anterior,
+  `closePopup(p)` solo cierra si `p` es el abierto.
+- Orden de pintado: raíz → outside → diálogos → **popup** (profundidad `LAYER_DEPTH * (diálogos + 1)`) → `afterRender`
+  → elemento arrastrado. Mientras hay popup, raíz, outside y diálogos reciben el cursor falso (`-10000`).
+- Enrutado: `mouseClicked` consulta primero al popup (`false` → cerrar y consumir), `mouseScrolled` le ofrece la rueda,
+  `keyPressed` cierra con `Esc`; `init()`, `openDialog()` y `removed()` lo cierran.
+- `DataContext.listOr(name)`: proveedor vivo de `List<?>` (registrado o `@UIVar` que devuelva `List`); el antiguo
+  resolutor de tooltips pasa a llamarse `componentsOr`.
+
+### 6.2 Pestaña Media
+
+- `Button video_quality` (placeholder) y el botón cíclico `media/audio_track` se sustituyen por dos `Dropdown` con
+  `width=FILL`, `placeholder` y `tooltip` en la etiqueta del control:
+  - `media/video_quality`: `options=video_qualities` (calidades que ofrece la fuente en el aire, de menor a mayor, como
+    `"720p"`; `UNKNOWN` se muestra como `waterframes.gui.media.video_quality.auto`), `selected=video_quality` (la calidad
+    más cercana a la del reproductor), `enabled=video_qualities_ready` (más de una), `onSelect=selectVideoQuality()`
+    → `MediaPlayer.quality(q)` del seguidor local.
+  - `media/audio_track`: `options=audio_tracks` (nombre de la pista, si no su idioma, si no `#n`), `selected=audio_track`
+    (índice de `audioTrack()`), `enabled=audio_tracks_ready`, `onSelect=selectAudioTrack()` → `audioTrack(track)`.
+- Ambas elecciones son por espectador (nunca estado de sesión). Variables eliminadas: `audio_track_tooltip`, evento
+  `nextAudioTrack`; claves lang eliminadas: `waterframes.gui.media.audio_track.{none,current,switch}`; nuevas:
+  `waterframes.gui.media.video_quality.auto` (y `video_quality` en `es_mx`).

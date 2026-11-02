@@ -414,7 +414,9 @@ Legend: ⚠ gotcha or hard rule, ↪ reuse pointer ("to do X use Y").
   duplicated by hand from `UIBuilder.applyGeneric`, keep both in sync. Core tags: `Parent`, `Grid`, `Frame`,
   `ParentList`, `ParentTab`, `ComboButton`, `Text`, `Button`, `ToggleButton`, `StateButton`, `TabButton`, `Icon`,
   `ItemIcon`, `PlayerHead`, `Switch`, `Slider`, `Stepper`, `ProgressBar`, `SeekBar`, `InputText`, `Thumbnail`,
-  `MediaPlayer`, `Blank`, `Spacer`.
+  `MediaPlayer`, `Blank`, `Spacer`, `Dropdown` (`options` tuple | live `List`, `enum` class name loaded without
+  init, `selected` int | live number, `placeholder`, `textScale`; `onSelect` index). `DataContext.listOr` serves
+  live `List<?>` vars (tooltips use `componentsOr`).
 - `UIHost`: `uiStore()` plus default sugar `registerVar(key, boolean|long|double|Object|Supplier)`,
   `registerUIEvent(key, Handler|Runnable)`, `registerEvent(id, Consumer<Element>)`. `Store.baked()` snapshots the
   dynamics overlaid by constants on every inflate. ⚠ `baked()` swallows supplier throwables.
@@ -428,7 +430,10 @@ Legend: ⚠ gotcha or hard rule, ↪ reuse pointer ("to do X use Y").
   `onChange(index)`), `Tab`/`ParentTab` (18 px strip over a `FrameLayout` body, `active(int)` silent, `indexOf(id)`,
   `onChange` click-only; `onActivate` never fires for the initial tab), `ComboButton` (fused `Button` segments, spacing
   forced to 0), `Text` (`text`, `color`, `textScale`, `ellipsize`, `lines`, wrap cache; equal text returns early),
-  `Switch` (`value`, `source`, `onToggle`; with a source the knob follows the source only), `Slider` (`range`,
+  `Dropdown implements Popup` (fixed/enum/supplier options pulled once per tick into `shown`, draw-time `selected`
+  supplier, list opens through `openPopup(this)`: 8 rows, wheel scroll, flips above when no room below, closes on
+  outside press/Esc/tab switch/disable/dialog/dispose; lists are painted in screen space from `bounds`, so no scaled
+  ancestors), `Switch` (`value`, `source`, `onToggle`; with a source the knob follows the source only), `Slider` (`range`,
   `value`, `stepped`, `icon`, `onChange` per move, `onCommit` on release; right click opens an `InputNumber` editor),
   `Stepper` (`InputNumber` + 9 px `+`/`-` column; `onChange`/`onCommit` also fire for code-driven writes), `InputText`
   (vanilla `EditBox`; `onChange`, `onSubmit`, `onCommit` on blur or Enter when changed since focus), `InputNumber`,
@@ -453,6 +458,10 @@ Legend: ⚠ gotcha or hard rule, ↪ reuse pointer ("to do X use Y").
   dimming under the top dialog, elevation per layer, pointer capture with other buttons swallowed, stale captures
   released on tick against GLFW's physical button state, `onFilesDrop`, `get(ResourceLocation)` (root then outside),
   hooks `closed()`, `afterReflow()`, `afterRender`, `pickExtra`; `removed()` disposes everything and resets cursors.
+  Popup layer (`core/Popup`): one at a time via `popup(Popup)`/`closePopup(Popup)`, reached from any element through
+  `Element.openPopup/closePopup` bubbling like `floatDragged`; painted after the dialogs at `LAYER_DEPTH * (dialogs + 1)`,
+  lower layers get the fake cursor and no tooltips, presses go to it first (unclaimed → close + consume), Esc closes it,
+  `init`/`openDialog`/`removed` close it.
   ⚠ `clear()` does not dispose code-added media widgets; only builder-registered disposables are freed on re-init.
 - `Panel extends ParentLinear` (PANEL face, `edgeFrame()`, `disposable`, `disposeInflated`, `filesDropped`), `Dialog
   extends Panel implements UIHost` (own `DataContext`, `init()`, `closed()`, `closeable()`, `close()`), `ScreenStack`

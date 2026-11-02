@@ -168,10 +168,8 @@
     "waterframes.gui.lit_image_only": "img only",
 
     "waterframes.gui.media.video_quality": "Video quality",
+    "waterframes.gui.media.video_quality.auto": "Auto",
     "waterframes.gui.media.audio_track": "Audio track",
-    "waterframes.gui.media.audio_track.none": "This media has a single audio track",
-    "waterframes.gui.media.audio_track.current": "Audio track: %s",
-    "waterframes.gui.media.audio_track.switch": "%s of %s, click to switch",
     "waterframes.gui.media.subtitles": "Subtitles",
     "waterframes.gui.media.buffer_time": "Buffer time",
     "waterframes.gui.media.speed": "Speed",

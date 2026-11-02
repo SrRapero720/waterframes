@@ -2,6 +2,7 @@ package me.srrapero720.waterui.screen;
 
 import me.srrapero720.waterui.core.Anchor;
 import me.srrapero720.waterui.core.Element;
+import me.srrapero720.waterui.core.Popup;
 import me.srrapero720.waterui.format.UIHost;
 import me.srrapero720.waterui.layout.ParentLinear;
 import me.srrapero720.waterui.theme.Drawable;
@@ -126,5 +127,16 @@ public class Panel extends ParentLinear {
     @Override
     protected void floatDragged(Element element, int grabX, int grabY) {
         if (screen != null) screen.drag(element, grabX, grabY);
+    }
+
+    // SAME ROUTE FOR THE POPUP LAYER
+    @Override
+    protected void openPopup(Popup popup) {
+        if (screen != null) screen.popup(popup);
+    }
+
+    @Override
+    protected void closePopup(Popup popup) {
+        if (screen != null) screen.closePopup(popup);
     }
 }

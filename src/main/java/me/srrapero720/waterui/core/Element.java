@@ -368,6 +368,18 @@ public abstract class Element {
         if (owner != null) owner.floatDragged(element, grabX, grabY);
     }
 
+    // BUBBLES A POPUP LAYER REQUEST UP THE TREE THE SAME WAY; THE SCREEN HOLDS ONE POPUP AT A TIME
+    protected void openPopup(Popup popup) {
+        AbstractParent owner = this.parent();
+        if (owner != null) owner.openPopup(popup);
+    }
+
+    // CLOSES popup ONLY WHILE IT IS THE ONE OPEN, SO A STALE CLOSE NEVER DROPS A NEWER LAYER
+    protected void closePopup(Popup popup) {
+        AbstractParent owner = this.parent();
+        if (owner != null) owner.closePopup(popup);
+    }
+
     /** Fires when this element gains keyboard focus. */
     public Element onFocus(Runnable onFocus) {
         this.pointer().focusIn = onFocus;

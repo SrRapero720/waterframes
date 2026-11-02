@@ -123,9 +123,24 @@ public final class DataContext {
         return () -> { try { return (Icon) h.invoke(); } catch (Throwable t) { return null; } };
     }
 
+    /** Live option list for {@code name} (any {@link List}), or a constant empty list when missing/mismatched. */
+    public Supplier<List<?>> listOr(String name) {
+        Supplier<?> reg = registered(name);
+        if (reg != null) {
+            probe(name, reg, List.class);
+            return () -> { try { return reg.get() instanceof List<?> l ? l : List.of(); } catch (Throwable t) { return List.of(); } };
+        }
+        Method m = resolve(name);
+        if (m == null) return List::of;
+        if (!List.class.isAssignableFrom(m.getReturnType())) return mismatch(name, m, "List", List::of);
+        MethodHandle h = handle(m);
+        if (h == null) return List::of;
+        return () -> { try { Object o = h.invoke(); return o instanceof List<?> l ? l : List.of(); } catch (Throwable t) { return List.of(); } };
+    }
+
     /** Live tooltip: read for the single hovered element only, so the supplier goes straight in. */
     public void tooltip(Element e, String name) {
-        e.tooltip(listOr(name));
+        e.tooltip(componentsOr(name));
     }
 
     // ---- TICKED BINDINGS (EVALUATED AT 20 Hz, CACHED) ----------------------------------
@@ -166,7 +181,7 @@ public final class DataContext {
 
     // ---- RESOLUTION --------------------------------------------------------------------
 
-    private Supplier<List<Component>> listOr(String name) {
+    private Supplier<List<Component>> componentsOr(String name) {
         Supplier<?> reg = registered(name);
         if (reg != null) {
             probe(name, reg, List.class);

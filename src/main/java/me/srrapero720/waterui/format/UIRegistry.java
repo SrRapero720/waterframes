@@ -9,6 +9,7 @@ import me.srrapero720.waterui.theme.Icon;
 import me.srrapero720.waterui.widget.Blank;
 import me.srrapero720.waterui.widget.Button;
 import me.srrapero720.waterui.widget.ComboButton;
+import me.srrapero720.waterui.widget.Dropdown;
 import me.srrapero720.waterui.widget.IconView;
 import me.srrapero720.waterui.widget.InputText;
 import me.srrapero720.waterui.widget.ItemIcon;
@@ -30,11 +31,13 @@ import net.minecraft.locale.Language;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.LongSupplier;
 
 import static me.srrapero720.waterui.WaterUI.LOGGER;
 
@@ -274,6 +277,26 @@ public final class UIRegistry {
         event("Switch", "onToggle", (e, handler) -> ((Switch) e).onChange(v -> handler.invoke(String.valueOf(v))));
         binding("Switch", "value", (e, name, data) -> { data.require(name, boolean.class); ((Switch) e).source(data.boolOr(name)); });
 
+        // OPTIONS ARE A TUPLE OF PRINTABLE LITERALS, AN ENUM CLASS NAME OR A LIVE LIST; NONE LEAVES A STYLING-ONLY FIELD CODE FEEDS LATER
+        register("Dropdown", Dropdown::new, false);
+        property("Dropdown", "options", (e, v, c) -> {
+            if (!(v instanceof UIValue.Tuple t)) throw new UIFormatException(null, -1, "options expects a tuple of strings");
+            List<String> fixed = new ArrayList<>(t.items().size());
+            for (UIValue item: t.items()) fixed.add(c.string(item));
+            ((Dropdown) e).options(fixed);
+        });
+        property("Dropdown", "enum", (e, v, c) -> ((Dropdown) e).options(enumClass(c.string(v))));
+        property("Dropdown", "selected", (e, v, c) -> ((Dropdown) e).selected(c.intValue(v)));
+        property("Dropdown", "placeholder", (e, v, c) -> ((Dropdown) e).placeholder(c.component(v)));
+        property("Dropdown", "textScale", (e, v, c) -> ((Dropdown) e).textScale(c.floatValue(v)));
+        event("Dropdown", "onSelect", (e, handler) -> ((Dropdown) e).onSelect(index -> handler.invoke(String.valueOf(index))));
+        binding("Dropdown", "options", (e, name, data) -> { data.require(name, List.class); ((Dropdown) e).source(data.listOr(name)); });
+        binding("Dropdown", "selected", (e, name, data) -> {
+            data.require(name, int.class, long.class);
+            LongSupplier index = data.numberOr(name);
+            ((Dropdown) e).selected(() -> (int) index.getAsLong());
+        });
+
         register("Slider", Slider::new, false);
         property("Slider", "min", (e, v, c) -> ((Slider) e).range(c.doubleValue(v), ((Slider) e).max));
         property("Slider", "max", (e, v, c) -> ((Slider) e).range(((Slider) e).min, c.doubleValue(v)));
@@ -387,6 +410,18 @@ public final class UIRegistry {
             return UUID.fromString(raw.trim());
         } catch (RuntimeException e) {
             throw new UIFormatException(null, -1, "invalid UUID '" + raw + "'");
+        }
+    }
+
+    // LOADED WITHOUT INITIALISING, SO A PACK NAMING A NON-ENUM CLASS RUNS NONE OF ITS STATIC CODE
+    @SuppressWarnings("unchecked")
+    private static Class<? extends Enum<?>> enumClass(String name) {
+        try {
+            Class<?> type = Class.forName(name.trim(), false, UIRegistry.class.getClassLoader());
+            if (!type.isEnum()) throw new UIFormatException(null, -1, "'" + name + "' is not an enum");
+            return (Class<? extends Enum<?>>) type;
+        } catch (ClassNotFoundException e) {
+            throw new UIFormatException(null, -1, "unknown enum class '" + name + "'");
         }
     }
 }

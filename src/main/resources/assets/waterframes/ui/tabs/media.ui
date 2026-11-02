@@ -6,7 +6,11 @@ import "constants/icons"
 var muted
 var audio_pos_tooltip
 var audio_tracks_ready
-var audio_track_tooltip
+var audio_tracks
+var audio_track
+var video_qualities_ready
+var video_qualities
+var video_quality
 var watervision_ready
 var String media_source
 
@@ -45,10 +49,11 @@ Parent[orientation=HORIZONTAL, spacing=6, width=FILL, align=CENTER] {
 // DECODING OPTIONS — ALL PLACEHOLDERS, TWO SIDE-BY-SIDE COLUMNS FILLING THE REMAINING SPACE
 Parent[orientation=HORIZONTAL, spacing=6, width=FILL, height=FILL] {
     Parent[orientation=VERTICAL, spacing=2, width=FILL] {
-        Button[component="translatable:waterframes.gui.media.video_quality", enabled=false, width=FILL]
-        // CYCLES THE AUDIO TRACKS OF THE MEDIA ON AIR (DUBS, COMMENTARY); THE TOOLTIP NAMES THE ONE PLAYING
-        Button[id="media/audio_track", component="translatable:waterframes.gui.media.audio_track", enabled=audio_tracks_ready,
-               tooltip=audio_track_tooltip, width=FILL, onClick=nextAudioTrack()]
+        // QUALITY AND AUDIO TRACK OF THE MEDIA ON AIR, PICKED PER VIEWER; THE LISTS FILL ONCE THE PLAYER RESOLVES THEM
+        Dropdown[id="media/video_quality", width=FILL, options=video_qualities, selected=video_quality, enabled=video_qualities_ready,
+                 placeholder="translatable:waterframes.gui.media.video_quality", tooltip="translatable:waterframes.gui.media.video_quality", onSelect=selectVideoQuality()]
+        Dropdown[id="media/audio_track", width=FILL, options=audio_tracks, selected=audio_track, enabled=audio_tracks_ready,
+                 placeholder="translatable:waterframes.gui.media.audio_track", tooltip="translatable:waterframes.gui.media.audio_track", onSelect=selectAudioTrack()]
         Button[component="translatable:waterframes.gui.media.subtitles", enabled=false, width=FILL]
         Slider[id="media/buffer_time", width=FILL, height=14, enabled=false, formatKey="waterframes.gui.media.buffer_time"]
     }

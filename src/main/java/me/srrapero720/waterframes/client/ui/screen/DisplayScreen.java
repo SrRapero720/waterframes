@@ -38,6 +38,7 @@ import net.minecraft.world.item.ItemStack;
 import org.lwjgl.glfw.GLFW;
 import org.watermedia.api.player.MRL;
 import org.watermedia.api.player.MediaPlayer;
+import org.watermedia.api.util.MediaQuality;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,6 +47,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static me.srrapero720.waterui.core.Element.translatable;
 import static me.srrapero720.waterui.core.Element.translate;
@@ -137,14 +139,51 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerVar("muted", () -> tile.data.muted);
         this.registerVar("reload_ready", () -> tile.mrl != null && tile.data.hasUrl());
         this.registerVar("watervision_ready", () -> tile.data.hasUrl() && tile.mrl != null && tile.mrl.status().loaded());
+        // TRACK AND QUALITY PICKS ARE THIS VIEWER'S: NEITHER IS SESSION STATE, EVERY CLIENT HEARS AND SEES ITS OWN
         this.registerVar("audio_tracks_ready", () -> tile.follower() != null && tile.follower().audioTracks().size() > 1);
-        // THE PICK IS THIS VIEWER'S: AUDIO IS NEVER SESSION STATE, EVERY CLIENT HEARS ITS OWN TRACK
-        this.registerUIEvent("nextAudioTrack", () -> {
+        this.registerVar("audio_tracks", () -> {
+            final MediaPlayer follower = tile.follower();
+            if (follower == null) return List.of();
+            final List<MediaPlayer.AudioTrack> tracks = follower.audioTracks();
+            final List<String> names = new ArrayList<>(tracks.size());
+            // A TRACK NAMES ITSELF, ELSE ITS LANGUAGE SPELLS IT OUT, ELSE ITS POSITION IN THE LIST
+            for (final MediaPlayer.AudioTrack track: tracks) {
+                names.add(track.name() != null ? track.name()
+                        : track.lang() != null ? Locale.forLanguageTag(track.lang()).getDisplayLanguage()
+                        : "#" + (names.size() + 1));
+            }
+            return names;
+        });
+        this.registerVar("audio_track", () -> {
+            final MediaPlayer follower = tile.follower();
+            return follower == null ? -1 : follower.audioTracks().indexOf(follower.audioTrack());
+        });
+        this.registerUIEvent("selectAudioTrack", payload -> {
             final MediaPlayer follower = tile.follower();
             if (follower == null) return;
             final List<MediaPlayer.AudioTrack> tracks = follower.audioTracks();
-            if (tracks.size() < 2) return;
-            follower.audioTrack(tracks.get((tracks.indexOf(follower.audioTrack()) + 1) % tracks.size()));
+            final int index = Integer.parseInt(payload[payload.length - 1]);
+            if (index >= 0 && index < tracks.size()) follower.audioTrack(tracks.get(index));
+        });
+        // QUALITIES THE SOURCE ON AIR OFFERS, LOWEST FIRST; A SINGLE ONE LEAVES THE PICKER DISABLED
+        this.registerVar("video_qualities_ready", () -> this.qualities().size() > 1);
+        this.registerVar("video_qualities", () -> {
+            final List<String> names = new ArrayList<>();
+            for (final MediaQuality quality: this.qualities()) {
+                names.add(quality == MediaQuality.UNKNOWN ? translate("waterframes.gui.media.video_quality.auto") : quality.height() + "p");
+            }
+            return names;
+        });
+        this.registerVar("video_quality", () -> {
+            final MediaPlayer follower = tile.follower();
+            final Set<MediaQuality> qualities = this.qualities();
+            return follower == null ? -1 : List.copyOf(qualities).indexOf(MediaQuality.closest(qualities, follower.quality()));
+        });
+        this.registerUIEvent("selectVideoQuality", payload -> {
+            final MediaPlayer follower = tile.follower();
+            final List<MediaQuality> qualities = List.copyOf(this.qualities());
+            final int index = Integer.parseInt(payload[payload.length - 1]);
+            if (follower != null && index >= 0 && index < qualities.size()) follower.quality(qualities.get(index));
         });
         // THUMBNAIL URL OF THE MEDIA ON AIR; LIVE BECAUSE THE MRL RESOLVES ASYNC AFTER THE SCREEN OPENS
         this.registerVar("media_source", () -> {
@@ -276,21 +315,6 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         String key = cachedLink ? "waterframes.gui.source.add"
                 : cachedQuery ? "waterframes.gui.source.search" : "waterframes.gui.source.hint";
         return List.of(translatable(key));
-    }
-
-    @UIVar("audio_track_tooltip")
-    public List<Component> audioTrackTooltip() {
-        final MediaPlayer follower = tile.follower();
-        final List<MediaPlayer.AudioTrack> tracks = follower != null ? follower.audioTracks() : List.of();
-        if (tracks.size() < 2) return List.of(translatable("waterframes.gui.media.audio_track.none"));
-        final MediaPlayer.AudioTrack current = follower.audioTrack();
-        // A TRACK NAMES ITSELF, ELSE ITS LANGUAGE SPELLS IT OUT, ELSE ITS POSITION IN THE LIST
-        final int index = Math.max(0, tracks.indexOf(current));
-        final String name = current != null && current.name() != null ? current.name()
-                : current != null && current.lang() != null ? Locale.forLanguageTag(current.lang()).getDisplayLanguage()
-                : "#" + (index + 1);
-        return List.of(translatable("waterframes.gui.media.audio_track.current", ChatFormatting.AQUA + name),
-                translatable("waterframes.gui.media.audio_track.switch", index + 1, tracks.size()));
     }
 
     @UIVar("audio_pos_tooltip")
@@ -467,6 +491,13 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     }
 
     // ROW MODEL OF WHAT THE TILE PLAYS: THE PLAYLIST ROW'S OWN, ELSE ONE BUILT ONCE PER LOOSE URL, ELSE null
+    // QUALITY KEYS OF THE SOURCE ON AIR IN ENUM ORDER (LOWEST FIRST), EMPTY UNTIL THE MRL RESOLVES
+    private Set<MediaQuality> qualities() {
+        if (tile.mrl == null || !tile.mrl.status().loaded()) return Set.of();
+        final MRL.Source source = tile.mrl.source(tile.data.getSource());
+        return source != null ? source.qualities().keySet() : Set.of();
+    }
+
     private SourceRow onAir() {
         if (!this.tile.data.hasUrl()) return null;
         final Entry entry = this.playingEntry();
