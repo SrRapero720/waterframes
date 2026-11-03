@@ -36,7 +36,7 @@ Legend: ⚠ gotcha or hard rule, ↪ reuse pointer ("to do X use Y").
 
 | Path | Content |
 |---|---|
-| `src/main/java/me/srrapero720/waterframes/` | `WaterFrames` (entry), `DisplaysConfig`, `DisplaysRegistry`, `common/` (block, data, entity, network, commands, item, compat, util/geo), `client/` (display, rendering, sound, ui) |
+| `src/main/java/me/srrapero720/waterframes/` | `WaterFrames` (entry), `WaterFramesConfig`, `WaterFramesManager`, `common/` (block, data, entity, network, commands, item, compat, util/geo), `client/` (display, rendering, sound, ui) |
 | `src/main/java/me/srrapero720/waterui/` | The toolkit: `core`, `layout`, `format`, `theme`, `widget`, `screen` |
 | `src/main/java/dev/ryanhcode/sable`, `org/valkyrienskies` | Compile-only stubs of third party APIs, excluded from the jar |
 | `src/main/resources/assets/waterframes/` | `ui/**` (`.ui` documents, themes, icon table), `textures/screen_atlas.png`, blockstates, models, lang, sounds |
@@ -61,7 +61,7 @@ Legend: ⚠ gotcha or hard rule, ↪ reuse pointer ("to do X use Y").
 - ⚠ `TV_BOX.shape` is a full cube while its `box` is a window on the front face. ⚠ `AlignedBox.scale(1.01f)` on the TV
   hitbox scales around the block origin.
 - ↪ To add a kind: add the enum row, fill `permission()`, `projectionDefault()`, `box()` and `shape()`, register its
-  block, item and tile type in `DisplaysRegistry`.
+  block, item and tile type in `WaterFramesManager`.
 
 ### `DisplayBlock` (final, `common/block`)
 - One `BaseEntityBlock` for every kind; `caps` is the only per-kind data. `of(caps)` is the only factory: it writes the
@@ -147,7 +147,7 @@ Legend: ⚠ gotcha or hard rule, ↪ reuse pointer ("to do X use Y").
   file or `://`), `getDistance(tile | level + pos, position)` (Sable, then Valkyrien Skies, then plain), `deltaFrames()`.
   ↪ Every reach check goes through `getDistance`.
 
-### `DisplaysConfig`
+### `WaterFramesConfig`
 - Server keys (section.key default, getter): `rendering.maxWidth` 40 `maxWidth()`, `maxHeight` 40, `maxRenderDistance`
   64 `maxRenDis()`, `maxProjectionDistance` 64 `maxProjDis()`, `keepRendering` true `keepsRendering()`;
   `multimedia.maxVolumeDistance` 64 `maxVolDis()`, `maxVolume` 100 (10..100, WaterMedia clamps gain at 100) `maxVol()`,
@@ -170,7 +170,7 @@ Legend: ⚠ gotcha or hard rule, ↪ reuse pointer ("to do X use Y").
   `blacklistMode`), `addOnWhitelist` (validates against `HOSTS_PATTERN`, false otherwise), `removeOnWhitelist`,
   `toggleWhitelist`.
 
-### `DisplaysRegistry`
+### `WaterFramesManager`
 - Blocks (`frame`, `projector`, `tv`, `big_tv`, `tv_box` = `DisplayBlock.of(caps)`), items (`remote` + one `BlockItem`
   each), five tile types (`TILE_*`, all `DisplayTile`; `tileType(caps)` maps a kind to its holder; kept per kind so saved
   worlds keep their displays), the `display` sound event, the `remote` data component (`CodecManager` codecs), the

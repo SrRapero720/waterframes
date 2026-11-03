@@ -1,6 +1,7 @@
 package me.srrapero720.waterframes.common.block.entity;
 
-import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.WaterFramesClient;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.Display;
 import me.srrapero720.waterframes.client.ui.screen.DisplayScreen;
@@ -22,7 +23,7 @@ import me.srrapero720.waterframes.common.network.packets.PositionPacket;
 import me.srrapero720.waterframes.common.network.packets.PreviousPacket;
 import me.srrapero720.waterframes.common.network.packets.SeekPacket;
 import me.srrapero720.waterframes.common.network.packets.VolumePacket;
-import me.srrapero720.waterframes.common.util.geo.AlignedBox;
+import me.srrapero720.waterframes.common.util.AlignedBox;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -165,7 +166,7 @@ public class DisplayTile extends BlockEntity {
     }
 
     /** Releases every session of a level going away; the tiles themselves may never hear about it. */
-    public static void releaseSessions(final Level level) {
+    public static void close(final Level level) {
         for (final Iterator<DisplayTile> it = SESSIONS.iterator(); it.hasNext();) {
             final DisplayTile tile = it.next();
             if (tile.level != level) continue;
@@ -228,9 +229,7 @@ public class DisplayTile extends BlockEntity {
 
     /** Opens this display's settings or remote screen. Client-only: no server caller ever links its body. */
     public void openScreen(final boolean remote) {
-        final Minecraft client = Minecraft.getInstance();
-        if (client.player == null) return;
-        client.setScreen(remote ? new RemoteScreen(client.player, this) : new DisplayScreen(this));
+        WaterFramesClient.openScreen(this, remote ? RemoteScreen::new : DisplayScreen::new);
     }
 
     // ==========================================================================
@@ -318,7 +317,7 @@ public class DisplayTile extends BlockEntity {
         }
 
         // LIGHT FOLLOWS THE BRIGHTNESS WHILE ENABLED AND GOES OUT THE TICK IT IS SWITCHED OFF
-        final boolean lit = DisplaysConfig.forceLightOnPlay() || DisplaysConfig.useLightOnPlay() && this.data.lit;
+        final boolean lit = WaterFramesConfig.forceLightOnPlay() || WaterFramesConfig.useLightOnPlay() && this.data.lit;
         final int light = lit && this.data.active && this.data.hasUrl() ? (int) ((this.data.brightness / 255f) * this.level.getMaxLightLevel()) : 0;
         if (this.lightLevel != light) {
             this.lightLevel = light;

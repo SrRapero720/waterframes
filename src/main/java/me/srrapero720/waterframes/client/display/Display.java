@@ -5,8 +5,8 @@ import me.srrapero720.waterframes.client.sound.DisplaySound;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
 import me.srrapero720.waterframes.common.network.packets.MediaReportPacket;
-import me.srrapero720.waterframes.common.util.geo.AlignedBox;
-import me.srrapero720.waterframes.common.util.geo.Axis;
+import me.srrapero720.waterframes.common.util.AlignedBox;
+import me.srrapero720.waterframes.common.util.Axis;
 import org.watermedia.api.player.ALEngine;
 import org.watermedia.api.player.MRL;
 import org.watermedia.api.player.MediaPlayer;
@@ -56,7 +56,7 @@ public class Display extends AbstractTexture {
         // THE BLOCK POSITION IS THE DISPLAY'S IDENTITY: ONE TEXTURE NAME PER BLOCK FOR ITS WHOLE LIFE
         BlockPos pos = tile.getBlockPos();
         this.location = WaterFrames.asResource("display_at_" + pos.getX() + "_" + pos.getY() + "_" + pos.getZ());
-        DisplaysRegistry.registerTexture(this.location, this);
+        WaterFramesClient.registerTexture(this.location, this);
         DisplayList.add(this);
         this.openPlayer();
     }
@@ -88,7 +88,7 @@ public class Display extends AbstractTexture {
 
         // VOLUME AND MUTE STAY PRIVATE TO THIS VIEWER, THE SESSION GRANTS NO SAY OVER THEM. NOTHING
         // IS STARTED HERE EITHER: A START REQUEST WOULD REWIND THE MEDIA FOR EVERYONE WATCHING
-        if (DisplaysConfig.soundIntegration()) {
+        if (WaterFramesConfig.soundIntegration()) {
             // THE GAME OWNS THE GAIN ONCE THE SOUND REGISTERS; STAY SILENT UNTIL THEN
             this.mediaPlayer.mute(true);
         } else {
@@ -194,7 +194,7 @@ public class Display extends AbstractTexture {
             }
         }
 
-        if (!DisplaysConfig.soundIntegration()) {
+        if (!WaterFramesConfig.soundIntegration()) {
             this.dropSounds();
 
             // A MUTED PLAYER GETS NO GAIN UPDATES; THE BACKEND RESTARTS ITS BUFFERS ON EVERY GAIN WRITE
@@ -337,7 +337,7 @@ public class Display extends AbstractTexture {
 
     public void setMuteMode(boolean mute) {
         // UNDER ENGINE INTEGRATION THE PACKET'S DATA CHANGE ALREADY DRIVES THE INSTANCE GAIN
-        if (this.mediaPlayer == null || DisplaysConfig.soundIntegration()) return;
+        if (this.mediaPlayer == null || WaterFramesConfig.soundIntegration()) return;
         this.mediaPlayer.mute(mute);
     }
 
@@ -361,7 +361,7 @@ public class Display extends AbstractTexture {
             this.mediaPlayer = null;
         }
 
-        DisplaysRegistry.unregisterTexture(this.location);
+        WaterFramesClient.unregisterTexture(this.location);
         DisplayList.remove(this);
     }
 
@@ -372,7 +372,7 @@ public class Display extends AbstractTexture {
     public int rangedVol(int volume, int min, int max) {
         volume = this.falloffVol(volume, min, max);
 
-        if (DisplaysConfig.useMasterVolume()) {
+        if (WaterFramesConfig.useMasterVolume()) {
             volume = (int) (volume * (Minecraft.getInstance().options.getSoundSourceVolume(SoundSource.MASTER)));
         }
 

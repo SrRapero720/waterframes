@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.client.ui.screen.widget;
 
-import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterui.theme.Drawable;
 import me.srrapero720.waterui.widget.InputText;
 import net.minecraft.ChatFormatting;
@@ -79,7 +79,7 @@ public class UrlField extends InputText {
         if (this.url() == null) {
             return List.of(Component.literal(ChatFormatting.BLUE + translate("waterframes.gui.url.tooltip.empty")));
         }
-        if (valid() && !DisplaysConfig.canSave(Minecraft.getInstance().player, this.text())) {
+        if (valid() && !WaterFramesConfig.canSave(Minecraft.getInstance().player, this.text())) {
             return List.of(Component.literal(ChatFormatting.RED + translate("waterframes.gui.url.tooltip.not_whitelisted")));
         }
         // NOTHING OF ITS OWN: FALL BACK TO THE GENERIC tooltip= SUPPLIER INSTEAD OF DROPPING IT (M10)

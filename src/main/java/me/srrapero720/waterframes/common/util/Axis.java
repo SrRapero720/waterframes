@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.common.util.geo;
+package me.srrapero720.waterframes.common.util;
 
 import net.minecraft.core.Direction;
 

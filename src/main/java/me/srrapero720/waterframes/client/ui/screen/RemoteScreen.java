@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.client.ui.screen;
 
-import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterui.format.UIVar;
 import me.srrapero720.waterui.screen.WaterScreen;
@@ -9,6 +9,7 @@ import me.srrapero720.waterui.theme.Icon;
 import me.srrapero720.waterframes.common.block.data.types.PositionHorizontal;
 import me.srrapero720.waterframes.common.block.data.types.PositionVertical;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 
 public class RemoteScreen extends WaterScreen {
@@ -18,10 +19,10 @@ public class RemoteScreen extends WaterScreen {
     private final DisplayTile tile;
     private final Player player;
 
-    public RemoteScreen(Player player, DisplayTile tile) {
+    public RemoteScreen(DisplayTile tile) {
         super(WaterFrames.asResource("remote"), WIDTH, HEIGHT);
         this.tile = tile;
-        this.player = player;
+        this.player = Minecraft.getInstance().player;
 
         // ONE-LINERS REGISTER STRAIGHT INTO THE HOST STORE (§5.6, §12.2); COMPOSED GATES MIX
         // CAPABILITY && RANGE HERE BECAUSE THE FORMAT HAS NO EXPRESSIONS. remote.ui DECLARES THE repeat
@@ -55,7 +56,7 @@ public class RemoteScreen extends WaterScreen {
     @UIVar("signal_icon")
     public Icon signalIcon() {
         double distance = WaterFrames.getDistance(tile, player.position());
-        double range = DisplaysConfig.maxRcDis();
+        double range = WaterFramesConfig.maxRcDis();
         if (distance >= range) return Icons.SIGNAL_0;
         int pct = (int) (distance / range * 100);
         return pct < 25 ? Icons.SIGNAL_4 : pct < 50 ? Icons.SIGNAL_3 : pct < 75 ? Icons.SIGNAL_2 : Icons.SIGNAL_1;
@@ -63,7 +64,7 @@ public class RemoteScreen extends WaterScreen {
 
     // RANGE GATE: EVERY POWER AND TRANSPORT BUTTON DIMS ONCE THE PLAYER STEPS OUT OF RC RANGE
     private boolean inRange() {
-        return WaterFrames.getDistance(tile, player.position()) < DisplaysConfig.maxRcDis();
+        return WaterFrames.getDistance(tile, player.position()) < WaterFramesConfig.maxRcDis();
     }
 
     @Override

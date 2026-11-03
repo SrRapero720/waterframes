@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.common.network;
 
-import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.network.packets.ActivePacket;
@@ -165,7 +165,7 @@ public final class DisplayNetwork {
     // THE SENDER MUST BE ALLOWED TO USE THE DISPLAY AND BE WITHIN REACH OF IT; ANYTHING ELSE IS A FORGED OR STALE
     // PACKET AND IS DROPPED WITHOUT TOUCHING THE BLOCK. ONE WARNING: A HOSTILE CLIENT MUST NOT FLOOD THE LOG
     private static boolean allowed(final IPayloadContext context, final DisplayTile tile) {
-        if (context.player() instanceof final ServerPlayer player && DisplaysConfig.canControl(player, tile)) return true;
+        if (context.player() instanceof final ServerPlayer player && WaterFramesConfig.canControl(player, tile)) return true;
         if (!rejectWarned) {
             rejectWarned = true;
             LOGGER.warn(IT, "Dropped a display command from {} for {}: not allowed or out of reach", context.player().getName().getString(), tile.getBlockPos());

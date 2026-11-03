@@ -1,6 +1,6 @@
 package me.srrapero720.waterframes.client.ui.screen;
 
-import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterui.format.UIEvent;
 import me.srrapero720.waterui.format.UIVar;
@@ -223,7 +223,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerUIEvent("openWatervision", () -> { WVCompat.openScreen(tile.data.getUrl(), tile.data.volume); tile.setPause(true, true); });
         // TOGGLE PAYLOADS AND ROW TOKENS ARRIVE AT args[1], AFTER THE ELEMENT id (§12.1, §12.2)
         this.registerUIEvent("mute", args -> tile.setMute(true, Boolean.parseBoolean(args[1])));
-        this.registerUIEvent("shaderMode", args -> DisplaysConfig.shaderMode(Boolean.parseBoolean(args[1])));
+        this.registerUIEvent("shaderMode", args -> WaterFramesConfig.shaderMode(Boolean.parseBoolean(args[1])));
         this.registerUIEvent("submit", this::submit);
         this.registerUIEvent("upload", () -> this.openDialog(new UploadScreen(this::append)));
         this.registerUIEvent("deleteSource", this::deleteSelected);
@@ -246,19 +246,19 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerVar("render_behind", tile.caps.renderBehind());
         this.registerVar("hide_model", tile.canHideModel());
         this.registerVar("watervision", WVCompat.installed());
-        this.registerVar("max_width", DisplaysConfig.maxWidth());
-        this.registerVar("max_height", DisplaysConfig.maxHeight());
-        this.registerVar("max_render_distance", DisplaysConfig.maxRenDis());
-        this.registerVar("max_projection_distance", DisplaysConfig.maxProjDis());
-        this.registerVar("max_volume", DisplaysConfig.maxVol());
-        this.registerVar("max_volume_distance", DisplaysConfig.maxVolDis());
+        this.registerVar("max_width", WaterFramesConfig.maxWidth());
+        this.registerVar("max_height", WaterFramesConfig.maxHeight());
+        this.registerVar("max_render_distance", WaterFramesConfig.maxRenDis());
+        this.registerVar("max_projection_distance", WaterFramesConfig.maxProjDis());
+        this.registerVar("max_volume", WaterFramesConfig.maxVol());
+        this.registerVar("max_volume_distance", WaterFramesConfig.maxVolDis());
         // THE EMBLEM IS AUTHORED IN display_preview.ui AS AN outsideAnchor ItemIcon; JAVA ONLY SUPPLIES THE STACK
         this.registerVar("emblem_item", new ItemStack(tile.getBlockState().getBlock()));
         this.registerVar("emblem_name", tile.getBlockState().getBlock().getName().getString());
 
         // MUTABLE TILE STATE AS SUPPLIERS: THE final vars OF THE DOCS SNAPSHOT THEM FRESH ON EVERY
         // RE-INFLATE (§5.6), SO A RESIZE RE-SEEDS THE KNOBS FROM THE CURRENT DATA, NOT THE OPEN-TIME ONE
-        this.registerVar("volume_min_max", () -> Math.min(tile.data.maxVolumeDistance, DisplaysConfig.maxVolDis()));
+        this.registerVar("volume_min_max", () -> Math.min(tile.data.maxVolumeDistance, WaterFramesConfig.maxVolDis()));
         this.registerVar("width", tile.data::getWidth);
         this.registerVar("height", tile.data::getHeight);
         this.registerVar("rotation", () -> tile.data.rotation);
@@ -278,7 +278,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerVar("show_model", () -> tile.canHideModel() && tile.isVisible());
         this.registerVar("flip_x", () -> tile.data.flipX);
         this.registerVar("flip_y", () -> tile.data.flipY);
-        this.registerVar("shader_mode", DisplaysConfig::shaderMode);
+        this.registerVar("shader_mode", WaterFramesConfig::shaderMode);
         this.registerVar("pos_x", () -> tile.data.getPosX().name());
         this.registerVar("pos_y", () -> tile.data.getPosY().name());
     }
@@ -736,7 +736,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     // PLAYLIST FIRST (THE SERVER PICKS THE URL OUT OF IT), THEN THE DATA PATCH; ONLY KEYS DIFFERING
     // FROM THE TILE TRAVEL, AND A SECTION WHOSE WIDGETS RESOLVED NULL CONTRIBUTES NOTHING (H4)
     private void flush() {
-        if (tile.isRemoved() || !DisplaysConfig.canSave(Minecraft.getInstance().player, this.url())) return;
+        if (tile.isRemoved() || !WaterFramesConfig.canSave(Minecraft.getInstance().player, this.url())) return;
         if (this.listChanged()) {
             this.listSent = this.ticks;
             DisplayNetwork.sendServer(new DataListSyncPacket(tile.getBlockPos(), this.listNbt()));

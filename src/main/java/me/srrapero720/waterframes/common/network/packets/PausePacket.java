@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.common.network.packets;
 
 import io.netty.buffer.ByteBuf;
-import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.network.ControlPacket;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
@@ -27,7 +27,7 @@ public record PausePacket(BlockPos pos, boolean paused, boolean rewind) implemen
 
     @Override
     public void apply(DisplayTile tile) {
-        tile.data.paused = (DisplaysConfig.useMasterModeRedstone() && tile.isPowered()) || paused;
+        tile.data.paused = (WaterFramesConfig.useMasterModeRedstone() && tile.isPowered()) || paused;
         // A RESUME BY HAND ENDS THE REDSTONE PAUSE TOO; THE SIGNAL DROPPING LATER HAS NOTHING LEFT TO UNDO
         if (!tile.data.paused) tile.data.redstonePaused = false;
 

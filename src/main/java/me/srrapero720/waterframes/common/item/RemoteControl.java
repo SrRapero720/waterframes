@@ -1,7 +1,6 @@
 package me.srrapero720.waterframes.common.item;
 
-import me.srrapero720.waterframes.DisplaysConfig;
-import me.srrapero720.waterframes.DisplaysRegistry;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.item.data.RemoteData;
@@ -10,7 +9,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -38,7 +36,7 @@ public class RemoteControl extends Item {
 
     /** Whether the stack is a remote bound to that block of that level. */
     public static boolean bound(final ItemStack stack, final Level level, final BlockPos pos) {
-        final RemoteData data = stack.get(DisplaysRegistry.REMOTE_DATA);
+        final RemoteData data = stack.get(WaterFrames.REMOTE_DATA);
         return data != null && data.matches(level, pos);
     }
 
@@ -47,26 +45,26 @@ public class RemoteControl extends Item {
         final ItemStack stack = player.getItemInHand(hand);
         if (hand == InteractionHand.OFF_HAND) return InteractionResultHolder.fail(stack);
 
-        if (!DisplaysConfig.canInteractRemote(player)) {
+        if (!WaterFramesConfig.canInteractRemote(player)) {
             feedback(player, "waterframes.common.access.denied", ChatFormatting.DARK_RED, 0.5f);
             return InteractionResultHolder.fail(stack);
         }
 
-        final RemoteData data = stack.get(DisplaysRegistry.REMOTE_DATA);
+        final RemoteData data = stack.get(WaterFrames.REMOTE_DATA);
         if (data == null) {
             feedback(player, "waterframes.remote.bound.failed", ChatFormatting.RED, 0.75f);
             return InteractionResultHolder.pass(stack);
         }
 
         if (player.isCrouching()) {
-            stack.set(DisplaysRegistry.REMOTE_DATA, null);
+            stack.set(WaterFrames.REMOTE_DATA, null);
             feedback(player, "waterframes.remote.unbound.success", ChatFormatting.AQUA, 1.25f);
             return InteractionResultHolder.success(stack);
         }
 
         // RANGE FIRST: A FAR AWAY BINDING MUST NOT MAKE THE SERVER LOAD A CHUNK JUST TO SAY NO
         final BlockPos pos = data.pos();
-        if (data.matches(level, pos) && WaterFrames.getDistance(level, pos, player.position()) < DisplaysConfig.maxRcDis()) {
+        if (data.matches(level, pos) && WaterFrames.getDistance(level, pos, player.position()) < WaterFramesConfig.maxRcDis()) {
             if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof DisplayTile) {
                 if (player instanceof final ServerPlayer server) DisplayNetwork.openScreen(server, pos, true);
                 return InteractionResultHolder.success(stack);
@@ -76,7 +74,7 @@ public class RemoteControl extends Item {
         }
 
         // THE DISPLAY IS GONE OR LIVES IN ANOTHER DIMENSION: THE BINDING IS WORTHLESS, DROP IT
-        stack.set(DisplaysRegistry.REMOTE_DATA, null);
+        stack.set(WaterFrames.REMOTE_DATA, null);
         feedback(player, "waterframes.remote.display.failed", ChatFormatting.RED, 0.75f);
         return InteractionResultHolder.fail(stack);
     }
@@ -85,10 +83,10 @@ public class RemoteControl extends Item {
     public InteractionResult useOn(final UseOnContext context) {
         final Player player = context.getPlayer();
         final ItemStack stack = context.getItemInHand();
-        if (player == null || context.getHand() == InteractionHand.OFF_HAND || stack.has(DisplaysRegistry.REMOTE_DATA) || !player.isCrouching())
+        if (player == null || context.getHand() == InteractionHand.OFF_HAND || stack.has(WaterFrames.REMOTE_DATA) || !player.isCrouching())
             return InteractionResult.PASS;
 
-        if (!DisplaysConfig.canBindRemote(player)) {
+        if (!WaterFramesConfig.canBindRemote(player)) {
             feedback(player, "waterframes.common.access.denied", ChatFormatting.DARK_RED, 0.5f);
             return InteractionResult.FAIL;
         }
@@ -96,7 +94,7 @@ public class RemoteControl extends Item {
         final Level level = context.getLevel();
         final BlockPos pos = context.getClickedPos();
         if (level.getBlockEntity(pos) instanceof DisplayTile) {
-            stack.set(DisplaysRegistry.REMOTE_DATA, new RemoteData(level, pos));
+            stack.set(WaterFrames.REMOTE_DATA, new RemoteData(level, pos));
             feedback(player, "waterframes.remote.bound.success", ChatFormatting.AQUA, 1.25f);
             return InteractionResult.SUCCESS;
         }
@@ -128,7 +126,7 @@ public class RemoteControl extends Item {
 
     @Override
     public boolean isFoil(final ItemStack stack) {
-        return stack.has(DisplaysRegistry.REMOTE_DATA);
+        return stack.has(WaterFrames.REMOTE_DATA);
     }
 
     @Override

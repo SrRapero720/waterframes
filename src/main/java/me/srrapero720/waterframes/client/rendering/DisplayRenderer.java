@@ -1,25 +1,23 @@
 package me.srrapero720.waterframes.client.rendering;
 
 import com.mojang.blaze3d.vertex.*;
-import me.srrapero720.waterframes.DisplaysConfig;
-import me.srrapero720.waterframes.WaterFrames;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
-import me.srrapero720.waterframes.common.util.geo.Axis;
-import me.srrapero720.waterframes.common.util.geo.Facing;
-import me.srrapero720.waterframes.common.util.geo.AlignedBox;
-import me.srrapero720.waterframes.common.util.geo.BoxCorner;
-import me.srrapero720.waterframes.common.util.geo.BoxFace;
+import me.srrapero720.waterframes.common.util.Axis;
+import me.srrapero720.waterframes.common.util.Facing;
+import me.srrapero720.waterframes.common.util.AlignedBox;
+import me.srrapero720.waterframes.common.util.BoxCorner;
+import me.srrapero720.waterframes.common.util.BoxFace;
 
 import java.util.function.Function;
 
@@ -52,7 +50,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     @Override
     public void render(DisplayTile tile, float partialTicks, PoseStack pose, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         var display = tile.display;
-        if (display == null || !DisplaysConfig.keepsRendering()) return;
+        if (display == null || !WaterFramesConfig.keepsRendering()) return;
 
         var direction = tile.getDirection();
         var box = tile.getRenderBox();
@@ -89,7 +87,7 @@ public class DisplayRenderer implements BlockEntityRenderer<DisplayTile> {
     private void vertex(PoseStack pose, MultiBufferSource source, AlignedBox box, BoxFace boxface, Facing facing,
                         boolean front, boolean back, boolean flipX, boolean flipY, int brightness, int alpha, ResourceLocation texture) {
 
-        VertexConsumer builder = source.getBuffer(DisplaysConfig.shaderMode() ? RenderType.entityTranslucentCull(texture) : BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE.apply(texture));
+        VertexConsumer builder = source.getBuffer(WaterFramesConfig.shaderMode() ? RenderType.entityTranslucentCull(texture) : BLOCK_TRANSLUCENT_CULL_CUSTOM_TEXTURE.apply(texture));
         Vec3i normal = facing.normal;
         if (front) {
             for (BoxCorner corner: boxface.corners) {

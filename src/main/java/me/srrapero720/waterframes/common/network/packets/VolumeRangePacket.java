@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.common.network.packets;
 
 import io.netty.buffer.ByteBuf;
-import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.network.ControlPacket;
 import me.srrapero720.waterframes.common.network.DisplayNetwork;
@@ -25,7 +25,7 @@ public record VolumeRangePacket(BlockPos pos, int min, int max) implements Contr
 
     @Override
     public void apply(DisplayTile tile) {
-        tile.data.maxVolumeDistance = DisplaysConfig.maxVolDis(max);
+        tile.data.maxVolumeDistance = WaterFramesConfig.maxVolDis(max);
         tile.data.minVolumeDistance = Math.clamp(min, 0, tile.data.maxVolumeDistance);
     }
 }

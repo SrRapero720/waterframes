@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.common.util.geo;
+package me.srrapero720.waterframes.common.util;
 
 /**
  * The 8 corners of an {@link AlignedBox}, each one described by the face it touches on

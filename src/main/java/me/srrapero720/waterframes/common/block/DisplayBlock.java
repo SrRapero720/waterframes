@@ -1,8 +1,8 @@
 package me.srrapero720.waterframes.common.block;
 
 import com.mojang.serialization.MapCodec;
-import me.srrapero720.waterframes.DisplaysConfig;
-import me.srrapero720.waterframes.DisplaysRegistry;
+import me.srrapero720.waterframes.WaterFramesConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.data.DisplayCaps;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.item.RemoteControl;
@@ -201,7 +201,7 @@ public final class DisplayBlock extends BaseEntityBlock implements SimpleWaterlo
         if (stack.getItem() instanceof RemoteControl && RemoteControl.bound(stack, level, pos)) {
             if (level.getBlockEntity(pos) instanceof final DisplayTile tile) {
                 if (player instanceof final ServerPlayer server) {
-                    if (DisplaysConfig.canControl(server, tile)) tile.setPause(false, !tile.data.paused);
+                    if (WaterFramesConfig.canControl(server, tile)) tile.setPause(false, !tile.data.paused);
                 } else {
                     // A PUFF OF AQUA DUST AROUND THE BLOCK CENTRE, THE REMOTE'S ACKNOWLEDGEMENT
                     final Vec3 center = Vec3.atCenterOf(pos);
@@ -221,7 +221,7 @@ public final class DisplayBlock extends BaseEntityBlock implements SimpleWaterlo
 
     @Override
     protected InteractionResult useWithoutItem(final BlockState state, final Level level, final BlockPos pos, final Player player, final BlockHitResult hit) {
-        if (player instanceof final ServerPlayer server && DisplaysConfig.canInteractBlock(player, this)) DisplayNetwork.openScreen(server, pos, false);
+        if (player instanceof final ServerPlayer server && WaterFramesConfig.canInteractBlock(player, this)) DisplayNetwork.openScreen(server, pos, false);
         return InteractionResult.SUCCESS;
     }
 
@@ -237,7 +237,7 @@ public final class DisplayBlock extends BaseEntityBlock implements SimpleWaterlo
     @Override
     public void neighborChanged(final BlockState state, final Level level, final BlockPos pos, final Block block, final BlockPos neighborPos, final boolean isMoving) {
         super.neighborChanged(state, level, pos, block, neighborPos, isMoving);
-        if (!DisplaysConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof final DisplayTile tile)) return;
+        if (!WaterFramesConfig.useRedstone() || !(level.getBlockEntity(pos) instanceof final DisplayTile tile)) return;
         final boolean signal = level.hasNeighborSignal(pos);
         if (state.getValue(POWERED) == signal) return;
 
@@ -249,7 +249,7 @@ public final class DisplayBlock extends BaseEntityBlock implements SimpleWaterlo
             if (tile.data.paused) return;
             tile.data.redstonePaused = true;
             tile.setPause(false, true);
-        } else if (tile.data.redstonePaused || DisplaysConfig.useMasterModeRedstone()) {
+        } else if (tile.data.redstonePaused || WaterFramesConfig.useMasterModeRedstone()) {
             tile.data.redstonePaused = false;
             tile.setPause(false, false);
         }
@@ -271,7 +271,7 @@ public final class DisplayBlock extends BaseEntityBlock implements SimpleWaterlo
 
     @Override
     public BlockEntity newBlockEntity(final BlockPos pos, final BlockState state) {
-        return new DisplayTile(DisplaysRegistry.tileType(this.caps), pos, state);
+        return new DisplayTile(WaterFrames.tileType(this.caps), pos, state);
     }
 
     @Override

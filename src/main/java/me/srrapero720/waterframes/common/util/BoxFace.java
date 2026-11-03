@@ -1,4 +1,4 @@
-package me.srrapero720.waterframes.common.util.geo;
+package me.srrapero720.waterframes.common.util;
 
 /**
  * A face of an {@link AlignedBox}: its 4 corners in counter-clockwise winding plus the

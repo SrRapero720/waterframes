@@ -1,8 +1,7 @@
 package me.srrapero720.waterframes.common.block.data;
 
-import me.srrapero720.waterframes.DisplaysConfig;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
-import me.srrapero720.waterframes.common.block.DisplayBlock;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import me.srrapero720.waterframes.common.block.data.types.AudioPosition;
@@ -112,10 +111,10 @@ public class DisplayData {
     public float rotation = 0;
     public int alpha = 255;
     public int brightness = 255;
-    public int renderDistance = DisplaysConfig.maxRenDis(32);
+    public int renderDistance = WaterFramesConfig.maxRenDis(32);
 
-    public int volume = DisplaysConfig.maxVol();
-    public int maxVolumeDistance = DisplaysConfig.maxVolDis(20);
+    public int volume = WaterFramesConfig.maxVol();
+    public int maxVolumeDistance = WaterFramesConfig.maxVolDis(20);
     public int minVolumeDistance = Math.min(5, maxVolumeDistance);
 
     public boolean loop = true;
@@ -129,7 +128,7 @@ public class DisplayData {
     public boolean renderBothSides = false;
 
     // PROJECTOR VALUES
-    public float projectionDistance = DisplaysConfig.maxProjDis(8f);
+    public float projectionDistance = WaterFramesConfig.maxProjDis(8f);
     public float audioOffset = 0;
 
     /**
@@ -318,13 +317,13 @@ public class DisplayData {
             this.max.y = nbt.getFloat(MAX_Y);
             this.rotation = nbt.getFloat(ROTATION);
         }
-        this.renderDistance = DisplaysConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
+        this.renderDistance = WaterFramesConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
         this.flipX = nbt.getBoolean(FLIP_X);
         this.flipY = nbt.getBoolean(FLIP_Y);
         this.alpha = nbt.contains(ALPHA) ? nbt.getInt(ALPHA) : this.alpha;
         this.brightness = nbt.contains(BRIGHTNESS) ? nbt.getInt(BRIGHTNESS) : this.brightness;
-        this.volume = nbt.contains(VOLUME) ? DisplaysConfig.maxVol(nbt.getInt(VOLUME)) : this.volume;
-        this.maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? DisplaysConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX)) : this.maxVolumeDistance;
+        this.volume = nbt.contains(VOLUME) ? WaterFramesConfig.maxVol(nbt.getInt(VOLUME)) : this.volume;
+        this.maxVolumeDistance = nbt.contains(VOL_RANGE_MAX) ? WaterFramesConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX)) : this.maxVolumeDistance;
         this.minVolumeDistance = nbt.contains(VOL_RANGE_MIN) ? Math.min(nbt.getInt(VOL_RANGE_MIN), this.maxVolumeDistance) : this.minVolumeDistance;
         this.paused = nbt.getBoolean(PAUSED);
         this.redstonePaused = nbt.getBoolean(REDSTONE_PAUSED);
@@ -338,7 +337,7 @@ public class DisplayData {
         }
 
         if (tile.caps.projects()) {
-            this.projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? DisplaysConfig.maxProjDis(nbt.getFloat(PROJECTION_DISTANCE)) : this.projectionDistance;
+            this.projectionDistance = nbt.contains(PROJECTION_DISTANCE) ? WaterFramesConfig.maxProjDis(nbt.getFloat(PROJECTION_DISTANCE)) : this.projectionDistance;
             this.audioOffset = nbt.contains(AUDIO_OFFSET) ? nbt.getFloat(AUDIO_OFFSET) : this.audioOffset;
         }
 
@@ -358,7 +357,7 @@ public class DisplayData {
                 this.flipX = nbt.getBoolean("flipX");
                 this.flipY = nbt.getBoolean("flipY");
 
-                this.maxVolumeDistance = DisplaysConfig.maxVolDis((int) nbt.getFloat("max"));
+                this.maxVolumeDistance = WaterFramesConfig.maxVolDis((int) nbt.getFloat("max"));
                 this.minVolumeDistance = Math.min((int) nbt.getFloat("min"), maxVolumeDistance);
 
                 this.renderDistance = nbt.getInt("render");
@@ -428,7 +427,7 @@ public class DisplayData {
     }
 
     private void restrictWidth() {
-        float maxWidth = DisplaysConfig.maxWidth();
+        float maxWidth = WaterFramesConfig.maxWidth();
         if (getWidth() > maxWidth) {
             switch (getPosX()) {
                 case LEFT -> {
@@ -449,7 +448,7 @@ public class DisplayData {
     }
 
     private void restrictHeight() {
-        float maxHeight = DisplaysConfig.maxHeight();
+        float maxHeight = WaterFramesConfig.maxHeight();
         if (getHeight() > maxHeight) {
             switch (getPosY()) {
                 case TOP -> {
@@ -481,9 +480,9 @@ public class DisplayData {
             reject(tile, player, "");
             return;
         }
-        String rejected = received.isEmpty() && !DisplaysConfig.canSave(player, "") ? "" : null;
+        String rejected = received.isEmpty() && !WaterFramesConfig.canSave(player, "") ? "" : null;
         for (final Entry entry: received) {
-            if (rejected == null && !DisplaysConfig.canSave(player, entry.url())) rejected = entry.url();
+            if (rejected == null && !WaterFramesConfig.canSave(player, entry.url())) rejected = entry.url();
         }
         if (rejected != null) {
             reject(tile, player, rejected);
@@ -522,7 +521,7 @@ public class DisplayData {
         DisplayData data = tile.data;
         // THE PERMISSION GATE CHECKS THE INCOMING URL, OR THE ONE ON AIR WHEN THE PATCH HAS NONE
         String gate = nbt.contains(URL) ? nbt.getString(URL) : data.getUrl();
-        if (!DisplaysConfig.canSave(player, gate == null ? "" : gate)) {
+        if (!WaterFramesConfig.canSave(player, gate == null ? "" : gate)) {
             reject(tile, player, gate == null ? "" : gate);
             return;
         }
@@ -537,11 +536,11 @@ public class DisplayData {
         if (tile.caps.resizes()) {
             // SIZE AND ANCHOR TRAVEL APART; THE MISSING HALF IS READ BACK FROM THE DATA
             if (nbt.contains(WIDTH) || nbt.contains(POS_X)) {
-                float width = nbt.contains(WIDTH) ? DisplaysConfig.maxWidth(nbt.getFloat(WIDTH)) : data.getWidth();
+                float width = nbt.contains(WIDTH) ? WaterFramesConfig.maxWidth(nbt.getFloat(WIDTH)) : data.getWidth();
                 data.setWidth(nbt.contains(POS_X) ? enumOf(PositionHorizontal.VALUES, nbt.getInt(POS_X)) : data.getPosX(), width);
             }
             if (nbt.contains(HEIGHT) || nbt.contains(POS_Y)) {
-                float height = nbt.contains(HEIGHT) ? DisplaysConfig.maxHeight(nbt.getFloat(HEIGHT)) : data.getHeight();
+                float height = nbt.contains(HEIGHT) ? WaterFramesConfig.maxHeight(nbt.getFloat(HEIGHT)) : data.getHeight();
                 data.setHeight(nbt.contains(POS_Y) ? enumOf(PositionVertical.VALUES, nbt.getInt(POS_Y)) : data.getPosY(), height);
             }
             if (nbt.contains(ROTATION) && Float.isFinite(nbt.getFloat(ROTATION))) data.rotation = nbt.getFloat(ROTATION);
@@ -551,11 +550,11 @@ public class DisplayData {
         if (nbt.contains(FLIP_Y)) data.flipY = nbt.getBoolean(FLIP_Y);
         if (nbt.contains(ALPHA)) data.alpha = Math.clamp(nbt.getInt(ALPHA), 0, 255);
         if (nbt.contains(BRIGHTNESS)) data.brightness = Math.clamp(nbt.getInt(BRIGHTNESS), 0, 255);
-        if (nbt.contains(RENDER_DISTANCE)) data.renderDistance = DisplaysConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
+        if (nbt.contains(RENDER_DISTANCE)) data.renderDistance = WaterFramesConfig.maxRenDis(nbt.getInt(RENDER_DISTANCE));
 
-        if (nbt.contains(VOLUME)) data.volume = DisplaysConfig.maxVol(nbt.getInt(VOLUME));
+        if (nbt.contains(VOLUME)) data.volume = WaterFramesConfig.maxVol(nbt.getInt(VOLUME));
         if (nbt.contains(VOL_RANGE_MAX) || nbt.contains(VOL_RANGE_MIN)) {
-            if (nbt.contains(VOL_RANGE_MAX)) data.maxVolumeDistance = DisplaysConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX));
+            if (nbt.contains(VOL_RANGE_MAX)) data.maxVolumeDistance = WaterFramesConfig.maxVolDis(nbt.getInt(VOL_RANGE_MAX));
             if (nbt.contains(VOL_RANGE_MIN)) data.minVolumeDistance = nbt.getInt(VOL_RANGE_MIN);
             data.minVolumeDistance = Math.clamp(data.minVolumeDistance, 0, Math.max(0, data.maxVolumeDistance));
         }
@@ -566,7 +565,7 @@ public class DisplayData {
         if (nbt.contains(RENDER_BOTH_SIDES) && tile.caps.renderBehind()) data.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
 
         if (tile.caps.projects()) {
-            if (nbt.contains(PROJECTION_DISTANCE)) data.projectionDistance = DisplaysConfig.maxProjDis(nbt.getFloat(PROJECTION_DISTANCE));
+            if (nbt.contains(PROJECTION_DISTANCE)) data.projectionDistance = WaterFramesConfig.maxProjDis(nbt.getFloat(PROJECTION_DISTANCE));
             // AFTER PROJECTION: THE OFFSET IS DERIVED FROM WHATEVER DISTANCE ENDED UP IN FORCE
             if (nbt.contains(AUDIO_OFFSET)) data.setAudioPosition(enumOf(AudioPosition.VALUES, nbt.getInt(AUDIO_OFFSET)));
         }

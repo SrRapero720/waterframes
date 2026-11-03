@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class DisplaysConfig {
+public class WaterFramesConfig {
     private static final Pattern HOSTS_PATTERN = Pattern.compile("^(?!-)([a-zA-Z0-9-]{1,63}\\.)+[a-zA-Z]{2,63}$");
 
     private static final Builder SERVER = new Builder();
@@ -427,8 +427,8 @@ public class DisplaysConfig {
         if (usePermissionsAPI.get()) {
             // THE PERMISSION HANDLER ONLY EXISTS ON THE SERVER; A CLIENT ASKING IS OPTIMISTIC AND THE SERVER DECIDES
             if (player.level().isClientSide) return valid;
-            boolean canSave = DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_DISPLAYS_EDIT);
-            boolean canBypass = DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_WHITELIST_BYPASS);
+            boolean canSave = WaterFrames.getPermBoolean(player.getUUID(), WaterFrames.PERM_DISPLAYS_EDIT);
+            boolean canBypass = WaterFrames.getPermBoolean(player.getUUID(), WaterFrames.PERM_WHITELIST_BYPASS);
             // CLEARING A DISPLAY NEEDS NO WHITELIST, THERE IS NO HOST TO JUDGE
             boolean whitelisted = url.isEmpty() || isWhiteListed(url);
 
@@ -448,7 +448,7 @@ public class DisplaysConfig {
     public static boolean canInteractBlock(Player player, DisplayBlock block) {
         if (usePermissionsAPI.get()) {
             if (player.level().isClientSide) return true;
-            return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_DISPLAYS_INTERACT) || DisplaysRegistry.getPermBoolean(player.getUUID(), block.caps.permission());
+            return WaterFrames.getPermBoolean(player.getUUID(), WaterFrames.PERM_DISPLAYS_INTERACT) || WaterFrames.getPermBoolean(player.getUUID(), block.caps.permission());
         } else {
             GameType gameType = (player instanceof final ServerPlayer serverPlayer)
                     ? serverPlayer.gameMode.getGameModeForPlayer()
@@ -465,7 +465,7 @@ public class DisplaysConfig {
     public static boolean canInteractRemote(Player player) {
         if (usePermissionsAPI.get()) {
             if (player.level().isClientSide) return true;
-            return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_REMOTE_INTERACT) || isOwner(player);
+            return WaterFrames.getPermBoolean(player.getUUID(), WaterFrames.PERM_REMOTE_INTERACT) || isOwner(player);
         } else {
             if (isAdmin(player)) return true;
             return useRemotes.get();
@@ -475,7 +475,7 @@ public class DisplaysConfig {
     public static boolean canBindRemote(Player player) {
         if (usePermissionsAPI.get()) {
             if (player.level().isClientSide) return true;
-            return DisplaysRegistry.getPermBoolean(player.getUUID(), DisplaysRegistry.PERM_REMOTE_BIND) || isOwner(player);
+            return WaterFrames.getPermBoolean(player.getUUID(), WaterFrames.PERM_REMOTE_BIND) || isOwner(player);
         } else {
             if (isAdmin(player)) return true;
             return useBindingRemotes.get();

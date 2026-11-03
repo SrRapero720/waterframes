@@ -4,8 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import me.srrapero720.waterframes.DisplaysConfig;
-import me.srrapero720.waterframes.DisplaysRegistry;
+import me.srrapero720.waterframes.WaterFramesConfig;
 import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.DisplayList;
 import me.srrapero720.waterframes.common.block.data.DisplayData;
@@ -36,8 +35,6 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import java.util.*;
-
-import static me.srrapero720.waterframes.WaterFrames.LOGGER;
 
 import java.util.function.Supplier;
 public class WaterFramesCommand {
@@ -208,12 +205,12 @@ public class WaterFramesCommand {
         );
 
         DEFAULT_INPUTS = new ItemInput[] {
-                new ItemInput(Holder.direct(DisplaysRegistry.REMOTE_ITEM.get()), DataComponentPatch.builder().build()),
-                new ItemInput(Holder.direct(DisplaysRegistry.FRAME_ITEM.get()), DataComponentPatch.builder().build()),
-                new ItemInput(Holder.direct(DisplaysRegistry.PROJECTOR_ITEM.get()), DataComponentPatch.builder().build()),
-                new ItemInput(Holder.direct(DisplaysRegistry.TV_ITEM.get()), DataComponentPatch.builder().build()),
-                new ItemInput(Holder.direct(DisplaysRegistry.BIG_TV_ITEM.get()), DataComponentPatch.builder().build()),
-                new ItemInput(Holder.direct(DisplaysRegistry.TV_BOX_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(WaterFrames.REMOTE_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(WaterFrames.FRAME_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(WaterFrames.PROJECTOR_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(WaterFrames.TV_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(WaterFrames.BIG_TV_ITEM.get()), DataComponentPatch.builder().build()),
+                new ItemInput(Holder.direct(WaterFrames.TV_BOX_ITEM.get()), DataComponentPatch.builder().build()),
         };
 
         dispatcher.register(waterframes);
@@ -250,8 +247,8 @@ public class WaterFramesCommand {
         }
 
         // THE CONFIG CAPS APPLY HERE AS THEY DO TO SCREEN EDITS, AND A MISSING HEIGHT KEEPS THE CURRENT ONE
-        tile.data.setWidth(DisplaysConfig.maxWidth(width));
-        if (height > 0) tile.data.setHeight(DisplaysConfig.maxHeight(height));
+        tile.data.setWidth(WaterFramesConfig.maxWidth(width));
+        if (height > 0) tile.data.setHeight(WaterFramesConfig.maxHeight(height));
 
         tile.setDirty();
         source.sendSuccess(msgSuccess("waterframes.commands.edit.size.success"), true);
@@ -312,7 +309,7 @@ public class WaterFramesCommand {
     public static int setRenderDistance(DisplayTile tile, CommandSourceStack source, int renderDistance) {
         if (tile == null) return 1;
 
-        tile.data.renderDistance = DisplaysConfig.maxRenDis(renderDistance);
+        tile.data.renderDistance = WaterFramesConfig.maxRenDis(renderDistance);
 
         tile.setDirty();
         source.sendSuccess(msgSuccess("waterframes.commands.edit.render_distance.success"), true);
@@ -327,7 +324,7 @@ public class WaterFramesCommand {
             return 2;
         }
 
-        tile.data.projectionDistance = DisplaysConfig.maxProjDis(projectionDistance);
+        tile.data.projectionDistance = WaterFramesConfig.maxProjDis(projectionDistance);
 
         tile.setDirty();
         source.sendSuccess(msgSuccess("waterframes.commands.edit.projection.success"), true);
@@ -445,8 +442,8 @@ public class WaterFramesCommand {
     public static int setVolume(DisplayTile tile, CommandSourceStack source, int volume, int min, int max) {
         if (tile == null) return 1;
 
-        if (volume != -1) tile.data.volume = DisplaysConfig.maxVol(volume);
-        if (max != -1) tile.data.maxVolumeDistance = DisplaysConfig.maxVolDis(max);
+        if (volume != -1) tile.data.volume = WaterFramesConfig.maxVol(volume);
+        if (max != -1) tile.data.maxVolumeDistance = WaterFramesConfig.maxVolDis(max);
         if (min != -1) tile.data.minVolumeDistance = Math.clamp(min, 0, tile.data.maxVolumeDistance);
 
         tile.setDirty();
@@ -493,12 +490,12 @@ public class WaterFramesCommand {
     }
 
     public static int whitelist$toggle(CommandSourceStack source) {
-        source.sendSuccess(msgSuccess("waterframes.commands.whitelist.toggle", DisplaysConfig.toggleWhitelist() ? ACTIVATED : DEACTIVATED), true);
+        source.sendSuccess(msgSuccess("waterframes.commands.whitelist.toggle", WaterFramesConfig.toggleWhitelist() ? ACTIVATED : DEACTIVATED), true);
         return 0;
     }
 
     public static int whitelist$remove(CommandSourceStack source, String value) {
-        boolean removed = DisplaysConfig.removeOnWhitelist(value);
+        boolean removed = WaterFramesConfig.removeOnWhitelist(value);
         if (removed)
             source.sendSuccess(msgSuccess("waterframes.commands.whitelist.remove", value), true);
         else
@@ -507,7 +504,7 @@ public class WaterFramesCommand {
     }
 
     public static int whitelist$add(CommandSourceStack source, String value) {
-        if (DisplaysConfig.addOnWhitelist(value)) source.sendSuccess(msgSuccess("waterframes.commands.whitelist.add", value), true);
+        if (WaterFramesConfig.addOnWhitelist(value)) source.sendSuccess(msgSuccess("waterframes.commands.whitelist.add", value), true);
         else source.sendFailure(msgFailed("waterframes.commands.whitelist.add.failed", value));
         return 0;
     }

@@ -1,7 +1,7 @@
 package me.srrapero720.waterframes.client.sound;
 
-import me.srrapero720.waterframes.DisplaysConfig;
-import me.srrapero720.waterframes.DisplaysRegistry;
+import me.srrapero720.waterframes.WaterFramesConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.client.display.Display;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
 import me.srrapero720.waterframes.common.compat.sable.SableCompat;
@@ -50,7 +50,7 @@ public class DisplaySound extends AbstractTickableSoundInstance {
     private int rangeMax = Integer.MIN_VALUE;
 
     private DisplaySound(Display display, DisplayTile tile, int source, ALEngine.Mix side) {
-        super(DisplaysRegistry.DISPLAY_SOUND.get(), SoundSource.RECORDS, SoundInstance.createUnseededRandom());
+        super(WaterFrames.DISPLAY_SOUND.get(), SoundSource.RECORDS, SoundInstance.createUnseededRandom());
         this.display = display;
         this.tile = tile;
         this.side = side;
@@ -166,7 +166,7 @@ public class DisplaySound extends AbstractTickableSoundInstance {
     // SUPPORT STEREO MEDIA WOULD DODGE THE ENGINE'S ATTENUATION; BOTH STAY ON EMULATED GAIN
     private static boolean emulated() {
         return !SourceWrapper.SPATIALIZE
-                || (SableCompat.installed() && DisplaysConfig.sableCompat())
-                || (VSCompat.installed() && DisplaysConfig.vsEurekaCompat());
+                || (SableCompat.installed() && WaterFramesConfig.sableCompat())
+                || (VSCompat.installed() && WaterFramesConfig.vsEurekaCompat());
     }
 }

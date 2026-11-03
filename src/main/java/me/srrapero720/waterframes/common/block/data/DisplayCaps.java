@@ -1,13 +1,13 @@
 package me.srrapero720.waterframes.common.block.data;
 
 import com.mojang.serialization.Codec;
-import me.srrapero720.waterframes.DisplaysConfig;
-import me.srrapero720.waterframes.DisplaysRegistry;
+import me.srrapero720.waterframes.WaterFramesConfig;
+import me.srrapero720.waterframes.WaterFrames;
 import me.srrapero720.waterframes.common.block.DisplayBlock;
 import me.srrapero720.waterframes.common.block.entity.DisplayTile;
-import me.srrapero720.waterframes.common.util.geo.AlignedBox;
-import me.srrapero720.waterframes.common.util.geo.Axis;
-import me.srrapero720.waterframes.common.util.geo.Facing;
+import me.srrapero720.waterframes.common.util.AlignedBox;
+import me.srrapero720.waterframes.common.util.Axis;
+import me.srrapero720.waterframes.common.util.Facing;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.state.BlockState;
@@ -82,9 +82,9 @@ public enum DisplayCaps implements StringRepresentable {
     /** Permission node gating the screen of this kind. */
     public PermissionNode<Boolean> permission() {
         return switch (this) {
-            case FRAME -> DisplaysRegistry.PERM_DISPLAYS_INTERACT_FRAME;
-            case PROJECTOR -> DisplaysRegistry.PERM_DISPLAYS_INTERACT_PROJECTOR;
-            case TV, BIG_TV, TV_BOX -> DisplaysRegistry.PERM_DISPLAYS_INTERACT_TV;
+            case FRAME -> WaterFrames.PERM_DISPLAYS_INTERACT_FRAME;
+            case PROJECTOR -> WaterFrames.PERM_DISPLAYS_INTERACT_PROJECTOR;
+            case TV, BIG_TV, TV_BOX -> WaterFrames.PERM_DISPLAYS_INTERACT_TV;
         };
     }
 
@@ -92,7 +92,7 @@ public enum DisplayCaps implements StringRepresentable {
     public float projectionDefault() {
         return switch (this) {
             case FRAME -> FRAME_THICKNESS;
-            case PROJECTOR -> DisplaysConfig.maxProjDis(8f);
+            case PROJECTOR -> WaterFramesConfig.maxProjDis(8f);
             case TV, BIG_TV, TV_BOX -> 0f;
         };
     }
