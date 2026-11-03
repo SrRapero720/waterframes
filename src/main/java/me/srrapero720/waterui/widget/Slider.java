@@ -114,6 +114,13 @@ public class Slider extends Element {
         return this;
     }
 
+    /** Snaps the value to multiples of {@code step}; 0 leaves the bar continuous. */
+    public Slider step(double step) {
+        this.step = Math.max(0, step);
+        this.value = this.clamp(this.value);
+        return this;
+    }
+
     /** Whole numbers only when set; a step of 0 leaves the bar continuous. */
     public Slider stepped(boolean stepped) {
         this.step = stepped ? 1 : 0;

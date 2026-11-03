@@ -18,6 +18,8 @@ public interface ValueFormat {
     ValueFormat BLOCKS_DECIMAL = (value, max) -> Component.translatable("waterui.gui.blocks", decimal(value)).getString();
     /** Milliseconds in, {@code mm:ss/mm:ss} out, growing to hours only when the media needs it. */
     ValueFormat DURATION = (value, max) -> timestamp((long) value) + "/" + timestamp((long) max);
+    /** A rate multiplier: {@code x1.0}, {@code x1.5}, {@code x0.25}. */
+    ValueFormat SPEED = (value, max) -> "x" + (value == Math.rint(value) ? (long) value + ".0" : decimal(value));
 
     /** Two decimals, and no trailing ".00" when the value is whole. */
     static String decimal(double value) {

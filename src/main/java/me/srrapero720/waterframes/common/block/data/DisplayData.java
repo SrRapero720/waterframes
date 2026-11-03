@@ -53,6 +53,7 @@ public class DisplayData {
     public static final String VOL_RANGE_MIN= "volume_min_range";
     public static final String VOL_RANGE_MAX = "volume_max_range";
     public static final String LOOP = "loop";
+    public static final String SPEED = "speed";
     public static final String PAUSED = "paused";
     public static final String REDSTONE_PAUSED = "redstone_paused";
     public static final String MUTED = "muted";
@@ -71,6 +72,9 @@ public class DisplayData {
     // A PLAYLIST FROM THE WIRE IS CAPPED BEFORE IT IS PARSED: A HUGE ONE WOULD STALL THE SERVER TICK ON WHITELIST CHECKS
     public static final int MAX_PLAYLIST = 128;
     public static final int MAX_PLAYLIST_BYTES = 64 * 1_024;
+    // PLAYBACK RATE BOUNDS: WATERMEDIA TAKES (0, 4], THE LOW END STAYS LISTENABLE
+    public static final float MIN_SPEED = 0.25f;
+    public static final float MAX_SPEED = 4f;
 
     /**
      * One playlist line. A media is a gallery of sources and every one of them stands on its
@@ -115,6 +119,7 @@ public class DisplayData {
     public int minVolumeDistance = Math.min(5, maxVolumeDistance);
 
     public boolean loop = true;
+    public float speed = 1f;
     public boolean paused = false;
     // WHETHER THE CURRENT PAUSE CAME FROM A REDSTONE SIGNAL, SO ITS FALLING EDGE KNOWS WHAT TO UNDO
     public boolean redstonePaused = false;
@@ -274,6 +279,7 @@ public class DisplayData {
         nbt.putBoolean(MUTED, muted);
         nbt.putBoolean(LIT, lit);
         nbt.putBoolean(LOOP, loop);
+        nbt.putFloat(SPEED, speed);
 
         if (tile.caps.renderBehind()) {
             nbt.putBoolean(RENDER_BOTH_SIDES, renderBothSides);
@@ -325,6 +331,7 @@ public class DisplayData {
         this.muted = nbt.getBoolean(MUTED);
         this.lit = !nbt.contains(LIT) || nbt.getBoolean(LIT);
         this.loop = nbt.getBoolean(LOOP);
+        this.speed = nbt.contains(SPEED) ? speed(nbt.getFloat(SPEED)) : 1f;
 
         if (tile.caps.renderBehind()) {
             this.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
@@ -553,6 +560,7 @@ public class DisplayData {
             data.minVolumeDistance = Math.clamp(data.minVolumeDistance, 0, Math.max(0, data.maxVolumeDistance));
         }
 
+        if (nbt.contains(SPEED)) data.speed = speed(nbt.getFloat(SPEED));
         if (nbt.contains(VISIBLE) && tile.canHideModel()) tile.setVisibility(nbt.getBoolean(VISIBLE));
         if (nbt.contains(LIT)) data.lit = nbt.getBoolean(LIT);
         if (nbt.contains(RENDER_BOTH_SIDES) && tile.caps.renderBehind()) data.renderBothSides = nbt.getBoolean(RENDER_BOTH_SIDES);
@@ -577,6 +585,11 @@ public class DisplayData {
     // A HOSTILE PACKET CAN CARRY ANY ORDINAL, SO EVERY ENUM READ GOES THROUGH THIS CLAMP
     private static <T> T enumOf(T[] values, int ordinal) {
         return values[Math.clamp(ordinal, 0, values.length - 1)];
+    }
+
+    /** Playback rate clamped into the supported range; anything not finite falls back to normal speed. */
+    public static float speed(final float value) {
+        return Float.isFinite(value) ? Math.clamp(value, MIN_SPEED, MAX_SPEED) : 1f;
     }
 
     public static Patch patch(DisplayTile tile) {
@@ -664,6 +677,11 @@ public class DisplayData {
         public Patch volumeRange(int min, int max) {
             if (min != tile.data.minVolumeDistance) nbt.putInt(VOL_RANGE_MIN, min);
             if (max != tile.data.maxVolumeDistance) nbt.putInt(VOL_RANGE_MAX, max);
+            return this;
+        }
+
+        public Patch speed(float speed) {
+            if (Math.abs(speed - tile.data.speed) > EPSILON) nbt.putFloat(SPEED, speed);
             return this;
         }
 

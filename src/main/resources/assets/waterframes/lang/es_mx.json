@@ -52,6 +52,7 @@
     "waterframes.commands.edit.projection.failed": "No se puede actualizar la Distancia de Proyeccion en este tipo de Display",
     "waterframes.commands.edit.projection.success": "Se actualizo la Distancia de Proyeccion exitosamente",
     "waterframes.commands.edit.volume.success": "Se actualizo el Volumen exitosamente",
+    "waterframes.commands.edit.speed.success": "Se actualizo la velocidad de reproduccion exitosamente",
     "waterframes.commands.audit.author": "El author de la URL del display es: ",
     "waterframes.commands.audit.author.failed": "No se encontro el jugador con UUID [%s]",
     "waterframes.commands.audit.author.console": "El autor de la URL del display es: [console/unknown]",
@@ -103,6 +104,7 @@
     "waterframes.gui.media.video_quality": "Calidad de video",
     "waterframes.gui.media.video_quality.auto": "Automática",
     "waterframes.gui.media.audio_track": "Pista de audio",
+    "waterframes.gui.media.speed": "Velocidad",
 
     "waterframes.gui.icon.volume": "Volumen",
     "waterframes.gui.icon.rotation": "Rotation de la imagen",

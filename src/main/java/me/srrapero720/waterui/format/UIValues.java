@@ -180,6 +180,7 @@ public final class UIValues {
             case "BLOCKS" -> ValueFormat.BLOCKS;
             case "BLOCKS_DECIMAL" -> ValueFormat.BLOCKS_DECIMAL;
             case "DURATION" -> ValueFormat.DURATION;
+            case "SPEED" -> ValueFormat.SPEED;
             default -> throw new UIFormatException(null, -1, "unknown format '" + name + "'");
         };
     }

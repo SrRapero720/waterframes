@@ -24,6 +24,9 @@ final var volume_max
 final var projects
 final var watervision
 final var audio_offset
+final var speed
+final var speed_min
+final var speed_max
 
 root[tabIcon=icon_multimedia, tabTooltip="translatable:waterframes.gui.tab.media",
      orientation=VERTICAL, align=STRETCH, width=FILL, height=FILL, spacing=4]
@@ -58,7 +61,9 @@ Parent[orientation=HORIZONTAL, spacing=6, width=FILL, height=FILL] {
         Slider[id="media/buffer_time", width=FILL, height=14, enabled=false, formatKey="waterframes.gui.media.buffer_time"]
     }
     Parent[orientation=VERTICAL, spacing=2, width=FILL] {
-        Slider[id="media/speed", width=FILL, height=14, enabled=false, formatKey="waterframes.gui.media.speed"]
+        // PLAYBACK RATE OF THE SESSION, SHARED BY EVERY VIEWER; QUARTER STEPS READ AS x1.0, x1.25...
+        Slider[id="media/speed", width=FILL, height=14, min=speed_min, max=speed_max, step=0.25, format=SPEED, value=speed,
+               tooltip="translatable:waterframes.gui.media.speed", onValueCommit=commit()]
         Slider[id="media/pitch", width=FILL, height=14, enabled=false, formatKey="waterframes.gui.media.pitch"]
         Button[component="translatable:waterframes.gui.media.chroma", enabled=false, width=FILL]
         Switch[component="translatable:waterframes.gui.media.cache", enabled=false, textScale=0.75]

@@ -21,20 +21,20 @@ final var row_inset
 // select LIVES ON THE CONTENT AND THE GRIP TAP, NOT THE ROOT: A PRESS ON THE REMOVE BUTTON MUST NEVER SELECT.
 // dragThumbId HANDS THE GRIP TO THE LIST'S INTEGRATED DRAG (§10.6); ITS onClick FIRES ONLY ON A TAP
 root[orientation=HORIZONTAL, align=CENTER, spacing=2, width=FILL, margin=row_inset,
-     dragThumbId=grip, onRightClick=openUri(key)]
+     dragThumbId=grip, onRightClick=openUri(key), onClick=select(key)]
 
 // GRAB THUMB: HOLD IT TO DRAG THE ROW, TAP IT TO SELECT. HIDDEN ON SUB-SOURCES, WHOSE COLUMN COLLAPSES
 Icon[id="grip", icon=icon_drag_thumb, width=10, height=FILL, visible=media, onClick=select(key)]
 
 // PICTURE WITH THE OWNER HEAD AS A WATERMARK AND THE DURATION RIDING ITS BOTTOM-LEFT CORNER
-Frame[width=thumb_width, height=thumb_height, face=field, onClick=select(key)] {
+Frame[width=thumb_width, height=thumb_height, face=field] {
     Thumbnail[anchor=STRETCH, source=thumbnail, fallback=icon_videoplayer]
     PlayerHead[anchor=RIGHT|BOTTOM, uuid=uuid, width=12, height=12, visible=media]
     Text[anchor=LEFT|BOTTOM, component=duration_text, textScale=0.5]
 }
 
 // TITLE OVER THE BYLINE, CENTRED IN THE ROW HEIGHT; A SUB-SOURCE DROPS THE BYLINE AND SHRINKS ITS TITLE
-Parent[orientation=VERTICAL, width=FILL, justify=CENTER, spacing=1, onClick=select(key)] {
+Parent[orientation=VERTICAL, width=FILL, justify=CENTER, spacing=1] {
     Text[component=title, textScale=title_scale, ellipsize=true, lines=2, width=FILL]
     Text[component=byline, textScale=0.5, ellipsize=true, width=FILL, visible=media]
 }

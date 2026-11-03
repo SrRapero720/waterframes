@@ -1,15 +1,34 @@
 # 📦 RELEASE 3.0.0.1 (ALPHA)
+- ⚙️ Every display kind now shares one block and one block entity class; its differences live in a single capabilities table
+- ⚙️ Removed outdated settings that did nothing anymore (the multimedia switch, the lag tick correction and the experimental playlist mode) together with the `/waterframes experiments` command; playlists are always on
+- ⚙️ Display commands sent by players are now checked on the server for permission and distance before they apply, and the network protocol changed with it
+- ✨ The display screen got a player pane: live preview with its status badge and the title on air, seek bar, playback, loop, mute and reload in one column
+- ✨ `/waterframes reload_all` now really reloads every display on screen
+- ✨ Displays play in stereo: the left and right channels come from the left and right edges of the picture
+- ✨ Dubbed videos pick the audio in your game language, or the original one when there is none, and the Media tab lets you pick the track from a list
+- ✨ The Media tab lets you pick the video quality from the ones the source offers
+- ✨ Layout files gained a `Dropdown` list widget with fixed, enum or live options
 - ✨ Reorder the playlist by dragging entries with their new grab handle, replacing the old up/down arrows
   - The row floats under your cursor with grab-hand cursors, while the list makes room for it live
 - ✨ Remote control buttons now repeat while held down (volume, arrows and skip)
 - ✨ Every screen is now built from editable layout files, so resource packs can retheme and rearrange the GUIs
-- ✨ The playback bar now shows the current media's status right next to the reload button
 - ✨ The Media tab now shows a live preview thumbnail of the media on air
-- ✨ The display screen now previews the media on air beside the tabs, with rewind, play, pause, stop and fast forward keys
-  - The preview mirrors the block itself, so watching it costs no extra performance
-- 🛠️ The remote control was rebuilt on a proper grid: buttons finally line up straight with even spacing
+- 🛠️ Displays freeze while the game is paused in singleplayer and resume where they were
+- 🛠️ A redstone signal that pauses a display no longer resumes one you paused by hand when the signal drops
+- 🛠️ Playlist changes the server refuses now tell you why, and the screen goes back to what the display really plays
+- 🛠️ Max volume is capped at 100, nothing ever played louder anyway
+- 🛠️ Command edits respect the same limits as the screen, and `/waterframes whitelist add` rejects anything that is not a host name
+- 🛠️ The remote control was rebuilt on a grid: buttons line up straight with even spacing
   - Volume and channel got fused up/down rocker buttons
 - 🛠️ Playlist and search previews are now bigger and widescreen (3:2), and the extra sources of a media take much less room
 - 🛠️ Toggle labels are slightly smaller so pages read cleaner
 - 🛠️ Opening a playlist entry's link now asks for confirmation before leaving the game
 - 🛠️ Display settings now save the moment you finish adjusting them, instead of after a short delay
+- 🐛 Screen icons showed the wrong pictures after the atlas was redrawn
+- 🐛 Playlists could be rewritten and displays controlled by anyone, from anywhere; a bound remote now toggles playback on the server
+- 🐛 Enabling the permissions API crashed the game when a screen opened
+- 🐛 Muted displays stuttered their audio while walking away
+- 🐛 The owner of a singleplayer world was not an admin for the whitelist, so local files were refused
+- 🐛 Displays on Create contraptions could crash the game when they received their data
+- 🐛 Turning a knob on a switched off display switched it back on
+- 🐛 `/waterframes audit author` never recognised the console as the author

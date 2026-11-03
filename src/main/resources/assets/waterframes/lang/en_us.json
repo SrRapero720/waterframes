@@ -51,6 +51,7 @@
     "waterframes.commands.edit.render_distance.success": "Render Distance updated successfully",
     "waterframes.commands.edit.projection.failed": "Cannot update the Projection Distance for this Display type",
     "waterframes.commands.edit.projection.success": "Projection Distance updated successfully",
+    "waterframes.commands.edit.speed.success": "Playback speed updated successfully",
     "waterframes.commands.edit.pause.failed": "Cannot update the Pause State for this Display type",
     "waterframes.commands.edit.pause.success": "Pause state updated successfully",
     "waterframes.commands.edit.settime.failed": "Cannot update the Time for this Display type",

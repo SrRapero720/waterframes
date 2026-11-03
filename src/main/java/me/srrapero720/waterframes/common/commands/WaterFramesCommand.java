@@ -155,6 +155,12 @@ public class WaterFramesCommand {
                 )
         );
 
+        edit.then(Commands.literal("speed")
+                .then(Commands.argument(DisplayData.SPEED, FloatArgumentType.floatArg(DisplayData.MIN_SPEED, DisplayData.MAX_SPEED))
+                        .executes(c -> setSpeed(getTile(c), c.getSource(), getFloat(c, DisplayData.SPEED)))
+                )
+        );
+
         edit.then(Commands.literal("pause")
                 .then(Commands.argument(DisplayData.PAUSED, BoolArgumentType.bool())
                         .executes(c -> setPauseState(getTile(c), c.getSource(), getBoolean(c, DisplayData.PAUSED)))
@@ -325,6 +331,17 @@ public class WaterFramesCommand {
 
         tile.setDirty();
         source.sendSuccess(msgSuccess("waterframes.commands.edit.projection.success"), true);
+        return 0;
+    }
+
+    public static int setSpeed(DisplayTile tile, CommandSourceStack source, float speed) {
+        if (tile == null) return 1;
+
+        // THE TILE'S CLOCK TICK PICKS THE NEW RATE UP AND SHIPS IT TO EVERY VIEWER
+        tile.data.speed = DisplayData.speed(speed);
+
+        tile.setDirty();
+        source.sendSuccess(msgSuccess("waterframes.commands.edit.speed.success"), true);
         return 0;
     }
 

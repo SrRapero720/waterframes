@@ -302,6 +302,7 @@ public final class UIRegistry {
         property("Slider", "max", (e, v, c) -> ((Slider) e).range(((Slider) e).min, c.doubleValue(v)));
         property("Slider", "value", (e, v, c) -> ((Slider) e).value(c.doubleValue(v)));
         property("Slider", "stepped", (e, v, c) -> ((Slider) e).stepped(c.bool(v)));
+        property("Slider", "step", (e, v, c) -> ((Slider) e).step(c.doubleValue(v)));
         property("Slider", "icon", (e, v, c) -> ((Slider) e).icon(c.icon(v)));
         property("Slider", "format", (e, v, c) -> ((Slider) e).format(UIValues.format(v)));
         // BAKED KEY FOR PLACEHOLDER SLIDERS; MEMOIZED PER Language INSTANCE, WHICH SWAPS ON A LANGUAGE RELOAD

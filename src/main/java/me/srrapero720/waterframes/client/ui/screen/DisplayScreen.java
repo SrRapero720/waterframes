@@ -120,7 +120,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
     private AnchorPicker position;
     private Slider rotation, alpha, brightness, renderDistance, projectionDistance;
     private Switch lit, mirror, showModel, flipX, flipY;
-    private Slider volume, volumeMin, volumeMax;
+    private Slider volume, volumeMin, volumeMax, speed;
     private StateButton audioOffset;
     /** Video surface mirroring the tile's own player; the document only places it (§13.2). */
     private UIMediaPlayer preview;
@@ -269,6 +269,9 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.registerVar("volume", () -> tile.data.volume);
         this.registerVar("volume_min", () -> tile.data.minVolumeDistance);
         this.registerVar("volume_max", () -> tile.data.maxVolumeDistance);
+        this.registerVar("speed", () -> tile.data.speed);
+        this.registerVar("speed_min", DisplayData.MIN_SPEED);
+        this.registerVar("speed_max", DisplayData.MAX_SPEED);
         this.registerVar("audio_offset", () -> tile.data.getAudioPosition().ordinal());
         this.registerVar("lit", () -> tile.data.lit);
         this.registerVar("mirror", () -> tile.data.renderBothSides);
@@ -352,6 +355,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         this.volume = this.slider("media/volume");
         this.volumeMin = this.slider("media/volume_min");
         this.volumeMax = this.slider("media/volume_max");
+        this.speed = this.slider("media/speed");
         this.audioOffset = this.get(WaterFrames.asResource("media/audio_offset")) instanceof StateButton s ? s : null;
         // A RE-INFLATE HANDS OUT A FRESH SURFACE: FORGET THE OLD WRAP SO THE NEXT TICK BINDS THIS ONE
         this.preview = this.get(WaterFrames.asResource("display/preview")) instanceof UIMediaPlayer p ? p : null;
@@ -752,6 +756,7 @@ public class DisplayScreen extends WaterScreen implements ParentList.RowBinder {
         if (projectionDistance != null) patch.projection((float) projectionDistance.value());
         if (volume != null) patch.volume(volume.intValue());
         if (volumeMin != null && volumeMax != null) patch.volumeRange(volumeMin.intValue(), volumeMax.intValue());
+        if (speed != null) patch.speed((float) speed.value());
         // CLAMPED: A PACK DECLARING EXTRA StateButton ICONS MUST NOT INDEX PAST THE REAL ENUM
         if (audioOffset != null) patch.audioPosition(AudioPosition.VALUES[Math.clamp(audioOffset.state(), 0, AudioPosition.VALUES.length - 1)]);
         // PUTTING NEW MEDIA ON AIR SWITCHES THE DISPLAY ON; A KNOB TURN ON A SWITCHED OFF ONE LEAVES IT OFF

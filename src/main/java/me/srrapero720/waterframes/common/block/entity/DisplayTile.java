@@ -362,6 +362,8 @@ public class DisplayTile extends BlockEntity {
         final boolean hold = this.data.paused || !this.data.active;
         if (hold && this.clock.playing()) this.clock.pause(true);
         else if (!hold && this.clock.paused()) this.clock.pause(false);
+        // THE RATE IS SESSION STATE: THE CLOCK RUNS AT IT AND EVERY FOLLOWER ADOPTS IT FROM THE SNAPSHOT (A LIVE CLOCK REFUSES)
+        if (this.clock.speed() != this.data.speed) this.clock.speed(this.data.speed);
 
         // THE VIEWERS FOLLOW SNAPSHOTS: EVERY STATE CHANGE SHIPS AT ONCE AND A STEADY CLOCK REPEATS
         // ITSELF ON THE HEARTBEAT, SINCE THE FOLLOWERS EXTRAPOLATE THE TIME ON THEIR OWN IN BETWEEN
